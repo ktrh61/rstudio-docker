@@ -13,9 +13,14 @@ CURRENT_GID=$(id -g rstudio)
 if [ "$TARGET_UID" != "$CURRENT_UID" ] || [ "$TARGET_GID" != "$CURRENT_GID" ]; then
     echo "Adjusting UID/GID: $CURRENT_UID:$CURRENT_GID -> $TARGET_UID:$TARGET_GID"
     
-    # グループ変更
+    # グループ変更（既存GIDとの衝突回避）
     if [ "$TARGET_GID" != "$CURRENT_GID" ]; then
-        groupmod -g "$TARGET_GID" rstudio
+        # 既存のGIDがあるかチェック
+        if getent group "$TARGET_GID" >/dev/null 2>&1; then
+            echo "Warning: GID $TARGET_GID already exists, skipping group modification"
+        else
+            groupmod -g "$TARGET_GID" rstudio
+        fi
     fi
     
     # ユーザー変更
