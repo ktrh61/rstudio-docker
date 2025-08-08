@@ -1,0 +1,27 @@
+# rstudio-dockerディレクトリで実行
+cat > .gitignore << 'EOF'
+# データファイル
+*.rds
+*.RData
+*.csv
+data/
+output/
+
+# 画像・レポートファイル
+*.png
+*.jpg
+*.pdf
+*.html
+plots/
+reports/
+
+# R関連の一時ファイル
+.Rhistory
+.RData
+.Ruserdata
+.Rproj.user/
+
+# OS関連
+.DS_Store
+Thumbs.db
+EOF
