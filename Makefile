@@ -23,12 +23,14 @@ CURRENT_USER := $(shell whoami)
 # 作業ディレクトリ
 WORK_DIR := $(shell pwd)
 
-# 環境検出
+# 環境検出とUID設定
 UNAME_S := $(shell uname -s)
 ifeq ($(UNAME_S),Darwin)
 	OS_TYPE := macOS
+	UID_ARGS := 
 else
 	OS_TYPE := Linux
+	UID_ARGS := -e HOST_UID=$(USER_UID) -e HOST_GID=$(USER_GID)
 endif
 
 .PHONY: help build build-with-uid run stop clean logs info ps status
@@ -69,15 +71,14 @@ build-with-uid:
 		-t $(IMG) .
 	@echo "✅ Build completed with custom UID/GID"
 
-# コンテナ実行（既存run.shの機能を統合）
+# コンテナ実行（既存run.shの機能を統合・macOS対応）
 run:
 	@echo "Starting RStudio container..."
 	@echo "Environment: $(OS_TYPE) | User: $(CURRENT_USER)"
 	@$(MAKE) stop 2>/dev/null || true
 	docker run --rm -d \
 		-e PASSWORD="$(PASSWORD)" \
-		-e HOST_UID=$(USER_UID) \
-		-e HOST_GID=$(USER_GID) \
+		$(UID_ARGS) \
 		-e OMP_NUM_THREADS="$(THREADS)" \
 		-e OPENBLAS_NUM_THREADS="$(THREADS)" \
 		-p "$(PORT):8787" \
