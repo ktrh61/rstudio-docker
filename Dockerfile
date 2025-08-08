@@ -53,8 +53,7 @@ RUN groupmod -g ${USER_GID} rstudio && \
     chown -R rstudio:rstudio /home/rstudio
 
 # エントリーポイントスクリプト追加
-COPY entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh
+COPY --chmod=755 entrypoint.sh /usr/local/bin/entrypoint.sh
 
 # エントリーポイント設定
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
