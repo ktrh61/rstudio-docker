@@ -1,11 +1,17 @@
-# rstudio-dockerディレクトリで実行
+# 正しく.gitignoreファイルを作成
 cat > .gitignore << 'EOF'
 # データファイル
 *.rds
 *.RData
 *.csv
-data/
-output/
+data/*
+!data/.gitkeep
+!data/*/
+!data/*/.gitkeep
+output/*
+!output/.gitkeep
+!output/*/
+!output/*/.gitkeep
 
 # 画像・レポートファイル
 *.png
