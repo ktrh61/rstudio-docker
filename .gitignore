@@ -1,9 +1,13 @@
-# 正しく.gitignoreファイルを作成
-cat > .gitignore << 'EOF'
 # データファイル
 *.rds
 *.RData
 *.csv
+*.rda
+*.xlsx
+*.tsv
+*.txt
+*.gtf
+*.sqlite
 data/*
 !data/.gitkeep
 !data/*/
@@ -30,4 +34,3 @@ reports/
 # OS関連
 .DS_Store
 Thumbs.db
-EOF
