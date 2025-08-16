@@ -8,7 +8,7 @@ limma_voom <- function(counts) {
   )
   d$samples$norm.factors <- c
   
-  size <- d$samples[, 2] * d$sample[, 3]
+  size <- d$samples[, 2] * d$samples[, 3]
   size <- size / mean(size)
   
   ncol_counts <- ncol(counts) / 2
