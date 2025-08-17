@@ -1,5 +1,5 @@
 # ==============================================================================
-# REBC-THYR PCA Phase 2 Analysis v3 - Group Comparison + R0+R1 Clustering
+# REBC-THYR PCA Phase 2 Analysis v3 - Group Comparison + Clustering (Corrected)
 # 07_pca_phase2_v3.R
 # ==============================================================================
 
@@ -14,7 +14,7 @@ library(RhpcBLASctl)
 source("./utils/with_openblas_threads.R")
 sourceCpp("./utils/CDM_fast3_arma_enhanced.cpp")
 
-cat("Starting PCA Phase 2 v3: Group comparison + R0+R1 clustering...\n")
+cat("Starting PCA Phase 2 v3: Group comparison + clustering (corrected)...\n")
 
 # ==============================================================================
 # 1. CDM_fast Compatible Wrapper
@@ -40,19 +40,23 @@ CDM_fast_compatible <- function(X, verbose = FALSE) {
 }
 
 # ==============================================================================
-# 2. Load Data
+# 2. Load Data (Corrected Input)
 # ==============================================================================
 
-cat("Loading purity-filtered sample lists and TPM data...\n")
+cat("Loading high-purity sample lists and TPM data...\n")
 
-load("./data/processed/purity_filtered_sample_lists.rda")
+# Load the correct output from 06_purity_analysis_v3.R
+load("./data/processed/final_high_purity_sample_lists.rda")
 load("./data/processed/thyr_tpm.rda")
 
+# Use the correct variable name from 06
+high_purity_sample_lists <- final_high_purity_sample_lists
+
 # Display final sample counts
-cat("High-purity sample counts:\n")
+cat("High-purity sample counts (input from 06):\n")
 for (group in c("R0", "R1", "B0", "B1")) {
-  if (group %in% names(purity_filtered_sample_lists)) {
-    n_pairs <- length(purity_filtered_sample_lists[[group]]$tumor)
+  if (group %in% names(high_purity_sample_lists)) {
+    n_pairs <- length(high_purity_sample_lists[[group]]$tumor)
     cat(sprintf("  %s: %d pairs\n", group, n_pairs))
   }
 }
@@ -83,13 +87,13 @@ for (comp_name in names(comparison_groups)) {
   groups <- comp_info$groups
   tissue <- comp_info$tissue
   
-  # Collect samples
+  # Collect samples from high-purity lists
   all_samples <- c()
   all_labels <- c()
   
   for (group in groups) {
-    if (group %in% names(purity_filtered_sample_lists)) {
-      group_samples <- purity_filtered_sample_lists[[group]][[tissue]]
+    if (group %in% names(high_purity_sample_lists)) {
+      group_samples <- high_purity_sample_lists[[group]][[tissue]]
       if (length(group_samples) > 0) {
         all_samples <- c(all_samples, group_samples)
         all_labels <- c(all_labels, rep(group, length(group_samples)))
@@ -99,6 +103,7 @@ for (comp_name in names(comparison_groups)) {
   
   if (length(all_samples) < 6) {
     cat(sprintf("Insufficient samples (%d), skipping...\n", length(all_samples)))
+    comparison_results[[comp_name]] <- NULL
     next
   }
   
@@ -108,6 +113,11 @@ for (comp_name in names(comparison_groups)) {
   available_samples <- all_samples[all_samples %in% colnames(tpm)]
   available_labels <- all_labels[all_samples %in% colnames(tpm)]
   
+  if (length(available_samples) < length(all_samples)) {
+    missing_count <- length(all_samples) - length(available_samples)
+    cat(sprintf("Warning: %d samples missing from TPM data\n", missing_count))
+  }
+  
   combined_tpm <- tpm[, available_samples, drop = FALSE]
   non_zero_genes <- rowSums(combined_tpm > 0) > 0
   combined_tpm_filtered <- combined_tpm[non_zero_genes, ]
@@ -115,199 +125,67 @@ for (comp_name in names(comparison_groups)) {
   cat(sprintf("Using %d genes for PCA\n", nrow(combined_tpm_filtered)))
   
   # Run PCA
-  pca_result <- CDM_fast_compatible(combined_tpm_filtered, verbose = FALSE)
-  
-  # Calculate separation distance
-  unique_groups <- unique(available_labels)
-  if (length(unique_groups) == 2) {
-    group1_scores <- pca_result$scores[available_labels == unique_groups[1], 1:2]
-    group2_scores <- pca_result$scores[available_labels == unique_groups[2], 1:2]
+  tryCatch({
+    pca_result <- CDM_fast_compatible(combined_tpm_filtered, verbose = FALSE)
     
-    group1_centroid <- colMeans(group1_scores)
-    group2_centroid <- colMeans(group2_scores)
-    separation_distance <- sqrt(sum((group1_centroid - group2_centroid)^2))
-  } else {
-    separation_distance <- NA
-  }
-  
-  comparison_results[[comp_name]] <- list(
-    pca = pca_result,
-    samples = available_samples,
-    labels = available_labels,
-    title = comp_info$title,
-    separation_distance = separation_distance,
-    sample_counts = table(available_labels)
-  )
-  
-  cat(sprintf("PC1-2 variance: %.1f%%, Separation: %.3f\n",
-              sum(pca_result$variance_explained[1:2]) * 100, separation_distance))
+    # Calculate separation distance
+    unique_groups <- unique(available_labels)
+    if (length(unique_groups) == 2) {
+      group1_scores <- pca_result$scores[available_labels == unique_groups[1], 1:2, drop = FALSE]
+      group2_scores <- pca_result$scores[available_labels == unique_groups[2], 1:2, drop = FALSE]
+      
+      group1_centroid <- colMeans(group1_scores)
+      group2_centroid <- colMeans(group2_scores)
+      separation_distance <- sqrt(sum((group1_centroid - group2_centroid)^2))
+    } else {
+      separation_distance <- NA
+    }
+    
+    comparison_results[[comp_name]] <- list(
+      pca = pca_result,
+      samples = available_samples,
+      labels = available_labels,
+      title = comp_info$title,
+      separation_distance = separation_distance,
+      sample_counts = table(available_labels),
+      n_genes = nrow(combined_tpm_filtered)
+    )
+    
+    cat(sprintf("PC1-2 variance: %.1f%%, Separation: %.3f\n",
+                sum(pca_result$variance_explained[1:2]) * 100, separation_distance))
+    
+  }, error = function(e) {
+    cat(sprintf("Error in PCA for %s: %s\n", comp_name, e$message))
+    comparison_results[[comp_name]] <- NULL
+  })
 }
 
 # ==============================================================================
-# 4. R0+R1 Clustering Analysis (Main Focus)
-# ==============================================================================
-
-cat("\n=== R0+R1 Clustering Analysis ===\n")
-
-# Prepare R0+R1 combined data
-r0_tumor <- purity_filtered_sample_lists$R0$tumor
-r0_normal <- purity_filtered_sample_lists$R0$normal
-r1_tumor <- purity_filtered_sample_lists$R1$tumor  
-r1_normal <- purity_filtered_sample_lists$R1$normal
-
-# Combine tumor samples
-tumor_samples <- c(r0_tumor, r1_tumor)
-tumor_labels <- c(rep("R0", length(r0_tumor)), rep("R1", length(r1_tumor)))
-
-cat(sprintf("R0+R1 tumor clustering: %d samples (R0:%d, R1:%d)\n",
-            length(tumor_samples), length(r0_tumor), length(r1_tumor)))
-
-# Extract and filter TPM
-available_tumor <- tumor_samples[tumor_samples %in% colnames(tpm)]
-available_tumor_labels <- tumor_labels[tumor_samples %in% colnames(tpm)]
-
-r01_tpm <- tpm[, available_tumor, drop = FALSE]
-non_zero_genes <- rowSums(r01_tpm > 0) > 0
-r01_tpm_filtered <- r01_tpm[non_zero_genes, ]
-
-cat(sprintf("Using %d genes for R0+R1 analysis\n", nrow(r01_tpm_filtered)))
-
-# PCA
-r01_pca <- CDM_fast_compatible(r01_tpm_filtered, verbose = FALSE)
-
-cat(sprintf("R0+R1 PCA: PC1-2 explains %.1f%% variance\n",
-            sum(r01_pca$variance_explained[1:2]) * 100))
-
-# K-means clustering (k=2)
-set.seed(123)
-kmeans_result <- kmeans(r01_pca$scores[, 1:3], centers = 2, nstart = 25)
-
-# Hierarchical clustering
-dist_matrix <- dist(r01_pca$scores[, 1:3])
-hclust_result <- hclust(dist_matrix, method = "ward.D2")
-hclust_clusters <- cutree(hclust_result, k = 2)
-
-# Silhouette analysis
-sil_kmeans <- silhouette(kmeans_result$cluster, dist_matrix)
-sil_hclust <- silhouette(hclust_clusters, dist_matrix)
-
-# Analyze clustering vs original labels
-r01_clustering_results <- list(
-  original_labels = available_tumor_labels,
-  kmeans_clusters = kmeans_result$cluster,
-  hclust_clusters = hclust_clusters,
-  scores = r01_pca$scores,
-  silhouette_kmeans = mean(sil_kmeans[, 3]),
-  silhouette_hclust = mean(sil_hclust[, 3])
-)
-
-# Cross-tabulation analysis
-cat("\nClustering vs Original Labels:\n")
-cat("K-means clustering:\n")
-kmeans_table <- table(Original = available_tumor_labels, Cluster = kmeans_result$cluster)
-print(kmeans_table)
-
-cat("Hierarchical clustering:\n")
-hclust_table <- table(Original = available_tumor_labels, Cluster = hclust_clusters)
-print(hclust_table)
-
-# Calculate clustering purity
-calc_purity <- function(cluster_table) {
-  max_per_cluster <- apply(cluster_table, 2, max)
-  sum(max_per_cluster) / sum(cluster_table)
-}
-
-kmeans_purity <- calc_purity(kmeans_table)
-hclust_purity <- calc_purity(hclust_table)
-
-cat(sprintf("\nClustering purity: K-means=%.3f, Hierarchical=%.3f\n", 
-            kmeans_purity, hclust_purity))
-cat(sprintf("Silhouette scores: K-means=%.3f, Hierarchical=%.3f\n",
-            r01_clustering_results$silhouette_kmeans, r01_clustering_results$silhouette_hclust))
-
-# ==============================================================================
-# 5. Clustering Interpretation
-# ==============================================================================
-
-cat("\n=== Clustering Interpretation ===\n")
-
-# Determine best clustering method
-best_method <- if (r01_clustering_results$silhouette_kmeans > r01_clustering_results$silhouette_hclust) {
-  "kmeans"
-} else {
-  "hclust"
-}
-
-best_clusters <- if (best_method == "kmeans") {
-  kmeans_result$cluster
-} else {
-  hclust_clusters
-}
-
-best_table <- if (best_method == "kmeans") kmeans_table else hclust_table
-best_purity <- if (best_method == "kmeans") kmeans_purity else hclust_purity
-
-cat(sprintf("Best method: %s (purity=%.3f)\n", best_method, best_purity))
-
-# Analyze radiation exposure hypothesis
-if (best_purity > 0.7) {
-  cat("✅ High clustering purity suggests potential radiation exposure separation\n")
-  
-  # Identify potential radiation-exposed cluster
-  r0_in_cluster1 <- sum(best_table["R0", 1])
-  r0_in_cluster2 <- sum(best_table["R0", 2])
-  
-  if (r0_in_cluster1 > r0_in_cluster2) {
-    # Cluster 1 is likely non-exposed (more R0)
-    cat("Cluster 1: Likely non-exposed (radiation negative)\n")
-    cat("Cluster 2: Likely exposed (radiation positive)\n")
-    radiation_cluster <- 2
-  } else {
-    # Cluster 2 is likely non-exposed (more R0)
-    cat("Cluster 1: Likely exposed (radiation positive)\n") 
-    cat("Cluster 2: Likely non-exposed (radiation negative)\n")
-    radiation_cluster <- 1
-  }
-  
-  # Count mixed cases in R1
-  r1_in_radiation_cluster <- best_table["R1", radiation_cluster]
-  r1_in_non_radiation_cluster <- best_table["R1", 3 - radiation_cluster]
-  
-  cat(sprintf("R1 cases - Radiation cluster: %d, Non-radiation cluster: %d\n",
-              r1_in_radiation_cluster, r1_in_non_radiation_cluster))
-  
-  estimated_radiation_rate <- r1_in_radiation_cluster / sum(best_table["R1", ])
-  cat(sprintf("Estimated R1 radiation rate: %.1f%%\n", estimated_radiation_rate * 100))
-  
-} else {
-  cat("⚠️ Low clustering purity suggests limited separation\n")
-}
-
-# ==============================================================================
-# 4. Comprehensive Clustering Analysis (All Groups)
+# 4. Comprehensive Clustering Analysis
 # ==============================================================================
 
 cat("\n=== Comprehensive Clustering Analysis ===\n")
 
+# Define clustering configurations using high-purity sample lists
 clustering_configs <- list(
   "R0_R1_tumor" = list(
-    samples = list(r0 = purity_filtered_sample_lists$R0$tumor,
-                   r1 = purity_filtered_sample_lists$R1$tumor),
+    samples = list(R0 = high_purity_sample_lists$R0$tumor,
+                   R1 = high_purity_sample_lists$R1$tumor),
     title = "R0+R1 Tumor Clustering"
   ),
   "R0_R1_normal" = list(
-    samples = list(r0 = purity_filtered_sample_lists$R0$normal,
-                   r1 = purity_filtered_sample_lists$R1$normal),
+    samples = list(R0 = high_purity_sample_lists$R0$normal,
+                   R1 = high_purity_sample_lists$R1$normal),
     title = "R0+R1 Normal Clustering"
   ),
   "B0_B1_tumor" = list(
-    samples = list(b0 = purity_filtered_sample_lists$B0$tumor,
-                   b1 = purity_filtered_sample_lists$B1$tumor),
+    samples = list(B0 = high_purity_sample_lists$B0$tumor,
+                   B1 = high_purity_sample_lists$B1$tumor),
     title = "B0+B1 Tumor Clustering"
   ),
   "B0_B1_normal" = list(
-    samples = list(b0 = purity_filtered_sample_lists$B0$normal,
-                   b1 = purity_filtered_sample_lists$B1$normal),
+    samples = list(B0 = high_purity_sample_lists$B0$normal,
+                   B1 = high_purity_sample_lists$B1$normal),
     title = "B0+B1 Normal Clustering"
   )
 )
@@ -323,6 +201,14 @@ for (config_name in names(clustering_configs)) {
   # Combine samples
   group1_samples <- config$samples[[1]]
   group2_samples <- config$samples[[2]]
+  
+  # Check if samples exist
+  if (length(group1_samples) == 0 || length(group2_samples) == 0) {
+    cat("One or both groups have no samples, skipping...\n")
+    clustering_results[[config_name]] <- NULL
+    next
+  }
+  
   combined_samples <- c(group1_samples, group2_samples)
   combined_labels <- c(rep(names(config$samples)[1], length(group1_samples)),
                        rep(names(config$samples)[2], length(group2_samples)))
@@ -333,7 +219,7 @@ for (config_name in names(clustering_configs)) {
               names(config$samples)[2], length(group2_samples)))
   
   # Check minimum requirements
-  if (length(combined_samples) < 10 || length(group1_samples) < 3 || length(group2_samples) < 3) {
+  if (length(combined_samples) < 8 || length(group1_samples) < 3 || length(group2_samples) < 3) {
     cat("Insufficient samples for clustering, skipping...\n")
     clustering_results[[config_name]] <- NULL
     next
@@ -344,8 +230,14 @@ for (config_name in names(clustering_configs)) {
   available_labels <- combined_labels[combined_samples %in% colnames(tpm)]
   
   if (length(available_samples) < length(combined_samples)) {
-    cat(sprintf("Warning: %d samples missing from TPM data\n", 
-                length(combined_samples) - length(available_samples)))
+    missing_count <- length(combined_samples) - length(available_samples)
+    cat(sprintf("Warning: %d samples missing from TPM data\n", missing_count))
+  }
+  
+  if (length(available_samples) < 8) {
+    cat("Insufficient available samples for clustering, skipping...\n")
+    clustering_results[[config_name]] <- NULL
+    next
   }
   
   combined_tpm <- tpm[, available_samples, drop = FALSE]
@@ -355,18 +247,22 @@ for (config_name in names(clustering_configs)) {
   cat(sprintf("Using %d genes for clustering analysis\n", nrow(combined_tpm_filtered)))
   
   # PCA
-  pca_result <- CDM_fast_compatible(combined_tpm_filtered, verbose = FALSE)
-  
-  cat(sprintf("PCA: PC1-2 explains %.1f%% variance\n",
-              sum(pca_result$variance_explained[1:2]) * 100))
-  
-  # K-means clustering (k=2)
-  set.seed(123)
   tryCatch({
-    kmeans_result <- kmeans(pca_result$scores[, 1:3], centers = 2, nstart = 25)
+    pca_result <- CDM_fast_compatible(combined_tpm_filtered, verbose = FALSE)
+    
+    cat(sprintf("PCA: PC1-2 explains %.1f%% variance\n",
+                sum(pca_result$variance_explained[1:2]) * 100))
+    
+    # Use first 3 PCs for clustering (or fewer if not available)
+    n_pcs <- min(3, ncol(pca_result$scores))
+    pca_scores_for_clustering <- pca_result$scores[, 1:n_pcs, drop = FALSE]
+    
+    # K-means clustering (k=2)
+    set.seed(123)
+    kmeans_result <- kmeans(pca_scores_for_clustering, centers = 2, nstart = 25)
     
     # Hierarchical clustering
-    dist_matrix <- dist(pca_result$scores[, 1:3])
+    dist_matrix <- dist(pca_scores_for_clustering)
     hclust_result <- hclust(dist_matrix, method = "ward.D2")
     hclust_clusters <- cutree(hclust_result, k = 2)
     
@@ -410,13 +306,55 @@ for (config_name in names(clustering_configs)) {
       hclust_purity = hclust_purity,
       silhouette_kmeans = mean(sil_kmeans[, 3]),
       silhouette_hclust = mean(sil_hclust[, 3]),
-      title = config$title
+      title = config$title,
+      n_genes = nrow(combined_tpm_filtered),
+      n_pcs_used = n_pcs
     )
     
     # Interpretation
     best_purity <- max(kmeans_purity, hclust_purity)
     if (best_purity > 0.7) {
       cat("✅ High clustering purity - potential distinct subgroups\n")
+      
+      # Special analysis for R0+R1 combinations
+      if (grepl("R0.*R1", config_name)) {
+        # Determine which method is better
+        best_method <- ifelse(kmeans_purity > hclust_purity, "kmeans", "hclust")
+        best_table <- ifelse(kmeans_purity > hclust_purity, 
+                             list(kmeans_table), list(hclust_table))[[1]]
+        
+        cat(sprintf("Best method for %s: %s (purity=%.3f)\n", 
+                    config_name, best_method, best_purity))
+        
+        # Analyze radiation exposure hypothesis
+        r0_in_cluster1 <- best_table["R0", 1]
+        r0_in_cluster2 <- best_table["R0", 2]
+        r1_in_cluster1 <- best_table["R1", 1]
+        r1_in_cluster2 <- best_table["R1", 2]
+        
+        if (r0_in_cluster1 > r0_in_cluster2) {
+          # Cluster 1 is likely non-exposed (more R0)
+          radiation_cluster <- 2
+          cat("Cluster 1: Likely non-exposed (more R0)\n")
+          cat("Cluster 2: Likely exposed (more R1)\n")
+        } else {
+          # Cluster 2 is likely non-exposed (more R0)
+          radiation_cluster <- 1
+          cat("Cluster 1: Likely exposed (more R1)\n")
+          cat("Cluster 2: Likely non-exposed (more R0)\n")
+        }
+        
+        # Calculate estimated radiation exposure rate in R1
+        r1_total <- r1_in_cluster1 + r1_in_cluster2
+        r1_exposed <- ifelse(radiation_cluster == 1, r1_in_cluster1, r1_in_cluster2)
+        
+        if (r1_total > 0) {
+          estimated_radiation_rate <- r1_exposed / r1_total
+          cat(sprintf("Estimated R1 radiation exposure rate: %.1f%% (%d/%d)\n",
+                      estimated_radiation_rate * 100, r1_exposed, r1_total))
+        }
+      }
+      
     } else if (best_purity > 0.6) {
       cat("⚠️ Moderate clustering purity - some separation\n")
     } else {
@@ -439,30 +377,29 @@ if (!dir.exists("./data/processed")) {
   dir.create("./data/processed", recursive = TRUE)
 }
 
-# Ensure clustering_results exists (fallback for errors)
-if (!exists("clustering_results")) {
-  cat("Warning: clustering_results not found, creating empty list\n")
-  clustering_results <- list()
-}
-
-phase2_clustering_results <- list(
+# Comprehensive Phase 2 results
+phase2_clustering_results_v3 <- list(
   comparison_results = comparison_results,
   clustering_results = clustering_results,
+  high_purity_sample_lists = high_purity_sample_lists,
   analysis_date = Sys.time(),
-  analysis_version = "v3_comprehensive_clustering"
+  analysis_version = "v3_corrected_input_comprehensive"
 )
 
-save(phase2_clustering_results, file = "./data/processed/phase2_clustering_results.rda")
+save(phase2_clustering_results_v3, file = "./data/processed/phase2_clustering_results_v3.rda")
+
+cat("Results saved to ./data/processed/phase2_clustering_results_v3.rda\n")
 
 # ==============================================================================
-# 6. Summary
+# 6. Summary and Assessment
 # ==============================================================================
 
 cat("\n==============================================\n")
-cat("Phase 2 PCA + Comprehensive Clustering Summary\n")
+cat("Phase 2 PCA + Clustering Summary (Corrected)\n")
 cat("==============================================\n")
 
 cat("Group Comparisons:\n")
+valid_comparisons <- 0
 for (comp_name in names(comparison_results)) {
   if (!is.null(comparison_results[[comp_name]])) {
     result <- comparison_results[[comp_name]]
@@ -470,69 +407,87 @@ for (comp_name in names(comparison_results)) {
                 comp_name, 
                 sum(result$pca$variance_explained[1:2]) * 100,
                 result$separation_distance))
+    valid_comparisons <- valid_comparisons + 1
+  } else {
+    cat(sprintf("  %s: FAILED (insufficient samples)\n", comp_name))
   }
 }
+
+cat(sprintf("\nValid group comparisons: %d/4\n", valid_comparisons))
 
 cat("\nClustering Analysis Summary:\n")
-# Check if clustering_results exists and has content
-if (exists("clustering_results") && length(clustering_results) > 0) {
-  for (config_name in names(clustering_results)) {
-    if (!is.null(clustering_results[[config_name]])) {
-      result <- clustering_results[[config_name]]
-      best_purity <- max(result$kmeans_purity, result$hclust_purity)
-      cat(sprintf("  %s: Best purity=%.3f\n", config_name, best_purity))
-    }
-  }
-} else {
-  cat("  No clustering results available\n")
-}
-
-# Overall assessment
 high_purity_count <- 0
 moderate_purity_count <- 0
 low_purity_count <- 0
+valid_clustering <- 0
 
-if (exists("clustering_results") && length(clustering_results) > 0) {
-  for (config_name in names(clustering_results)) {
-    if (!is.null(clustering_results[[config_name]])) {
-      result <- clustering_results[[config_name]]
-      best_purity <- max(result$kmeans_purity, result$hclust_purity)
-      
-      if (best_purity > 0.7) {
-        high_purity_count <- high_purity_count + 1
-      } else if (best_purity > 0.6) {
-        moderate_purity_count <- moderate_purity_count + 1
-      } else {
-        low_purity_count <- low_purity_count + 1
-      }
+for (config_name in names(clustering_results)) {
+  if (!is.null(clustering_results[[config_name]])) {
+    result <- clustering_results[[config_name]]
+    best_purity <- max(result$kmeans_purity, result$hclust_purity)
+    cat(sprintf("  %s: Best purity=%.3f\n", config_name, best_purity))
+    
+    if (best_purity > 0.7) {
+      high_purity_count <- high_purity_count + 1
+    } else if (best_purity > 0.6) {
+      moderate_purity_count <- moderate_purity_count + 1
+    } else {
+      low_purity_count <- low_purity_count + 1
     }
+    valid_clustering <- valid_clustering + 1
+  } else {
+    cat(sprintf("  %s: FAILED (insufficient samples)\n", config_name))
   }
 }
 
-cat(sprintf("\nOverall clustering assessment:\n"))
-cat(sprintf("  High purity (>70%%): %d comparisons\n", high_purity_count))
-cat(sprintf("  Moderate purity (60-70%%): %d comparisons\n", moderate_purity_count))
-cat(sprintf("  Low purity (<60%%): %d comparisons\n", low_purity_count))
+cat(sprintf("\nValid clustering analyses: %d/4\n", valid_clustering))
+cat(sprintf("Clustering quality assessment:\n"))
+cat(sprintf("  High purity (>70%%): %d\n", high_purity_count))
+cat(sprintf("  Moderate purity (60-70%%): %d\n", moderate_purity_count))
+cat(sprintf("  Low purity (<60%%): %d\n", low_purity_count))
 
+# Overall recommendation
 if (high_purity_count > 0) {
-  cat("\n✅ Some groups show distinct subpopulations - proceed to DEG analysis\n")
+  cat("\n✅ EXCELLENT: Strong subgroup separation detected\n")
+  cat("Recommendation: Proceed with DEG analysis focusing on high-separation groups\n")
 } else if (moderate_purity_count > 0) {
-  cat("\n⚠️ Moderate separation observed - careful DEG analysis recommended\n")
+  cat("\n⚠️ MODERATE: Some separation observed\n")
+  cat("Recommendation: Careful DEG analysis with interpretation caveats\n")
+} else if (valid_clustering > 0) {
+  cat("\n❌ POOR: Limited subgroup separation\n")
+  cat("Recommendation: Consider alternative approaches or skip clustering-based analysis\n")
 } else {
-  cat("\n❌ Limited separation - consider alternative approaches or skip DEG analysis\n")
+  cat("\n❌ FAILED: No valid clustering analyses\n")
+  cat("Recommendation: Review sample filtering and data quality\n")
 }
 
+# Next steps guidance
 cat("\nNext steps:\n")
 if (high_purity_count > 0 || moderate_purity_count > 0) {
   cat("1. Proceed to DEGES normalization (08)\n")
-  cat("2. DEG analysis focusing on high-separation groups\n")
-  cat("3. Consider clustering-informed sample selection\n")
+  cat("2. Focus DEG analysis on groups with high separation\n")
+  cat("3. Consider cluster-informed sample stratification\n")
+  cat("4. Use clustering results to interpret DEG findings\n")
 } else {
-  cat("1. Review data quality and filtering thresholds\n")
-  cat("2. Consider alternative stratification approaches\n")
-  cat("3. May skip extensive DEG analysis due to limited separation\n")
+  cat("1. Review high-purity filtering thresholds in 06\n")
+  cat("2. Consider standard group comparison without clustering\n")
+  cat("3. May proceed with DEG analysis using original R0/R1 labels\n")
 }
 
-cat("Phase 2 comprehensive clustering analysis completed!\n")
-cat("==============================================\n")
+# Special note about R0+R1 clustering
+r01_tumor_available <- "R0_R1_tumor" %in% names(clustering_results) && 
+  !is.null(clustering_results[["R0_R1_tumor"]])
+r01_normal_available <- "R0_R1_normal" %in% names(clustering_results) && 
+  !is.null(clustering_results[["R0_R1_normal"]])
 
+if (r01_tumor_available || r01_normal_available) {
+  cat("\n🎯 R0+R1 Clustering Results Available:\n")
+  cat("These results can inform radiation exposure hypothesis testing\n")
+  cat("Consider using clustering-based stratification in feature selection\n")
+} else {
+  cat("\n⚠️ R0+R1 Clustering Not Available:\n")
+  cat("Limited samples for radiation exposure clustering analysis\n")
+}
+
+cat("\nPhase 2 comprehensive analysis (v3 corrected) completed!\n")
+cat("==============================================\n")
