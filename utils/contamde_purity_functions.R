@@ -105,13 +105,31 @@ contamde_purity <- function(counts,
   ncol_design <- ncol(design)
   
   # sample size factor（limma_voom の出力を使用）
+  # 修正版
   size <- d$size
-  count_norm   <- t(t(counts) / size)
-  count_normal <- count_norm[,  seq_len(ncol_counts)] + 1
-  count_tumor  <- count_norm[, -seq_len(ncol_counts)] + 1
+  count_norm <- t(t(counts) / size)
   
-  # log2 ratio
+  # 0値遺伝子の除外
+  valid_genes <- apply(count_norm, 1, function(x) all(x > 0))
+  count_norm_valid <- count_norm[valid_genes, ]
+  counts_valid <- counts[valid_genes, ]
+  
+  if (verbose) {
+    n_excluded <- sum(!valid_genes)
+    cat(sprintf("Excluded %d genes with zero counts (%.2f%%)\n", 
+                n_excluded, n_excluded/nrow(count_norm)*100))
+  }
+  
+  # 0値なしで安全な計算
+  count_normal <- count_norm_valid[,  seq_len(ncol_counts)]
+  count_tumor  <- count_norm_valid[, -seq_len(ncol_counts)]
+  
+  # log2 ratio（完全に純粋な計算）
   y <- log2(count_tumor) - log2(count_normal)
+  
+  # counts変数も更新（下流処理のため）
+  counts <- counts_valid
+  nrow_counts <- nrow(counts_valid)  # 遺伝子数を更新
   
   if (verbose) cat("Calculating log2 tumor/normal ratios...\n")
   
@@ -120,6 +138,9 @@ contamde_purity <- function(counts,
   
   if (contaminated) {
     if (verbose) cat("Estimating tumor purity proportions...\n")
+    
+    p_limma <- p_limma[valid_genes]
+    log2_fc_limma <- log2_fc_limma[valid_genes]
     
     # qvalueは必須（ユーザー要件）
     tryCatch({
