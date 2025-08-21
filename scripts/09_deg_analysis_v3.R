@@ -42,7 +42,7 @@ apply_statistical_filter_v3 <- function(original_counts, normalized_counts, samp
   dgelist <- DGEList(counts = original_counts, group = factor(sample_groups))
   
   # Apply filterByExpr with enhanced parameters
-  keep <- filterByExpr(dgelist, min.count = 2, min.total.count = 10, min.prop = 0.7)
+  keep <- filterByExpr(dgelist, group = factor(sample_groups))
   
   cat(sprintf("Enhanced filterByExpr: %d/%d genes passed (%.1f%%)\n",
               sum(keep), length(keep), sum(keep)/length(keep)*100))
@@ -105,9 +105,7 @@ perform_brunner_munzel_test_v3 <- function(normalized_data, sample_groups, group
     group2_medians[i] <- median2
     
     # Log2 fold change (group2 vs group1)
-    # Add small pseudocount to avoid log(0)
-    pseudocount <- 1e-6
-    fold_changes[i] <- log2((mean2 + pseudocount) / (mean1 + pseudocount))
+    fold_changes[i] <- log2(mean2) - log2(mean1)
     
     # Brunner-Munzel test
     tryCatch({
@@ -603,3 +601,4 @@ cat("4. Proceed to 11_feature_selection_v3.R with consistent gene foundation\n")
 cat("\nDEG analysis v3 completed successfully!\n")
 cat("Ready for 321 consistent gene discovery!\n")
 cat("==============================================\n")
+

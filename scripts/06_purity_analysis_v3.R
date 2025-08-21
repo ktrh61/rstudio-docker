@@ -77,22 +77,29 @@ estimate_tumor_purity <- function(count_matrix, group_name, verbose = TRUE) {
   dge <- DGEList(counts = count_matrix)
   n_pairs <- ncol(count_matrix) / 2
   group_factor <- factor(c(rep("normal", n_pairs), rep("tumor", n_pairs)))
-  keep <- filterByExpr(dge, group = group_factor, min.count = 1, min.total.count = 15)
+  keep <- filterByExpr(dge, group = group_factor)
   dge_filtered <- dge[keep, , keep.lib.sizes = FALSE]
   
   if (verbose) {
     cat(sprintf("  After filterByExpr: %d genes (from %d)\n", 
                 nrow(dge_filtered), nrow(count_matrix)))
+    # シンプルな0カウント確認
+    zero_count <- sum(dge_filtered$counts == 0)
+    total_elements <- length(dge_filtered$counts)
+    zero_pct <- zero_count / total_elements * 100
+    
+    cat(sprintf("  Zero counts: %d/%d (%.2f%%)\n", 
+                zero_count, total_elements, zero_pct))
   }
   
   # Run contamDE purity estimation (lightweight version)
   tryCatch({
-    contamde_result <- contamde_lm(
+    contamde_result <- contamde_purity(
       counts = dge_filtered$counts,
       subtype = NULL,
       covariate = NULL,
       contaminated = TRUE,
-      robust = TRUE
+      verbose = TRUE
     )
     
     # Extract purity estimates
@@ -473,3 +480,4 @@ if (total_final_pairs >= 10) {
 
 cat("\nPurity analysis v3 (corrected) completed!\n")
 cat("==============================================\n")
+

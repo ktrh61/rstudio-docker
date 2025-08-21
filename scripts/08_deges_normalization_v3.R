@@ -145,7 +145,7 @@ perform_deges_iteration <- function(count_matrix, sample_groups, iteration = 0, 
   dgelist <- DGEList(counts = count_matrix, group = factor(sample_groups))
   
   # Apply filterByExpr for low expression filtering
-  keep <- filterByExpr(dgelist, min.count = 1, min.total.count = 15)
+  keep <- filterByExpr(dgelist, group = factor(sample_groups))
   dgelist_filtered <- dgelist[keep, , keep.lib.sizes = FALSE]
   
   cat(sprintf("After filterByExpr: %d genes (from %d)\n", 
@@ -596,3 +596,4 @@ cat("4. Target 321 consistent gene discovery\n")
 
 cat("\nDEGES normalization v3 completed successfully!\n")
 cat("==============================================\n")
+
