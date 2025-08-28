@@ -1,6 +1,6 @@
 # ==============================================================================
-# REBC-THYR PCA Analysis Script v5 - MUREN + logCPM + CDM Integration
-# 05_pca_analysis_v5.R
+# REBC-THYR PCA Analysis Script v6 - Simple logCPM + CDM
+# 05_pca_analysis_v6.R
 # ==============================================================================
 
 # Required libraries
@@ -8,11 +8,7 @@ library(SummarizedExperiment)
 library(dplyr)
 library(edgeR)
 
-# Source improved utilities
-source("./utils/utils_improved.R")
-source("./utils/norm_improved.R")
-
-cat("Starting PCA analysis v5 with MUREN + logCPM + CDM integration...\n")
+cat("Starting PCA analysis v6 with simple logCPM + CDM...\n")
 
 # ==============================================================================
 # 1. Load Data and Sample Lists
@@ -30,10 +26,10 @@ cat("Count data dimensions:", dim(count_data), "\n")
 cat("Available groups:", names(sample_lists), "\n")
 
 # ==============================================================================
-# 2. Protein Coding Gene Filtering
+# 2. Gene Filtering
 # ==============================================================================
 
-cat("Applying protein coding gene filtering...\n")
+cat("Applying gene filtering...\n")
 
 dgelist_all <- DGEList(counts = count_data)
 
@@ -69,68 +65,50 @@ analysis_groups <- list(
 )
 
 # ==============================================================================
-# 4. MUREN Normalization + logCPM Function
+# 4. Simple logCPM Conversion Function
 # ==============================================================================
 
-prepare_cdm_data <- function(count_matrix, sample_ids, analysis_name) {
+prepare_cdm_data_simple <- function(count_matrix, sample_ids, analysis_name) {
   cat(sprintf("\n--- Preparing CDM data for %s ---\n", analysis_name))
   
   analysis_counts <- count_matrix[, sample_ids, drop = FALSE]
   cat(sprintf("Analysis counts: %d genes x %d samples\n", 
               nrow(analysis_counts), ncol(analysis_counts)))
   
-  initialize_muren(n_genes = nrow(analysis_counts), 
-                   n_samples = ncol(analysis_counts), 
-                   priority = "robustness")
+  # Simple CPM calculation
+  cat("Converting to CPM...\n")
+  library_sizes <- colSums(analysis_counts)
+  cpm_data <- sweep(analysis_counts, 2, library_sizes, "/") * 1e6
   
-  cat("Applying MUREN normalization (LTS method)...\n")
-  tryCatch({
-    muren_coeff <- muren_norm(
-      reads = analysis_counts,
-      refs = 'saturated',
-      pairwise_method = "lts",
-      single_param = TRUE,
-      res_return = 'scaling_coeff',
-      filter_gene = FALSE,
-      trim = 10,
-      workers = "auto"
-    )
-    
-    normalized_counts <- sweep(analysis_counts, 2, 1/muren_coeff, "*")
-    
-  }, error = function(e) {
-    cat(sprintf("MUREN failed: %s\nUsing TMM normalization as fallback\n", e$message))
-    dgelist_temp <- DGEList(counts = analysis_counts)
-    dgelist_temp <- calcNormFactors(dgelist_temp)
-    normalized_counts <- cpm(dgelist_temp, normalized.lib.sizes = TRUE)
-    muren_coeff <- dgelist_temp$samples$norm.factors
-  })
-  
-  cat("Converting to logCPM for CDM input...\n")
-  
-  total_counts <- colSums(normalized_counts)
-  cpm_data <- sweep(normalized_counts, 2, total_counts, "/") * 1e6
-  
+  # logCPM transformation
+  cat("Converting to logCPM...\n")
   prior_count <- 0.5
   log_cpm <- log2(cpm_data + prior_count)
   
-  cat(sprintf("logCPM data: %d genes x %d samples\n", 
+  # Additional low expression filtering within group
+  # Remove genes with very low expression (mean logCPM < 1)
+  mean_logcpm <- rowMeans(log_cpm)
+  expressed_genes <- mean_logcpm >= 1
+  
+  if (sum(expressed_genes) < nrow(log_cpm)) {
+    log_cpm <- log_cpm[expressed_genes, , drop = FALSE]
+    cat(sprintf("Removed %d low-expression genes (mean logCPM < 1)\n", 
+                sum(!expressed_genes)))
+  }
+  
+  cat(sprintf("Final logCPM data: %d genes x %d samples\n", 
               nrow(log_cpm), ncol(log_cpm)))
   
-  # Use all available genes without filtering
-  cat("Using all available genes for CDM analysis\n")
-  
   return(list(
-    normalized_counts = normalized_counts,
     log_cpm = log_cpm,
-    muren_coeff = muren_coeff,
     sample_ids = sample_ids,
-    n_genes_final = nrow(log_cpm)
+    n_genes_final = nrow(log_cpm),
+    library_sizes = library_sizes
   ))
 }
 
 # ==============================================================================
-# 5. CDM-based PCA Function
+# 5. CDM-based PCA Function (unchanged)
 # ==============================================================================
 
 perform_cdm_pca <- function(log_cpm_data, analysis_name, verbose = TRUE) {
@@ -214,7 +192,7 @@ perform_cdm_pca <- function(log_cpm_data, analysis_name, verbose = TRUE) {
 }
 
 # ==============================================================================
-# 6. Outlier Detection Function
+# 6. Outlier Detection Function (unchanged)
 # ==============================================================================
 
 enhanced_outlier_detection <- function(analysis_name, pca_result, verbose = TRUE) {
@@ -277,9 +255,9 @@ enhanced_outlier_detection <- function(analysis_name, pca_result, verbose = TRUE
 # 7. Main Analysis Loop
 # ==============================================================================
 
-cat("\nPerforming PCA analysis with MUREN + logCPM + CDM for each group...\n")
+cat("\nPerforming PCA analysis with simple logCPM + CDM for each group...\n")
 
-pca_results_v5 <- list()
+pca_results_v6 <- list()
 
 for (analysis_name in names(analysis_groups)) {
   cat(sprintf("\n=== Analyzing %s ===\n", analysis_name))
@@ -316,10 +294,10 @@ for (analysis_name in names(analysis_groups)) {
   cat(sprintf("%s: %d samples\n", description, length(available_samples)))
   
   tryCatch({
-    cdm_data <- prepare_cdm_data(filtered_counts, available_samples, analysis_name)
+    cdm_data <- prepare_cdm_data_simple(filtered_counts, available_samples, analysis_name)
     pca_result <- perform_cdm_pca(cdm_data$log_cpm, analysis_name, verbose = TRUE)
     
-    pca_results_v5[[analysis_name]] <- list(
+    pca_results_v6[[analysis_name]] <- list(
       pca = pca_result,
       samples = available_samples,
       description = description,
@@ -327,7 +305,8 @@ for (analysis_name in names(analysis_groups)) {
       n_samples = length(available_samples),
       analysis_name = analysis_name,
       group = group_name,
-      tissue = tissue_type
+      tissue = tissue_type,
+      library_sizes = cdm_data$library_sizes
     )
     
     cat(sprintf("PCA completed: %d components, %.1f%% variance explained by PC1-2\n",
@@ -336,7 +315,7 @@ for (analysis_name in names(analysis_groups)) {
     
   }, error = function(e) {
     cat(sprintf("Error in analysis for %s: %s\n", analysis_name, e$message))
-    pca_results_v5[[analysis_name]] <- NULL
+    pca_results_v6[[analysis_name]] <- NULL
   })
 }
 
@@ -346,18 +325,18 @@ for (analysis_name in names(analysis_groups)) {
 
 cat("\n=== Outlier Detection Analysis ===\n")
 
-outlier_detection_results_v5 <- list()
+outlier_detection_results_v6 <- list()
 
-for (analysis_name in names(pca_results_v5)) {
-  if (!is.null(pca_results_v5[[analysis_name]])) {
+for (analysis_name in names(pca_results_v6)) {
+  if (!is.null(pca_results_v6[[analysis_name]])) {
     outlier_result <- enhanced_outlier_detection(
       analysis_name, 
-      pca_results_v5[[analysis_name]]$pca, 
+      pca_results_v6[[analysis_name]]$pca, 
       verbose = TRUE
     )
     
     if (!is.null(outlier_result)) {
-      outlier_detection_results_v5[[analysis_name]] <- outlier_result
+      outlier_detection_results_v6[[analysis_name]] <- outlier_result
     }
   }
 }
@@ -368,17 +347,17 @@ for (analysis_name in names(pca_results_v5)) {
 
 cat("\n=== Creating filtered sample lists with pair consistency ===\n")
 
-pca_filtered_sample_lists_v5 <- sample_lists
+pca_filtered_sample_lists_v6 <- sample_lists
 
 outliers_by_group <- list()
 
-for (analysis_name in names(outlier_detection_results_v5)) {
-  if (is.null(outlier_detection_results_v5[[analysis_name]])) next
+for (analysis_name in names(outlier_detection_results_v6)) {
+  if (is.null(outlier_detection_results_v6[[analysis_name]])) next
   
-  outlier_data <- outlier_detection_results_v5[[analysis_name]]
+  outlier_data <- outlier_detection_results_v6[[analysis_name]]
   if (length(outlier_data$combined_samples) == 0) next
   
-  pca_data <- pca_results_v5[[analysis_name]]
+  pca_data <- pca_results_v6[[analysis_name]]
   group_name <- pca_data$group
   tissue_type <- pca_data$tissue
   
@@ -390,7 +369,7 @@ for (analysis_name in names(outlier_detection_results_v5)) {
 }
 
 for (group_name in c("R0", "R1", "B0", "B1")) {
-  if (!group_name %in% names(pca_filtered_sample_lists_v5)) next
+  if (!group_name %in% names(pca_filtered_sample_lists_v6)) next
   
   orig_tumor <- sample_lists[[group_name]]$tumor
   orig_normal <- sample_lists[[group_name]]$normal
@@ -426,9 +405,9 @@ for (group_name in c("R0", "R1", "B0", "B1")) {
     
     keep_indices <- setdiff(1:length(orig_cases), outlier_indices)
     
-    pca_filtered_sample_lists_v5[[group_name]]$tumor <- orig_tumor[keep_indices]
-    pca_filtered_sample_lists_v5[[group_name]]$normal <- orig_normal[keep_indices]
-    pca_filtered_sample_lists_v5[[group_name]]$cases <- orig_cases[keep_indices]
+    pca_filtered_sample_lists_v6[[group_name]]$tumor <- orig_tumor[keep_indices]
+    pca_filtered_sample_lists_v6[[group_name]]$normal <- orig_normal[keep_indices]
+    pca_filtered_sample_lists_v6[[group_name]]$cases <- orig_cases[keep_indices]
     
     cat(sprintf("%s: %d pairs → %d pairs after filtering\n",
                 group_name, length(orig_cases), length(keep_indices)))
@@ -442,11 +421,11 @@ for (group_name in c("R0", "R1", "B0", "B1")) {
 # 10. Summary Statistics
 # ==============================================================================
 
-cat("\n=== PCA Phase 1 Summary (MUREN + logCPM + CDM) ===\n")
+cat("\n=== PCA Phase 1 Summary (Simple logCPM + CDM) ===\n")
 
-writeLines(capture.output(sessionInfo()), "session_info_pca_v5.txt")
+writeLines(capture.output(sessionInfo()), "session_info_pca_v6.txt")
 
-pca_summary_v5 <- data.frame(
+pca_summary_v6 <- data.frame(
   Group = character(0),
   Tissue = character(0),
   Original_N = integer(0),
@@ -461,19 +440,19 @@ pca_summary_v5 <- data.frame(
 for (analysis_name in names(analysis_groups)) {
   group_info <- analysis_groups[[analysis_name]]
   
-  if (analysis_name %in% names(pca_results_v5) && !is.null(pca_results_v5[[analysis_name]])) {
-    pca_data <- pca_results_v5[[analysis_name]]
+  if (analysis_name %in% names(pca_results_v6) && !is.null(pca_results_v6[[analysis_name]])) {
+    pca_data <- pca_results_v6[[analysis_name]]
     
     n_outliers <- 0
-    if (analysis_name %in% names(outlier_detection_results_v5)) {
-      n_outliers <- length(outlier_detection_results_v5[[analysis_name]]$combined_outliers)
+    if (analysis_name %in% names(outlier_detection_results_v6)) {
+      n_outliers <- length(outlier_detection_results_v6[[analysis_name]]$combined_outliers)
     }
     
     pc1_var <- pca_data$pca$variance_explained[1] * 100
     pc2_var <- ifelse(length(pca_data$pca$variance_explained) > 1, 
                       pca_data$pca$variance_explained[2] * 100, 0)
     
-    pca_summary_v5 <- rbind(pca_summary_v5, data.frame(
+    pca_summary_v6 <- rbind(pca_summary_v6, data.frame(
       Group = group_info$group,
       Tissue = group_info$tissue,
       Original_N = pca_data$n_samples,
@@ -487,12 +466,12 @@ for (analysis_name in names(analysis_groups)) {
   }
 }
 
-print(pca_summary_v5)
+print(pca_summary_v6)
 
 cat("\nFinal paired sample counts after outlier removal:\n")
 for (group in c("R0", "R1", "B0", "B1")) {
-  if (group %in% names(pca_filtered_sample_lists_v5)) {
-    n_pairs <- length(pca_filtered_sample_lists_v5[[group]]$cases)
+  if (group %in% names(pca_filtered_sample_lists_v6)) {
+    n_pairs <- length(pca_filtered_sample_lists_v6[[group]]$cases)
     cat(sprintf("  %s: %d pairs\n", group, n_pairs))
   }
 }
@@ -501,20 +480,20 @@ for (group in c("R0", "R1", "B0", "B1")) {
 # 11. Save Results
 # ==============================================================================
 
-cat("\nSaving PCA Phase 1 results v5...\n")
+cat("\nSaving PCA Phase 1 results v6...\n")
 
-pca_phase1_results_v5 <- list(
-  pca_results = pca_results_v5,
-  outlier_detection_results = outlier_detection_results_v5,
-  pca_filtered_sample_lists = pca_filtered_sample_lists_v5,
-  pca_summary = pca_summary_v5,
+pca_phase1_results_v6 <- list(
+  pca_results = pca_results_v6,
+  outlier_detection_results = outlier_detection_results_v6,
+  pca_filtered_sample_lists = pca_filtered_sample_lists_v6,
+  pca_summary = pca_summary_v6,
   analysis_groups = analysis_groups,
   analysis_date = Sys.time(),
-  analysis_version = "v5_muren_logcpm_cdm"
+  analysis_version = "v6_simple_logcpm_cdm"
 )
 
-save(pca_phase1_results_v5, file = "./data/processed/pca_phase1_results_v5.rda")
-save(pca_filtered_sample_lists_v5, file = "./data/processed/pca_filtered_sample_lists_v5.rda")
+save(pca_phase1_results_v6, file = "./data/processed/pca_phase1_results_v6.rda")
+save(pca_filtered_sample_lists_v6, file = "./data/processed/pca_filtered_sample_lists_v6.rda")
 
 cat("Results saved to ./data/processed/\n")
 
@@ -522,16 +501,16 @@ cat("Results saved to ./data/processed/\n")
 # 12. Final Summary
 # ==============================================================================
 
-cat("\n=== PCA Phase 1 Analysis v5 Complete ===\n")
+cat("\n=== PCA Phase 1 Analysis v6 Complete ===\n")
 
-total_outliers <- sum(pca_summary_v5$Outliers)
+total_outliers <- sum(pca_summary_v6$Outliers)
 cat(sprintf("Total outliers detected: %d\n", total_outliers))
 
 min_samples <- 5
 viable_groups <- character(0)
 for (group in c("R0", "R1", "B0", "B1")) {
-  if (group %in% names(pca_filtered_sample_lists_v5)) {
-    n_pairs <- length(pca_filtered_sample_lists_v5[[group]]$cases)
+  if (group %in% names(pca_filtered_sample_lists_v6)) {
+    n_pairs <- length(pca_filtered_sample_lists_v6[[group]]$cases)
     if (n_pairs >= min_samples) {
       viable_groups <- c(viable_groups, group)
     }
@@ -541,9 +520,10 @@ for (group in c("R0", "R1", "B0", "B1")) {
 cat(sprintf("\nGroups viable for downstream analysis (≥%d pairs): %s\n",
             min_samples, paste(viable_groups, collapse = ", ")))
 
-cat("\nNext steps:\n")
-cat("1. ContamDE analysis with MUREN-normalized data\n")
-cat("2. DEG analysis using logCPM + BM test approach\n")
-cat("3. Feature selection with improved TPM (no effective length)\n")
+cat("\nKey features of v6:\n")
+cat("1. Simple CPM + logCPM transformation\n")
+cat("2. Within-group low expression filtering (mean logCPM >= 1)\n")
+cat("3. No complex normalization methods\n")
+cat("4. Simplified and faster processing\n")
 
-cat("\nPCA Phase 1 v5 completed successfully!\n")
+cat("\nPCA Phase 1 v6 completed successfully!\n")
