@@ -34,3 +34,13 @@ reports/
 # OS関連
 .DS_Store
 Thumbs.db
+
+# === v7 specific ===
+# GDC download directories (explicit)
+analysis_v7/data/raw/gdc/
+
+# Keep manifests for reproducibility
+!analysis_v7/data/raw/manifest_*.tsv
+
+# Session info logs
+session_info_*.txt
