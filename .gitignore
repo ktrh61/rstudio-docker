@@ -44,3 +44,6 @@ analysis_v7/data/raw/gdc/
 
 # Session info logs
 session_info_*.txt
+
+# Keep directory structure
+!**/.gitkeep
