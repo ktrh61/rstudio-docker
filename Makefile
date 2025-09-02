@@ -2,7 +2,7 @@
 # 複数環境対応（macOS + Colima、WSL2）
 
 # 設定変数（既存run.shとの互換性保持）
-IMG := bioconductor-openblas:devel
+IMG := bioconductor-openblas:3.21
 PORT := 8787
 PASSWORD := password
 NAME := rstudio-cdm

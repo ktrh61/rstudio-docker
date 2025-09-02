@@ -1,4 +1,4 @@
-FROM bioconductor/bioconductor_docker:devel
+FROM bioconductor/bioconductor_docker:RELEASE_3_21
 
 # 環境変数（早い段階で設定）
 ENV DEBIAN_FRONTEND=noninteractive \
@@ -59,7 +59,7 @@ COPY --chmod=755 entrypoint.sh /usr/local/bin/entrypoint.sh
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 
 # 作業ディレクトリ設定
-WORKDIR /home/rstudio
+WORKDIR /home/rstudio/project
 
 # ヘルスチェック追加
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s \
