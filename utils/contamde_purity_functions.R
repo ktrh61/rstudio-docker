@@ -1,17 +1,26 @@
 # ==============================================================================
-# ContamDE Purity Estimation Functions v6 (Lightweight Version)
-# contamde_purity_functions_v6.R
+# ContamDE Purity Estimation Functions v7 (Enhanced Version)
+# contamde_purity_functions_v7.R
 # ==============================================================================
 # 
 # Purpose: Tumor purity estimation only (no DEG analysis)
-# Modifications for v6:
-# - Updated MUREN integration for compatibility with utils_improved.R
-# - LTS option support for better stability
-# - Simplified verbose output
+# Modifications for v7:
+# - Paired sample correlation handling via duplicateCorrelation
+# - Robust eBayes for outlier resistance
+# - Improved zero count handling
+# - Safe design matrix construction
+# - Enhanced p-value adjustment with 1000 gene limit (original contamDE)
 
 # Note: Requires prior loading of:
 # source("./utils/utils_improved.R")
 # source("./utils/norm_improved.R")
+
+# Sanity check: required packages
+for (pkg in c("edgeR","limma","qvalue")) {
+  if (!requireNamespace(pkg, quietly = TRUE)) {
+    stop("Package '", pkg, "' is required.")
+  }
+}
 
 # ==============================================================================
 # limma + voom with MUREN scaling factors
@@ -31,7 +40,7 @@ limma_voom_purity <- function(counts, pairwise_method = "lts",
   
   # MUREN scaling coefficients using improved version
   # pairwise_method: "lts", "mode", "median", "trim10", "huber"
-  c <- muren_norm(
+  nf <- muren_norm(
     counts,
     refs = "saturated",
     pairwise_method = pairwise_method,
@@ -41,33 +50,38 @@ limma_voom_purity <- function(counts, pairwise_method = "lts",
   )
   
   # Validate coefficients
-  if (any(!is.finite(c)) || any(c <= 0)) {
+  if (any(!is.finite(nf)) || any(nf <= 0)) {
     stop("MUREN scaling coefficients contain non-finite or non-positive values.")
   }
   
   # Rescale to geometric mean = 1
-  geo_mean <- exp(mean(log(c)))
-  c <- c / geo_mean
+  geo_mean <- exp(mean(log(nf)))
+  nf <- nf / geo_mean
   
   # Apply to edgeR
-  d$samples$norm.factors <- as.numeric(c)
+  d$samples$norm.factors <- as.numeric(nf)
   
-  # voom transformation
+  # voom transformation with paired design
   condition <- factor(c(rep("Normal", ncol_counts), rep("Tumor", ncol_counts)))
   design <- stats::model.matrix(~ 0 + condition)
   colnames(design) <- levels(condition)
   v <- limma::voom(d, design, normalize.method = voom_norm)
   
+  # Pair information: 1..N for Normal/Tumor correspondence
+  pair <- factor(rep(seq_len(ncol_counts), times = 2))
+  
   # Effective library sizes
   size <- d$samples$lib.size * d$samples$norm.factors
   size <- size / mean(size)
   
-  # limma fit for p-values and log2FC
-  fit <- limma::lmFit(v, design)
+  # limma fit with paired sample correlation
+  corfit <- limma::duplicateCorrelation(v, design, block = pair)
+  fit <- limma::lmFit(v, design, block = pair,
+                      correlation = corfit$consensus.correlation)
   contrs <- limma::makeContrasts(contrasts = "Tumor - Normal",
                                  levels = design)
   fit2 <- limma::contrasts.fit(fit, contrs)
-  fit2 <- limma::eBayes(fit2, trend = TRUE)
+  fit2 <- limma::eBayes(fit2, trend = TRUE, robust = TRUE)
   
   return(list(
     counts = counts,
@@ -118,21 +132,20 @@ contamde_purity <- function(counts,
   # Normalize counts by MUREN size factors
   count_norm <- t(t(counts) / size)
   
-  # Handle zero counts
+  # Handle zero counts (use raw counts for determination)
   if (prior.count > 0) {
+    valid_genes <- rep(TRUE, nrow(counts))
     count_norm_valid <- count_norm
-    valid_genes <- rep(TRUE, nrow(count_norm))
   } else {
-    valid_genes <- apply(count_norm, 1, function(x) all(x > 0))
+    valid_genes <- apply(counts, 1L, function(x) all(x > 0))
     count_norm_valid <- count_norm[valid_genes, , drop = FALSE]
   }
-  
   counts_valid <- counts[valid_genes, , drop = FALSE]
   
   if (verbose) {
     n_exc <- sum(!valid_genes)
     cat(sprintf("  Excluded %d genes with zero counts (%.1f%%)\n", 
-                n_exc, 100 * n_exc / nrow(count_norm)))
+                n_exc, 100 * n_exc / nrow(counts)))
   }
   
   # Split normal/tumor and calculate log2 ratios
@@ -147,23 +160,21 @@ contamde_purity <- function(counts,
       log2(count_norm_valid[, idx_n, drop=FALSE])
   }
   
-  # Design matrix (simplified)
+  # Design matrix (safe construction via data.frame)
   if (is.null(subtype) || length(unique(subtype)) == 1) {
-    subtype <- rep(1, ncol_counts)
     if (is.null(covariate)) {
-      design <- matrix(subtype, ncol = 1)
+      design <- matrix(1, ncol_counts, 1)
     } else {
-      covariate <- matrix(covariate, ncol = ncol_counts)
-      design <- stats::model.matrix(~ covariate)
+      df <- data.frame(cov = covariate)
+      design <- stats::model.matrix(~ cov, df)
     }
   } else {
-    subtype <- factor(subtype)
+    df <- data.frame(subtype = factor(subtype),
+                     cov = covariate)
     if (is.null(covariate)) {
-      design <- stats::model.matrix(~ 0 + subtype)
+      design <- stats::model.matrix(~ 0 + subtype, df)
     } else {
-      covariate0 <- matrix(covariate, nrow = ncol_counts)
-      design <- stats::model.matrix(~ 0 + subtype + covariate0)
-      rm(covariate0)
+      design <- stats::model.matrix(~ 0 + subtype + cov, df)
     }
   }
   
@@ -180,20 +191,26 @@ contamde_purity <- function(counts,
     p_limma <- p_limma[valid_genes]
     log2_fc_limma <- log2_fc_limma[valid_genes]
     
-    # Calculate adjusted p-values
+    # Calculate adjusted p-values (qvalue required)
     p_adj <- tryCatch(
       qvalue::qvalue(p_limma, pi0.method = "bootstrap")$qvalues,
-      error = function(e) {
-        stop("qvalue calculation failed: ", e$message)
-      }
+      error = function(e) stop("qvalue calculation failed: ", e$message)
     )
+    
+    # Limit to top 1000 genes (original contamDE approach)
+    n_sig <- sum(p_adj < 0.1, na.rm = TRUE)
+    if (n_sig > 1000L) {
+      idx_sig    <- which(is.finite(p_adj) & p_adj < 0.1)
+      idx_sorted <- idx_sig[order(p_adj[idx_sig])]
+      keep       <- idx_sorted[seq_len(1000L)]
+      p_adj[-keep] <- 1
+      if (verbose) {
+        cat(sprintf("  Info: Limited to top 1000 genes (from %d with q < 0.1)\n", n_sig))
+      }
+    }
     
     # Define informative genes
     log2_fc <- log2_fc_limma
-    if (sum(p_adj < 0.1) > 1e3) {
-      p_adj[-order(p_adj)[1:1e3]] <- 1
-    }
-    
     up <- which(p_adj < 0.1 & log2_fc > log2(1.5))
     down <- which(p_adj < 0.1 & log2_fc < -log2(1.5))
     
@@ -253,7 +270,7 @@ contamde_purity <- function(counts,
     n_pairs = ncol_counts,
     n_genes = nrow(counts_valid),
     informative_genes = list(up = up, down = down),
-    normalization_method = "MUREN_LTS",
+    normalization_method = paste0("MUREN_", toupper(pairwise_method)),
     estimation_date = Sys.time()
   ))
 }
@@ -380,8 +397,11 @@ create_purity_filtered_lists <- function(original_sample_lists, purity_results,
   return(filtered_lists)
 }
 
-cat("ContamDE purity functions v6 loaded successfully!\n")
-cat("Using MUREN normalization with LTS option for stability\n")
+cat("ContamDE purity functions v7 loaded successfully!\n")
+cat("Key improvements:\n")
+cat("  - Paired sample correlation handling\n")
+cat("  - Robust eBayes for outlier resistance\n")
+cat("  - Top 1000 gene limit (original contamDE)\n")
 cat("Main functions:\n")
 cat("  - contamde_purity(): Estimate tumor purity\n")
 cat("  - assess_purity_quality(): Quality assessment\n")
