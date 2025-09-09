@@ -134,16 +134,32 @@ muren_norm <- function(reads,
   parallel::clusterSetRNGStream(cl, 12345L)
   on.exit(if (isTRUE(own_cluster)) try(parallel::stopCluster(cl), silent = TRUE), add = TRUE)
   
+  # ★ 各ワーカーでBLAS/OMPを1スレッドに固定（外側並列との二重化防止）
+  parallel::clusterCall(cl, function() {
+    if (requireNamespace("RhpcBLASctl", quietly = TRUE)) {
+      RhpcBLASctl::blas_set_num_threads(1L)
+      RhpcBLASctl::omp_set_num_threads(1L)
+    } else {
+      Sys.setenv(OMP_NUM_THREADS = "1",
+                 OPENBLAS_NUM_THREADS = "1",
+                 MKL_NUM_THREADS = "1",
+                 BLIS_NUM_THREADS = "1",
+                 VECLIB_MAXIMUM_THREADS = "1")
+    }
+    NULL
+  })
+  
   # ★ これを追加：各ワーカーに pairwise_method を伝える
   parallel::clusterCall(cl, function(m) { options(muren_pair_method = m); NULL }, pairwise_method)
   
   # ワーカーに必要な関数を配布
-  parallel::clusterExport(
-    cl,
-    varlist = c("reg_sp","mode_sp","reg_dp",".reg_backend",
-                "polish_one_gene","polish_coeff","lg","ep","TOL"),
-    envir = .GlobalEnv
-  )
+  needed <- c("reg_sp","mode_sp","reg_dp",".reg_backend",
+              "polish_one_gene","polish_coeff","lg","ep","TOL")
+  missing <- needed[!vapply(needed, exists, logical(1), inherits = FALSE)]
+  if (length(missing) > 0) {
+    stop("Required MUREN helpers not found: ", paste(missing, collapse = ", "))
+  }
+  parallel::clusterExport(cl, varlist = needed, envir = environment())
   
   pkgs <- c("MASS")
   if (requireNamespace("robustbase", quietly = TRUE)) pkgs <- c(pkgs, "robustbase")
