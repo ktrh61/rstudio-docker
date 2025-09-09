@@ -155,11 +155,11 @@ muren_norm <- function(reads,
   # ワーカーに必要な関数を配布
   needed <- c("reg_sp","mode_sp","reg_dp",".reg_backend",
               "polish_one_gene","polish_coeff","lg","ep","TOL")
-  missing <- needed[!vapply(needed, exists, logical(1), inherits = FALSE)]
-  if (length(missing) > 0) {
+  missing <- needed[!vapply(needed, exists, logical(1), envir = .GlobalEnv, inherits = TRUE)]
+  if (length(missing)) {
     stop("Required MUREN helpers not found: ", paste(missing, collapse = ", "))
   }
-  parallel::clusterExport(cl, varlist = needed, envir = environment())
+  parallel::clusterExport(cl, varlist = needed, envir = .GlobalEnv)
   
   pkgs <- c("MASS")
   if (requireNamespace("robustbase", quietly = TRUE)) pkgs <- c(pkgs, "robustbase")
