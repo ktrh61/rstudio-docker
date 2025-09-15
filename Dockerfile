@@ -8,39 +8,39 @@ ENV DEBIAN_FRONTEND=noninteractive \
 
 # OpenBLAS とクリーンアップを一つのRUNで実行
 RUN apt-get update && apt-get install -y --no-install-recommends \
-      libopenblas0-pthread \
-      libopenblas-dev \
-      liblapack-dev \
-      # 追加の有用なパッケージ
-      htop \
-      vim \
-      curl \
-      git \
-  && rm -rf /var/lib/apt/lists/* \
-  && apt-get clean
+    libopenblas0-pthread \
+    libopenblas-dev \
+    liblapack-dev \
+    # 追加の有用なパッケージ
+    htop \
+    vim \
+    curl \
+    git \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
 
 # alternatives設定（エラーハンドリング強化）
 RUN set -eux; \
     # アーキテクチャ検出
     ARCH=$(dpkg --print-architecture); \
     if [ "$ARCH" = "amd64" ]; then \
-        ARCH_SUFFIX="x86_64-linux-gnu"; \
+    ARCH_SUFFIX="x86_64-linux-gnu"; \
     elif [ "$ARCH" = "arm64" ]; then \
-        ARCH_SUFFIX="aarch64-linux-gnu"; \
+    ARCH_SUFFIX="aarch64-linux-gnu"; \
     else \
-        echo "Unsupported architecture: $ARCH" >&2; \
-        exit 1; \
+    echo "Unsupported architecture: $ARCH" >&2; \
+    exit 1; \
     fi; \
     \
     # alternatives設定（アーキテクチャ対応）
     if update-alternatives --list libblas.so.3-${ARCH_SUFFIX} >/dev/null 2>&1; then \
-        update-alternatives --set libblas.so.3-${ARCH_SUFFIX} /usr/lib/${ARCH_SUFFIX}/openblas-pthread/libblas.so.3; \
-        update-alternatives --set liblapack.so.3-${ARCH_SUFFIX} /usr/lib/${ARCH_SUFFIX}/openblas-pthread/liblapack.so.3; \
+    update-alternatives --set libblas.so.3-${ARCH_SUFFIX} /usr/lib/${ARCH_SUFFIX}/openblas-pthread/libblas.so.3; \
+    update-alternatives --set liblapack.so.3-${ARCH_SUFFIX} /usr/lib/${ARCH_SUFFIX}/openblas-pthread/liblapack.so.3; \
     elif update-alternatives --list libblas.so.3 >/dev/null 2>&1; then \
-        update-alternatives --set libblas.so.3 /usr/lib/${ARCH_SUFFIX}/openblas/libblas.so.3; \
-        update-alternatives --set liblapack.so.3 /usr/lib/${ARCH_SUFFIX}/openblas/liblapack.so.3; \
+    update-alternatives --set libblas.so.3 /usr/lib/${ARCH_SUFFIX}/openblas/libblas.so.3; \
+    update-alternatives --set liblapack.so.3 /usr/lib/${ARCH_SUFFIX}/openblas/liblapack.so.3; \
     else \
-        echo "Warning: Could not configure BLAS alternatives" >&2; \
+    echo "Warning: Could not configure BLAS alternatives" >&2; \
     fi
 
 # 動的UID/GID設定のための準備
@@ -52,8 +52,9 @@ RUN groupmod -g ${USER_GID} rstudio && \
     usermod -u ${USER_UID} rstudio && \
     chown -R rstudio:rstudio /home/rstudio
 
-# エントリーポイントスクリプト追加
-COPY --chmod=755 entrypoint.sh /usr/local/bin/entrypoint.sh
+# エントリーポイントスクリプト追加（BuildKit不要な方法）
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod 755 /usr/local/bin/entrypoint.sh
 
 # エントリーポイント設定
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
