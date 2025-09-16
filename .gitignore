@@ -27,7 +27,6 @@ reports/
 
 # R関連の一時ファイル
 .Rhistory
-.RData
 .Ruserdata
 .Rproj.user/
 
@@ -38,6 +37,10 @@ Thumbs.db
 # === v7 specific ===
 # GDC download directories (explicit)
 analysis_v7/data/raw/gdc/
+
+# Logs directory (execution records)
+analysis_v7/logs/
+!analysis_v7/logs/.gitkeep
 
 # Keep manifests for reproducibility
 !analysis_v7/data/raw/manifest_*.tsv
