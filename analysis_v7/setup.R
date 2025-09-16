@@ -20,8 +20,16 @@ paths <- list(
   raw = "analysis_v7/data/raw/",
   gdc = "analysis_v7/data/raw/gdc/",
   processed = "analysis_v7/data/processed/",
-  output = "analysis_v7/output/"
+  output = "analysis_v7/output/",
+  logs = "analysis_v7/logs/"
 )
+
+# Create directories if they don't exist
+for(path in paths) {
+  if(!dir.exists(path)) {
+    dir.create(path, recursive = TRUE, showWarnings = FALSE)
+  }
+}
 
 # Display environment
 cat("\n=== Environment ===\n")
