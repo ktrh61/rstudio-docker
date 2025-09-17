@@ -1,15 +1,14 @@
 # ==============================================================================
-# ContamDE Purity Estimation Functions v7 (Enhanced Version)
-# contamde_purity_functions_v7.R
+# ContamDE Purity Estimation Functions v7 (Original Behavior)
+# contamde_purity_functions.R
 # ==============================================================================
 # 
 # Purpose: Tumor purity estimation only (no DEG analysis)
-# Modifications for v7:
-# - Paired sample correlation handling via duplicateCorrelation
-# - Robust eBayes for outlier resistance
-# - Improved zero count handling
-# - Safe design matrix construction
-# - Enhanced p-value adjustment with 1000 gene limit (original contamDE)
+# Based on original contamDE.lm.R behavior
+# Key changes from previous v7:
+# - No 0-1 clipping (follows original)
+# - Direct array indexing without empty checks
+# - Warnings for unusual values but no forced corrections
 
 # Note: Requires prior loading of:
 # source("./utils/utils_improved.R")
@@ -26,7 +25,7 @@ for (pkg in c("edgeR","limma","qvalue")) {
 # limma + voom with MUREN scaling factors
 # ==============================================================================
 limma_voom_purity <- function(counts, pairwise_method = "lts",
-                              workers = "auto", voom_norm = "quantile") {
+                              workers = "auto") {
   
   if (!is.matrix(counts)) {
     counts <- as.matrix(counts)
@@ -39,7 +38,6 @@ limma_voom_purity <- function(counts, pairwise_method = "lts",
   d <- edgeR::DGEList(counts = counts)
   
   # MUREN scaling coefficients using improved version
-  # pairwise_method: "lts", "mode", "median", "trim10", "huber"
   nf <- muren_norm(
     counts,
     refs = "saturated",
@@ -61,23 +59,18 @@ limma_voom_purity <- function(counts, pairwise_method = "lts",
   # Apply to edgeR
   d$samples$norm.factors <- as.numeric(nf)
   
-  # voom transformation with paired design
+  # voom transformation (normalize.method fixed to "none")
   condition <- factor(c(rep("Normal", ncol_counts), rep("Tumor", ncol_counts)))
   design <- stats::model.matrix(~ 0 + condition)
   colnames(design) <- levels(condition)
-  v <- limma::voom(d, design, normalize.method = voom_norm)
-  
-  # Pair information: 1..N for Normal/Tumor correspondence
-  pair <- factor(rep(seq_len(ncol_counts), times = 2))
+  v <- limma::voom(d, design, normalize.method = "none")
   
   # Effective library sizes
   size <- d$samples$lib.size * d$samples$norm.factors
   size <- size / mean(size)
   
-  # limma fit with paired sample correlation
-  corfit <- limma::duplicateCorrelation(v, design, block = pair)
-  fit <- limma::lmFit(v, design, block = pair,
-                      correlation = corfit$consensus.correlation)
+  # limma fit (no duplicateCorrelation / no blocking)
+  fit <- limma::lmFit(v, design)
   contrs <- limma::makeContrasts(contrasts = "Tumor - Normal",
                                  levels = design)
   fit2 <- limma::contrasts.fit(fit, contrs)
@@ -92,7 +85,7 @@ limma_voom_purity <- function(counts, pairwise_method = "lts",
 }
 
 # ==============================================================================
-# Main purity estimation function (lightweight contamDE)
+# Main purity estimation function (following original contamDE.lm)
 # ==============================================================================
 contamde_purity <- function(counts,
                             subtype = NULL,
@@ -100,7 +93,6 @@ contamde_purity <- function(counts,
                             contaminated = TRUE,
                             pairwise_method = "lts",
                             workers = "auto",
-                            voom_norm = "quantile",
                             prior.count = 0,
                             verbose = TRUE) {
   
@@ -121,8 +113,7 @@ contamde_purity <- function(counts,
   d <- limma_voom_purity(
     counts = counts, 
     pairwise_method = pairwise_method,
-    workers = workers, 
-    voom_norm = voom_norm
+    workers = workers
   )
   
   p_limma <- d$p.limma
@@ -132,7 +123,7 @@ contamde_purity <- function(counts,
   # Normalize counts by MUREN size factors
   count_norm <- t(t(counts) / size)
   
-  # Handle zero counts (use raw counts for determination)
+  # Handle zero counts
   if (prior.count > 0) {
     valid_genes <- rep(TRUE, nrow(counts))
     count_norm_valid <- count_norm
@@ -209,7 +200,7 @@ contamde_purity <- function(counts,
       }
     }
     
-    # Define informative genes
+    # Define informative genes (following original contamDE.lm)
     log2_fc <- log2_fc_limma
     up <- which(p_adj < 0.1 & log2_fc > log2(1.5))
     down <- which(p_adj < 0.1 & log2_fc < -log2(1.5))
@@ -219,34 +210,57 @@ contamde_purity <- function(counts,
                   length(up), length(down)))
     }
     
-    # Calculate purity estimates
-    if (length(up) > 0) {
+    # Calculate purity estimates (original contamDE.lm approach)
+    # Note: Original does not check for empty indices
+    if (length(up) > 0 && length(down) > 0) {
       y_up <- y[up, , drop = FALSE]
-    } else {
-      y_up <- matrix(0, 0, ncol_counts)
-    }
-    
-    if (length(down) > 0) {
       y_down <- y[down, , drop = FALSE]
+      
+      sumup <- colSums(y_up)
+      sumdown <- colSums(y_down)
+      sum.max <- max(sumup - sumdown)
+      
+      if (!is.finite(sum.max) || sum.max <= 0) {
+        warning("sum.max is non-positive. This should not happen with proper informative genes.")
+        w_hat <- rep(1.0, ncol_counts)
+      } else {
+        # Original formula without clipping
+        w_hat <- (sumup - sumdown) / sum.max
+      }
+    } else if (length(up) > 0) {
+      # Only up-regulated genes found
+      warning("Only up-regulated informative genes found. Purity estimation may be unreliable.")
+      y_up <- y[up, , drop = FALSE]
+      sumup <- colSums(y_up)
+      w_hat <- sumup / max(sumup)
+    } else if (length(down) > 0) {
+      # Only down-regulated genes found
+      warning("Only down-regulated informative genes found. Purity estimation may be unreliable.")
+      y_down <- y[down, , drop = FALSE]
+      sumdown <- colSums(y_down)
+      # Note: down-regulated should contribute negatively
+      w_hat <- -sumdown / max(abs(sumdown))
     } else {
-      y_down <- matrix(0, 0, ncol_counts)
+      # No informative genes
+      warning("No informative genes found (up or down). Setting purity to 1.0.")
+      w_hat <- rep(1.0, ncol_counts)
     }
     
-    sumup <- colSums(y_up)
-    sumdown <- colSums(y_down)
-    sum.max <- max(sumup - sumdown)
-    
-    if (!is.finite(sum.max) || sum.max <= 0) {
-      warning("No informative genes found. Setting purity to 1.0.")
-      w_hat <- rep(1.0, ncol_counts)
-    } else {
-      w_hat <- (sumup - sumdown) / sum.max
-      w_hat <- pmax(0, pmin(1, w_hat))
+    # Warning for unusual values (but don't clip)
+    if (any(w_hat < 0)) {
+      warning(sprintf("Negative purity values detected: %d samples with w < 0 (min = %.3f)", 
+                      sum(w_hat < 0), min(w_hat)))
+    }
+    if (any(w_hat > 1)) {
+      warning(sprintf("Purity values > 1 detected: %d samples with w > 1 (max = %.3f)", 
+                      sum(w_hat > 1), max(w_hat)))
     }
     
     if (verbose) {
       cat(sprintf("  Purity summary: mean=%.3f, sd=%.3f\n", 
                   mean(w_hat), sd(w_hat)))
+      cat(sprintf("  Purity range: [%.3f, %.3f]\n", 
+                  min(w_hat), max(w_hat)))
     }
   } else {
     if (verbose) {
@@ -307,6 +321,10 @@ assess_purity_quality <- function(purity_result, threshold = 0.6, verbose = TRUE
   purity_stats$retention_rate <- retention_rate
   purity_stats$high_purity_indices <- which(high_purity)
   
+  # Check for unusual values
+  purity_stats$n_negative <- sum(proportions < 0)
+  purity_stats$n_above_one <- sum(proportions > 1)
+  
   if (verbose) {
     cat("\n=== Purity Quality Assessment ===\n")
     cat(sprintf("Total samples: %d\n", n_samples))
@@ -314,6 +332,16 @@ assess_purity_quality <- function(purity_result, threshold = 0.6, verbose = TRUE
                 purity_stats$mean_purity, purity_stats$sd_purity))
     cat(sprintf("Range: [%.3f, %.3f]\n", 
                 purity_stats$min_purity, purity_stats$max_purity))
+    
+    if (purity_stats$n_negative > 0) {
+      cat(sprintf("WARNING: %d samples with negative purity\n", 
+                  purity_stats$n_negative))
+    }
+    if (purity_stats$n_above_one > 0) {
+      cat(sprintf("WARNING: %d samples with purity > 1\n", 
+                  purity_stats$n_above_one))
+    }
+    
     cat(sprintf("High purity (≥%.1f): %d/%d (%.1f%%)\n",
                 threshold, n_high_purity, n_samples, retention_rate * 100))
     
@@ -398,10 +426,10 @@ create_purity_filtered_lists <- function(original_sample_lists, purity_results,
 }
 
 cat("ContamDE purity functions v7 loaded successfully!\n")
-cat("Key improvements:\n")
-cat("  - Paired sample correlation handling\n")
-cat("  - Robust eBayes for outlier resistance\n")
-cat("  - Top 1000 gene limit (original contamDE)\n")
+cat("Key changes (reverting to original behavior):\n")
+cat("  - No 0-1 clipping of purity values\n")
+cat("  - Warnings for negative/above-1 values\n")
+cat("  - Direct array indexing (no empty checks)\n")
 cat("Main functions:\n")
 cat("  - contamde_purity(): Estimate tumor purity\n")
 cat("  - assess_purity_quality(): Quality assessment\n")
