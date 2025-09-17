@@ -1,5 +1,6 @@
-# 01_data_download.R - REBC-THYR Data Download (v7)
+# 01_data_download.R - REBC-THYR Data Download (v7.1)
 # Purpose: Download Gene Expression Quantification only (906 files)
+# v7.1: Added memory management with rm() for cleaner environment
 
 source("analysis_v7/setup.R")
 
@@ -27,6 +28,9 @@ q <- GenomicDataCommons::files() %>%
 cat("\nCreating filtered manifest...\n")
 manifest <- GenomicDataCommons::manifest(q)
 
+# Clean up query object (no longer needed)
+rm(q)
+
 # アクセスレベル確認
 access_table <- table(manifest$access)
 cat("\nAccess levels:\n")
@@ -44,7 +48,7 @@ if ("open" %in% names(access_table)) {
 timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
 manifest_file <- paste0(paths$raw, "manifest_gene_counts_", timestamp, ".tsv")
 data.table::fwrite(manifest_open, manifest_file, sep = "\t", quote = FALSE)
-cat("Manifest saved:", manifest_file, "\n")
+cat("Manifest saved:", basename(manifest_file), "\n")
 cat("Total files to download:", nrow(manifest_open), "\n")
 
 # Metadata保存
@@ -60,3 +64,10 @@ cat("\n=== Download Instructions ===\n")
 cat("Run in terminal:\n")
 cat(sprintf("gdc-client download -m %s -d %s\n", manifest_file, paths$gdc))
 cat("\nExpected: ~906 files (Gene Expression only)\n")
+
+# Final cleanup - remove all intermediate variables
+rm(manifest, manifest_open, access_table, timestamp, manifest_file, metadata_file)
+
+cat("\n=== Global Environment Cleanup ===\n")
+cat("All intermediate variables removed.\n")
+cat("Only 'paths' from setup.R remains in environment.\n")

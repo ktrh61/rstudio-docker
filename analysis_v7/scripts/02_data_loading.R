@@ -1,13 +1,23 @@
-# 02_data_loading.R - REBC-THYR Data Loading with Sample Mapping (v7)
+# 02_data_loading.R - REBC-THYR Data Loading with Sample Mapping (v7.2)
 # Purpose: Create file-sample mapping and load STAR-Counts into SummarizedExperiment
+# Output: SE with all assays (counts + expression values) and sample metadata
+# v7.2: Fixed column structure (9 cols), added all expression assays to SE, memory management
 
 source("analysis_v7/setup.R")
 
-cat("\n=== REBC-THYR Data Loading with Sample Mapping ===\n")
+cat("\n=== REBC-THYR Data Loading with Sample Mapping (v7.2) ===\n")
 cat("Date:", as.character(Sys.Date()), "\n")
 
+# Check if running on Unix-like system for parallel processing
+if(.Platform$OS.type != "unix") {
+  stop("This version requires Unix/Linux environment (WSL2, Mac, or Linux) for parallel processing")
+}
+
+library(parallel)
+library(data.table)
+
 # ============================================================================
-# Part 1: Create file_id to sample_submitter_id mapping
+# Part 1: Create file_id to sample_submitter_id mapping (with parallel result processing)
 # ============================================================================
 
 cat("\n--- Part 1: Creating sample mapping ---\n")
@@ -38,6 +48,7 @@ cat("\nQuerying GDC API for sample information...\n")
 cat("This may take a few moments for", n_files, "files\n")
 
 # Process in batches of 50
+# NOTE: API queries remain sequential to respect rate limits
 batch_size <- 50
 n_batches <- ceiling(n_files / batch_size)
 all_results <- list()
@@ -68,15 +79,22 @@ for(i in seq_len(n_batches)) {
 }
 close(pb)
 
-# Combine results
-cat("\nProcessing API results...\n")
+# Clean up progress bar variable
+rm(pb)
 
-# 完全版の実装（Metastaticサンプルにも対応）
-mapping_list <- list()
+# ============================================================================
+# Process API results in parallel
+# ============================================================================
+cat("\nProcessing API results in parallel...\n")
 
-for(batch_result in all_results) {
-  if(is.null(batch_result)) next
+# Function to process one batch result
+process_batch_result <- function(batch_result) {
+  if(is.null(batch_result)) return(NULL)
   
+  # Set data.table threads to 1 in worker
+  data.table::setDTthreads(1L)
+  
+  batch_mapping <- list()
   file_id_to_name <- setNames(batch_result$file_name, batch_result$id)
   
   for(j in seq_along(batch_result$cases)) {
@@ -90,11 +108,11 @@ for(batch_result in all_results) {
     if(!is.null(case_data$samples) && length(case_data$samples) > 0) {
       sample_data <- case_data$samples[[1]]
       
-      # sample_typeの処理（存在しない場合は代替情報を使用）
+      # Handle sample_type (may not exist for some samples)
       if(length(sample_data$sample_type) > 0) {
         sample_type_value <- as.character(sample_data$sample_type)[1]
       } else if(length(sample_data$tumor_descriptor) > 0 && length(sample_data$specimen_type) > 0) {
-        # Metastaticサンプルの場合、tumor_descriptorとspecimen_typeを結合
+        # Metastatic samples: combine tumor_descriptor and specimen_type
         sample_type_value <- paste(sample_data$tumor_descriptor[1], 
                                    sample_data$specimen_type[1], 
                                    "Tumor", sep = " ")
@@ -102,7 +120,7 @@ for(batch_result in all_results) {
         sample_type_value <- "Unknown"
       }
       
-      mapping_list[[file_id]] <- data.frame(
+      batch_mapping[[file_id]] <- data.frame(
         file_id = file_id,
         file_name = as.character(file_id_to_name[file_id])[1],
         case_submitter_id = as.character(case_submitter_id)[1],
@@ -113,17 +131,41 @@ for(batch_result in all_results) {
       )
     }
   }
+  
+  return(batch_mapping)
 }
+
+# Determine number of cores for result processing
+n_cores <- detectCores()
+cores_to_use_part1 <- max(1, min(n_cores - 1, 4))  # Cap at 4 cores for this step
+cat("Using", cores_to_use_part1, "cores for result processing\n")
+
+# Process all batch results in parallel
+mapping_lists <- mclapply(
+  all_results,
+  process_batch_result,
+  mc.cores = cores_to_use_part1,
+  mc.preschedule = FALSE  # Dynamic scheduling for variable processing time
+)
+
+# Flatten the nested list structure
+mapping_list <- unlist(mapping_lists, recursive = FALSE)
+mapping_list <- mapping_list[!sapply(mapping_list, is.null)]
 
 # Combine into single data frame
 file_sample_map <- data.table::rbindlist(mapping_list, fill = TRUE)
 cat("Mapping created for", nrow(file_sample_map), "files\n")
 
-# サンプルタイプの分布を確認
+# Clean up Part 1 intermediate objects
+rm(all_results, mapping_lists, mapping_list, batch_result, 
+   all_file_ids, batch_ids, batch_size, n_batches, i, 
+   start_idx, end_idx, n_files)
+
+# Sample type distribution
 cat("\nSample type distribution:\n")
 print(table(file_sample_map$sample_type))
 
-# Metastaticサンプルの詳細確認
+# Check for Metastatic samples
 metastatic_samples <- file_sample_map[grep("Metastatic", file_sample_map$sample_type), ]
 cat("\nMetastatic samples found:", nrow(metastatic_samples), "\n")
 if(nrow(metastatic_samples) > 0) {
@@ -131,8 +173,6 @@ if(nrow(metastatic_samples) > 0) {
   print(head(metastatic_samples$sample_submitter_id))
 }
 
-# 確認
-head(file_sample_map[, c("file_id", "sample_submitter_id", "case_submitter_id")])
 # Verify all manifest files are mapped
 unmapped <- setdiff(manifest$id, file_sample_map$file_id)
 if(length(unmapped) > 0) {
@@ -141,11 +181,14 @@ if(length(unmapped) > 0) {
   print(head(unmapped))
 }
 
+# Clean up verification variables
+rm(unmapped, metastatic_samples)
+
 # Save mapping
-mapping_file <- paste0(paths$processed, "file_sample_mapping_", 
+mapping_file <- paste0(paths$logs, "file_sample_mapping_", 
                        format(Sys.time(), "%Y%m%d_%H%M%S"), ".tsv")
 data.table::fwrite(file_sample_map, mapping_file, sep = "\t")
-cat("Mapping saved to:", basename(mapping_file), "\n")
+cat("Mapping saved to:", basename(mapping_file), " (in logs/)\n")
 
 # Summary
 cat("\nMapping summary:\n")
@@ -157,11 +200,17 @@ for(st in names(sample_type_table)) {
   cat("    ", st, ":", sample_type_table[st], "\n")
 }
 
+# Clean up summary variables
+rm(sample_type_table, st)
+
+# Clean up manifest (no longer needed)
+rm(manifest, manifest_file, manifest_files)
+
 # ============================================================================
-# Part 2: Load count data with correct sample IDs
+# Part 2: Load count data with correct sample IDs (FULLY OPTIMIZED PARALLEL VERSION)
 # ============================================================================
 
-cat("\n--- Part 2: Loading count data ---\n")
+cat("\n--- Part 2: Loading count data (Fully Optimized Parallel) ---\n")
 
 # Get TSV file paths
 tsv_files <- list.files(
@@ -179,7 +228,6 @@ if(length(tsv_files) == 0) {
 # Extract file_id from path (directory name)
 extract_file_id <- function(path) {
   parts <- strsplit(path, "/")[[1]]
-  # The file_id is the directory name above the TSV file
   parts[length(parts) - 1]
 }
 
@@ -191,6 +239,9 @@ tsv_file_map <- data.frame(
   file_id = file_ids_from_path,
   stringsAsFactors = FALSE
 )
+
+# Clean up intermediate variables
+rm(tsv_files, file_ids_from_path)
 
 # Merge with sample mapping
 tsv_file_map <- merge(
@@ -212,72 +263,210 @@ if(any(missing_mapping)) {
 tsv_file_map <- tsv_file_map[!missing_mapping, ]
 cat("\nFiles with valid mapping:", nrow(tsv_file_map), "\n")
 
-# Sort by sample_submitter_id for consistent ordering
+# Clean up missing_mapping check
+rm(missing_mapping)
+
+# IMPORTANT: Sort by sample_submitter_id for consistent ordering
 tsv_file_map <- tsv_file_map[order(tsv_file_map$sample_submitter_id), ]
 
-# Read first file to get gene structure
+# Read first file to get gene structure (optimized)
 cat("\nReading first file to get gene structure...\n")
-first_data <- data.table::fread(tsv_file_map$path[1])
 
-# Extract gene info (skip first 4 summary rows)
-gene_info <- first_data[5:nrow(first_data), 1:3]
-colnames(gene_info) <- c("gene_id", "gene_name", "gene_type")
-n_genes <- nrow(gene_info)
+# Read with proper handling of comment and summary rows
+first_data <- data.table::fread(
+  tsv_file_map$path[1],
+  skip = 1L,  # Skip only comment line
+  showProgress = FALSE,
+  nThread = 1L
+)
+
+# Remove the first 4 rows (N_unmapped, N_multimapping, N_noFeature, N_ambiguous)
+first_gene_info <- first_data[5:nrow(first_data), 1:3]
+colnames(first_gene_info) <- c("gene_id", "gene_name", "gene_type")
+n_genes <- nrow(first_gene_info)
 n_samples <- nrow(tsv_file_map)
+
+# Clean up first_data (no longer needed)
+rm(first_data)
 
 cat("Genes:", n_genes, "\n")
 cat("Samples:", n_samples, "\n")
 
-# Initialize count matrices
-cat("\nInitializing count matrices...\n")
+# ============================================================================
+# OPTIMIZED: Prepare lightweight arguments (just vectors, not data.frames)
+# ============================================================================
+tsv_file_paths <- tsv_file_map$path  # FIXED: Changed from 'paths' to 'tsv_file_paths'
+sample_ids <- tsv_file_map$sample_submitter_id
+idx <- seq_len(nrow(tsv_file_map))
+
+# ============================================================================
+# OPTIMIZED: Reading function with correct column structure (9 columns total)
+# ============================================================================
+read_star_counts_optimized <- function(i, paths_vec, ids_vec) {
+  # CRITICAL: Set data.table threads to 1 to avoid nested parallelism
+  data.table::setDTthreads(1L)
+  
+  path <- paths_vec[i]
+  sid <- ids_vec[i]
+  
+  tryCatch({
+    # Read file skipping only the comment line
+    DT <- data.table::fread(
+      path,
+      skip = 1L,  # Skip only the comment line, keep header
+      showProgress = FALSE,
+      nThread = 1L
+    )
+    
+    # Remove the first 4 rows (N_unmapped, N_multimapping, N_noFeature, N_ambiguous)
+    DT <- DT[5:nrow(DT), ]
+    
+    # Extract count and expression columns by position (9 columns total)
+    list(
+      idx = i,
+      sample_id = sid,
+      unstranded = as.numeric(DT[[4]]),       # Column 4: unstranded counts
+      stranded_first = as.numeric(DT[[5]]),   # Column 5: stranded_first counts
+      stranded_second = as.numeric(DT[[6]]),  # Column 6: stranded_second counts
+      tpm_unstranded = as.numeric(DT[[7]]),   # Column 7: TPM unstranded
+      fpkm_unstranded = as.numeric(DT[[8]]),  # Column 8: FPKM unstranded
+      fpkm_uq_unstranded = as.numeric(DT[[9]]), # Column 9: FPKM-UQ unstranded
+      success = TRUE
+    )
+  }, error = function(e) {
+    warning("Error reading file ", i, " (", basename(path), "): ", e$message)
+    list(
+      idx = i,
+      sample_id = sid,
+      success = FALSE
+    )
+  })
+}
+
+# Determine number of cores to use
+n_cores <- detectCores()
+cores_to_use <- max(1, min(n_cores - 1, 8))
+cat("\nUsing", cores_to_use, "cores for TSV file processing\n")
+
+# Read all files in parallel with optimized settings
+cat("\nReading count files in parallel (fully optimized)...\n")
+start_time <- Sys.time()
+
+# CRITICAL: Use lightweight arguments and dynamic scheduling
+results <- mclapply(
+  idx,
+  read_star_counts_optimized,
+  paths_vec = tsv_file_paths,      # FIXED: Using renamed variable
+  ids_vec = sample_ids,   # Lightweight vector  
+  mc.cores = cores_to_use,
+  mc.preschedule = FALSE  # CRITICAL: Dynamic scheduling for variable I/O times
+)
+
+end_time <- Sys.time()
+cat("Reading completed in", format(end_time - start_time), "\n")
+
+# Clean up reading variables (no longer needed)
+rm(tsv_file_paths, idx)
+
+# Check for failed reads
+failed_reads <- sapply(results, function(x) !isTRUE(x$success))
+if(any(failed_reads)) {
+  n_failed <- sum(failed_reads)
+  warning("Failed to read ", n_failed, " files")
+  if(n_failed <= 10) {
+    failed_samples <- sapply(results[failed_reads], function(x) x$sample_id)
+    cat("Failed samples:\n")
+    print(failed_samples)
+    rm(failed_samples)
+  } else {
+    cat("Too many failures to list (", n_failed, " files)\n")
+  }
+  rm(n_failed)
+}
+
+# Clean up failure check variables
+rm(failed_reads)
+
+# ============================================================================
+# Efficient matrix assembly
+# ============================================================================
+cat("\nAssembling count and expression matrices...\n")
+
+# Pre-allocate count matrices
 counts_unstranded <- matrix(0, nrow = n_genes, ncol = n_samples)
 counts_stranded_first <- matrix(0, nrow = n_genes, ncol = n_samples)
 counts_stranded_second <- matrix(0, nrow = n_genes, ncol = n_samples)
 
-# Set row and column names
-rownames(counts_unstranded) <- gene_info$gene_id
-rownames(counts_stranded_first) <- gene_info$gene_id
-rownames(counts_stranded_second) <- gene_info$gene_id
+# Pre-allocate expression matrices (TPM and FPKM)
+tpm_unstranded <- matrix(0, nrow = n_genes, ncol = n_samples)
+fpkm_unstranded <- matrix(0, nrow = n_genes, ncol = n_samples)
+fpkm_uq_unstranded <- matrix(0, nrow = n_genes, ncol = n_samples)
 
-# Use sample_submitter_id as column names
-colnames(counts_unstranded) <- tsv_file_map$sample_submitter_id
-colnames(counts_stranded_first) <- tsv_file_map$sample_submitter_id
-colnames(counts_stranded_second) <- tsv_file_map$sample_submitter_id
+# Set row names once
+rownames(counts_unstranded) <- first_gene_info$gene_id
+rownames(counts_stranded_first) <- first_gene_info$gene_id
+rownames(counts_stranded_second) <- first_gene_info$gene_id
+rownames(tpm_unstranded) <- first_gene_info$gene_id
+rownames(fpkm_unstranded) <- first_gene_info$gene_id
+rownames(fpkm_uq_unstranded) <- first_gene_info$gene_id
 
-# Function to read one file
-read_star_counts <- function(file_path) {
-  tryCatch({
-    data <- data.table::fread(file_path)
-    # Skip first 4 summary rows
-    counts <- data[5:nrow(data), ]
-    return(list(
-      unstranded = as.numeric(counts$unstranded),
-      stranded_first = as.numeric(counts$stranded_first),
-      stranded_second = as.numeric(counts$stranded_second),
-      success = TRUE
-    ))
-  }, error = function(e) {
-    warning("Error reading: ", basename(file_path), " - ", e$message)
-    return(list(success = FALSE))
-  })
-}
+# Set column names once
+colnames(counts_unstranded) <- sample_ids
+colnames(counts_stranded_first) <- sample_ids
+colnames(counts_stranded_second) <- sample_ids
+colnames(tpm_unstranded) <- sample_ids
+colnames(fpkm_unstranded) <- sample_ids
+colnames(fpkm_uq_unstranded) <- sample_ids
 
-# Read all files with progress
-cat("\nReading count files...\n")
-pb <- txtProgressBar(min = 0, max = n_samples, style = 3)
+# Fill matrices using direct indexing (faster than lookup)
+cat("Populating count and expression matrices...\n")
+pb <- txtProgressBar(min = 0, max = length(results), style = 3)
 
-for(i in seq_len(n_samples)) {
-  result <- read_star_counts(tsv_file_map$path[i])
-  
-  if(result$success) {
-    counts_unstranded[, i] <- result$unstranded
-    counts_stranded_first[, i] <- result$stranded_first
-    counts_stranded_second[, i] <- result$stranded_second
+for(i in seq_along(results)) {
+  if(results[[i]]$success) {
+    col_idx <- results[[i]]$idx  # Direct index, no lookup needed
+    # Count matrices
+    counts_unstranded[, col_idx] <- results[[i]]$unstranded
+    counts_stranded_first[, col_idx] <- results[[i]]$stranded_first
+    counts_stranded_second[, col_idx] <- results[[i]]$stranded_second
+    # Expression matrices
+    tpm_unstranded[, col_idx] <- results[[i]]$tpm_unstranded
+    fpkm_unstranded[, col_idx] <- results[[i]]$fpkm_unstranded
+    fpkm_uq_unstranded[, col_idx] <- results[[i]]$fpkm_uq_unstranded
   }
   setTxtProgressBar(pb, i)
 }
 close(pb)
-cat("\n")
+
+# Clean up progress bar and loop variables
+rm(pb, i, col_idx)
+
+# CRITICAL: Clean up the large results object (several GB)
+rm(results)
+gc()  # Force garbage collection to free memory
+
+# Verify non-zero counts
+cat("\nVerification:\n")
+cat("  Non-zero counts in unstranded:", sum(counts_unstranded > 0), "\n")
+cat("  Non-zero counts in stranded_first:", sum(counts_stranded_first > 0), "\n")
+cat("  Non-zero counts in stranded_second:", sum(counts_stranded_second > 0), "\n")
+cat("  Non-zero expression in TPM:", sum(tpm_unstranded > 0), "\n")
+cat("  Non-zero expression in FPKM:", sum(fpkm_unstranded > 0), "\n")
+cat("  Non-zero expression in FPKM-UQ:", sum(fpkm_uq_unstranded > 0), "\n")
+
+# Memory usage check
+mem_used <- as.numeric(
+  object.size(counts_unstranded) + 
+    object.size(counts_stranded_first) + 
+    object.size(counts_stranded_second) +
+    object.size(tpm_unstranded) +
+    object.size(fpkm_unstranded) +
+    object.size(fpkm_uq_unstranded)
+) / 1024^3
+cat("  Memory used by all matrices: ", round(mem_used, 2), " GB\n")
+
+# Clean up memory calculation variable
+rm(mem_used)
 
 # Create column data with all metadata
 cat("\nPreparing sample metadata...\n")
@@ -290,77 +479,158 @@ colData_df <- data.frame(
 )
 rownames(colData_df) <- colData_df$sample_submitter_id
 
-# Create row data
+# Create row data with gene_name and gene_type preserved
 rowData_df <- data.frame(
-  gene_id = gene_info$gene_id,
-  gene_name = gene_info$gene_name,
-  gene_type = gene_info$gene_type,
+  gene_id = first_gene_info$gene_id,
+  gene_name = first_gene_info$gene_name,
+  gene_type = first_gene_info$gene_type,
   stringsAsFactors = FALSE
 )
 
-# Create SummarizedExperiment
-cat("\nCreating SummarizedExperiment...\n")
-se <- SummarizedExperiment::SummarizedExperiment(
+# Clean up gene info (keeping rowData_df for SE)
+rm(first_gene_info)
+
+# Create SummarizedExperiment with all assays
+cat("\nCreating SummarizedExperiment with all assays...\n")
+thyr_se <- SummarizedExperiment::SummarizedExperiment(
   assays = list(
+    # Count assays
     unstranded = counts_unstranded,
     stranded_first = counts_stranded_first,
-    stranded_second = counts_stranded_second
+    stranded_second = counts_stranded_second,
+    # Expression assays
+    tpm_unstranded = tpm_unstranded,
+    fpkm_unstranded = fpkm_unstranded,
+    fpkm_uq_unstranded = fpkm_uq_unstranded
   ),
   colData = colData_df,
   rowData = rowData_df
 )
 
-cat("SummarizedExperiment created:\n")
-cat("  Genes:", nrow(se), "\n")
-cat("  Samples:", ncol(se), "\n")
-cat("  Assays:", paste(names(assays(se)), collapse = ", "), "\n")
+# Clean up individual matrices (now stored in thyr_se)
+rm(counts_unstranded, counts_stranded_first, counts_stranded_second)
+rm(tpm_unstranded, fpkm_unstranded, fpkm_uq_unstranded)
 
-# Basic QC
-cat("\nBasic QC:\n")
-lib_sizes <- colSums(assay(se, "unstranded"))
-cat("  Library sizes (unstranded):\n")
-cat("    Min:", format(min(lib_sizes), big.mark = ","), "\n")
-cat("    Median:", format(median(lib_sizes), big.mark = ","), "\n")
-cat("    Max:", format(max(lib_sizes), big.mark = ","), "\n")
+# Verify alignment
+cat("\nAlignment verification:\n")
+cat("  Assay colnames match colData rownames:", 
+    identical(colnames(assay(thyr_se, "stranded_second")), rownames(colData(thyr_se))), "\n")
+cat("  All names are sample_submitter_id:", 
+    all(colnames(assay(thyr_se, "stranded_second")) == colData(thyr_se)$sample_submitter_id), "\n")
 
-gene_detection <- rowSums(assay(se, "unstranded") > 0)
-cat("  Genes detected (>0 counts):\n")
-cat("    In any sample:", sum(gene_detection > 0), "\n")
-cat("    In >50% samples:", sum(gene_detection > ncol(se)/2), "\n")
+cat("\nSummarizedExperiment created:\n")
+cat("  Genes:", nrow(thyr_se), "\n")
+cat("  Samples:", ncol(thyr_se), "\n")
+cat("  Assays:", paste(names(assays(thyr_se)), collapse = ", "), "\n")
+cat("  Gene metadata: gene_id, gene_name, gene_type\n")
 
-# Sample type distribution
-cat("\n  Sample types in SE:\n")
-sample_type_se <- table(colData(se)$sample_type)
-for(st in names(sample_type_se)) {
-  cat("    ", st, ":", sample_type_se[st], "\n")
-}
+# Save SummarizedExperiment (fixed name only)
+saveRDS(thyr_se, paste0(paths$processed, "thyr_se_raw.rds"))
+cat("\nSaved to:", paste0(paths$processed, "thyr_se_raw.rds"), "\n")
 
-# Save results
+# Save metadata to logs
 timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
-output_file <- paste0(paths$processed, "thyr_se_raw_", timestamp, ".rds")
-saveRDS(se, output_file)
-cat("\nSaved to:", output_file, "\n")
-
-# Also save without timestamp for easier access
-saveRDS(se, paste0(paths$processed, "thyr_se_raw.rds"))
-save(se, file = paste0(paths$processed, "thyr_se_raw.RData"))
-
-# Save metadata
-metadata_file <- paste0(paths$processed, "loading_metadata_", timestamp, ".rds")
+metadata_file <- paste0(paths$logs, "loading_metadata_", timestamp, ".rds")
 saveRDS(list(
   loading_date = Sys.Date(),
-  n_files_manifest = nrow(manifest),
+  n_files_manifest = nrow(file_sample_map),
   n_files_loaded = n_samples,
   n_genes = n_genes,
   file_sample_map = file_sample_map,
-  lib_sizes = lib_sizes
+  parallel_cores_part1 = cores_to_use_part1,
+  parallel_cores_part2 = cores_to_use,
+  processing_time = end_time - start_time,
+  optimization_flags = list(
+    dynamic_scheduling = TRUE,
+    dt_threads = 1,
+    selective_columns = TRUE,
+    direct_numeric = TRUE,
+    all_assays_preserved = TRUE
+  )
 ), metadata_file)
+cat("Metadata saved to logs/\n")
+
+# Clean up timing and file variables
+rm(start_time, end_time, timestamp, metadata_file)
+
+# NOTE: Individual matrices already cleaned up after assembly (line 439-441)
+# No need to remove them again here
+
+# Clean up data frames and metadata
+rm(tsv_file_map, colData_df, rowData_df, file_sample_map)
+
+# Clean up processing variables
+rm(n_genes, n_samples, n_cores, cores_to_use, cores_to_use_part1)
+rm(sample_ids, mapping_file)
+
+# Clean up the functions we defined
+rm(extract_file_id, process_batch_result, read_star_counts_optimized)
+
+# Force garbage collection
+gc()
+
+# ============================================================================
+# Strand-specific count comparison and final cleanup
+# ============================================================================
+cat("\n=== Strand-specific count comparison ===\n")
+
+# Compare total counts across strand-specific assays
+total_counts <- c(
+  unstranded = sum(assay(thyr_se, "unstranded")),
+  stranded_first = sum(assay(thyr_se, "stranded_first")),
+  stranded_second = sum(assay(thyr_se, "stranded_second"))
+)
+cat("Total counts by assay:\n")
+print(total_counts)
+cat("Highest count assay:", names(which.max(total_counts)), "\n")
+
+# Check non-zero gene counts
+nonzero_genes <- c(
+  unstranded = sum(rowSums(assay(thyr_se, "unstranded")) > 0),
+  stranded_first = sum(rowSums(assay(thyr_se, "stranded_first")) > 0),
+  stranded_second = sum(rowSums(assay(thyr_se, "stranded_second")) > 0)
+)
+cat("\nGenes with non-zero counts:\n")
+print(nonzero_genes)
+
+# Recommendation
+if (names(which.max(total_counts)) == "stranded_second") {
+  cat("\n[OK] stranded_second appears to be the appropriate assay (highest counts)\n")
+} else {
+  cat("\n[WARNING] Note:", names(which.max(total_counts)), "has highest counts, not stranded_second\n")
+}
+
+# Quick sample check for downstream verification
+cat("\n=== Sample ID check for downstream ===\n")
+cat("First 5 sample IDs:\n")
+print(head(colnames(thyr_se), 5))
+cat("Sample ID format: ", 
+    ifelse(all(grepl("^SC", head(colnames(thyr_se), 5))), "SC format (correct)", "Unexpected format"), "\n")
+
+# Store essential info before final cleanup
+final_sample_count <- ncol(thyr_se)
+final_gene_count <- nrow(thyr_se)
+final_assay_names <- names(assays(thyr_se))
+
+# Final cleanup - remove ALL objects except thyr_se and paths
+rm(list = setdiff(ls(), c("thyr_se", "paths", "final_sample_count", "final_gene_count", "final_assay_names")))
+
+# Force garbage collection
+gc()
 
 cat("\n=== Data Loading Completed ===\n")
-cat("Files created:\n")
-cat("  - file_sample_mapping_*.tsv (mapping table)\n")
-cat("  - thyr_se_raw.rds (SummarizedExperiment)\n")
-cat("  - thyr_se_raw.RData\n")
-cat("  - loading_metadata_*.rds\n")
-cat("\nIMPORTANT: Sample IDs are now correctly mapped to sample_submitter_id\n")
-cat("Example sample IDs:", paste(head(colnames(se), 3), collapse = ", "), "\n")
+cat("Retained in environment:\n")
+cat("  - thyr_se: SummarizedExperiment object\n")
+cat("    Dimensions:", final_gene_count, "genes x", final_sample_count, "samples\n")
+cat("    Assays:", paste(final_assay_names, collapse = ", "), "\n")
+cat("    Gene metadata: gene_id, gene_name, gene_type\n")
+cat("  - paths: Directory structure from setup.R\n")
+cat("\nAll other objects removed for clean environment.\n")
+cat("\nFor downstream analysis:\n")
+cat("  - Load SE: thyr_se <- readRDS('analysis_v7/data/processed/thyr_se_raw.rds')\n")
+cat("  - Access counts: assay(thyr_se, 'stranded_second')\n")
+cat("  - Access metadata: colData(thyr_se)\n")
+cat("  - Access gene info: rowData(thyr_se)\n")
+
+# Clean up the final info variables
+rm(final_sample_count, final_gene_count, final_assay_names)
