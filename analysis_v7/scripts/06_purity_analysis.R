@@ -69,7 +69,7 @@ if (exists("thyr_se_strand2_nonzero")) {
   cat("Loading SE from file...\n")
   se <- readRDS(se_path)
 }
-cat("SE dimensions:", format(nrow(se), big.mark=","), "genes Ã— ", 
+cat("SE dimensions:", format(nrow(se), big.mark=","), "genes × ", 
     format(ncol(se), big.mark=","), "samples\n")
 
 # Load case_master_stage1_filtered
@@ -230,7 +230,7 @@ for (group_name in c("R0", "R1", "B0", "B1")) {
   
   # Prepare counts matrix
   counts <- prepare_contamde_matrix(se, paired$normal, paired$tumor, keep_genes)
-  cat(sprintf("  Count matrix: %d genes Ã— %d samples\n", nrow(counts), ncol(counts)))
+  cat(sprintf("  Count matrix: %d genes × %d samples\n", nrow(counts), ncol(counts)))
   
   # Run ContamDE purity estimation
   cat("  Running ContamDE...\n")
@@ -283,23 +283,13 @@ cat("\n--- Updating case_master with purity results ---\n")
 # Start with clean cases only (no outliers)
 thyr_case_master_stage2_filtered <- clean_cases
 
-# Initialize new columns
-thyr_case_master_stage2_filtered$tumor_purity <- NA_real_
-thyr_case_master_stage2_filtered$low_purity <- NA_integer_
-
-# Reorder columns to place purity info after has_outlier columns
-col_order <- names(thyr_case_master_stage2_filtered)
-has_outlier_idx <- which(col_order == "has_outlier_normal")
-if (length(has_outlier_idx) > 0) {
-  new_order <- c(
-    col_order[1:has_outlier_idx],
-    "tumor_purity", "low_purity",
-    col_order[(has_outlier_idx + 1):(length(col_order) - 2)]  # Exclude the two purity columns at the end
-  )
-  # Use dplyr select for data.frame compatibility
-  thyr_case_master_stage2_filtered <- thyr_case_master_stage2_filtered %>%
-    select(all_of(new_order))
-}
+# Initialize new columns and place them after has_outlier columns for readability
+thyr_case_master_stage2_filtered <- thyr_case_master_stage2_filtered %>%
+  mutate(
+    tumor_purity = NA_real_,
+    low_purity = NA_integer_
+  ) %>%
+  relocate(tumor_purity, low_purity, .after = has_outlier_normal)
 
 # Fill in purity values
 for (group_name in names(purity_results)) {
