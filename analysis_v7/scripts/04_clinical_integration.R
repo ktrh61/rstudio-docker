@@ -189,7 +189,7 @@ if (any(braf_mask, na.rm = TRUE)) {
   
   # Verify all are BRAF.MutV600E
   if (length(unique_designated) == 1 && unique_designated[1] == "BRAF.MutV600E") {
-    cat("  ✓ All BRAF cases are correctly BRAF.MutV600E\n")
+    cat("  âœ“ All BRAF cases are correctly BRAF.MutV600E\n")
   } else {
     warning("Unexpected Designated_Driver values in BRAF cases!")
   }
@@ -253,7 +253,7 @@ cat("\n--- Creating filtered case master ---\n")
 
 thyr_case_master <- thyr_case_master_full[!is.na(thyr_case_master_full$group), ]
 
-cat(sprintf("Total cases: %d → Grouped cases: %d (%.1f%%)\n",
+cat(sprintf("Total cases: %d â†’ Grouped cases: %d (%.1f%%)\n",
             nrow(thyr_case_master_full),
             nrow(thyr_case_master),
             nrow(thyr_case_master) / nrow(thyr_case_master_full) * 100))
@@ -341,7 +341,7 @@ if (nrow(braf_cases) > 0) {
     warning("Found non-BRAF.MutV600E cases in BRAF group!")
     print(unique(braf_cases$Designated_Driver[non_v600e]))
   } else {
-    cat("  ✓ All BRAF cases are correctly BRAF.MutV600E\n")
+    cat("  âœ“ All BRAF cases are correctly BRAF.MutV600E\n")
   }
 }
 

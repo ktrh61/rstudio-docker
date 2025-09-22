@@ -1,11 +1,10 @@
 # ==============================================================================
 # ContamDE Purity Estimation Functions v7 (Enhanced Version)
-# contamde_purity_functions_v7.R
+# contamde_purity_functions.R
 # ==============================================================================
 # 
 # Purpose: Tumor purity estimation only (no DEG analysis)
 # Modifications for v7:
-# - Paired sample correlation handling via duplicateCorrelation
 # - Robust eBayes for outlier resistance
 # - Improved zero count handling
 # - Safe design matrix construction
@@ -26,7 +25,7 @@ for (pkg in c("edgeR","limma","qvalue")) {
 # limma + voom with MUREN scaling factors
 # ==============================================================================
 limma_voom_purity <- function(counts, pairwise_method = "lts",
-                              workers = "auto", voom_norm = "quantile") {
+                              workers = "auto") {
   
   if (!is.matrix(counts)) {
     counts <- as.matrix(counts)
@@ -61,23 +60,18 @@ limma_voom_purity <- function(counts, pairwise_method = "lts",
   # Apply to edgeR
   d$samples$norm.factors <- as.numeric(nf)
   
-  # voom transformation with paired design
+  # voom transformation (normalize.method fixed to "none")
   condition <- factor(c(rep("Normal", ncol_counts), rep("Tumor", ncol_counts)))
   design <- stats::model.matrix(~ 0 + condition)
   colnames(design) <- levels(condition)
-  v <- limma::voom(d, design, normalize.method = voom_norm)
-  
-  # Pair information: 1..N for Normal/Tumor correspondence
-  pair <- factor(rep(seq_len(ncol_counts), times = 2))
+  v <- limma::voom(d, design, normalize.method = "none")
   
   # Effective library sizes
   size <- d$samples$lib.size * d$samples$norm.factors
   size <- size / mean(size)
   
-  # limma fit with paired sample correlation
-  corfit <- limma::duplicateCorrelation(v, design, block = pair)
-  fit <- limma::lmFit(v, design, block = pair,
-                      correlation = corfit$consensus.correlation)
+  # limma fit (no duplicateCorrelation / no blocking)
+  fit <- limma::lmFit(v, design)
   contrs <- limma::makeContrasts(contrasts = "Tumor - Normal",
                                  levels = design)
   fit2 <- limma::contrasts.fit(fit, contrs)
@@ -100,8 +94,7 @@ contamde_purity <- function(counts,
                             contaminated = TRUE,
                             pairwise_method = "lts",
                             workers = "auto",
-                            voom_norm = "quantile",
-                            prior.count = 0,
+                            prior.count = 1.0,
                             verbose = TRUE) {
   
   if (verbose) cat("Starting tumor purity estimation...\n")
@@ -121,8 +114,7 @@ contamde_purity <- function(counts,
   d <- limma_voom_purity(
     counts = counts, 
     pairwise_method = pairwise_method,
-    workers = workers, 
-    voom_norm = voom_norm
+    workers = workers
   )
   
   p_limma <- d$p.limma
@@ -310,15 +302,15 @@ assess_purity_quality <- function(purity_result, threshold = 0.6, verbose = TRUE
   if (verbose) {
     cat("\n=== Purity Quality Assessment ===\n")
     cat(sprintf("Total samples: %d\n", n_samples))
-    cat(sprintf("Mean purity: %.3f ± %.3f\n", 
+    cat(sprintf("Mean purity: %.3f Â± %.3f\n", 
                 purity_stats$mean_purity, purity_stats$sd_purity))
     cat(sprintf("Range: [%.3f, %.3f]\n", 
                 purity_stats$min_purity, purity_stats$max_purity))
-    cat(sprintf("High purity (≥%.1f): %d/%d (%.1f%%)\n",
+    cat(sprintf("High purity (â‰¥%.1f): %d/%d (%.1f%%)\n",
                 threshold, n_high_purity, n_samples, retention_rate * 100))
     
     if (retention_rate >= 0.7) {
-      cat("Retention: Excellent (≥70%)\n")
+      cat("Retention: Excellent (â‰¥70%)\n")
     } else if (retention_rate >= 0.5) {
       cat("Retention: Acceptable (50-70%)\n")
     } else {
@@ -387,7 +379,7 @@ create_purity_filtered_lists <- function(original_sample_lists, purity_results,
     )
     
     if (verbose) {
-      cat(sprintf("  %s: %d → %d samples (%.1f%% retention)\n",
+      cat(sprintf("  %s: %d â†’ %d samples (%.1f%% retention)\n",
                   group_name, n_original, length(filtered_tumor),
                   length(filtered_tumor) / n_original * 100))
     }
@@ -399,7 +391,7 @@ create_purity_filtered_lists <- function(original_sample_lists, purity_results,
 
 cat("ContamDE purity functions v7 loaded successfully!\n")
 cat("Key improvements:\n")
-cat("  - Paired sample correlation handling\n")
+cat("  - Fixed voom normalization (none)\n")
 cat("  - Robust eBayes for outlier resistance\n")
 cat("  - Top 1000 gene limit (original contamDE)\n")
 cat("Main functions:\n")
