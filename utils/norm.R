@@ -1,267 +1,420 @@
-# utils/norm.R — MUREN core (consolidated fast path)
-# 依存: foreach, doSNOW, iterators, parallel, MASS（任意: robustbase）
-# 事前に utils/utils.R を source（.reg_backend, reg_sp, mode_sp, reg_dp 等）
+#' MUREN: a Robust and Multi-reference Approach of RNA-seq
+#' Transcript Normalization
+#'
+#'
+#' MUltiple REference Normalizer (MUREN) of RNA-seq counts.
+#'
+#'
+#' @param reads data.frame or matrix. A tabular counts of gene/transcript X sample
 
-if (!requireNamespace("assertthat", quietly = TRUE)) stop("Package 'assertthat' is required.")
-if (!requireNamespace("foreach", quietly = TRUE))    stop("Package 'foreach' is required.")
-if (!requireNamespace("doSNOW", quietly = TRUE))     stop("Package 'doSNOW' is required.")
-if (!requireNamespace("iterators", quietly = TRUE))  stop("Package 'iterators' is required.")
-if (!requireNamespace("MASS", quietly = TRUE))       stop("Package 'MASS' is required.")
-if (!requireNamespace("parallel", quietly = TRUE))   stop("Package 'parallel' is required.")
-`%dopar%` <- foreach::`%dopar%`
+#' @param refs reference samples by name characters or integers of sample orders.
+#'   Or, 'saturated' selects all samples as references.
+#'
+#' @param pairwise_method string. \code{lts} (Least Trimmed Squares regression)
+#'   or \code{mode}
+#' @param single_param logical. single parameter form (scaling) or double paramter
+#' form (non-linear)
+#' @param res_return type of values returned. \code{counts} (normalized counts),
+#'   \code{log_counts} (log2 (normalized counts + 1)), or \code{scaling_coeff} (scaling
+#'   coefficients (counterpart of library size), valid when \code{single_param = TRUE})
+#' @param filter_gene logical. whether filter genes with rare raw counts, the filter
+#'   strategy simply filters genes with the maximum count less than \code{trim}
+#' @param trim numeric. filter genes with counts less than \code{trim} in
+#'   all samples
+#' @param maxiter integer. the maximum number of iterations
+#'   in the median polish.
+#' @param workers integer. the number of nodes in the parallel cluster (\code{snow}).
+#' @param ... additional parameters passing on to \code{pairwise_method}
+#'
+#' @details
+#' The \code{reads} should be a tabular type that contains each sample
+#' in the columns. Columns of non-numeric annotations are kept in the
+#' returned values. Notice than all the numeric columns all treated as samples.
+#'
+#' You can specify reference samples with their names (column names of \code{reads}),
+#' or the order indices, e.g., \code{1:3} means the first 3 samples. Or, take all
+#' samples as references (\code{refs = 'saturated'}).
+#'
+#' Single parameter form (\code{single_param = TRUE}) (default and recommended)
+#' is a scaling normalization, in this case, \code{lts} (Least Trimmed Squares regression)
+#' or \code{mode} are applicable. Double parameter form
+#' (\code{single_param = FALSE}) (slower) is a non-linear (power function)
+#' normalization.
+#'
+#' The returned scaling coeff (\code{res_return = 'scaling_coeff'}), which is
+#' counterpart of library size, should divide
+#' the raw read counts to get normalized counts. Never re-adjust it by total sample
+#' counts or other numbers
+#'
+#' Parallel computation is implemented with \code{doSNOW} and its dependencies.
+#'
+#' @return depends \code{res_return}
+#'
+#' @examples
+#' # A rat toxicogenomics RNA-seq data
+#' # from Munro et al (2014)
+#'
+#' data(rat_tox_thi)
+#'
+#' # normalized counts (raw scale)
+#' thi_norm = muren_norm(rat_tox_thi)
+#'
+#' # scaling coefficient is a counterpart of library size
+#' (thi_coeff = muren_norm(rat_tox_thi, res_return = 'scaling_coeff'))
+#'
+#' # normalize manually
+#' thi_norm2 = cbind(rat_tox_thi[1],
+#'               as.matrix(rat_tox_thi[-1]) %*% diag(1/thi_coeff)
+#'             )
+#'
+#' @references
+#' Munro SA, Lund SP, Pine PS, et al. Assessing technical
+#' performance in differential gene expression experiments with
+#' external spike-in RNA control ratio mixtures. Nat Commun.
+#' 2014;5:5125. doi:10.1038/ncomms6125
+#'
+#' @include utils.R
+#' @import doSNOW
+#' @import foreach
+#' @import parallel
+#' @importFrom MASS ltsreg
+#' @importFrom matrixStats rowMaxs
+#' @import magrittr
+#' @importFrom assertthat assert_that
+#' @importFrom iterators iter
+#'
+#' @rdname muren_norm
+#' @name muren_norm
 
+
+
+#' @export
 muren_norm <- function(reads,
                        refs = 'saturated',
-                       pairwise_method = "lts",   # "lts","mode","median","trim10","huber"
-                       refs_cap = Inf,            # 参照本数の上限（中央値近傍から抽出）
+                       pairwise_method = "lts",
                        single_param = TRUE,
-                       res_return = 'counts',     # "counts" | "log_counts" | "scaling_coeff"(spのみ)
+                       res_return = 'counts',
                        filter_gene = TRUE,
                        trim = 10,
                        maxiter = 70,
-                       workers = 2,               # 数値 or "auto" or 既存cluster
-                       include_self = FALSE,
-                       ...) {
+                       workers = 2,
+                       ...
+) {
   
-  # reg_sp が読むスイッチを options で渡す
-  old_m <- getOption("muren_pair_method", NULL)
-  on.exit({ options(muren_pair_method = old_m) }, add = TRUE)
-  options(muren_pair_method = pairwise_method)
   
-  # BLAS は 1 スレ（外側並列と二重化しない）
-  if (requireNamespace("RhpcBLASctl", quietly = TRUE)) {
-    RhpcBLASctl::blas_set_num_threads(1L)
+  
+  
+  ##  check params
+  
+  assert_that(is.logical(single_param))
+  
+  assert_that(is.character(pairwise_method))
+  assert_that(any(pairwise_method %in% c('lts', 'mode')))
+  
+  assert_that(maxiter > 0 & is.wholenumber(maxiter))
+  assert_that(workers > 0 & is.wholenumber(workers))
+  
+  # if(!is.null(design)) assert_that(is.data.frame(design))
+  assert_that(is.data.frame(reads) | is.matrix(reads))
+  assert_that(trim >= 0 )
+  
+  
+  # too few samples
+  assert_that(nrow(reads) > 1, msg = "Bad input data !")
+  
+  # filter the un-numeric cols
+  raw_reads = reads
+  
+  # numeric cols
+  i_sample = rep(TRUE, ncol(raw_reads))
+  if(is.data.frame(raw_reads)){
+    i_sample = sapply(raw_reads, is.numeric)
   }
   
-  # ---- 引数チェック ----
-  assertthat::assert_that(is.logical(single_param))
-  ok_methods <- c("lts","mode","median","trim10","huber")
-  assertthat::assert_that(is.character(pairwise_method), pairwise_method %in% ok_methods)
-  assertthat::assert_that(maxiter > 0 & is.wholenumber(maxiter))
-  assertthat::assert_that((is.numeric(workers) && workers >= 0 && is.wholenumber(workers)) ||
-                            (is.character(workers) && workers %in% c("auto")) ||
-                            inherits(workers, "cluster"))
-  assertthat::assert_that(is.data.frame(reads) | is.matrix(reads))
-  assertthat::assert_that(trim >= 0)
-  assertthat::assert_that(nrow(reads) > 1, msg = "Bad input data !")
   
-  raw_reads <- reads
+  reads = raw_reads %>%
+    extract(, i_sample) %>%
+    as.matrix
   
-  # 数値列のみ抽出
-  i_sample <- rep(TRUE, ncol(raw_reads))
-  if (is.data.frame(raw_reads)) i_sample <- sapply(raw_reads, is.numeric)
-  reads <- as.matrix(raw_reads[, i_sample, drop = FALSE])
+  # filter the low reads counts genes in param estimation
+  i_gene = filter_gene_l(reads, trim)
   
-  # 遺伝子フィルタ（群非依存の軽い条件）
-  i_gene <- filter_gene_l(reads, trim)
-  if (filter_gene) reads <- reads[i_gene, , drop = FALSE]
+  if(filter_gene){
+    reads %<>% extract(i_gene, )
+  }
   
-  # log2(1+x)
-  log_raw_reads_mx <- lg(reads)
+  log_raw_reads_mx = reads %>% lg
   
-  n_exp  <- ncol(reads)
-  n_gene <- nrow(reads)
-  REFSERR <- "Bad specification of references !"
+  # log_raw_reads_df = as.data.frame(log_raw_reads_mx)
   
-  # ---- refs の解釈（自己参照を除外）----
-  get_refs <- NULL
+  # #samples
+  n_exp = ncol(reads)
+  
+  
+  REFSERR = "Bad specification of references !"
+  
+  # specify reference strategy
+  
   if (is.character(refs)) {
     if (length(refs) == 1) {
+      
       if (refs == "saturated") {
-        get_refs <- function(k) if (include_self) seq_len(n_exp) else setdiff(seq_len(n_exp), k)
-      } else if (refs %in% colnames(reads)) {
-        ref_idx <- which(colnames(reads) %in% refs)
-        get_refs <- function(k) { v <- setdiff(ref_idx, k); if (length(v)==0) ref_idx else v }
-      } else stop(REFSERR)
-    } else {
-      if (all(refs %in% colnames(reads))) {
-        ref_idx <- which(colnames(reads) %in% refs)
-        get_refs <- function(k) { v <- setdiff(ref_idx, k); if (length(v)==0) ref_idx else v }
-      } else stop(REFSERR)
-    }
-  } else if (all(is.wholenumber(refs))) {
-    if (max(refs) <= n_exp) {
-      if (length(refs) > 1) {
-        get_refs <- function(k) { v <- setdiff(refs, k); if (length(v)==0) refs else v }
-      } else {
-        single <- as.integer(refs)
-        get_refs <- function(k) single
+        get_refs <- function(k) {
+          1:n_exp
+          # reads %>%
+          #   ncol %>%
+          #   seq.int %>%
+          #   is_in(k) %>%
+          #   not %>%
+          #   which %>%
+          #   # setdiff(k) %>%
+          #   return
+        }
       }
-    } else stop(REFSERR)
-  } else stop(REFSERR)
-  
-  # 回帰メソッドのラッパー名（実処理は reg_sp が options を読む）
-  reg_wapper <- if (single_param) { if (pairwise_method == 'mode') 'mode_sp' else 'reg_sp' } else 'reg_dp'
-  
-  # ---- 各サンプルの参照セットを作る ----
-  refs_list <- lapply(seq_len(n_exp), get_refs)
-  
-  # ---- refs_cap: ライブラリサイズ中央値近傍から上限本数に絞る ----
-  if (is.finite(refs_cap)) {
-    lib <- colSums(reads)
-    pick_k <- function(r, k) {
-      if (!length(r)) return(r)
-      m <- stats::median(lib[r])
-      r[order(abs(lib[r] - m))][seq_len(min(length(r), k))]
+      
+      # single ref specified by sample name
+      else if (refs %in% colnames(reads)) {
+        i = which(colnames(reads) %in% refs)
+        get_refs <- function(k) {
+          return(i)
+        }
+      }
+      
+      else {
+        stop(REFSERR)
+      }
     }
-    refs_list <- lapply(refs_list, pick_k, k = as.integer(refs_cap))
+    
+    # length(refs) != 1
+    else{
+      # refs is a string vector
+      if (all(refs %in% colnames(reads))){
+        i = which(colnames(reads) %in% refs)
+        get_refs <- function(k) {
+          # return(setdiff(i, k))
+          return(i)
+        }
+      }
+      else{
+        stop(REFSERR)
+      }
+    }
+    
   }
   
-  # cap 後に used/unused を確定
-  used_refs   <- sort(unique(unlist(refs_list)))
-  unused_refs <- setdiff(seq_len(n_exp), used_refs)
+  # is.character(refs) == FALSE
   
-  # ---- ペアインデックス ----
-  pairs <- do.call(rbind, lapply(seq_len(n_exp), function(i) {
-    if (length(refs_list[[i]]) == 0) return(NULL)
-    cbind(i, refs_list[[i]])
-  }))
-  if (is.null(pairs)) stop("No valid (sample, ref) pairs were generated.")
-  locations <- pairs[,2] + (pairs[,1] - 1L) * n_exp
+  else if (all(is.wholenumber(refs))) {
+    
+    # integer refs
+    if (max(refs) <= n_exp){
+      
+      # multiple integers
+      if (length(refs) > 1){
+        get_refs <- function(k) {
+          # return(setdiff(refs, k))
+          return(refs)
+        }
+      }
+      else {
+        
+        # one integer
+        get_refs <- function(k) {
+          return(refs)
+        }
+      }
+      
+    }
+    
+    else {
+      stop(REFSERR)
+    }
+  }
   
-  # ---- 並列設定（auto/cluster対応 & 再現性）----
-  own_cluster <- TRUE
-  if ((is.character(workers) && workers == "auto") || (is.numeric(workers) && workers == 0L)) {
-    workers <- max(1L, parallel::detectCores() - 1L)
+  # is.integer(refs) == FALSE
+  else{
+    stop(REFSERR)
   }
-  if (inherits(workers, "cluster")) {
-    cl <- workers; own_cluster <- FALSE; workers <- length(cl)
-  } else {
-    workers <- min(as.integer(workers), max(1L, n_exp))
-    cl <- parallel::makeCluster(workers, type = "PSOCK")
+  
+  
+  
+  # specify the regression method
+  if (single_param){
+    if(pairwise_method == 'mode')
+      reg_wapper = 'mode_sp'
+    else
+      reg_wapper = 'reg_sp'
   }
+  else
+    reg_wapper = 'reg_dp'
+  
+  
+  # number of genes
+  n_gene = nrow(reads)
+  N_gene = nrow(raw_reads)
+  
+  # refs for each sample
+  refs = lapply(1:n_exp, get_refs)
+  
+  # the used (as refs) samples
+  used_refs = sort(unique(unlist(refs)))
+  unused_refs = (1:n_exp)[!(1:n_exp %in% used_refs)]
+  
+  
+  ## Step 1: regressions with each ref
+  
+  # task quene for robust regression (ltsreg)
+  task_quene = unlist(lapply(1:n_exp, function(k)
+    return(
+      get_tasks(k, reg_wapper, refs[[k]])
+    )))
+  
+  # regressions in parallel
+  cl <- parallel::makeCluster(workers, type = "SOCK")
   doSNOW::registerDoSNOW(cl)
-  parallel::clusterSetRNGStream(cl, 12345L)
-  on.exit(if (isTRUE(own_cluster)) try(parallel::stopCluster(cl), silent = TRUE), add = TRUE)
   
-  # ★ これを追加：各ワーカーに pairwise_method を伝える
-  parallel::clusterCall(cl, function(m) { options(muren_pair_method = m); NULL }, pairwise_method)
+  res_pairwise <-  foreach(
+    task = iter(task_quene),
+    .packages = c("MASS"),
+    .combine = cbind,
+    .export = c("log_raw_reads_mx", "reg_sp", "reg_dp", "mode_sp")
+  ) %dopar%
+    eval(task)
   
-  # ワーカーに必要な関数を配布
-  parallel::clusterExport(
-    cl,
-    varlist = c("reg_sp","mode_sp","reg_dp",".reg_backend",
-                "polish_one_gene","polish_coeff","lg","ep","TOL"),
-    envir = .GlobalEnv
-  )
   
-  pkgs <- c("MASS")
-  if (requireNamespace("robustbase", quietly = TRUE)) pkgs <- c(pkgs, "robustbase")
   
-  # ---- チャンク配布で並列実行 ----
-  n_pairs <- nrow(pairs)
-  n_parts <- min(workers, n_pairs)
-  split_idx <- split(seq_len(n_pairs),
-                     rep(seq_len(n_parts), each = ceiling(n_pairs / n_parts), length.out = n_pairs))
+  ## Step 2: Median polish for each gene
   
-  if (single_param) {
-    # reg_sp / mode_sp：各ペア 1 スカラー → ベクトル連結
-    res_chunks <- foreach::foreach(
-      idx = iterators::iter(split_idx),
-      .packages = pkgs,
-      # ← 関数だけを明示。データ系は foreach の自動捕捉に任せる
-      .export   = c("reg_sp","mode_sp",".reg_backend"),
-      .combine  = "c"
-    ) %dopar% {
-      out <- numeric(length(idx))
-      for (ii in seq_along(idx)) {
-        p <- idx[ii]; i <- pairs[p, 1]; j <- pairs[p, 2]
-        if (reg_wapper == 'reg_sp')      out[ii] <- reg_sp (log_raw_reads_mx[, i], log_raw_reads_mx[, j], ...)
-        else                              out[ii] <- mode_sp(log_raw_reads_mx[, i], log_raw_reads_mx[, j], ...)
-      }
-      out
-    }
-    res_pairwise <- as.numeric(res_chunks)
+  # For each gene, the fitted reads of different refs and samples
+  # lie in the same row of matrix fitted_reads.
+  # A matrix of two factors 'ref X sample' (rs_mx) is needed for median polish.
+  # The levels of refs are set to 1,2,...,n_exp for brief, and
+  # then remove the unused refs.
+  
+  
+  # Skip median polish if there is one ref
+  if (refs %>% sapply(length) %>% max == 1){
     
-  } else {
-    # reg_dp：各ペア n_gene ベクトル → 行列cbind
-    res_chunks <- foreach::foreach(
-      idx = iterators::iter(split_idx),
-      .packages = pkgs,
-      .export   = c("reg_dp",".reg_backend",
-                    "log_raw_reads_mx","pairs","n_gene"),
-      .combine  = "cbind"
-    ) %dopar% {
-      out <- matrix(NA_real_, n_gene, length(idx))
-      for (ii in seq_along(idx)) {
-        p <- idx[ii]; i <- pairs[p, 1]; j <- pairs[p, 2]
-        out[, ii] <- reg_dp(log_raw_reads_mx[, i], log_raw_reads_mx[, j], ...)
-      }
-      out
-    }
-    res_pairwise <- as.matrix(res_chunks)
+    # transform to raw scale
+    fitted_reads  = ep(fitted_reads)
+    # 0 -> 0
+    
+    # fitted_reads[abs(log_raw_reads_mx) < TOL] = 0
+    
+    rownames(fitted_reads) = NULL
+    colnames(fitted_reads) = colnames(reads)
+    
+    t = raw_reads %>%
+      sapply(is.numeric) %>%
+      not %>%
+      extract(raw_reads, .) %>%
+      cbind(fitted_reads)
+    
+    return(t)
   }
   
-  # ---- まとめ ----
-  if (single_param) {
-    if (length(res_pairwise) != length(locations))
-      stop("Pairwise result length mismatch (single_param).")
+  # locations in rs_mx
+  locations = rep(0, length(task_quene))
+  k = 1
+  for (i in 1:n_exp) {
+    # i-sample
+    for (j in refs[[i]]) {
+      # j-ref
+      locations[k] = j + (i - 1) * n_exp
+      k = k + 1
+    }
+  }
+  
+  
+  # coeffs = as.matrix(coeffs)
+  
+  # gene-wise polish in dp and general (spline/smooth) cases
+  
+  if (!single_param) {
+    # alpha_dp = matrix(coeffs[1,], byrow = T, nrow = length(used_refs))
+    # beta_dp = matrix(coeffs[2,], byrow = T, nrow = length(used_refs))
     
-    # サンプル効果（log2係数）を推定
-    coef_sp <- polish_coeff(
-      fitted_n    = res_pairwise,
-      n_exp       = n_exp,
-      locations   = locations,
-      unused_refs = unused_refs,
-      maxiter     = maxiter
-    )
-    coef_sp <- 2^(as.vector(coef_sp))
-    names(coef_sp) <- colnames(reads)
-    
-    if (res_return == 'scaling_coeff') return(1/coef_sp)
-    
-    # counts をスケール（diag生成を避ける）
-    polished_mx <- sweep(as.matrix(raw_reads[, i_sample, drop = FALSE]), 2, coef_sp, `*`)
-    if (res_return == 'log_counts') polished_mx <- lg(polished_mx)
-    
-  } else {
-    if (!is.matrix(res_pairwise) || nrow(res_pairwise) != n_gene)
-      stop("Pairwise result shape mismatch (double_param).")
-    
-    # gene-wise polish
-    polished_mx <- foreach::foreach(
-      n = iterators::iter(seq_len(n_gene)),
+    polished_mx = foreach(
+      n = 1:n_gene,
       .combine = rbind,
-      .export  = c("polish_one_gene")
-    ) %dopar% {
+      .export = c("polish_one_gene")
+    ) %dopar%
       polish_one_gene(
-        fitted_n    = res_pairwise[n, ],
-        n_exp       = n_exp,
-        locations   = locations,
-        unused_refs = unused_refs,
-        maxiter     = maxiter
-      )
+        res_pairwise[n,], # pre-normalized log counts
+        n_exp,
+        locations,
+        unused_refs,
+        maxiter)
+    
+    # 0 -> 0 when dp
+    polished_mx[log_raw_reads_mx < TOL | polished_mx < 0] = 0
+    
+    # return value
+    if(res_return == 'counts'){
+      polished_mx = ep(polished_mx)
     }
     
-    # 0→0 と負の丸め
-    polished_mx[log_raw_reads_mx < TOL | polished_mx < 0] <- 0
     
-    if (res_return == 'counts') {
-      polished_mx <- ep(polished_mx)  # 2^x - 1
-    } else if (res_return == 'log_counts') {
-      # そのまま
-    } else if (res_return == 'scaling_coeff') {
-      stop("res_return='scaling_coeff' is only valid when single_param=TRUE.")
+  }
+  parallel::stopCluster(cl)
+  
+  
+  if(single_param){
+    coef_sp = polish_coeff(res_pairwise, # scaling coeffs
+                           n_exp,
+                           locations,
+                           unused_refs,
+                           maxiter)
+    
+    # return library size that be divided by raw counts
+    coef_sp = 2^(as.vector(coef_sp))
+    names(coef_sp) = colnames(reads)
+    
+    if(res_return == 'scaling_coeff'){
+      
+      return(1/coef_sp)
     }
+    
+    polished_mx =  as.matrix(raw_reads[, i_sample]) %*% diag(coef_sp)
+    
+    if(res_return == 'log_counts'){
+      polished_mx = lg(polished_mx)
+    }
+    
   }
   
-  # ---- 付帯情報/型 ----
-  if (!is.null(rownames(raw_reads))) {
-    if (single_param) rownames(polished_mx) <- rownames(raw_reads)
-    else              rownames(polished_mx) <- rownames(reads)
-  }
-  colnames(polished_mx) <- colnames(reads)
   
-  if (is.data.frame(raw_reads)) {
-    res_df <- raw_reads
-    if (single_param) {
-      res_df[, i_sample] <- polished_mx
-    } else {
-      res_df <- res_df[i_gene, , drop = FALSE]
-      res_df[, i_sample] <- polished_mx
-    }
-    return(res_df)
-  } else {
-    return(as.matrix(polished_mx))
+  
+  rownames(polished_mx) = NULL
+  if(!is.null(rownames(raw_reads))){
+    if(single_param) rownames(polished_mx) = rownames(raw_reads)
+    else rownames(polished_mx) = rownames(raw_reads)[i_gene]
   }
+  colnames(polished_mx) = colnames(reads)
+  
+  #
+  
+  ## add anno if raw_reads is data.frame
+  
+  if(is.data.frame(raw_reads)){
+    i_count = sapply(raw_reads, is.numeric)
+    if(!all(i_count)){
+      res = raw_reads
+      if(single_param){
+        res[, i_count] = polished_mx
+      }
+      else{
+        res[i_gene, i_count] = polished_mx
+      }
+      
+      
+      return(res)
+    }
+    
+    return(as.data.frame(polished_mx))
+  }
+  
+  return(polished_mx)
+  
+  
 }
