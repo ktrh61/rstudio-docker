@@ -32,28 +32,21 @@ suppressPackageStartupMessages({
 # ============================================================================
 
 CONFIG <- list(
-  # Statistical thresholds
-  FDR_CUTOFF = 0.05,          # FDR threshold for significance
-  PVALUE_CUTOFF = 0.05,       # p-value threshold
+  # Statistical threshold
+  FDR_CUTOFF = 0.05,          # FDR threshold for Storey method
   
-  # Gene set size limits
+  # Gene set size limits (for both ORA and GSEA)
   MIN_GENESET_SIZE = 10,      # Minimum genes in a set
   MAX_GENESET_SIZE = 500,     # Maximum genes in a set
   
-  # GSEA parameters
-  GSEA_NPERM = 10000,         # Number of permutations
-  GSEA_MINSIZE = 10,          # Minimum gene set size for GSEA
-  GSEA_MAXSIZE = 500,         # Maximum gene set size for GSEA
-  
   # Output control
-  TOP_TERMS = 30,             # Top terms to show in plots
   VERBOSE = TRUE              # Verbose output
 )
 
 cat("\nConfiguration:\n")
 cat("  FDR threshold:", CONFIG$FDR_CUTOFF, "\n")
 cat("  Gene set size:", CONFIG$MIN_GENESET_SIZE, "-", CONFIG$MAX_GENESET_SIZE, "\n")
-cat("  GSEA permutations:", CONFIG$GSEA_NPERM, "\n")
+cat("  GSEA: Using fgseaMultilevel (adaptive)\n")
 
 # ============================================================================
 # Load DEG results
@@ -89,7 +82,8 @@ all_gene_ids <- unique(unlist(lapply(thyr_deg_results, function(x) {
   x$deg_summary$results_df$gene_id
 })))
 
-# Remove version numbers from Ensembl IDs
+# Remove Ensembl version numbers (e.g., ENSG00000001.5 -> ENSG00000001)
+# This is standard practice as version numbers change between releases
 all_gene_ids_clean <- sub("\\..*", "", all_gene_ids)
 
 cat("Total unique genes:", length(all_gene_ids_clean), "\n")
@@ -114,7 +108,15 @@ gene_mapping <- tryCatch({
 })
 
 # Remove duplicates and NAs
+# For 1:many mappings (one Ensembl -> multiple Entrez), keep the first
 gene_mapping <- gene_mapping[!is.na(gene_mapping$ENTREZID), ]
+
+# Check for 1:many mappings before removing duplicates
+n_multi <- sum(duplicated(gene_mapping$ENSEMBL))
+if (n_multi > 0) {
+  cat(sprintf("  Note: %d Ensembl IDs map to multiple Entrez IDs (using first match)\n", n_multi))
+}
+
 gene_mapping <- gene_mapping[!duplicated(gene_mapping$ENSEMBL), ]
 
 cat("  Successfully mapped:", nrow(gene_mapping), "genes\n")
@@ -339,8 +341,12 @@ prepare_gsea_genelist <- function(deg_results, gene_mapping) {
   gene_list <- all_genes_mapped$log2FC
   names(gene_list) <- all_genes_mapped$ENTREZID
   
-  # Remove duplicates by keeping the one with largest absolute fold change
+  # Handle duplicate Entrez IDs (different Ensembl IDs mapping to same Entrez)
+  # Keep the one with largest absolute fold change
   if (any(duplicated(names(gene_list)))) {
+    n_dup <- sum(duplicated(names(gene_list)))
+    cat(sprintf("    Note: %d duplicate Entrez IDs found (using max |log2FC|)\n", n_dup))
+    
     gene_list_dedup <- tapply(gene_list, names(gene_list), function(x) x[which.max(abs(x))])
     # Convert array to numeric vector
     gene_list <- as.numeric(gene_list_dedup)
@@ -358,9 +364,8 @@ perform_go_gsea <- function(gene_list, ont = "BP") {
   gseGO(geneList = gene_list,
         OrgDb = org.Hs.eg.db,
         ont = ont,
-        nPerm = CONFIG$GSEA_NPERM,
-        minGSSize = CONFIG$GSEA_MINSIZE,
-        maxGSSize = CONFIG$GSEA_MAXSIZE,
+        minGSSize = CONFIG$MIN_GENESET_SIZE,
+        maxGSSize = CONFIG$MAX_GENESET_SIZE,
         pvalueCutoff = 1,  # Get all results
         pAdjustMethod = "BH",
         verbose = FALSE,
@@ -371,9 +376,8 @@ perform_go_gsea <- function(gene_list, ont = "BP") {
 perform_kegg_gsea <- function(gene_list) {
   gseKEGG(geneList = gene_list,
           organism = 'hsa',
-          nPerm = CONFIG$GSEA_NPERM,
-          minGSSize = CONFIG$GSEA_MINSIZE,
-          maxGSSize = CONFIG$GSEA_MAXSIZE,
+          minGSSize = CONFIG$MIN_GENESET_SIZE,
+          maxGSSize = CONFIG$MAX_GENESET_SIZE,
           pvalueCutoff = 1,  # Get all results
           pAdjustMethod = "BH",
           verbose = FALSE,
@@ -384,9 +388,8 @@ perform_kegg_gsea <- function(gene_list) {
 perform_reactome_gsea <- function(gene_list) {
   gsePathway(geneList = gene_list,
              organism = "human",
-             nPerm = CONFIG$GSEA_NPERM,
-             minGSSize = CONFIG$GSEA_MINSIZE,
-             maxGSSize = CONFIG$GSEA_MAXSIZE,
+             minGSSize = CONFIG$MIN_GENESET_SIZE,
+             maxGSSize = CONFIG$MAX_GENESET_SIZE,
              pvalueCutoff = 1,  # Get all results
              pAdjustMethod = "BH",
              verbose = FALSE,
@@ -478,95 +481,123 @@ cat("\nPhase 3 complete! Ready to run enrichment analyses.\n")
 
 cat("\n=== EXECUTING ENRICHMENT ANALYSES ===\n")
 
-# Initialize results storage
-all_enrichment_results <- list()
-
-# ----------------------------------------------------------------------------
-# 1. ORA for R0_vs_R1_tumor
-# ----------------------------------------------------------------------------
-
-if ("R0_vs_R1_tumor" %in% names(thyr_deg_results)) {
-  cat("\n[ORA Analysis] R0_vs_R1_tumor\n")
+# Check if results already exist
+results_file <- paste0(output_dir, "all_enrichment_results.rds")
+if (file.exists(results_file)) {
+  cat("Previous results detected. Loading from file...\n")
+  all_enrichment_results <- readRDS(results_file)
+  cat("Loaded enrichment results successfully.\n")
+  
+  # Count results
+  if ("R0_vs_R1_tumor_ORA" %in% names(all_enrichment_results)) {
+    ora_count <- sum(!sapply(all_enrichment_results[["R0_vs_R1_tumor_ORA"]], is.null))
+    cat(sprintf("  ORA analyses: %d\n", ora_count))
+  }
+  
+  if ("GSEA" %in% names(all_enrichment_results)) {
+    gsea_count <- 0
+    for (comp in names(all_enrichment_results[["GSEA"]])) {
+      gsea_count <- gsea_count + sum(!sapply(all_enrichment_results[["GSEA"]][[comp]], is.null))
+    }
+    cat(sprintf("  GSEA analyses: %d\n", gsea_count))
+  }
+  
+  cat("\nSkipping re-analysis. To force re-analysis, delete:\n")
+  cat("  ", results_file, "\n")
+  
+} else {
+  # Execute new analysis
+  cat("No previous results found. Starting new analysis...\n")
+  
+  # Initialize results storage
+  all_enrichment_results <- list()
+  
+  # ----------------------------------------------------------------------------
+  # 1. ORA for R0_vs_R1_tumor
+  # ----------------------------------------------------------------------------
+  
+  if ("R0_vs_R1_tumor" %in% names(thyr_deg_results)) {
+    cat("\n[ORA Analysis] R0_vs_R1_tumor\n")
+    cat("======================================\n")
+    
+    ora_results <- run_ora_analysis(
+      comparison_name = "R0_vs_R1_tumor",
+      thyr_deg_results = thyr_deg_results,
+      gene_mapping = gene_mapping,
+      output_dir = output_dir
+    )
+    
+    all_enrichment_results[["R0_vs_R1_tumor_ORA"]] <- ora_results
+    
+    # Summary
+    successful_ora <- sum(!sapply(ora_results, is.null))
+    cat(sprintf("\n  ORA Complete: %d/%d analyses successful\n", 
+                successful_ora, length(ora_results)))
+  }
+  
+  # ----------------------------------------------------------------------------
+  # 2. GSEA for all comparisons
+  # ----------------------------------------------------------------------------
+  
+  cat("\n[GSEA Analysis] All Comparisons\n")
   cat("======================================\n")
   
-  ora_results <- run_ora_analysis(
-    comparison_name = "R0_vs_R1_tumor",
-    thyr_deg_results = thyr_deg_results,
-    gene_mapping = gene_mapping,
-    output_dir = output_dir
-  )
+  comparisons_to_analyze <- names(thyr_deg_results)
+  gsea_results_all <- list()
   
-  all_enrichment_results[["R0_vs_R1_tumor_ORA"]] <- ora_results
+  for (comp_name in comparisons_to_analyze) {
+    cat(sprintf("\nProcessing: %s\n", comp_name))
+    cat(paste(rep("-", 40), collapse = ""), "\n")
+    
+    gsea_results <- run_gsea_analysis(
+      comparison_name = comp_name,
+      thyr_deg_results = thyr_deg_results,
+      gene_mapping = gene_mapping,
+      output_dir = output_dir
+    )
+    
+    gsea_results_all[[comp_name]] <- gsea_results
+    
+    # Summary for this comparison
+    successful_gsea <- sum(!sapply(gsea_results, is.null))
+    cat(sprintf("  GSEA Complete: %d/3 databases enriched\n", successful_gsea))
+  }
   
-  # Summary
-  successful_ora <- sum(!sapply(ora_results, is.null))
-  cat(sprintf("\n  ORA Complete: %d/%d analyses successful\n", 
-              successful_ora, length(ora_results)))
+  all_enrichment_results[["GSEA"]] <- gsea_results_all
+  
+  # ----------------------------------------------------------------------------
+  # 3. Overall Summary
+  # ----------------------------------------------------------------------------
+  
+  cat("\n=== ENRICHMENT ANALYSIS SUMMARY ===\n")
+  cat("=====================================\n")
+  
+  # Count ORA results
+  if ("R0_vs_R1_tumor_ORA" %in% names(all_enrichment_results)) {
+    ora_count <- sum(!sapply(all_enrichment_results[["R0_vs_R1_tumor_ORA"]], is.null))
+    cat(sprintf("ORA analyses completed: %d\n", ora_count))
+  }
+  
+  # Count GSEA results
+  gsea_count <- 0
+  for (comp in names(all_enrichment_results[["GSEA"]])) {
+    gsea_count <- gsea_count + sum(!sapply(all_enrichment_results[["GSEA"]][[comp]], is.null))
+  }
+  cat(sprintf("GSEA analyses completed: %d\n", gsea_count))
+  
+  # Total analyses
+  total_analyses <- ifelse(exists("ora_count"), ora_count, 0) + gsea_count
+  cat(sprintf("\nTotal enrichment analyses: %d\n", total_analyses))
+  
+  # Save consolidated results object
+  saveRDS(all_enrichment_results, results_file)
+  cat("\nResults saved: all_enrichment_results.rds\n")
+  
+  # List output directory contents
+  output_files <- list.files(output_dir, recursive = TRUE, pattern = "\\.csv$")
+  cat(sprintf("\nGenerated %d result files in %s\n", 
+              length(output_files), output_dir))
 }
-
-# ----------------------------------------------------------------------------
-# 2. GSEA for all comparisons
-# ----------------------------------------------------------------------------
-
-cat("\n[GSEA Analysis] All Comparisons\n")
-cat("======================================\n")
-
-comparisons_to_analyze <- names(thyr_deg_results)
-gsea_results_all <- list()
-
-for (comp_name in comparisons_to_analyze) {
-  cat(sprintf("\nProcessing: %s\n", comp_name))
-  cat(paste(rep("-", 40), collapse = ""), "\n")
-  
-  gsea_results <- run_gsea_analysis(
-    comparison_name = comp_name,
-    thyr_deg_results = thyr_deg_results,
-    gene_mapping = gene_mapping,
-    output_dir = output_dir
-  )
-  
-  gsea_results_all[[comp_name]] <- gsea_results
-  
-  # Summary for this comparison
-  successful_gsea <- sum(!sapply(gsea_results, is.null))
-  cat(sprintf("  GSEA Complete: %d/3 databases enriched\n", successful_gsea))
-}
-
-all_enrichment_results[["GSEA"]] <- gsea_results_all
-
-# ----------------------------------------------------------------------------
-# 3. Overall Summary
-# ----------------------------------------------------------------------------
-
-cat("\n=== ENRICHMENT ANALYSIS SUMMARY ===\n")
-cat("=====================================\n")
-
-# Count ORA results
-if ("R0_vs_R1_tumor_ORA" %in% names(all_enrichment_results)) {
-  ora_count <- sum(!sapply(all_enrichment_results[["R0_vs_R1_tumor_ORA"]], is.null))
-  cat(sprintf("ORA analyses completed: %d\n", ora_count))
-}
-
-# Count GSEA results
-gsea_count <- 0
-for (comp in names(all_enrichment_results[["GSEA"]])) {
-  gsea_count <- gsea_count + sum(!sapply(all_enrichment_results[["GSEA"]][[comp]], is.null))
-}
-cat(sprintf("GSEA analyses completed: %d\n", gsea_count))
-
-# Total analyses
-total_analyses <- ifelse(exists("ora_count"), ora_count, 0) + gsea_count
-cat(sprintf("\nTotal enrichment analyses: %d\n", total_analyses))
-
-# Save consolidated results object
-saveRDS(all_enrichment_results, 
-        paste0(output_dir, "all_enrichment_results.rds"))
-cat("\nResults saved: all_enrichment_results.rds\n")
-
-# List output directory contents
-output_files <- list.files(output_dir, recursive = TRUE, pattern = "\\.csv$")
-cat(sprintf("\nGenerated %d result files in %s\n", 
-            length(output_files), output_dir))
 
 cat("\nPhase 4 complete! Main enrichment analyses finished.\n")
 cat("Next: Cross-driver gene annotation (Phase 5)\n")
