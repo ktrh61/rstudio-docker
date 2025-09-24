@@ -126,7 +126,7 @@ r0_cases <- ret_cases %>% filter(group == "R0")
 r1_cases <- ret_cases %>% filter(group == "R1")
 
 cat(sprintf("  R0 cases (POC=0%%): %d\n", nrow(r0_cases)))
-cat(sprintf("  R1 cases (POC≥66.6%%): %d\n", nrow(r1_cases)))
+cat(sprintf("  R1 cases (POCâ‰¥66.6%%): %d\n", nrow(r1_cases)))
 
 # Check sample counts
 if (nrow(r0_cases) < 5 || nrow(r1_cases) < 5) {
@@ -217,7 +217,7 @@ names(gene_lengths) <- rownames(se)
 cat("  Validating gene lengths...\n")
 invalid_lengths <- which(is.na(gene_lengths) | gene_lengths <= 0)
 if (length(invalid_lengths) > 0) {
-  cat(sprintf("  WARNING: Found %d genes with invalid lengths (NA or ≤0)\n", 
+  cat(sprintf("  WARNING: Found %d genes with invalid lengths (NA or â‰¤0)\n", 
               length(invalid_lengths)))
   
   # Show examples
@@ -320,7 +320,7 @@ if (any(!is.finite(log2_tpm))) {
 }
 
 cat("  Log2 transformation completed successfully\n")
-cat(sprintf("  Matrix dimensions: %d genes × %d samples\n", 
+cat(sprintf("  Matrix dimensions: %d genes Ã— %d samples\n", 
             nrow(log2_tpm), ncol(log2_tpm)))
 
 # --------------------------------------------------------------------------
@@ -333,9 +333,9 @@ cat("\n--- 1.7 Creating group-specific matrices ---\n")
 log2_tpm_r0 <- log2_tpm[, r0_samples]
 log2_tpm_r1 <- log2_tpm[, r1_samples]
 
-cat(sprintf("  R0 matrix: %d genes × %d samples\n", 
+cat(sprintf("  R0 matrix: %d genes Ã— %d samples\n", 
             nrow(log2_tpm_r0), ncol(log2_tpm_r0)))
-cat(sprintf("  R1 matrix: %d genes × %d samples\n", 
+cat(sprintf("  R1 matrix: %d genes Ã— %d samples\n", 
             nrow(log2_tpm_r1), ncol(log2_tpm_r1)))
 
 # --------------------------------------------------------------------------
@@ -421,14 +421,14 @@ cat("Ready for Step 2: Candidate Pair Generation\n")
 
 # Final check
 cat("\n--- Final Status ---\n")
-cat(sprintf("  ✓ R0 samples: %d (expected: 11)\n", length(r0_samples)))
-cat(sprintf("  ✓ R1 samples: %d (expected: 13)\n", length(r1_samples)))
-cat(sprintf("  ✓ Zero-free genes: %d\n", length(zero_free_genes)))
-cat(sprintf("  ✓ DEGs total: %d\n", nrow(sig_degs)))
-cat(sprintf("  ✓ DEGs in zero-free: %d (%.1f%%)\n", 
+cat(sprintf("  âœ“ R0 samples: %d (expected: 11)\n", length(r0_samples)))
+cat(sprintf("  âœ“ R1 samples: %d (expected: 13)\n", length(r1_samples)))
+cat(sprintf("  âœ“ Zero-free genes: %d\n", length(zero_free_genes)))
+cat(sprintf("  âœ“ DEGs total: %d\n", nrow(sig_degs)))
+cat(sprintf("  âœ“ DEGs in zero-free: %d (%.1f%%)\n", 
             length(degs_in_zero_free),
             length(degs_in_zero_free) / nrow(sig_degs) * 100))
-cat("  ✓ Data saved successfully\n")
+cat("  âœ“ Data saved successfully\n")
 cat("\nNote: DEG filtering will be applied in Step 2 for candidate pair generation\n")
 
 # ============================================================================
@@ -468,7 +468,7 @@ cat("\n--- 2.2 Calculating median TPM across R0+R1 ---\n")
 
 # Combine R0 and R1 log2 TPM matrices
 all_samples_log2tpm <- cbind(log2_tpm_r0, log2_tpm_r1)
-cat(sprintf("  Combined matrix: %d genes × %d samples\n", 
+cat(sprintf("  Combined matrix: %d genes Ã— %d samples\n", 
             nrow(all_samples_log2tpm), ncol(all_samples_log2tpm)))
 
 # Calculate median log2 TPM for each gene across all samples
@@ -638,10 +638,10 @@ if (final_candidates < min_candidates_required) {
   if (CONFIG$trim_low != 0.10 || CONFIG$M != 10) {
     cat("  NOTE: Already adjusted parameters:\n")
     if (CONFIG$trim_low != 0.10) {
-      cat(sprintf("    - trim_low: 0.10 → %.2f\n", CONFIG$trim_low))
+      cat(sprintf("    - trim_low: 0.10 â†’ %.2f\n", CONFIG$trim_low))
     }
     if (CONFIG$M != 10) {
-      cat(sprintf("    - M: 10 → %d\n", CONFIG$M))
+      cat(sprintf("    - M: 10 â†’ %d\n", CONFIG$M))
     }
   }
   
@@ -652,7 +652,7 @@ if (final_candidates < min_candidates_required) {
   stop(sprintf("STOPPING: Only %d pairs, need at least %d", 
                final_candidates, min_candidates_required))
 } else {
-  cat(sprintf("\n  ✓ Sufficient candidates: %d ≥ %d\n", 
+  cat(sprintf("\n  âœ“ Sufficient candidates: %d â‰¥ %d\n", 
               final_candidates, min_candidates_required))
 }
 
@@ -743,11 +743,324 @@ cat("Ready for Step 3: Adoption Criteria\n")
 
 # Final summary
 cat("\n--- Step 2 Summary ---\n")
-cat(sprintf("  Initial pairs (up × down): %s\n", 
+cat(sprintf("  Initial pairs (up Ã— down): %s\n", 
             format(initial_pairs_raw, big.mark = ",")))
 cat(sprintf("  After expression trim: %s\n", 
             format(initial_pairs_after_trim, big.mark = ",")))
 cat(sprintf("  After M=%d limit: %d\n", CONFIG$M, final_candidates))
 cat(sprintf("  Retention rate: %.1f%%\n", 
             final_candidates / initial_pairs_raw * 100))
-cat("  ✓ All criteria satisfied\n")
+cat("  âœ“ All criteria satisfied\n")
+
+# ============================================================================
+# STEP 3a: Adoption Criteria - Basic Judgment
+# ============================================================================
+
+cat("\n\n=== STEP 3a: Adoption Criteria (Basic Judgment) ===\n\n")
+
+# --------------------------------------------------------------------------
+# 3a.1 Load Step 2 data and calculate REO values
+# --------------------------------------------------------------------------
+
+cat("--- 3a.1 Loading data and calculating REO values ---\n")
+
+step2_data <- readRDS(paste0(paths$processed, "reo_step2_data.rds"))
+pairs_df <- step2_data$pairs_df
+log2_tpm_r0 <- step2_data$log2_tpm_r0
+log2_tpm_r1 <- step2_data$log2_tpm_r1
+
+cat(sprintf("  Loaded %d candidate pairs\n", nrow(pairs_df)))
+cat(sprintf("  R0 samples: %d, R1 samples: %d\n", 
+            ncol(log2_tpm_r0), ncol(log2_tpm_r1)))
+
+# Calculate REO values (r = log2(up/down) = log2(up) - log2(down))
+# Since we already have log2 TPM, just subtract
+cat("\n  Calculating REO values (r = log2(up/down))...\n")
+
+# For R0 samples
+reo_r0 <- matrix(NA, nrow = nrow(pairs_df), ncol = ncol(log2_tpm_r0))
+colnames(reo_r0) <- colnames(log2_tpm_r0)
+for (i in 1:nrow(pairs_df)) {
+  up_values <- log2_tpm_r0[pairs_df$gene_up[i], ]
+  down_values <- log2_tpm_r0[pairs_df$gene_down[i], ]
+  reo_r0[i, ] <- up_values - down_values
+}
+
+# For R1 samples
+reo_r1 <- matrix(NA, nrow = nrow(pairs_df), ncol = ncol(log2_tpm_r1))
+colnames(reo_r1) <- colnames(log2_tpm_r1)
+for (i in 1:nrow(pairs_df)) {
+  up_values <- log2_tpm_r1[pairs_df$gene_up[i], ]
+  down_values <- log2_tpm_r1[pairs_df$gene_down[i], ]
+  reo_r1[i, ] <- up_values - down_values
+}
+
+cat(sprintf("  REO matrices created: %d pairs Ã— %d R0 + %d R1 samples\n",
+            nrow(pairs_df), ncol(reo_r0), ncol(reo_r1)))
+
+# --------------------------------------------------------------------------
+# 3a.2 Apply five judgment criteria
+# --------------------------------------------------------------------------
+
+cat("\n--- 3a.2 Applying judgment criteria ---\n")
+
+# Initialize results
+judgment_results <- data.frame(
+  pair_id = pairs_df$pair_id,
+  # Criterion 1: R0 directionality
+  r0_consistent_direction = NA,
+  r0_direction = NA,
+  r0_exceptions = NA,
+  r0_valid_samples = NA,
+  criterion1_pass = FALSE,
+  # Criterion 2: Strength
+  r0_a2_value = NA,
+  r0_strong_samples = NA,
+  criterion2_pass = FALSE,
+  # Criterion 3: R1 reversal
+  r1_reversal_rate = NA,
+  r1_reversal_count = NA,
+  r1_valid_samples = NA,
+  r1_ci_lower = NA,
+  criterion3_pass = FALSE,
+  # Criterion 4: 100% reversal exclusion
+  criterion4_pass = TRUE,  # Default true, set false if 100% reversal
+  # Criterion 5: Dead zone (implicit in other criteria)
+  # Overall
+  all_criteria_pass = FALSE,
+  stringsAsFactors = FALSE
+)
+
+# Process each pair
+cat("  Processing criteria for each pair...\n")
+pb <- txtProgressBar(min = 0, max = nrow(pairs_df), style = 3)
+
+for (i in 1:nrow(pairs_df)) {
+  # Get REO values for this pair
+  r0_values <- reo_r0[i, ]
+  r1_values <- reo_r1[i, ]
+  
+  # ===== Criterion 1: R0 Directionality =====
+  # Only consider |r| >= dead_zone
+  r0_valid <- abs(r0_values) >= CONFIG$dead_zone
+  r0_valid_values <- r0_values[r0_valid]
+  n_r0_valid <- length(r0_valid_values)
+  
+  if (n_r0_valid >= (length(r0_values) - 1)) {
+    # Enough valid samples (at least n-1)
+    r0_signs <- sign(r0_valid_values)
+    r0_positive <- sum(r0_signs > 0)
+    r0_negative <- sum(r0_signs < 0)
+    
+    # Determine majority direction
+    if (r0_positive >= r0_negative) {
+      r0_direction <- 1
+      r0_exceptions <- r0_negative
+    } else {
+      r0_direction <- -1
+      r0_exceptions <- r0_positive
+    }
+    
+    # Check if consistent (at most 1 exception)
+    criterion1 <- r0_exceptions <= 1
+    
+    judgment_results$r0_direction[i] <- r0_direction
+    judgment_results$r0_exceptions[i] <- r0_exceptions
+    judgment_results$r0_valid_samples[i] <- n_r0_valid
+    judgment_results$criterion1_pass[i] <- criterion1
+  } else {
+    # Not enough valid samples
+    judgment_results$r0_valid_samples[i] <- n_r0_valid
+    judgment_results$criterion1_pass[i] <- FALSE
+    # Skip to next pair
+    setTxtProgressBar(pb, i)
+    next
+  }
+  
+  # ===== Criterion 2: Strength (a[2] >= tau_strength) =====
+  # Remove |r| < dead_zone
+  r0_strong <- abs(r0_values) >= CONFIG$dead_zone
+  r0_strong_values <- abs(r0_values[r0_strong])  # Use absolute values for strength
+  n_r0_strong <- length(r0_strong_values)
+  
+  if (n_r0_strong >= (length(r0_values) - 1)) {
+    # Sort and get a[2] (second smallest)
+    r0_sorted <- sort(r0_strong_values)
+    if (length(r0_sorted) >= 2) {
+      a2_value <- r0_sorted[2]  # Second smallest
+      criterion2 <- a2_value >= CONFIG$tau_strength
+      
+      judgment_results$r0_a2_value[i] <- a2_value
+      judgment_results$r0_strong_samples[i] <- n_r0_strong
+      judgment_results$criterion2_pass[i] <- criterion2
+    } else {
+      judgment_results$r0_strong_samples[i] <- n_r0_strong
+      judgment_results$criterion2_pass[i] <- FALSE
+    }
+  } else {
+    judgment_results$r0_strong_samples[i] <- n_r0_strong
+    judgment_results$criterion2_pass[i] <- FALSE
+  }
+  
+  # ===== Criterion 3: R1 Reversal =====
+  # Remove |r| < dead_zone for R1 too
+  r1_valid <- abs(r1_values) >= CONFIG$dead_zone
+  r1_valid_values <- r1_values[r1_valid]
+  n_r1_valid <- length(r1_valid_values)
+  
+  if (n_r1_valid > 0 && !is.na(r0_direction)) {
+    # Count reversals (opposite sign to R0 expectation)
+    if (r0_direction == 1) {
+      # R0 expects positive, count negatives in R1
+      r1_reversals <- sum(r1_valid_values < 0)
+    } else {
+      # R0 expects negative, count positives in R1
+      r1_reversals <- sum(r1_valid_values > 0)
+    }
+    
+    r1_reversal_rate <- r1_reversals / n_r1_valid
+    
+    # Wilson confidence interval (no continuity correction)
+    if (n_r1_valid > 0) {
+      # Wilson score interval
+      z <- qnorm(0.975)  # 95% CI
+      p_hat <- r1_reversal_rate
+      n <- n_r1_valid
+      
+      denominator <- 1 + z^2/n
+      center <- (p_hat + z^2/(2*n)) / denominator
+      margin <- z * sqrt(p_hat * (1-p_hat) / n + z^2/(4*n^2)) / denominator
+      
+      ci_lower <- center - margin
+      ci_upper <- center + margin
+      
+      # Ensure bounds are [0,1]
+      ci_lower <- max(0, ci_lower)
+      ci_upper <- min(1, ci_upper)
+      
+      criterion3 <- ci_lower > 0.5
+      
+      judgment_results$r1_reversal_rate[i] <- r1_reversal_rate
+      judgment_results$r1_reversal_count[i] <- r1_reversals
+      judgment_results$r1_valid_samples[i] <- n_r1_valid
+      judgment_results$r1_ci_lower[i] <- ci_lower
+      judgment_results$criterion3_pass[i] <- criterion3
+    }
+  } else {
+    judgment_results$r1_valid_samples[i] <- n_r1_valid
+    judgment_results$criterion3_pass[i] <- FALSE
+  }
+  
+  # ===== Criterion 4: 100% Reversal Exclusion =====
+  if (!is.na(judgment_results$r1_reversal_rate[i])) {
+    if (judgment_results$r1_reversal_rate[i] == 1.0) {
+      judgment_results$criterion4_pass[i] <- FALSE
+    }
+  }
+  
+  # ===== Overall Pass/Fail =====
+  judgment_results$all_criteria_pass[i] <- 
+    judgment_results$criterion1_pass[i] &
+    judgment_results$criterion2_pass[i] &
+    judgment_results$criterion3_pass[i] &
+    judgment_results$criterion4_pass[i]
+  
+  setTxtProgressBar(pb, i)
+}
+close(pb)
+
+# --------------------------------------------------------------------------
+# 3a.3 Summary of results
+# --------------------------------------------------------------------------
+
+cat("\n--- 3a.3 Summary of judgment results ---\n")
+
+# Count passes for each criterion
+cat("\nCriterion pass rates:\n")
+cat(sprintf("  1. R0 directionality: %d / %d (%.1f%%)\n",
+            sum(judgment_results$criterion1_pass),
+            nrow(judgment_results),
+            sum(judgment_results$criterion1_pass) / nrow(judgment_results) * 100))
+
+cat(sprintf("  2. Strength (a[2]â‰¥%.2f): %d / %d (%.1f%%)\n",
+            CONFIG$tau_strength,
+            sum(judgment_results$criterion2_pass),
+            nrow(judgment_results),
+            sum(judgment_results$criterion2_pass) / nrow(judgment_results) * 100))
+
+cat(sprintf("  3. R1 reversal (CI>0.5): %d / %d (%.1f%%)\n",
+            sum(judgment_results$criterion3_pass),
+            nrow(judgment_results),
+            sum(judgment_results$criterion3_pass) / nrow(judgment_results) * 100))
+
+cat(sprintf("  4. Not 100%% reversal: %d / %d (%.1f%%)\n",
+            sum(judgment_results$criterion4_pass),
+            nrow(judgment_results),
+            sum(judgment_results$criterion4_pass) / nrow(judgment_results) * 100))
+
+cat(sprintf("\nOverall pass (all criteria): %d / %d (%.1f%%)\n",
+            sum(judgment_results$all_criteria_pass),
+            nrow(judgment_results),
+            sum(judgment_results$all_criteria_pass) / nrow(judgment_results) * 100))
+
+# Filter to passed pairs
+passed_pairs <- judgment_results[judgment_results$all_criteria_pass, ]
+cat(sprintf("\nâœ“ Pairs passing Step 3a: %d\n", nrow(passed_pairs)))
+
+# --------------------------------------------------------------------------
+# 3a.4 Save Step 3a results
+# --------------------------------------------------------------------------
+
+cat("\n--- 3a.4 Saving Step 3a results ---\n")
+
+# Combine with original pair info
+step3a_results <- cbind(
+  pairs_df,
+  judgment_results[, -1]  # Remove duplicate pair_id
+)
+
+step3a_data <- list(
+  # Configuration
+  config = CONFIG,
+  
+  # Full results
+  all_results = step3a_results,
+  passed_pairs = step3a_results[step3a_results$all_criteria_pass, ],
+  
+  # REO matrices for passed pairs
+  reo_r0_passed = reo_r0[judgment_results$all_criteria_pass, ],
+  reo_r1_passed = reo_r1[judgment_results$all_criteria_pass, ],
+  
+  # Summary statistics
+  n_input = nrow(pairs_df),
+  n_passed = sum(judgment_results$all_criteria_pass),
+  pass_rate = sum(judgment_results$all_criteria_pass) / nrow(pairs_df),
+  
+  # Sample info
+  r0_samples = step2_data$r0_samples,
+  r1_samples = step2_data$r1_samples,
+  
+  # Metadata
+  timestamp = Sys.time(),
+  step = "Step 3a Complete"
+)
+
+saveRDS(step3a_data, paste0(paths$processed, "reo_step3a_data.rds"))
+cat("  Step 3a data saved to: reo_step3a_data.rds\n")
+
+# Export summary CSV
+write.csv(step3a_results[step3a_results$all_criteria_pass, ],
+          paste0(paths$output, "step3a_passed_pairs.csv"),
+          row.names = FALSE)
+cat("  Passed pairs exported to: step3a_passed_pairs.csv\n")
+
+cat("\n=== STEP 3a COMPLETE ===\n")
+
+if (nrow(passed_pairs) > 0) {
+  cat("Ready for Step 3b: Proxy Check (Fusion subtype)\n")
+} else {
+  cat("WARNING: No pairs passed Step 3a criteria!\n")
+  cat("Consider adjusting parameters:\n")
+  cat("  - tau_strength (currently", CONFIG$tau_strength, ")\n")
+  cat("  - dead_zone (currently", CONFIG$dead_zone, ")\n")
+}
