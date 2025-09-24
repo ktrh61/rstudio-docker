@@ -24,9 +24,9 @@ CONFIG <- list(
   # Basic parameters
   tau_strength = log2(1.5),        # Strength criterion
   dead_zone = log2(1.2),           # Dead zone threshold
-  trim_low = 0.10,                 # Lower trim rate
+  trim_low = 0.07,                 # Lower trim rate (ADJUSTED from 0.10)
   trim_high = 0.10,                # Upper trim rate
-  M = 10,                          # Maximum pairs per gene
+  M = 12,                          # Maximum pairs per gene (ADJUSTED from 10)
   N = 10,                          # Panel size (default)
   T_ratio = 0.4,                   # Decision threshold ratio
   CI_method = "Wilson",            # CI calculation method (no continuity correction)
@@ -41,6 +41,7 @@ CONFIG <- list(
 
 # Log configuration
 cat("=== Configuration Parameters ===\n")
+cat("  NOTE: trim_low adjusted to 0.07, M adjusted to 12 due to candidate shortage\n")
 for(param in names(CONFIG)) {
   if(is.numeric(CONFIG[[param]])) {
     cat(sprintf("  %s: %.4f\n", param, CONFIG[[param]]))
@@ -79,18 +80,8 @@ if (is.null(r0r1_tumor)) {
 # Get DEG dataframe
 deg_df <- r0r1_tumor$deg_summary$results_df
 
-# Check required columns exist
-required_cols <- c("gene_id", "log2FC", "significant")
-missing_cols <- setdiff(required_cols, colnames(deg_df))
-if (length(missing_cols) > 0) {
-  cat("ERROR: Required columns missing from DEG results:\n")
-  cat("  Missing:", paste(missing_cols, collapse=", "), "\n")
-  cat("  Available columns:", paste(colnames(deg_df), collapse=", "), "\n")
-  stop("Column structure mismatch in DEG results")
-}
-
-# Display actual column names for verification
-cat("  DEG result columns found:", paste(colnames(deg_df)[1:min(8, ncol(deg_df))], collapse=", "))
+# Display actual column names for transparency
+cat("  DEG result columns: ", paste(colnames(deg_df)[1:min(8, ncol(deg_df))], collapse=", "))
 if (ncol(deg_df) > 8) cat(", ...")
 cat("\n")
 
@@ -439,3 +430,324 @@ cat(sprintf("  ✓ DEGs in zero-free: %d (%.1f%%)\n",
             length(degs_in_zero_free) / nrow(sig_degs) * 100))
 cat("  ✓ Data saved successfully\n")
 cat("\nNote: DEG filtering will be applied in Step 2 for candidate pair generation\n")
+
+# ============================================================================
+# STEP 2: Candidate Pair Generation (RET-limited)
+# ============================================================================
+
+cat("\n\n=== STEP 2: Candidate Pair Generation ===\n\n")
+
+# --------------------------------------------------------------------------
+# 2.1 Load Step 1 data
+# --------------------------------------------------------------------------
+
+cat("--- 2.1 Loading Step 1 data ---\n")
+
+step1_data <- readRDS(paste0(paths$processed, "reo_step1_data.rds"))
+cat("  Step 1 data loaded successfully\n")
+
+# Extract necessary data
+up_degs <- step1_data$up_degs_zero_free
+down_degs <- step1_data$down_degs_zero_free
+log2_tpm_r0 <- step1_data$log2_tpm_r0
+log2_tpm_r1 <- step1_data$log2_tpm_r1
+
+cat(sprintf("  Up-regulated DEGs (zero-free): %d\n", length(up_degs)))
+cat(sprintf("  Down-regulated DEGs (zero-free): %d\n", length(down_degs)))
+cat(sprintf("  Initial pairs possible: %s\n", 
+            format(length(up_degs) * length(down_degs), big.mark = ",")))
+
+# Store initial pair count for ratio calculation
+initial_pairs_raw <- length(up_degs) * length(down_degs)
+
+# --------------------------------------------------------------------------
+# 2.2 Calculate gene median TPM for filtering
+# --------------------------------------------------------------------------
+
+cat("\n--- 2.2 Calculating median TPM across R0+R1 ---\n")
+
+# Combine R0 and R1 log2 TPM matrices
+all_samples_log2tpm <- cbind(log2_tpm_r0, log2_tpm_r1)
+cat(sprintf("  Combined matrix: %d genes × %d samples\n", 
+            nrow(all_samples_log2tpm), ncol(all_samples_log2tpm)))
+
+# Calculate median log2 TPM for each gene across all samples
+gene_median_log2tpm <- apply(all_samples_log2tpm, 1, median)
+
+# Filter to DEGs only
+up_medians <- gene_median_log2tpm[up_degs]
+down_medians <- gene_median_log2tpm[down_degs]
+
+cat("  Median log2 TPM calculated for all genes\n")
+
+# --------------------------------------------------------------------------
+# 2.3 Apply expression level filter (trim upper/lower)
+# --------------------------------------------------------------------------
+
+cat("\n--- 2.3 Applying expression level filter ---\n")
+
+# Use CONFIG values for trimming
+trim_low <- CONFIG$trim_low    # Now 0.08 (adjusted)
+trim_high <- CONFIG$trim_high  # Still 0.10
+
+cat(sprintf("  Trim settings: lower %.0f%%, upper %.0f%%\n", 
+            trim_low * 100, trim_high * 100))
+
+# For up-regulated genes
+up_quantiles <- quantile(up_medians, probs = c(trim_low, 1 - trim_high))
+up_keep <- up_medians >= up_quantiles[1] & up_medians <= up_quantiles[2]
+up_filtered <- names(up_medians)[up_keep]
+
+cat(sprintf("  Up-regulated genes:\n"))
+cat(sprintf("    Before trim: %d\n", length(up_medians)))
+cat(sprintf("    Lower %.0f%% cutoff: %.2f\n", trim_low * 100, up_quantiles[1]))
+cat(sprintf("    Upper %.0f%% cutoff: %.2f\n", trim_high * 100, up_quantiles[2]))
+cat(sprintf("    After trim: %d (removed %d)\n", 
+            length(up_filtered), length(up_medians) - length(up_filtered)))
+
+# For down-regulated genes
+down_quantiles <- quantile(down_medians, probs = c(trim_low, 1 - trim_high))
+down_keep <- down_medians >= down_quantiles[1] & down_medians <= down_quantiles[2]
+down_filtered <- names(down_medians)[down_keep]
+
+cat(sprintf("  Down-regulated genes:\n"))
+cat(sprintf("    Before trim: %d\n", length(down_medians)))
+cat(sprintf("    Lower %.0f%% cutoff: %.2f\n", trim_low * 100, down_quantiles[1]))
+cat(sprintf("    Upper %.0f%% cutoff: %.2f\n", trim_high * 100, down_quantiles[2]))
+cat(sprintf("    After trim: %d (removed %d)\n", 
+            length(down_filtered), length(down_medians) - length(down_filtered)))
+
+# Store for logging
+initial_pairs_after_trim <- length(up_filtered) * length(down_filtered)
+cat(sprintf("\n  Pairs after trim: %s\n", 
+            format(initial_pairs_after_trim, big.mark = ",")))
+
+# --------------------------------------------------------------------------
+# 2.4 Apply one-sided multiplicity limit (M=10)
+# --------------------------------------------------------------------------
+
+cat("\n--- 2.4 Applying multiplicity limit (M=", CONFIG$M, ") ---\n", sep="")
+
+# Get DEG ranks for selection priority
+deg_df <- step1_data$deg_df
+sig_degs <- step1_data$sig_degs
+
+# Create priority ranking: |logFC| desc, then qvalue asc, then gene_id asc
+sig_degs$abs_logFC <- abs(sig_degs$log2FC)
+sig_degs <- sig_degs[order(-sig_degs$abs_logFC, sig_degs$qvalue, sig_degs$gene_id), ]
+
+# Create rank lookup
+gene_ranks <- setNames(1:nrow(sig_degs), sig_degs$gene_id)
+
+# Function to select top M partners based on rank
+select_top_partners <- function(genes, partner_genes, M = 10) {
+  # For each gene, select top M partners
+  selected_pairs <- list()
+  genes_hitting_limit <- 0
+  
+  for (gene in genes) {
+    # Get all possible partners
+    partners <- partner_genes
+    
+    # Rank partners
+    partner_ranks <- gene_ranks[partners]
+    
+    # Count how many hit the M limit
+    if (length(partner_ranks) >= M) {
+      genes_hitting_limit <- genes_hitting_limit + 1
+    }
+    
+    # Select top M (lowest rank = highest priority)
+    top_partners <- names(sort(partner_ranks)[1:min(M, length(partner_ranks))])
+    
+    # Store pairs with proper naming
+    for (partner in top_partners) {
+      pair_name <- paste(gene, partner, sep = "_")
+      selected_pairs[[pair_name]] <- c(gene, partner)
+    }
+  }
+  
+  return(list(pairs = selected_pairs, hitting_limit = genes_hitting_limit))
+}
+
+# Apply M limit for up genes (each up gene pairs with at most M down genes)
+up_result <- select_top_partners(up_filtered, down_filtered, M = CONFIG$M)
+up_limited_pairs <- up_result$pairs  # Extract pairs from result
+up_hitting_limit <- up_result$hitting_limit
+
+# Apply M limit for down genes (each down gene pairs with at most M up genes)  
+down_result <- select_top_partners(down_filtered, up_filtered, M = CONFIG$M)
+down_limited_pairs <- down_result$pairs  # Extract pairs from result
+down_hitting_limit <- down_result$hitting_limit
+
+# Diagnostic information
+cat(sprintf("  Up genes hitting M limit: %d / %d (%.1f%%)\n",
+            up_hitting_limit, length(up_filtered),
+            up_hitting_limit / length(up_filtered) * 100))
+cat(sprintf("  Down genes hitting M limit: %d / %d (%.1f%%)\n",
+            down_hitting_limit, length(down_filtered),
+            down_hitting_limit / length(down_filtered) * 100))
+
+# Combine and deduplicate
+all_pairs_list <- c(up_limited_pairs, down_limited_pairs)
+
+# Deduplicate while preserving structure
+# unique() drops names, so we need a different approach
+pair_names <- names(all_pairs_list)
+unique_pair_names <- unique(pair_names)
+unique_pairs <- all_pairs_list[unique_pair_names]
+
+cat(sprintf("\n  Pairs before M limit: %s\n", 
+            format(initial_pairs_after_trim, big.mark = ",")))
+cat(sprintf("  Pairs after M=%d limit: %d\n", CONFIG$M, length(unique_pairs)))
+cat(sprintf("  Reduction: %.1f%%\n", 
+            (1 - length(unique_pairs) / initial_pairs_after_trim) * 100))
+
+# Additional diagnostic
+if (up_hitting_limit + down_hitting_limit == 0) {
+  cat("\n  WARNING: No genes hitting M limit. Increasing M will have no effect!\n")
+} else {
+  potential_gain <- (up_hitting_limit + down_hitting_limit) * 2  # Rough estimate
+  cat(sprintf("  Potential gain from M increase: ~%d pairs\n", potential_gain))
+}
+
+final_candidates <- length(unique_pairs)
+
+# --------------------------------------------------------------------------
+# 2.5 Check stopping conditions
+# --------------------------------------------------------------------------
+
+cat("\n--- 2.5 Checking stopping conditions ---\n")
+
+# Calculate minimum candidates threshold
+min_candidates_abs <- CONFIG$min_candidates_abs
+min_candidates_ratio <- CONFIG$min_candidates_ratio
+min_candidates_dynamic <- ceiling(min_candidates_ratio * initial_pairs_raw)
+min_candidates_required <- max(min_candidates_abs, min_candidates_dynamic)
+
+cat(sprintf("  Minimum candidates (absolute): %d\n", min_candidates_abs))
+cat(sprintf("  Minimum candidates (%.1f%% of initial): %d\n", 
+            min_candidates_ratio * 100, min_candidates_dynamic))
+cat(sprintf("  Required threshold: %d\n", min_candidates_required))
+cat(sprintf("  Actual candidates: %d\n", final_candidates))
+
+if (final_candidates < min_candidates_required) {
+  cat("\n  WARNING: Insufficient candidate pairs!\n")
+  
+  # Check if we already adjusted parameters
+  if (CONFIG$trim_low != 0.10 || CONFIG$M != 10) {
+    cat("  NOTE: Already adjusted parameters:\n")
+    if (CONFIG$trim_low != 0.10) {
+      cat(sprintf("    - trim_low: 0.10 → %.2f\n", CONFIG$trim_low))
+    }
+    if (CONFIG$M != 10) {
+      cat(sprintf("    - M: 10 → %d\n", CONFIG$M))
+    }
+  }
+  
+  cat("\n  Consider further adjustments:\n")
+  cat("    - Further reduce trim thresholds\n")
+  cat("    - Further increase M limit\n")
+  cat("    - Check DEG quality\n")
+  stop(sprintf("STOPPING: Only %d pairs, need at least %d", 
+               final_candidates, min_candidates_required))
+} else {
+  cat(sprintf("\n  ✓ Sufficient candidates: %d ≥ %d\n", 
+              final_candidates, min_candidates_required))
+}
+
+# --------------------------------------------------------------------------
+# 2.6 Create pair matrix
+# --------------------------------------------------------------------------
+
+cat("\n--- 2.6 Creating pair matrix ---\n")
+
+# Check structure
+if (length(unique_pairs) == 0) {
+  stop("ERROR: No unique pairs generated")
+}
+
+# Verify names exist
+if (is.null(names(unique_pairs))) {
+  stop("ERROR: Pair names lost during processing")
+}
+
+# Convert list to data frame - more explicit approach
+pairs_df <- data.frame(
+  pair_id = names(unique_pairs),
+  gene_up = sapply(unique_pairs, function(x) x[1]),
+  gene_down = sapply(unique_pairs, function(x) x[2]),
+  stringsAsFactors = FALSE
+)
+
+# Verify structure
+if (nrow(pairs_df) != length(unique_pairs)) {
+  stop("ERROR: Data frame creation failed")
+}
+
+# Add median TPM info
+pairs_df$up_median_log2tpm <- gene_median_log2tpm[pairs_df$gene_up]
+pairs_df$down_median_log2tpm <- gene_median_log2tpm[pairs_df$gene_down]
+
+# Add DEG info (logFC, qvalue)
+up_deg_info <- sig_degs[match(pairs_df$gene_up, sig_degs$gene_id), ]
+down_deg_info <- sig_degs[match(pairs_df$gene_down, sig_degs$gene_id), ]
+
+pairs_df$up_logFC <- up_deg_info$log2FC
+pairs_df$up_qvalue <- up_deg_info$qvalue
+pairs_df$down_logFC <- down_deg_info$log2FC
+pairs_df$down_qvalue <- down_deg_info$qvalue
+
+cat(sprintf("  Pair matrix created: %d pairs\n", nrow(pairs_df)))
+cat("  Columns: pair_id, gene_up, gene_down, expression levels, DEG stats\n")
+
+# --------------------------------------------------------------------------
+# 2.7 Save Step 2 results
+# --------------------------------------------------------------------------
+
+cat("\n--- 2.7 Saving Step 2 results ---\n")
+
+step2_data <- list(
+  # Configuration
+  config = CONFIG,
+  
+  # Pair information
+  pairs_df = pairs_df,
+  n_pairs = nrow(pairs_df),
+  
+  # Gene lists after filtering
+  up_genes_filtered = up_filtered,
+  down_genes_filtered = down_filtered,
+  
+  # Expression data (passed through)
+  log2_tpm_r0 = log2_tpm_r0,
+  log2_tpm_r1 = log2_tpm_r1,
+  r0_samples = step1_data$r0_samples,
+  r1_samples = step1_data$r1_samples,
+  
+  # Logging info
+  initial_pairs_raw = initial_pairs_raw,
+  initial_pairs_after_trim = initial_pairs_after_trim,
+  final_candidates = final_candidates,
+  
+  # Metadata
+  timestamp = Sys.time(),
+  step = "Step 2 Complete"
+)
+
+saveRDS(step2_data, paste0(paths$processed, "reo_step2_data.rds"))
+cat("  Step 2 data saved to: reo_step2_data.rds\n")
+
+cat("\n=== STEP 2 COMPLETE ===\n")
+cat("Ready for Step 3: Adoption Criteria\n")
+
+# Final summary
+cat("\n--- Step 2 Summary ---\n")
+cat(sprintf("  Initial pairs (up × down): %s\n", 
+            format(initial_pairs_raw, big.mark = ",")))
+cat(sprintf("  After expression trim: %s\n", 
+            format(initial_pairs_after_trim, big.mark = ",")))
+cat(sprintf("  After M=%d limit: %d\n", CONFIG$M, final_candidates))
+cat(sprintf("  Retention rate: %.1f%%\n", 
+            final_candidates / initial_pairs_raw * 100))
+cat("  ✓ All criteria satisfied\n")
