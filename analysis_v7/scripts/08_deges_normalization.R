@@ -1,16 +1,16 @@
-# 08_deges_normalization.R - Stage 3 DEGES Iterative Normalization (FIXED)
+# 08_deges_normalization.R - Stage 3 DEGES Iterative Normalization (REVISED)
 # Purpose: Apply DEGES-MUREN normalization to high-purity paired samples
-# Method: Cook's distance + MUREN (LTS) + GLM iteration
+# Method: filterByExpr -> Cook's distance -> MUREN (LTS) + GLM iteration
 # Input: thyr_case_master_stage2_filtered, thyr_se_strand2_nonzero  
-# Output: analysis_deges_results.rds, analysis_norm_factors.rds
-# Version: v7.2 - Fixed floorPDEG logic and Cook's distance (F-distribution)
-# Date: 2025-01-20 (Fixed: 2025-09-17)
+# Output: Normalized CPM values and DGEList objects with DEGES-MUREN factors
+# Version: v7.3 - Revised workflow with consistent gene sets
+# Date: 2025-01-20 (Revised: 2025-01-21)
 
 source("analysis_v7/setup.R")
 
-cat("\n=== Stage 3: DEGES Normalization (v7.2 - Fixed) ===\n")
+cat("\n=== Stage 3: DEGES Normalization (v7.3 - Revised) ===\n")
 cat("Date:", as.character(Sys.Date()), "\n")
-cat("Method: DEGES-MUREN with F-distribution Cook's distance\n")
+cat("Method: filterByExpr -> Cook's -> DEGES-MUREN -> CPM output\n")
 cat("Groups: R0/R1/B0/B1 high-purity pairs only\n")
 
 # Load packages
@@ -176,33 +176,11 @@ extract_paired_samples <- function(group_name, case_df, sample_meta) {
 }
 
 # ============================================================================
-# Extract samples for each group
-# ============================================================================
-
-cat("\n--- Extracting paired samples for each group ---\n")
-
-# Create sample lists using case-based extraction
-sample_lists <- list()
-
-for (group_name in c("R0", "R1", "B0", "B1")) {
-  paired <- extract_paired_samples(group_name, high_purity_cases, sample_metadata)
-  
-  if (length(paired$cases) > 0) {
-    sample_lists[[group_name]] <- paired
-    cat(sprintf("  %s: %d pairs\n", group_name, length(paired$cases)))
-  } else {
-    cat(sprintf("  %s: No pairs available\n", group_name))
-  }
-}
-
-saveRDS(sample_lists, paste0(paths$processed, "analysis_sample_lists.rds"))
-
-# ============================================================================
 # Cook's distance outlier detection
 # ============================================================================
 
 detect_cook_outliers <- function(count_matrix, sample_groups, quantile_cutoff = 0.99) {
-  cat("\n--- Cook's distance outlier detection ---\n")
+  cat("  Cook's distance outlier detection...\n")
   
   # Create DESeq2 dataset
   coldata <- data.frame(
@@ -224,15 +202,12 @@ detect_cook_outliers <- function(count_matrix, sample_groups, quantile_cutoff = 
   # Get Cook's distances
   cooks <- assays(dds)[["cooks"]]
   
-  # DESeq2 default: F-distribution based cutoff
-  # F(p, n-p) where p = number of parameters, n = number of samples
+  # F-distribution based cutoff (DESeq2 default)
   n_samples <- ncol(count_matrix)
   n_params <- ncol(model.matrix(~ sample_groups))
-  
-  # Calculate F-distribution cutoff (DESeq2 default)
   f_cutoff <- qf(quantile_cutoff, df1 = n_params, df2 = n_samples - n_params)
   
-  # Determine outliers (genes with any sample exceeding F-distribution threshold)
+  # Determine outliers
   max_cooks <- apply(cooks, 1, function(x) {
     if (all(is.na(x))) {
       return(NA)
@@ -241,60 +216,39 @@ detect_cook_outliers <- function(count_matrix, sample_groups, quantile_cutoff = 
     }
   })
   
-  # Outliers are genes exceeding F-distribution threshold
   outliers <- !is.na(max_cooks) & max_cooks > f_cutoff
   
-  cat(sprintf("  F-distribution cutoff (F_%d,%d at %.0f%%): %.3f\n", 
-              n_params, n_samples - n_params, quantile_cutoff * 100, f_cutoff))
-  cat(sprintf("  Outlier genes: %d (%.2f%%)\n", 
+  cat(sprintf("    F-distribution cutoff: %.3f\n", f_cutoff))
+  cat(sprintf("    Outlier genes: %d (%.2f%%)\n", 
               sum(outliers), sum(outliers) / length(outliers) * 100))
-  
-  # Additional diagnostic: show distribution of max Cook's distances
-  valid_max_cooks <- max_cooks[!is.na(max_cooks)]
-  if (length(valid_max_cooks) > 0) {
-    cat(sprintf("  Cook's distance range: [%.3f, %.3f]\n", 
-                min(valid_max_cooks), max(valid_max_cooks)))
-    cat(sprintf("  Median Cook's distance: %.3f\n", median(valid_max_cooks)))
-  }
   
   outlier_gene_ids <- rownames(count_matrix)[outliers]
   
   return(list(
     outliers = outliers,
     threshold = f_cutoff,
-    cooks_distances = cooks,
     outlier_count = sum(outliers),
-    f_params = c(df1 = n_params, df2 = n_samples - n_params),
     outlier_gene_ids = outlier_gene_ids
   ))
 }
 
 # ============================================================================
-# DEGES iteration function (FIXED)
+# DEGES iteration function
 # ============================================================================
 
 perform_deges_iteration <- function(count_matrix, sample_groups, iteration = 0, 
                                     config = CONFIG) {
-  cat(sprintf("\n--- DEGES Iteration %d ---\n", iteration))
+  cat(sprintf("    Iteration %d:\n", iteration))
   
-  # Create DGEList
+  # Create DGEList (no additional filtering here - already filtered)
   dgelist <- DGEList(counts = count_matrix, group = factor(sample_groups))
   
-  # Apply filterByExpr with group specification
-  keep <- filterByExpr(dgelist, group = dgelist$samples$group)
-  dgelist_filtered <- dgelist[keep, , keep.lib.sizes = FALSE]
-  
-  cat(sprintf("  After filterByExpr: %d genes (from %d)\n", 
-              nrow(dgelist_filtered), nrow(count_matrix)))
-  
-  # MUREN normalization (without TMM)
-  cat("  Applying MUREN normalization...\n")
-  
-  dgelist_normalized <- dgelist_filtered  # Start with filtered data
+  # MUREN normalization
+  cat("      Applying MUREN normalization...\n")
   
   tryCatch({
     muren_coeff <- muren_norm(
-      dgelist_normalized$counts,
+      dgelist$counts,
       refs = "saturated",
       pairwise_method = config$MUREN_METHOD,
       single_param = TRUE,
@@ -302,19 +256,17 @@ perform_deges_iteration <- function(count_matrix, sample_groups, iteration = 0,
       workers = config$MUREN_WORKERS
     )
     
-    # Apply MUREN factors directly
-    dgelist_normalized$samples$norm.factors <- muren_coeff / mean(muren_coeff)
-    
-    cat("  MUREN normalization applied successfully\n")
+    # Apply MUREN factors
+    dgelist$samples$norm.factors <- muren_coeff / mean(muren_coeff)
     
   }, error = function(e) {
-    cat("  ERROR: MUREN failed:", e$message, "\n")
+    cat("      ERROR: MUREN failed:", e$message, "\n")
     stop("MUREN normalization failed. Stopping execution.")
   })
   
   # GLM fitting for differential expression
   design <- model.matrix(~ sample_groups)
-  y <- voom(dgelist_normalized, design, plot = FALSE)
+  y <- voom(dgelist, design, plot = FALSE)
   fit <- lmFit(y, design)
   fit <- eBayes(fit)
   
@@ -325,7 +277,6 @@ perform_deges_iteration <- function(count_matrix, sample_groups, iteration = 0,
   qobj <- tryCatch({
     qvalue(pvalues, pi0.method = "bootstrap")
   }, error = function(e) {
-    # Fallback to BH if qvalue fails
     list(qvalues = p.adjust(pvalues, method = "BH"),
          pi0 = 1.0)
   })
@@ -337,85 +288,76 @@ perform_deges_iteration <- function(count_matrix, sample_groups, iteration = 0,
   deg_count <- sum(qvalues < 0.10, na.rm = TRUE)
   deg_proportion <- deg_count / length(qvalues)
   
-  cat(sprintf("  Pi0 estimate: %.3f\n", pi0))
-  cat(sprintf("  DEGs (q < 0.10): %d (%.2f%%)\n", 
-              deg_count, deg_proportion * 100))
+  cat(sprintf("      Pi0: %.3f, DEGs: %d (%.2f%%)\n", 
+              pi0, deg_count, deg_proportion * 100))
   
-  # ========================================================================
-  # FIXED: Determine potential DEGs and non-DEGs for next iteration
-  # ========================================================================
+  # Determine potential DEGs and non-DEGs
   n_genes <- length(qvalues)
   
   if (deg_proportion > config$CONVERGENCE_THRESHOLD) {
     # More than 5% DEGs: use q < 0.10 as potential DEGs
     potential_deg_indices <- which(qvalues < 0.10)
     non_deg_indices <- which(qvalues >= 0.10)
-    cat("  -> Standard processing: q < 0.10 as potential DEGs\n")
     
   } else {
-    # 5% or fewer DEGs (including 0%): apply floor processing
-    # Select genes with q-value strictly less than 5th percentile
-    
-    # Sort q-values to find the 5th percentile
+    # 5% or fewer DEGs: apply floor processing
     sorted_qvalues <- sort(qvalues)
-    n_5pct <- floor(n_genes * 0.05)  # Use floor, not ceiling
+    n_5pct <- floor(n_genes * 0.05)
     
     if (n_5pct > 0) {
-      # Get the q-value at 5th percentile position
       q_threshold <- sorted_qvalues[n_5pct]
-      
-      # Select genes with q < threshold (strict inequality)
       potential_deg_indices <- which(qvalues < q_threshold)
       non_deg_indices <- which(qvalues >= q_threshold)
       
-      actual_deg_pct <- length(potential_deg_indices) / n_genes * 100
-      
       if (deg_count == 0) {
-        cat(sprintf("  -> Floor processing: No q < 0.10 found\n"))
-        if (length(potential_deg_indices) > 0) {
-          cat(sprintf("     Selected %d genes (%.2f%%) with q < %.4f\n", 
-                      length(potential_deg_indices), actual_deg_pct, q_threshold))
-        } else {
-          cat(sprintf("     No genes selected (all q >= %.4f)\n", q_threshold))
-        }
-      } else {
-        cat(sprintf("  -> Floor processing: Only %d q < 0.10\n", deg_count))
-        if (length(potential_deg_indices) > 0) {
-          cat(sprintf("     Selected %d genes (%.2f%%) with q < %.4f\n", 
-                      length(potential_deg_indices), actual_deg_pct, q_threshold))
-        } else {
-          cat(sprintf("     No genes selected (all q >= %.4f)\n", q_threshold))
-        }
+        cat(sprintf("      Floor processing: selected %d genes (%.2f%%)\n", 
+                    length(potential_deg_indices), 
+                    length(potential_deg_indices) / n_genes * 100))
       }
     } else {
-      # n_5pct = 0: cannot apply floor processing
       potential_deg_indices <- integer(0)
       non_deg_indices <- seq_len(n_genes)
-      
-      cat("  -> Floor processing: Cannot apply (insufficient genes for 5% threshold)\n")
     }
   }
   
-  # Check termination condition
-  # Only terminate if we cannot identify ANY potential DEGs
-  # This should rarely happen unless n_genes is 0
+  # Check termination
   terminate <- (length(potential_deg_indices) == 0 || n_genes == 0)
   
-  norm_factors_with_names <- dgelist_normalized$samples$norm.factors
-  names(norm_factors_with_names) <- rownames(dgelist_normalized$samples)
+  norm_factors_with_names <- dgelist$samples$norm.factors
+  names(norm_factors_with_names) <- rownames(dgelist$samples)
   
   return(list(
-    normalized_counts = dgelist_normalized$counts,
     norm_factors = norm_factors_with_names,
     potential_deg_indices = potential_deg_indices,
     non_deg_indices = non_deg_indices,
     terminate = terminate,
     pi0 = pi0,
     deg_count = deg_count,
-    deg_proportion = deg_proportion,
-    keep_genes = which(keep)
+    deg_proportion = deg_proportion
   ))
 }
+
+# ============================================================================
+# Extract samples for each group
+# ============================================================================
+
+cat("\n--- Extracting paired samples for each group ---\n")
+
+# Create sample lists using case-based extraction
+sample_lists <- list()
+
+for (group_name in c("R0", "R1", "B0", "B1")) {
+  paired <- extract_paired_samples(group_name, high_purity_cases, sample_metadata)
+  
+  if (length(paired$cases) > 0) {
+    sample_lists[[group_name]] <- paired
+    cat(sprintf("  %s: %d pairs\n", group_name, length(paired$cases)))
+  } else {
+    cat(sprintf("  %s: No pairs available\n", group_name))
+  }
+}
+
+saveRDS(sample_lists, paste0(paths$processed, "analysis_sample_lists.rds"))
 
 # ============================================================================
 # Process each comparison
@@ -480,24 +422,39 @@ for (comp_name in names(comparisons)) {
     count_matrix <- count_matrix[is_protein_coding, , drop = FALSE]
     gene_info_pc <- gene_info[is_protein_coding, , drop = FALSE]
     
-    cat(sprintf("  Protein coding genes: %d (from %d total)\n", 
-                sum(is_protein_coding), length(is_protein_coding)))
+    cat(sprintf("  Protein coding genes: %d\n", nrow(count_matrix)))
     
-    # Apply Cook's distance outlier removal
-    cook_result <- detect_cook_outliers(count_matrix, sample_groups, 
+    # ========================================================================
+    # NEW WORKFLOW: filterByExpr first
+    # ========================================================================
+    
+    # Step 1: Apply filterByExpr
+    cat("  Applying filterByExpr...\n")
+    dgelist_initial <- DGEList(counts = count_matrix, group = factor(sample_groups))
+    keep <- filterByExpr(dgelist_initial, group = dgelist_initial$samples$group)
+    count_matrix_filtered <- count_matrix[keep, , drop = FALSE]
+    gene_info_filtered <- gene_info_pc[keep, , drop = FALSE]
+    cat(sprintf("    After filterByExpr: %d genes\n", nrow(count_matrix_filtered)))
+    
+    # Store the filtered gene set (this will be our consistent reference)
+    filtered_gene_set <- which(keep)
+    
+    # Step 2: Apply Cook's distance outlier removal (for normalization only)
+    cook_result <- detect_cook_outliers(count_matrix_filtered, sample_groups, 
                                         CONFIG$COOKS_QUANTILE)
     
-    # Remove outlier genes
     if (cook_result$outlier_count > 0) {
-      count_matrix_clean <- count_matrix[!cook_result$outliers, , drop = FALSE]
-      cat(sprintf("  After Cook's removal: %d genes\n", nrow(count_matrix_clean)))
+      count_matrix_for_norm <- count_matrix_filtered[!cook_result$outliers, , drop = FALSE]
+      cat(sprintf("    For normalization: %d genes (after Cook's removal)\n", 
+                  nrow(count_matrix_for_norm)))
     } else {
-      count_matrix_clean <- count_matrix
-      cat("  No Cook's outliers detected\n")
+      count_matrix_for_norm <- count_matrix_filtered
+      cat("    No Cook's outliers detected\n")
     }
     
-    # DEGES iterations
-    current_counts <- count_matrix_clean
+    # Step 3: DEGES iterations (on Cook's-filtered subset)
+    cat("  Starting DEGES iterations...\n")
+    current_counts <- count_matrix_for_norm
     iteration_results <- list()
     
     for (iter in 0:(CONFIG$MAX_ITERATIONS - 1)) {
@@ -510,45 +467,64 @@ for (comp_name in names(comparisons)) {
       
       iteration_results[[paste0("iteration_", iter)]] <- result
       
-      # Check termination conditions
+      # Check termination
       if (result$terminate) {
-        cat(sprintf("\nDEGES terminated at iteration %d (no genes available)\n", iter))
+        cat(sprintf("    DEGES terminated at iteration %d\n", iter))
         break
       }
       
       if (iter == CONFIG$MAX_ITERATIONS - 1) {
-        cat(sprintf("\nDEGES reached maximum iterations (%d)\n", CONFIG$MAX_ITERATIONS))
+        cat(sprintf("    DEGES reached maximum iterations (%d)\n", CONFIG$MAX_ITERATIONS))
         break
       }
       
       # Prepare for next iteration: use only non-DEG genes
-      if (length(result$non_deg_indices) > 100) {  # Minimum genes for next iteration
-        # Map non-DEG indices back to clean matrix
-        keep_rows <- result$keep_genes[result$non_deg_indices]
-        current_counts <- count_matrix_clean[keep_rows, , drop = FALSE]
-        cat(sprintf("  Genes for next iteration: %d\n", length(keep_rows)))
+      if (length(result$non_deg_indices) > 0) {
+        current_counts <- count_matrix_for_norm[result$non_deg_indices, , drop = FALSE]
+        cat(sprintf("    Genes for next iteration: %d\n", nrow(current_counts)))
       } else {
-        cat("\nToo few non-DEG genes for next iteration, stopping\n")
+        # No non-DEG genes left (all genes are DEGs)
+        cat("    No non-DEG genes for next iteration, stopping\n")
         break
       }
     }
     
-    # Store results
-    comp_tissue <- paste(comp_name, tissue_type, sep = "_")
+    # ========================================================================
+    # Step 4: Apply norm.factors to filterByExpr-filtered data (before Cook's)
+    # ========================================================================
     
     final_result <- iteration_results[[length(iteration_results)]]
     
+    # Create DGEList with filterByExpr-filtered genes (not Cook's filtered)
     dgelist_final <- DGEList(
-      counts = count_matrix,
-      group = factor(sample_groups),
-      genes = gene_info_pc
+      counts = count_matrix_filtered,  # filterByExpr後、Cook's前
+      samples = data.frame(
+        row.names = all_samples,
+        group = factor(sample_groups),
+        norm.factors = final_result$norm_factors[all_samples]
+      ),
+      genes = gene_info_filtered
     )
-    dgelist_final$samples$norm.factors <- final_result$norm_factors[all_samples]
     
+    # Calculate normalized CPM values
+    cat("  Calculating normalized CPM values...\n")
+    normalized_cpm <- cpm(dgelist_final, normalized.lib.sizes = TRUE, 
+                          prior.count = 0, log = FALSE)
+    
+    # Store results
+    comp_tissue <- paste(comp_name, tissue_type, sep = "_")
+    
+    # Save DGEList
     dgelist_filename <- paste0(paths$processed, "analysis_dgelist_", comp_tissue, ".rds")
     saveRDS(dgelist_final, dgelist_filename)
     cat(sprintf("  DGEList saved: %s\n", basename(dgelist_filename)))
     
+    # Save normalized CPM
+    cpm_filename <- paste0(paths$processed, "analysis_cpm_", comp_tissue, ".rds")
+    saveRDS(normalized_cpm, cpm_filename)
+    cat(sprintf("  Normalized CPM saved: %s\n", basename(cpm_filename)))
+    
+    # Store summary information
     thyr_deges_results[[comp_tissue]] <- list(
       comparison = comp_name,
       tissue = tissue_type,
@@ -557,33 +533,34 @@ for (comp_name in names(comparisons)) {
         group1 = length(samples1),
         group2 = length(samples2)
       ),
-      cook_outliers = cook_result,
-      iterations = iteration_results,
-      final_iteration = length(iteration_results),
-      terminated = iteration_results[[length(iteration_results)]]$terminate,
-      final_deg_count = iteration_results[[length(iteration_results)]]$deg_count
+      n_genes_initial = sum(is_protein_coding),
+      n_genes_filtered = length(filtered_gene_set),
+      cook_outliers = cook_result$outlier_count,
+      iterations = length(iteration_results),
+      final_deg_count = final_result$deg_count,
+      normalized_cpm = normalized_cpm
     )
     
-    # Save normalization factors (final iteration)
+    # Save normalization factors
     thyr_norm_factors[[comp_tissue]] <- final_result$norm_factors
     
+    # Log processing details
     deges_processing_log$comparisons[[comp_tissue]] <- list(
       comparison = comp_name,
       tissue = tissue_type,
       n_samples = list(group1 = length(samples1), group2 = length(samples2)),
       sample_ids = all_samples,
       n_protein_coding = sum(is_protein_coding),
+      n_after_filter = length(filtered_gene_set),
       cook_outliers = list(
         n_outliers = cook_result$outlier_count,
-        outlier_gene_ids = cook_result$outlier_gene_ids,
         threshold = cook_result$threshold
       ),
       iterations_summary = lapply(iteration_results, function(x) {
         list(
           pi0 = x$pi0,
           deg_count = x$deg_count,
-          deg_proportion = x$deg_proportion,
-          n_genes_used = length(x$non_deg_indices) + length(x$potential_deg_indices)
+          deg_proportion = x$deg_proportion
         )
       })
     )
@@ -606,10 +583,10 @@ for (comp_name in names(thyr_deges_results)) {
     tissue = result$tissue,
     n_group1 = result$n_samples$group1,
     n_group2 = result$n_samples$group2,
-    cook_outliers = result$cook_outliers$outlier_count,
-    iterations = result$final_iteration,
-    terminated = result$terminated,
-    final_pi0 = result$iterations[[result$final_iteration]]$pi0,
+    genes_initial = result$n_genes_initial,
+    genes_filtered = result$n_genes_filtered,
+    cook_outliers = result$cook_outliers,
+    iterations = result$iterations,
     final_degs = result$final_deg_count,
     stringsAsFactors = FALSE
   )
@@ -633,7 +610,7 @@ deges_output <- list(
   sample_lists = sample_lists,
   results = thyr_deges_results,
   summary = summary_data,
-  version = "v7.2_fixed"  # Mark as fixed version (floorPDEG + Cook's)
+  version = "v7.3_revised"
 )
 
 saveRDS(deges_output, paste0(paths$processed, "analysis_deges_results.rds"))
@@ -649,6 +626,7 @@ write.csv(summary_data,
           row.names = FALSE)
 cat("  Summary CSV saved: analysis_deges_summary.csv\n")
 
+# Save processing log
 log_file <- paste0(paths$logs, "deges_processing_info_", 
                    format(Sys.time(), "%Y%m%d_%H%M%S"), ".rds")
 saveRDS(deges_processing_log, log_file)
@@ -658,32 +636,27 @@ cat("  Processing log saved to logs/\n")
 # Final report
 # ============================================================================
 
-cat("\n=== DEGES Normalization Complete (Fixed Version) ===\n")
+cat("\n=== DEGES Normalization Complete (Revised Version) ===\n")
 cat("Configuration:\n")
-cat("  Max iterations:", CONFIG$MAX_ITERATIONS, "\n")
-cat("  Cook's distance: F-distribution cutoff (DESeq2 default)\n")
-cat("  MUREN method:", CONFIG$MUREN_METHOD, "\n")
-cat("  FloorPDEG: Top 5% with q < 5th percentile\n")
+cat("  Workflow: filterByExpr -> Cook's -> DEGES iterations\n")
+cat("  Gene set: Consistent (filterByExpr-filtered) throughout\n")
+cat("  Output: Normalized CPM values (prior.count = 0)\n")
 cat("\nProcessed comparisons:\n")
 
 for (comp_name in names(thyr_deges_results)) {
   result <- thyr_deges_results[[comp_name]]
-  status <- ifelse(result$terminated, 
-                   "terminated (insufficient genes)",
-                   sprintf("%d final DEGs", result$final_deg_count))
-  cat(sprintf("  %s: %d iterations, %s\n",
+  cat(sprintf("  %s: %d genes, %d iterations\n",
               comp_name, 
-              result$final_iteration,
-              status))
+              result$n_genes_filtered,
+              result$iterations))
 }
 
 cat("\nOutputs:\n")
 cat("  Main: analysis_deges_results.rds\n")
 cat("  Factors: analysis_norm_factors.rds\n")
-cat("  Summary: analysis_deges_summary.csv\n")
 cat("  DGELists: analysis_dgelist_*.rds (4 files)\n")
-cat("  Sample lists: analysis_sample_lists.rds\n")
-cat("  Processing log: in logs/\n")
+cat("  CPM values: analysis_cpm_*.rds (4 files)\n")
+cat("  Summary: analysis_deges_summary.csv\n")
 cat("\nNext: Run 09_deg_analysis.R for differential expression\n")
 
 # Clean up

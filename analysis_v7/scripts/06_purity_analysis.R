@@ -3,12 +3,12 @@
 # Method: MUREN normalization with contamDE purity estimation
 # Input: thyr_case_master_stage1_filtered, thyr_se_strand2_nonzero
 # Output: thyr_case_master_stage2_filtered with tumor_purity and low_purity flags
-# Version: v7.0
-# Date: 2025-01-20
+# Version: v7.0.1 - Fixed filtering logic for standalone execution
+# Date: 2025-01-20 (Fixed: 2025-01-21)
 
 source("analysis_v7/setup.R")
 
-cat("\n=== Stage 2: Tumor Purity Analysis (v7.0) ===\n")
+cat("\n=== Stage 2: Tumor Purity Analysis (v7.0.1 - Fixed) ===\n")
 cat("Date:", as.character(Sys.Date()), "\n")
 cat("Analysis: R0/R1/B0/B1 groups with clean paired samples\n")
 cat("Method: ContamDE with MUREN normalization\n")
@@ -69,7 +69,7 @@ if (exists("thyr_se_strand2_nonzero")) {
   cat("Loading SE from file...\n")
   se <- readRDS(se_path)
 }
-cat("SE dimensions:", format(nrow(se), big.mark=","), "genes Ã—", 
+cat("SE dimensions:", format(nrow(se), big.mark=","), "genes × ", 
     format(ncol(se), big.mark=","), "samples\n")
 
 # Load case_master_stage1_filtered
@@ -93,12 +93,13 @@ sample_metadata <- as.data.frame(colData(se))
 gene_info <- as.data.frame(rowData(se))
 
 # ============================================================================
-# Filter to clean cases only
+# Filter to clean cases only (FIXED: removed low_purity reference)
 # ============================================================================
 
 cat("\n--- Filtering to clean cases ---\n")
 
 # Keep only cases without outliers
+# NOTE: low_purity will be determined later in this script
 clean_cases <- case_master %>%
   filter(has_outlier_tumor == 0 & has_outlier_normal == 0)
 
@@ -229,7 +230,7 @@ for (group_name in c("R0", "R1", "B0", "B1")) {
   
   # Prepare counts matrix
   counts <- prepare_contamde_matrix(se, paired$normal, paired$tumor, keep_genes)
-  cat(sprintf("  Count matrix: %d genes Ã— %d samples\n", nrow(counts), ncol(counts)))
+  cat(sprintf("  Count matrix: %d genes × %d samples\n", nrow(counts), ncol(counts)))
   
   # Run ContamDE purity estimation
   cat("  Running ContamDE...\n")
@@ -295,7 +296,9 @@ if (length(has_outlier_idx) > 0) {
     "tumor_purity", "low_purity",
     col_order[(has_outlier_idx + 1):(length(col_order) - 2)]  # Exclude the two purity columns at the end
   )
-  thyr_case_master_stage2_filtered <- thyr_case_master_stage2_filtered[, ..new_order]
+  # Use dplyr select for data.frame compatibility
+  thyr_case_master_stage2_filtered <- thyr_case_master_stage2_filtered %>%
+    select(all_of(new_order))
 }
 
 # Fill in purity values

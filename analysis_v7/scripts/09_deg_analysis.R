@@ -1,17 +1,18 @@
 # 09_deg_analysis.R - DEG Analysis with Brunner-Munzel and Storey Method
-# Purpose: Perform differential expression analysis on DEGES-normalized data
-# Method: Brunner-Munzel test with Storey (qvalue) multiple testing correction
-# Input: analysis_dgelist_*.rds (from 08_deges_normalization.R)
-# Output: thyr_deg_results.rds with DEG lists and consistency evaluation
-# Version: v7.1 - DGEList-based processing
-# Date: 2025-01-20
+# Purpose: Perform differential expression analysis on DEGES-normalized CPM data
+# Method: Brunner-Munzel test on CPM values with Storey (qvalue) correction
+# Input: analysis_dgelist_*.rds, analysis_cpm_*.rds (from 08_deges_normalization.R)
+# Output: thyr_deg_results.rds with DEG lists and enhanced consistency evaluation
+# Version: v7.3 - Enhanced consistency analysis (tumor-normal + cross-driver)
+# Date: 2025-01-21
 
 source("analysis_v7/setup.R")
 
-cat("\n=== DEG Analysis with Brunner-Munzel + Storey Method (v7.1) ===\n")
+cat("\n=== DEG Analysis with Brunner-Munzel + Storey Method (v7.3) ===\n")
 cat("Date:", as.character(Sys.Date()), "\n")
-cat("Method: Brunner-Munzel test with Storey correction\n")
-cat("Focus: R0 vs R1, B0 vs B1 comparisons (tumor/normal)\n")
+cat("Method: Brunner-Munzel test on normalized CPM (no log)\n")
+cat("Correction: Storey method (q < 0.05)\n")
+cat("Enhancement: Cross-driver consistency evaluation\n")
 
 # Load packages
 suppressPackageStartupMessages({
@@ -35,23 +36,15 @@ CONFIG <- list(
 
 cat("\nConfiguration:\n")
 cat("  Significance threshold (q-value):", CONFIG$ALPHA, "\n")
+cat("  Input: Normalized CPM (no log transformation)\n")
+cat("  No pseudocount added\n")
 
 # ============================================================================
 # Helper functions for DEG analysis
 # ============================================================================
 
-# Prepare normalized counts from DGEList
-prepare_normalized_counts <- function(dgelist) {
-  # Calculate normalized counts (CPM with prior count)
-  # norm.factors already in dgelist$samples
-  normalized_counts <- cpm(dgelist, normalized.lib.sizes = TRUE, 
-                           prior.count = 0.5, log = FALSE)
-  
-  return(normalized_counts)
-}
-
-# Perform Brunner-Munzel test
-perform_brunner_munzel_test <- function(normalized_data, sample_groups, 
+# Perform Brunner-Munzel test on CPM data
+perform_brunner_munzel_test <- function(cpm_data, sample_groups, 
                                         group1_name, group2_name) {
   cat("  Performing Brunner-Munzel tests...\n")
   
@@ -64,7 +57,7 @@ perform_brunner_munzel_test <- function(normalized_data, sample_groups,
               group2_name, length(group2_indices)))
   
   # Initialize results
-  n_genes <- nrow(normalized_data)
+  n_genes <- nrow(cpm_data)
   pvalues <- rep(NA_real_, n_genes)
   statistics <- rep(NA_real_, n_genes)
   fold_changes <- rep(NA_real_, n_genes)
@@ -81,9 +74,9 @@ perform_brunner_munzel_test <- function(normalized_data, sample_groups,
                   i, n_genes, i/n_genes*100))
     }
     
-    # Extract expression values
-    group1_values <- as.numeric(normalized_data[i, group1_indices])
-    group2_values <- as.numeric(normalized_data[i, group2_indices])
+    # Extract CPM values (no log transformation)
+    group1_values <- as.numeric(cpm_data[i, group1_indices])
+    group2_values <- as.numeric(cpm_data[i, group2_indices])
     
     # Calculate means
     mean1 <- mean(group1_values, na.rm = TRUE)
@@ -91,9 +84,8 @@ perform_brunner_munzel_test <- function(normalized_data, sample_groups,
     group1_means[i] <- mean1
     group2_means[i] <- mean2
     
-    # Log2 fold change (group2 vs group1)
-    pseudocount <- 1
-    fold_changes[i] <- log2(mean2 + pseudocount) - log2(mean1 + pseudocount)
+    # Log2 fold change (group2 vs group1) - no pseudocount
+    fold_changes[i] <- log2(mean2) - log2(mean1)
     
     # Brunner-Munzel test
     tryCatch({
@@ -122,7 +114,7 @@ perform_brunner_munzel_test <- function(normalized_data, sample_groups,
     fold_changes = fold_changes,
     group1_means = group1_means,
     group2_means = group2_means,
-    gene_names = rownames(normalized_data),
+    gene_names = rownames(cpm_data),
     group1_name = group1_name,
     group2_name = group2_name,
     n_group1 = length(group1_indices),
@@ -157,7 +149,7 @@ apply_storey_correction <- function(pvalues, alpha = 0.05) {
     qvalues <- rep(NA_real_, length(pvalues))
     qvalues[valid_pvals] <- qvalue_result$qvalues
     
-    # Identify significant genes
+    # Identify significant genes (q < 0.05, no FC cutoff)
     significant <- qvalues < alpha & !is.na(qvalues)
     n_significant <- sum(significant)
     
@@ -206,8 +198,8 @@ create_deg_summary <- function(bm_result, storey_result, comparison_name, gene_i
     qvalue = storey_result$qvalues,
     log2FC = bm_result$fold_changes,
     statistic = bm_result$statistics,
-    group1_mean = bm_result$group1_means,
-    group2_mean = bm_result$group2_means,
+    group1_mean_cpm = bm_result$group1_means,
+    group2_mean_cpm = bm_result$group2_means,
     significant = storey_result$significant,
     stringsAsFactors = FALSE
   )
@@ -216,7 +208,7 @@ create_deg_summary <- function(bm_result, storey_result, comparison_name, gene_i
   results_df$abs_log2FC <- abs(results_df$log2FC)
   results_df$direction <- ifelse(results_df$log2FC > 0, "UP", "DOWN")
   
-  # Add gene annotation
+  # Add gene annotation if available
   if (!is.null(gene_info_df) && nrow(gene_info_df) > 0) {
     # Match gene annotations
     matching_idx <- match(results_df$gene_id, rownames(gene_info_df))
@@ -275,25 +267,32 @@ for (comp_name in names(comparisons)) {
   for (tissue_type in c("tumor", "normal")) {
     cat(sprintf("\n--- %s %s ---\n", comp_name, tissue_type))
     
-    # Load DGEList for this comparison
+    # Load normalized CPM for this comparison
     comp_tissue <- paste(comp_name, tissue_type, sep = "_")
+    cpm_file <- paste0(paths$processed, "analysis_cpm_", comp_tissue, ".rds")
     dgelist_file <- paste0(paths$processed, "analysis_dgelist_", comp_tissue, ".rds")
     
-    if (!file.exists(dgelist_file)) {
-      cat(sprintf("  DGEList file not found: %s\n", basename(dgelist_file)))
+    if (!file.exists(cpm_file) || !file.exists(dgelist_file)) {
+      cat(sprintf("  Files not found for %s:\n", comp_tissue))
+      cat(sprintf("    CPM file exists: %s\n", file.exists(cpm_file)))
+      cat(sprintf("    DGEList file exists: %s\n", file.exists(dgelist_file)))
+      cat("  Possible causes:\n")
+      cat("    - Insufficient samples after quality filtering\n")
+      cat("    - All genes removed by Cook's distance filtering\n")
+      cat("    - filterByExpr removed all genes\n")
+      cat("  Check 08_deges_normalization.R output for details\n")
       cat("  Skipping this comparison\n")
       next
     }
     
-    # Load DGEList
-    dgelist <- readRDS(dgelist_file)
-    cat(sprintf("  Loaded DGEList: %d genes, %d samples\n", 
-                nrow(dgelist), ncol(dgelist)))
+    # Load normalized CPM
+    normalized_cpm <- readRDS(cpm_file)
+    cat(sprintf("  Loaded CPM: %d genes, %d samples\n", 
+                nrow(normalized_cpm), ncol(normalized_cpm)))
     
-    # Extract information from DGEList
-    count_matrix <- dgelist$counts
+    # Load DGEList for sample information and gene info
+    dgelist <- readRDS(dgelist_file)
     sample_groups <- as.character(dgelist$samples$group)
-    norm_factors <- dgelist$samples$norm.factors
     gene_info_subset <- dgelist$genes
     
     # Report sample distribution
@@ -302,23 +301,10 @@ for (comp_name in names(comparisons)) {
                 groups[1], group_table[groups[1]],
                 groups[2], group_table[groups[2]]))
     
-    # Report normalization factors
-    cat(sprintf("  Norm factors range: [%.3f, %.3f], median=%.3f\n",
-                min(norm_factors), max(norm_factors), median(norm_factors)))
-    
-    # Apply filterByExpr (already filtered, but reapply to be sure)
-    keep <- filterByExpr(dgelist, group = dgelist$samples$group)
-    dgelist_filtered <- dgelist[keep, , keep.lib.sizes = FALSE]
-    
-    cat(sprintf("  Genes after filterByExpr: %d\n", nrow(dgelist_filtered)))
-    
-    # Prepare normalized counts
-    normalized_counts <- prepare_normalized_counts(dgelist_filtered)
-    
-    # Perform Brunner-Munzel test
+    # Perform Brunner-Munzel test on CPM
     bm_result <- perform_brunner_munzel_test(
-      normalized_counts,
-      as.character(dgelist_filtered$samples$group),
+      normalized_cpm,
+      sample_groups,
       groups[1],
       groups[2]
     )
@@ -328,7 +314,7 @@ for (comp_name in names(comparisons)) {
     
     # Create summary
     deg_summary <- create_deg_summary(bm_result, storey_result, comp_tissue, 
-                                      dgelist_filtered$genes)
+                                      gene_info_subset)
     
     # Store results
     thyr_deg_results[[comp_tissue]] <- list(
@@ -336,13 +322,12 @@ for (comp_name in names(comparisons)) {
       tissue = tissue_type,
       groups = groups,
       samples = list(
-        group1 = rownames(dgelist_filtered$samples)[dgelist_filtered$samples$group == groups[1]],
-        group2 = rownames(dgelist_filtered$samples)[dgelist_filtered$samples$group == groups[2]]
+        group1 = rownames(dgelist$samples)[dgelist$samples$group == groups[1]],
+        group2 = rownames(dgelist$samples)[dgelist$samples$group == groups[2]]
       ),
       bm_result = bm_result,
       storey_result = storey_result,
       deg_summary = deg_summary,
-      norm_factors_used = norm_factors,
       analysis_date = Sys.time()
     )
     
@@ -362,12 +347,19 @@ for (comp_name in names(comparisons)) {
 }
 
 # ============================================================================
-# Consistency analysis between tumor and normal
+# Enhanced consistency analysis
 # ============================================================================
 
-cat("\n--- Evaluating tumor-normal consistency ---\n")
+cat("\n=== ENHANCED CONSISTENCY ANALYSIS ===\n")
 
+# Initialize comprehensive consistency results
 thyr_consistency_results <- list()
+
+# ----------------------------------------------------------------------------
+# 1. Tumor-Normal consistency (within same comparison)
+# ----------------------------------------------------------------------------
+
+cat("\n--- 1. Tumor-Normal Consistency ---\n")
 
 for (comp_name in names(comparisons)) {
   tumor_name <- paste(comp_name, "tumor", sep = "_")
@@ -379,7 +371,7 @@ for (comp_name in names(comparisons)) {
     next
   }
   
-  cat(sprintf("\n%s consistency analysis:\n", comp_name))
+  cat(sprintf("\n%s tumor-normal consistency:\n", comp_name))
   
   # Get DEG results
   tumor_degs <- thyr_deg_results[[tumor_name]]$deg_summary$results_df
@@ -398,7 +390,7 @@ for (comp_name in names(comparisons)) {
   cat(sprintf("  Overlapping significant genes: %d\n", length(overlap_sig)))
   
   if (length(overlap_sig) > 0) {
-    # Check direction consistency (simple sign check)
+    # Check direction consistency
     consistent_genes <- character()
     inconsistent_genes <- character()
     
@@ -417,8 +409,10 @@ for (comp_name in names(comparisons)) {
     cat(sprintf("  Consistent direction: %d\n", length(consistent_genes)))
     cat(sprintf("  Inconsistent direction: %d\n", length(inconsistent_genes)))
     
-    # Store consistency results
-    thyr_consistency_results[[comp_name]] <- list(
+    # Store tumor-normal consistency
+    thyr_consistency_results[[paste0(comp_name, "_tumor_normal")]] <- list(
+      type = "tumor_normal",
+      comparison = comp_name,
       common_genes = common_genes,
       tumor_sig_count = nrow(tumor_sig),
       normal_sig_count = nrow(normal_sig),
@@ -430,7 +424,7 @@ for (comp_name in names(comparisons)) {
     
     # Show top consistent genes
     if (length(consistent_genes) > 0) {
-      cat("\n  Top consistent genes:\n")
+      cat("\n  Top consistent genes (up to 5):\n")
       for (i in seq_len(min(5, length(consistent_genes)))) {
         gene <- consistent_genes[i]
         tumor_row <- tumor_sig[tumor_sig$gene_id == gene, ]
@@ -443,7 +437,9 @@ for (comp_name in names(comparisons)) {
       }
     }
   } else {
-    thyr_consistency_results[[comp_name]] <- list(
+    thyr_consistency_results[[paste0(comp_name, "_tumor_normal")]] <- list(
+      type = "tumor_normal",
+      comparison = comp_name,
       common_genes = common_genes,
       tumor_sig_count = nrow(tumor_sig),
       normal_sig_count = nrow(normal_sig),
@@ -452,6 +448,221 @@ for (comp_name in names(comparisons)) {
       inconsistent_genes = character(),
       consistency_rate = NA_real_
     )
+  }
+}
+
+# ----------------------------------------------------------------------------
+# 2. Cross-driver consistency (RET vs BRAF)
+# ----------------------------------------------------------------------------
+
+cat("\n--- 2. Cross-Driver Consistency (RET vs BRAF) ---\n")
+
+# Tumor comparison
+if ("R0_vs_R1_tumor" %in% names(thyr_deg_results) && 
+    "B0_vs_B1_tumor" %in% names(thyr_deg_results)) {
+  
+  cat("\nTumor cross-driver consistency:\n")
+  
+  ret_tumor <- thyr_deg_results[["R0_vs_R1_tumor"]]$deg_summary$results_df
+  braf_tumor <- thyr_deg_results[["B0_vs_B1_tumor"]]$deg_summary$results_df
+  
+  # Common genes
+  common_genes <- intersect(ret_tumor$gene_id, braf_tumor$gene_id)
+  cat(sprintf("  Common genes tested: %d\n", length(common_genes)))
+  
+  # Significant genes
+  ret_sig <- ret_tumor[ret_tumor$significant, ]
+  braf_sig <- braf_tumor[braf_tumor$significant, ]
+  
+  cat(sprintf("  RET significant: %d\n", nrow(ret_sig)))
+  cat(sprintf("  BRAF significant: %d\n", nrow(braf_sig)))
+  
+  # Overlapping significant
+  overlap_sig <- intersect(ret_sig$gene_id, braf_sig$gene_id)
+  cat(sprintf("  Overlapping significant: %d\n", length(overlap_sig)))
+  
+  if (length(overlap_sig) > 0) {
+    # Direction consistency
+    consistent_genes <- character()
+    inconsistent_genes <- character()
+    
+    for (gene in overlap_sig) {
+      ret_fc <- ret_sig$log2FC[ret_sig$gene_id == gene]
+      braf_fc <- braf_sig$log2FC[braf_sig$gene_id == gene]
+      
+      if (sign(ret_fc) == sign(braf_fc)) {
+        consistent_genes <- c(consistent_genes, gene)
+      } else {
+        inconsistent_genes <- c(inconsistent_genes, gene)
+      }
+    }
+    
+    cat(sprintf("  Consistent direction: %d\n", length(consistent_genes)))
+    cat(sprintf("  Inconsistent direction: %d\n", length(inconsistent_genes)))
+    
+    # Store cross-driver tumor consistency
+    thyr_consistency_results[["cross_driver_tumor"]] <- list(
+      type = "cross_driver",
+      tissue = "tumor",
+      ret_sig_count = nrow(ret_sig),
+      braf_sig_count = nrow(braf_sig),
+      overlap_sig = overlap_sig,
+      consistent_genes = consistent_genes,
+      inconsistent_genes = inconsistent_genes,
+      consistency_rate = length(consistent_genes) / length(overlap_sig)
+    )
+    
+    # Show top consistent cross-driver genes
+    if (length(consistent_genes) > 0) {
+      cat("\n  Top cross-driver consistent genes (radiation response candidates):\n")
+      for (i in seq_len(min(5, length(consistent_genes)))) {
+        gene <- consistent_genes[i]
+        ret_row <- ret_sig[ret_sig$gene_id == gene, ]
+        braf_row <- braf_sig[braf_sig$gene_id == gene, ]
+        gene_name <- ifelse(is.na(ret_row$gene_name[1]), gene, ret_row$gene_name[1])
+        cat(sprintf("    %s: RET FC=%.2f (q=%.3e), BRAF FC=%.2f (q=%.3e)\n",
+                    gene_name,
+                    ret_row$log2FC[1], ret_row$qvalue[1],
+                    braf_row$log2FC[1], braf_row$qvalue[1]))
+      }
+    }
+  } else {
+    thyr_consistency_results[["cross_driver_tumor"]] <- list(
+      type = "cross_driver",
+      tissue = "tumor",
+      ret_sig_count = nrow(ret_sig),
+      braf_sig_count = nrow(braf_sig),
+      overlap_sig = character(),
+      consistent_genes = character(),
+      inconsistent_genes = character(),
+      consistency_rate = NA_real_
+    )
+  }
+}
+
+# Normal comparison
+if ("R0_vs_R1_normal" %in% names(thyr_deg_results) && 
+    "B0_vs_B1_normal" %in% names(thyr_deg_results)) {
+  
+  cat("\nNormal cross-driver consistency:\n")
+  
+  ret_normal <- thyr_deg_results[["R0_vs_R1_normal"]]$deg_summary$results_df
+  braf_normal <- thyr_deg_results[["B0_vs_B1_normal"]]$deg_summary$results_df
+  
+  # Significant genes
+  ret_sig <- ret_normal[ret_normal$significant, ]
+  braf_sig <- braf_normal[braf_normal$significant, ]
+  
+  cat(sprintf("  RET significant: %d\n", nrow(ret_sig)))
+  cat(sprintf("  BRAF significant: %d\n", nrow(braf_sig)))
+  
+  # Overlapping significant
+  overlap_sig <- intersect(ret_sig$gene_id, braf_sig$gene_id)
+  cat(sprintf("  Overlapping significant: %d\n", length(overlap_sig)))
+  
+  if (length(overlap_sig) > 0) {
+    # Direction consistency
+    consistent_genes <- character()
+    inconsistent_genes <- character()
+    
+    for (gene in overlap_sig) {
+      ret_fc <- ret_sig$log2FC[ret_sig$gene_id == gene]
+      braf_fc <- braf_sig$log2FC[braf_sig$gene_id == gene]
+      
+      if (sign(ret_fc) == sign(braf_fc)) {
+        consistent_genes <- c(consistent_genes, gene)
+      } else {
+        inconsistent_genes <- c(inconsistent_genes, gene)
+      }
+    }
+    
+    cat(sprintf("  Consistent direction: %d\n", length(consistent_genes)))
+    cat(sprintf("  Inconsistent direction: %d\n", length(inconsistent_genes)))
+    
+    # Store cross-driver normal consistency
+    thyr_consistency_results[["cross_driver_normal"]] <- list(
+      type = "cross_driver",
+      tissue = "normal",
+      ret_sig_count = nrow(ret_sig),
+      braf_sig_count = nrow(braf_sig),
+      overlap_sig = overlap_sig,
+      consistent_genes = consistent_genes,
+      inconsistent_genes = inconsistent_genes,
+      consistency_rate = if(length(overlap_sig) > 0) length(consistent_genes) / length(overlap_sig) else NA
+    )
+  } else {
+    thyr_consistency_results[["cross_driver_normal"]] <- list(
+      type = "cross_driver",
+      tissue = "normal",
+      ret_sig_count = nrow(ret_sig),
+      braf_sig_count = nrow(braf_sig),
+      overlap_sig = character(),
+      consistent_genes = character(),
+      inconsistent_genes = character(),
+      consistency_rate = NA_real_
+    )
+  }
+}
+
+# ----------------------------------------------------------------------------
+# 3. Core radiation response genes (4-way consistency)
+# ----------------------------------------------------------------------------
+
+cat("\n--- 3. Core Radiation Response Genes (4-way analysis) ---\n")
+
+# Collect all significant gene lists
+all_sig_lists <- list()
+for (comp_tissue in names(thyr_deg_results)) {
+  sig_genes <- thyr_deg_results[[comp_tissue]]$deg_summary$results_df
+  sig_genes <- sig_genes[sig_genes$significant, ]
+  all_sig_lists[[comp_tissue]] <- sig_genes$gene_id
+}
+
+if (length(all_sig_lists) >= 2) {
+  # Find genes appearing in multiple comparisons
+  all_sig_genes <- unlist(all_sig_lists)
+  gene_freq <- table(all_sig_genes)
+  
+  # Genes appearing in 2+ comparisons
+  multi_comp_genes <- names(gene_freq[gene_freq >= 2])
+  cat(sprintf("  Genes significant in 2+ comparisons: %d\n", length(multi_comp_genes)))
+  
+  # Genes appearing in 3+ comparisons
+  three_comp_genes <- names(gene_freq[gene_freq >= 3])
+  cat(sprintf("  Genes significant in 3+ comparisons: %d\n", length(three_comp_genes)))
+  
+  # Genes appearing in all 4 comparisons
+  four_comp_genes <- names(gene_freq[gene_freq == 4])
+  cat(sprintf("  Genes significant in all 4 comparisons: %d\n", length(four_comp_genes)))
+  
+  # Store multi-comparison results
+  thyr_consistency_results[["multi_comparison"]] <- list(
+    type = "multi_comparison",
+    two_plus = multi_comp_genes,
+    three_plus = three_comp_genes,
+    four_way = four_comp_genes,
+    gene_frequencies = gene_freq[gene_freq >= 2]
+  )
+  
+  # Show top multi-comparison genes
+  if (length(three_comp_genes) > 0) {
+    cat("\n  Top multi-comparison genes (3+ comparisons):\n")
+    for (i in seq_len(min(5, length(three_comp_genes)))) {
+      gene <- three_comp_genes[i]
+      cat(sprintf("    %s appears in %d comparisons\n", gene, gene_freq[gene]))
+      
+      # Show details from each comparison
+      for (comp_tissue in names(all_sig_lists)) {
+        if (gene %in% all_sig_lists[[comp_tissue]]) {
+          deg_row <- thyr_deg_results[[comp_tissue]]$deg_summary$results_df
+          deg_row <- deg_row[deg_row$gene_id == gene & deg_row$significant, ]
+          if (nrow(deg_row) > 0) {
+            cat(sprintf("      %s: FC=%.2f, q=%.3e\n",
+                        comp_tissue, deg_row$log2FC[1], deg_row$qvalue[1]))
+          }
+        }
+      }
+    }
   }
 }
 
@@ -497,9 +708,11 @@ cat("\n--- Saving results ---\n")
 deg_output <- list(
   date = Sys.Date(),
   config = CONFIG,
+  method = "Brunner-Munzel on CPM (no log)",
   deg_results = thyr_deg_results,
   consistency_results = thyr_consistency_results,
-  summary = summary_data
+  summary = summary_data,
+  version = "v7.3_enhanced"
 )
 
 saveRDS(deg_output, paste0(paths$processed, "thyr_deg_results.rds"))
@@ -526,47 +739,123 @@ for (comp_tissue in names(thyr_deg_results)) {
     write.csv(sig_df,
               paste0(paths$output, sprintf("deg_results_%s_significant.csv", comp_tissue)),
               row.names = FALSE)
+    cat(sprintf("  %s: exported %d significant genes\n", comp_tissue, nrow(sig_df)))
   }
 }
-cat("  Individual DEG lists exported to output/\n")
+
+# Export consistency analysis results
+if (length(thyr_consistency_results) > 0) {
+  # Create consistency summary
+  consistency_summary <- data.frame()
+  
+  for (cons_name in names(thyr_consistency_results)) {
+    cons <- thyr_consistency_results[[cons_name]]
+    if (cons$type == "tumor_normal") {
+      consistency_summary <- rbind(consistency_summary, data.frame(
+        analysis = cons_name,
+        type = cons$type,
+        comparison = cons$comparison,
+        overlap_count = length(cons$overlap_sig),
+        consistent_count = length(cons$consistent_genes),
+        consistency_rate = cons$consistency_rate,
+        stringsAsFactors = FALSE
+      ))
+    } else if (cons$type == "cross_driver") {
+      consistency_summary <- rbind(consistency_summary, data.frame(
+        analysis = cons_name,
+        type = cons$type,
+        comparison = cons$tissue,
+        overlap_count = length(cons$overlap_sig),
+        consistent_count = length(cons$consistent_genes),
+        consistency_rate = cons$consistency_rate,
+        stringsAsFactors = FALSE
+      ))
+    }
+  }
+  
+  write.csv(consistency_summary,
+            paste0(paths$output, "deg_consistency_summary.csv"),
+            row.names = FALSE)
+  cat("  Consistency summary saved: deg_consistency_summary.csv\n")
+}
 
 # ============================================================================
 # Final report
 # ============================================================================
 
-cat("\n=== DEG Analysis Complete ===\n")
+cat("\n=== DEG Analysis Complete (v7.3 Enhanced) ===\n")
 cat("Configuration:\n")
-cat("  Test: Brunner-Munzel\n")
+cat("  Test: Brunner-Munzel on normalized CPM\n")
 cat("  Correction: Storey method (qvalue)\n")
 cat("  Significance: q <", CONFIG$ALPHA, "\n")
+cat("  No log transformation of CPM\n")
+cat("  No pseudocount added\n")
 cat("\nProcessed comparisons:\n")
 
 for (comp_tissue in names(thyr_deg_results)) {
   result <- thyr_deg_results[[comp_tissue]]
-  cat(sprintf("  %s: %d DEGs from %d genes\n",
+  cat(sprintf("  %s: %d DEGs from %d genes (%.1f%%)\n",
               comp_tissue,
               result$deg_summary$summary_stats$significant_genes,
-              result$deg_summary$summary_stats$total_genes_tested))
+              result$deg_summary$summary_stats$total_genes_tested,
+              result$deg_summary$summary_stats$significant_genes / 
+                result$deg_summary$summary_stats$total_genes_tested * 100))
 }
 
-if (length(thyr_consistency_results) > 0) {
-  cat("\nConsistency analysis:\n")
-  for (comp_name in names(thyr_consistency_results)) {
-    cons <- thyr_consistency_results[[comp_name]]
-    if (length(cons$consistent_genes) > 0) {
-      cat(sprintf("  %s: %d consistent genes (%.0f%% of overlap)\n",
-                  comp_name,
-                  length(cons$consistent_genes),
-                  cons$consistency_rate * 100))
-    } else {
-      cat(sprintf("  %s: No overlapping DEGs\n", comp_name))
-    }
+cat("\n=== Enhanced Consistency Analysis Results ===\n")
+
+# Tumor-normal consistency
+if ("R0_vs_R1_tumor_normal" %in% names(thyr_consistency_results)) {
+  cons <- thyr_consistency_results[["R0_vs_R1_tumor_normal"]]
+  if (length(cons$consistent_genes) > 0) {
+    cat(sprintf("R0_vs_R1 tumor-normal: %d consistent genes (%.0f%% of overlap)\n",
+                length(cons$consistent_genes),
+                cons$consistency_rate * 100))
+  }
+}
+
+if ("B0_vs_B1_tumor_normal" %in% names(thyr_consistency_results)) {
+  cons <- thyr_consistency_results[["B0_vs_B1_tumor_normal"]]
+  if (length(cons$consistent_genes) > 0) {
+    cat(sprintf("B0_vs_B1 tumor-normal: %d consistent genes (%.0f%% of overlap)\n",
+                length(cons$consistent_genes),
+                cons$consistency_rate * 100))
+  }
+}
+
+# Cross-driver consistency
+if ("cross_driver_tumor" %in% names(thyr_consistency_results)) {
+  cons <- thyr_consistency_results[["cross_driver_tumor"]]
+  cat(sprintf("\nCross-driver tumor: %d consistent genes\n",
+              length(cons$consistent_genes)))
+  if (length(cons$consistent_genes) > 0) {
+    cat("  → Potential universal radiation response markers\n")
+  }
+}
+
+if ("cross_driver_normal" %in% names(thyr_consistency_results)) {
+  cons <- thyr_consistency_results[["cross_driver_normal"]]
+  cat(sprintf("Cross-driver normal: %d consistent genes\n",
+              length(cons$consistent_genes)))
+}
+
+# Multi-comparison summary
+if ("multi_comparison" %in% names(thyr_consistency_results)) {
+  multi <- thyr_consistency_results[["multi_comparison"]]
+  cat(sprintf("\nMulti-comparison genes:\n"))
+  cat(sprintf("  2+ comparisons: %d genes\n", length(multi$two_plus)))
+  cat(sprintf("  3+ comparisons: %d genes\n", length(multi$three_plus)))
+  cat(sprintf("  All 4 comparisons: %d genes\n", length(multi$four_way)))
+  
+  if (length(multi$four_way) > 0) {
+    cat("  → Highest confidence radiation markers\n")
   }
 }
 
 cat("\nOutputs:\n")
 cat("  Main: thyr_deg_results.rds\n")
 cat("  Summary: deg_analysis_summary.csv\n")
+cat("  Consistency: deg_consistency_summary.csv\n")
 cat("  DEG lists: deg_results_*_all.csv, deg_results_*_significant.csv\n")
 
 # Highlight key findings
@@ -581,7 +870,7 @@ if (length(max_degs_idx) > 0) {
               max_row$degs_total, max_row$deg_rate))
 }
 
-# Check if R0_vs_R1_tumor has results
+# Check if R0_vs_R1_tumor has results (primary target)
 if ("R0_vs_R1_tumor" %in% names(thyr_deg_results)) {
   r0r1_tumor <- thyr_deg_results[["R0_vs_R1_tumor"]]
   cat(sprintf("\nR0_vs_R1_tumor (primary target): %d DEGs\n",
@@ -604,10 +893,11 @@ if ("R0_vs_R1_tumor" %in% names(thyr_deg_results)) {
 cat("\nNext steps:\n")
 if (sum(summary_data$degs_total) > 20) {
   cat("  1. Proceed to enrichment analysis (sufficient DEGs)\n")
-  cat("  2. Feature selection for biomarker development\n")
+  cat("  2. Feature selection focusing on cross-driver consistent genes\n")
+  cat("  3. Validate multi-comparison genes as biomarker candidates\n")
 } else if (sum(summary_data$degs_total) > 0) {
   cat("  1. Limited DEGs - consider GSEA or direct biomarker selection\n")
-  cat("  2. Review individual genes for biological relevance\n")
+  cat("  2. Focus on consistency-validated genes\n")
 } else {
   cat("  1. No significant DEGs detected\n")
   cat("  2. Consider adjusting parameters or alternative approaches\n")
