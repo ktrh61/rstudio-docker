@@ -64,9 +64,9 @@ case_master <- readRDS(case_master_path)
 # Filter for RET fusion cases with high purity
 ret_cases <- case_master %>%
   filter(driver == "RET" & 
-           has_outlier_tumor == 0 & 
-           has_outlier_normal == 0 & 
-           low_purity == 0)
+         has_outlier_tumor == 0 & 
+         has_outlier_normal == 0 & 
+         low_purity == 0)
 
 cat(sprintf("  RET fusion cases (high purity): %d\n", nrow(ret_cases)))
 
@@ -119,14 +119,14 @@ if (file.exists(sample_lists_path)) {
   # Find tumor samples for RET cases (with _merged suffix)
   r0_samples <- sample_metadata %>%
     filter(case_submitter_id %in% ret_r0_cases &
-             sample_type == "Primary Tumor" &
-             grepl("_merged", sample_submitter_id)) %>%
+           sample_type == "Primary Tumor" &
+           grepl("_merged", sample_submitter_id)) %>%
     pull(sample_submitter_id)
   
   r1_samples <- sample_metadata %>%
     filter(case_submitter_id %in% ret_r1_cases &
-             sample_type == "Primary Tumor" &
-             grepl("_merged", sample_submitter_id)) %>%
+           sample_type == "Primary Tumor" &
+           grepl("_merged", sample_submitter_id)) %>%
     pull(sample_submitter_id)
 }
 
