@@ -181,7 +181,7 @@ cat(sprintf("  Unique gene combinations: %d\n", n_edges))
 
 # Create bipartite graph from adjacency matrix
 # Use simple vertex numbering: 1:n_up for up genes, (n_up+1):(n_up+n_down) for down genes
-g <- graph_from_incidence_matrix(adj_matrix > 0, directed = FALSE, weighted = NULL)
+g <- graph_from_biadjacency_matrix(adj_matrix > 0, directed = FALSE, weighted = NULL)
 
 # Verify bipartite structure
 if (!is_bipartite(g)) {
@@ -435,6 +435,11 @@ if (nrow(final_pairs) > 0) {
 
 cat("\n--- 4.6 Saving Step 4 results ---\n")
 
+# Check if log2_tpm data exists in Step 3b data
+if (!all(c("log2_tpm_r0", "log2_tpm_r1") %in% names(step3b_data))) {
+  cat("  WARNING: log2_tpm data not found in Step 3b data. Step 5 may fail.\n")
+}
+
 # Update CONFIG with actually used values (for traceability)
 CONFIG$cor_threshold_used <- cor_threshold
 CONFIG$cor_method_used <- cor_method
@@ -447,6 +452,10 @@ step4_data <- list(
   final_pairs = final_pairs,
   final_reo_r0 = final_reo_r0,
   final_reo_r1 = final_reo_r1,
+  
+  # CRITICAL: Include log2_tpm data for Step 5
+  log2_tpm_r0 = if("log2_tpm_r0" %in% names(step3b_data)) step3b_data$log2_tpm_r0 else NULL,
+  log2_tpm_r1 = if("log2_tpm_r1" %in% names(step3b_data)) step3b_data$log2_tpm_r1 else NULL,
   
   # Intermediate results for traceability
   gene_unique_pairs = gene_unique_pairs,
