@@ -2,9 +2,9 @@
 # Purpose: Remove redundancy via maximum bipartite matching and correlation clustering
 # Input: reo_step3b_data.rds
 # Output: reo_step4_data.rds
-# Version: v1.8 - CONFIG-based thresholds and controlled debug output
-# Date: 2025-01-26 (Updated)
-# Note: Lexicographic ordering for representative selection
+# Version: v2.0 - Complete rewrite with all red-level fixes
+# Date: 2025-01-26 (Fully Revised)
+# Note: Uses proper bipartite matching with simple indexing
 
 source("analysis_v7/setup.R")
 
@@ -14,14 +14,13 @@ cat("Date:", as.character(Sys.Date()), "\n\n")
 # Load required packages
 suppressPackageStartupMessages({
   library(dplyr)
-  # igraph not needed anymore - using greedy selection instead of bipartite matching
+  library(igraph)  # Required for max_bipartite_match
 })
 
 # --------------------------------------------------------------------------
-# 1.0 Check for CONFIG parameters (defensive)
+# 1.0 Configuration defaults and validation
 # --------------------------------------------------------------------------
-# If CONFIG doesn't have correlation parameters, set defaults
-# This ensures backward compatibility
+# Define defaults for correlation parameters
 DEFAULT_COR_THRESHOLD <- 0.9
 DEFAULT_COR_METHOD <- "spearman"
 
@@ -45,9 +44,29 @@ stopifnot(all(c("passed_pairs", "reo_r0_passed", "reo_r1_passed", "config") %in%
 # CONFIGはRDSから取得
 CONFIG <- step3b_data$config
 
-# Set correlation parameters from CONFIG or defaults
-cor_threshold <- ifelse(!is.null(CONFIG$cor_threshold), CONFIG$cor_threshold, DEFAULT_COR_THRESHOLD)
-cor_method <- ifelse(!is.null(CONFIG$cor_method), CONFIG$cor_method, DEFAULT_COR_METHOD)
+# Fix 赤-1: Robust parameter validation with NA/empty string protection
+cor_threshold <- if (!is.null(CONFIG$cor_threshold) && 
+                     !is.na(CONFIG$cor_threshold) && 
+                     is.numeric(CONFIG$cor_threshold) &&
+                     CONFIG$cor_threshold >= 0 && 
+                     CONFIG$cor_threshold <= 1) {
+  CONFIG$cor_threshold
+} else {
+  cat(sprintf("  WARNING: Invalid cor_threshold in CONFIG. Using default: %.2f\n", 
+              DEFAULT_COR_THRESHOLD))
+  DEFAULT_COR_THRESHOLD
+}
+
+cor_method <- if (!is.null(CONFIG$cor_method) && 
+                  !is.na(CONFIG$cor_method) && 
+                  nchar(CONFIG$cor_method) > 0 &&
+                  CONFIG$cor_method %in% c("pearson", "spearman", "kendall")) {
+  CONFIG$cor_method
+} else {
+  cat(sprintf("  WARNING: Invalid cor_method in CONFIG. Using default: %s\n", 
+              DEFAULT_COR_METHOD))
+  DEFAULT_COR_METHOD
+}
 
 # Extract data
 passed_pairs <- step3b_data$passed_pairs
@@ -65,74 +84,62 @@ cat(sprintf("  Correlation settings (使用値=%s): threshold=%.2f\n", cor_metho
 
 cat("\n--- 4.2 Preparing data for redundancy removal ---\n")
 
-# Calculate a[2] (order statistic matching Step 3a definition) for each pair
-# a[2] is the (n_R0-1)th smallest absolute value after dead zone filter
-# This allows for at most 1 exception in R0 group
-calculate_a2 <- function(reo_values, dead_zone, n_r0) {
-  # Remove any NA values first (defensive programming)
-  reo_values <- reo_values[!is.na(reo_values)]
+# Fix 赤-3: Use a2_value from Step 3b instead of recalculating
+if (!"a2_value" %in% names(passed_pairs)) {
+  stop("ERROR: a2_value not found in Step 3b output. Data integrity issue.")
+}
+
+# Verify we have all required fields from Step 3b
+required_fields <- c("pair_id", "gene_up", "gene_down", "a2_value", "r1_reversal_rate")
+missing_fields <- setdiff(required_fields, names(passed_pairs))
+if (length(missing_fields) > 0) {
+  stop(sprintf("ERROR: Missing required fields from Step 3b: %s", 
+               paste(missing_fields, collapse=", ")))
+}
+
+# Calculate missing rate if not already present
+if (!"missing_rate" %in% names(passed_pairs)) {
+  cat("  Calculating missing rates...\n")
   
-  # Apply dead zone filter
-  valid_values <- abs(reo_values[abs(reo_values) >= dead_zone])
-  
-  # Need at least (n_r0 - 1) valid samples to calculate a[2]
-  if (length(valid_values) >= (n_r0 - 1)) {
-    # Sort and take the (n_r0-1)th value (allowing 1 exception)
-    # For n_r0=11, this takes the 10th smallest value
-    # sort() removes NA by default, but we already removed them
-    return(sort(valid_values, na.last = NA)[n_r0 - 1])
-  } else {
-    # Not enough valid samples - same as Step 3a rejection
-    return(NA)
+  missing_rate <- function(r0_row, r1_row, dead_zone) {
+    r0_invalid <- sum(abs(r0_row) < dead_zone)
+    r1_invalid <- sum(abs(r1_row) < dead_zone)
+    total_samples <- length(r0_row) + length(r1_row)
+    return((r0_invalid + r1_invalid) / total_samples)
   }
+  
+  missing_rates <- numeric(nrow(passed_pairs))
+  for (i in 1:nrow(passed_pairs)) {
+    missing_rates[i] <- missing_rate(reo_r0_passed[i, ], reo_r1_passed[i, ], CONFIG$dead_zone)
+  }
+  
+  passed_pairs$missing_rate <- missing_rates
+} else {
+  cat("  Missing rate already calculated in Step 3b\n")
 }
 
-# Calculate a[2] for all pairs
-a2_values <- numeric(nrow(passed_pairs))
-n_r0 <- length(r0_samples)  # Get R0 sample count
-for (i in 1:nrow(passed_pairs)) {
-  a2_values[i] <- calculate_a2(reo_r0_passed[i, ], CONFIG$dead_zone, n_r0)
-}
-
-# Add a[2] to passed_pairs dataframe
-passed_pairs$a2_value <- a2_values
-
-# Calculate missing rate for each pair
-missing_rate <- function(r0_row, r1_row, dead_zone) {
-  r0_invalid <- sum(abs(r0_row) < dead_zone)
-  r1_invalid <- sum(abs(r1_row) < dead_zone)
-  total_samples <- length(r0_row) + length(r1_row)
-  return((r0_invalid + r1_invalid) / total_samples)
-}
-
-# Calculate missing rates
-missing_rates <- numeric(nrow(passed_pairs))
-for (i in 1:nrow(passed_pairs)) {
-  missing_rates[i] <- missing_rate(reo_r0_passed[i, ], reo_r1_passed[i, ], CONFIG$dead_zone)
-}
-
-passed_pairs$missing_rate <- missing_rates
-
-cat(sprintf("  Calculated metrics for %d pairs\n", nrow(passed_pairs)))
-cat(sprintf("  a[2] range (strength, %dth order stat): %.2f - %.2f\n", 
-            n_r0 - 1,
-            min(a2_values, na.rm = TRUE), max(a2_values, na.rm = TRUE)))
+cat(sprintf("  Using a[2] from Step 3b: range %.2f - %.2f\n", 
+            min(passed_pairs$a2_value, na.rm = TRUE), 
+            max(passed_pairs$a2_value, na.rm = TRUE)))
 cat(sprintf("  Missing rate range: %.1f%% - %.1f%%\n", 
-            min(missing_rates) * 100, max(missing_rates) * 100))
+            min(passed_pairs$missing_rate) * 100, 
+            max(passed_pairs$missing_rate) * 100))
 
 # --------------------------------------------------------------------------
-# 4.3 Step 4.1: Gene-unique selection (1 gene = 1 pair) 
+# 4.3 Step 4.1: Maximum bipartite matching (proper implementation)
 # --------------------------------------------------------------------------
 
-cat("\n--- 4.3 Gene-unique selection (1 gene = 1 pair) ---\n")
+cat("\n--- 4.3 Maximum bipartite matching (1 gene = 1 pair) ---\n")
+
+# Fix 赤-2: Proper bipartite matching implementation with simple indexing
 
 # Calculate lexicographic scores for prioritization
-passed_pairs$lex_rank1 <- rank(-passed_pairs$a2_value, na.last = TRUE)  # Higher a[2] is better
-passed_pairs$lex_rank2 <- rank(-passed_pairs$r1_reversal_rate, na.last = TRUE)  # Higher reversal is better
-passed_pairs$lex_rank3 <- rank(passed_pairs$missing_rate, na.last = TRUE)  # Lower missing is better
-passed_pairs$lex_rank4 <- rank(paste0(passed_pairs$gene_up, "_", passed_pairs$gene_down))  # Alphabetical
+passed_pairs$lex_rank1 <- rank(-passed_pairs$a2_value, na.last = TRUE)  
+passed_pairs$lex_rank2 <- rank(-passed_pairs$r1_reversal_rate, na.last = TRUE)  
+passed_pairs$lex_rank3 <- rank(passed_pairs$missing_rate, na.last = TRUE)  
+passed_pairs$lex_rank4 <- rank(paste0(passed_pairs$gene_up, "_", passed_pairs$gene_down))
 
-# Combine into single score (lexicographic)
+# Combine into single score (lower is better)
 n_pairs <- nrow(passed_pairs)
 passed_pairs$lex_score <- (
   passed_pairs$lex_rank1 * (n_pairs^3) +
@@ -141,49 +148,141 @@ passed_pairs$lex_score <- (
     passed_pairs$lex_rank4
 )
 
-# Simple greedy approach: Sort by priority and select non-overlapping pairs
-# This is much simpler than bipartite matching and achieves the same goal
+# Get unique genes
+up_genes <- sort(unique(passed_pairs$gene_up))
+down_genes <- sort(unique(passed_pairs$gene_down))
+n_up <- length(up_genes)
+n_down <- length(down_genes)
 
-# Sort pairs by lexicographic score (best first)
-sorted_indices <- order(passed_pairs$lex_score)
-sorted_pairs <- passed_pairs[sorted_indices, ]
-sorted_reo_r0 <- reo_r0_passed[sorted_indices, ]
-sorted_reo_r1 <- reo_r1_passed[sorted_indices, ]
+cat(sprintf("  Unique up genes: %d\n", n_up))
+cat(sprintf("  Unique down genes: %d\n", n_down))
 
-# Track which genes have been used
-used_up_genes <- character(0)
-used_down_genes <- character(0)
-selected_indices <- integer(0)
+# Create adjacency matrix for bipartite graph
+# Rows = up genes, Columns = down genes
+# Values = best pair index for that combination (or 0 if no pair)
+adj_matrix <- matrix(0, nrow = n_up, ncol = n_down)
+weight_matrix <- matrix(Inf, nrow = n_up, ncol = n_down)
 
-# Greedy selection: iterate through sorted pairs
-for (i in 1:nrow(sorted_pairs)) {
-  current_up <- sorted_pairs$gene_up[i]
-  current_down <- sorted_pairs$gene_down[i]
+# Fill adjacency matrix with best pairs for each gene combination
+for (i in 1:nrow(passed_pairs)) {
+  up_idx <- which(up_genes == passed_pairs$gene_up[i])
+  down_idx <- which(down_genes == passed_pairs$gene_down[i])
   
-  # Check if either gene has been used
-  if (!current_up %in% used_up_genes && !current_down %in% used_down_genes) {
-    # Select this pair
-    selected_indices <- c(selected_indices, i)
-    used_up_genes <- c(used_up_genes, current_up)
-    used_down_genes <- c(used_down_genes, current_down)
+  # Store the best (lowest score) pair for this gene combination
+  if (passed_pairs$lex_score[i] < weight_matrix[up_idx, down_idx]) {
+    adj_matrix[up_idx, down_idx] <- i  # Store pair index
+    weight_matrix[up_idx, down_idx] <- passed_pairs$lex_score[i]
+  }
+}
+
+# Count actual edges
+n_edges <- sum(adj_matrix > 0)
+cat(sprintf("  Unique gene combinations: %d\n", n_edges))
+
+# Create bipartite graph from adjacency matrix
+# Use simple vertex numbering: 1:n_up for up genes, (n_up+1):(n_up+n_down) for down genes
+g <- graph_from_incidence_matrix(adj_matrix > 0, directed = FALSE, weighted = NULL)
+
+# Verify bipartite structure
+if (!is_bipartite(g)) {
+  stop("ERROR: Created graph is not bipartite. This should not happen.")
+}
+
+# Add weights (use negative of lex_score since igraph maximizes)
+edge_weights <- c()
+edges_mat <- as_edgelist(g)
+for (i in 1:nrow(edges_mat)) {
+  up_v <- edges_mat[i, 1]
+  down_v <- edges_mat[i, 2] - n_up  # Adjust for indexing
+  if (up_v <= n_up && down_v > 0 && down_v <= n_down) {
+    edge_weights <- c(edge_weights, -weight_matrix[up_v, down_v])
+  }
+}
+E(g)$weight <- edge_weights
+
+# Debug output (if VERBOSE)
+if (!is.null(CONFIG$VERBOSE) && CONFIG$VERBOSE) {
+  cat(sprintf("  DEBUG: Graph has %d vertices and %d edges\n", vcount(g), ecount(g)))
+  cat(sprintf("  DEBUG: Graph is bipartite: %s\n", is_bipartite(g)))
+  
+  components <- components(g)
+  cat(sprintf("  DEBUG: Number of connected components: %d\n", components$no))
+  
+  # Test with simple case
+  cat("  DEBUG: Testing max_bipartite_match with simple case...\n")
+  test_g <- make_bipartite_graph(
+    types = c(FALSE, FALSE, TRUE, TRUE),
+    edges = c(1,3, 1,4, 2,3, 2,4),
+    directed = FALSE
+  )
+  test_match <- max_bipartite_match(test_g)
+  cat(sprintf("    Simple test matching size: %d (expected: 2)\n", test_match$matching_size))
+}
+
+# Perform maximum bipartite matching
+cat("  Running maximum bipartite matching...\n")
+matching <- tryCatch({
+  max_bipartite_match(g, weights = E(g)$weight)
+}, error = function(e) {
+  cat(sprintf("  ERROR in weighted matching: %s\n", e$message))
+  cat("  Attempting unweighted matching as fallback...\n")
+  max_bipartite_match(g, weights = NULL)
+})
+
+cat(sprintf("  Matching found: %d pairs\n", matching$matching_size))
+
+# Extract matched pairs
+matched_pair_indices <- c()
+
+if (matching$matching_size > 0) {
+  # Process matching results
+  for (up_v in 1:n_up) {
+    matched_to <- matching$matching[up_v]
+    
+    if (!is.na(matched_to) && matched_to > n_up) {
+      down_v <- matched_to - n_up
+      
+      # Get the pair index from adjacency matrix
+      pair_idx <- adj_matrix[up_v, down_v]
+      
+      if (pair_idx > 0) {
+        matched_pair_indices <- c(matched_pair_indices, pair_idx)
+      }
+    }
   }
 }
 
 # Extract selected pairs
-if (length(selected_indices) > 0) {
-  gene_unique_pairs <- sorted_pairs[selected_indices, ]
-  gene_unique_reo_r0 <- sorted_reo_r0[selected_indices, ]
-  gene_unique_reo_r1 <- sorted_reo_r1[selected_indices, ]
+if (length(matched_pair_indices) > 0) {
+  gene_unique_pairs <- passed_pairs[matched_pair_indices, ]
+  gene_unique_reo_r0 <- reo_r0_passed[matched_pair_indices, ]
+  gene_unique_reo_r1 <- reo_r1_passed[matched_pair_indices, ]
 } else {
-  gene_unique_pairs <- sorted_pairs[integer(0), ]
-  gene_unique_reo_r0 <- sorted_reo_r0[integer(0), ]
-  gene_unique_reo_r1 <- sorted_reo_r1[integer(0), ]
+  # Fallback to greedy if matching completely fails
+  cat("  WARNING: Bipartite matching returned no results. Using greedy fallback...\n")
+  
+  # Sort by lex_score and greedily select
+  sorted_indices <- order(passed_pairs$lex_score)
+  sorted_pairs <- passed_pairs[sorted_indices, ]
+  
+  used_up <- character(0)
+  used_down <- character(0)
+  selected <- c()
+  
+  for (i in 1:nrow(sorted_pairs)) {
+    if (!sorted_pairs$gene_up[i] %in% used_up && 
+        !sorted_pairs$gene_down[i] %in% used_down) {
+      selected <- c(selected, sorted_indices[i])
+      used_up <- c(used_up, sorted_pairs$gene_up[i])
+      used_down <- c(used_down, sorted_pairs$gene_down[i])
+    }
+  }
+  
+  gene_unique_pairs <- passed_pairs[selected, ]
+  gene_unique_reo_r0 <- reo_r0_passed[selected, ]
+  gene_unique_reo_r1 <- reo_r1_passed[selected, ]
 }
 
-# Report results
-cat(sprintf("  Input pairs: %d\n", nrow(passed_pairs)))
-cat(sprintf("  Unique up genes: %d\n", length(unique(passed_pairs$gene_up))))
-cat(sprintf("  Unique down genes: %d\n", length(unique(passed_pairs$gene_down))))
 cat(sprintf("  Gene-unique pairs selected: %d\n", nrow(gene_unique_pairs)))
 cat(sprintf("  Retention rate: %.1f%%\n", 
             nrow(gene_unique_pairs) / nrow(passed_pairs) * 100))
@@ -200,11 +299,6 @@ if (!is.null(CONFIG$VERBOSE) && CONFIG$VERBOSE && nrow(gene_unique_pairs) > 0) {
                 gene_unique_pairs$a2_value[i],
                 gene_unique_pairs$r1_reversal_rate[i]))
   }
-  
-  cat(sprintf("\n  Unique up genes in result: %d\n", 
-              length(unique(gene_unique_pairs$gene_up))))
-  cat(sprintf("  Unique down genes in result: %d\n", 
-              length(unique(gene_unique_pairs$gene_down))))
 }
 
 # --------------------------------------------------------------------------
@@ -221,14 +315,12 @@ if (nrow(gene_unique_pairs) == 0) {
   final_reo_r0 <- gene_unique_reo_r0
   final_reo_r1 <- gene_unique_reo_r1
 } else if (nrow(gene_unique_pairs) == 1) {
-  # Only one pair - no clustering needed
   cat("  Only one pair available. No clustering needed.\n")
   final_pairs <- gene_unique_pairs
   final_reo_r0 <- gene_unique_reo_r0
   final_reo_r1 <- gene_unique_reo_r1
 } else {
   # Calculate pairwise correlations
-  # Combine R0 and R1 REO values for correlation calculation
   combined_reo <- cbind(gene_unique_reo_r0, gene_unique_reo_r1)
   n_pairs_unique <- nrow(gene_unique_pairs)
   
@@ -239,11 +331,12 @@ if (nrow(gene_unique_pairs) == 0) {
   # Calculate pairwise correlations
   for (i in 1:(n_pairs_unique - 1)) {
     for (j in (i + 1):n_pairs_unique) {
-      # Correlation across all samples using CONFIG method
       cor_value <- cor(combined_reo[i, ], combined_reo[j, ], 
                        method = cor_method, use = "complete.obs")
-      cor_matrix[i, j] <- cor_value
-      cor_matrix[j, i] <- cor_value
+      if (!is.na(cor_value)) {
+        cor_matrix[i, j] <- cor_value
+        cor_matrix[j, i] <- cor_value
+      }
     }
   }
   
@@ -254,59 +347,38 @@ if (nrow(gene_unique_pairs) == 0) {
   cat(sprintf("  Pairs with |ρ| > %.2f: %d\n", cor_threshold, nrow(high_cor_pairs)))
   
   if (nrow(high_cor_pairs) == 0) {
-    # No high correlations found - keep all pairs
+    # No high correlations found
     cat("  No highly correlated pairs found. Keeping all gene-unique pairs.\n")
     final_pairs <- gene_unique_pairs
     final_reo_r0 <- gene_unique_reo_r0
     final_reo_r1 <- gene_unique_reo_r1
   } else {
-    # Simple clustering approach without igraph
-    # Track which pairs belong to which cluster
-    cluster_membership <- seq_len(n_pairs_unique)  # Start with each in own cluster
+    # Create graph for correlation clustering
+    cor_g <- make_empty_graph(n = n_pairs_unique, directed = FALSE)
     
-    # Merge clusters for highly correlated pairs
-    for (i in 1:nrow(high_cor_pairs)) {
-      idx1 <- high_cor_pairs[i, 1]
-      idx2 <- high_cor_pairs[i, 2]
-      
-      # Merge clusters
-      cluster1 <- cluster_membership[idx1]
-      cluster2 <- cluster_membership[idx2]
-      
-      if (cluster1 != cluster2) {
-        # Merge cluster2 into cluster1
-        cluster_membership[cluster_membership == cluster2] <- cluster1
-      }
-    }
+    # Add edges for high correlation pairs
+    edges_to_add <- as.vector(t(high_cor_pairs))
+    cor_g <- add_edges(cor_g, edges_to_add)
     
-    # Renumber clusters to be sequential
-    unique_clusters <- unique(cluster_membership)
-    n_clusters <- length(unique_clusters)
-    for (i in seq_along(unique_clusters)) {
-      cluster_membership[cluster_membership == unique_clusters[i]] <- i
-    }
+    # Find connected components (correlation clusters)
+    clusters <- components(cor_g)
+    n_clusters <- clusters$no
     
     cat(sprintf("  Number of correlation clusters: %d\n", n_clusters))
-    
-    # Count cluster sizes
-    cluster_sizes <- table(cluster_membership)
-    cat(sprintf("  Singleton clusters: %d\n", sum(cluster_sizes == 1)))
-    cat(sprintf("  Multi-member clusters: %d\n", sum(cluster_sizes > 1)))
+    cat(sprintf("  Singleton clusters: %d\n", sum(clusters$csize == 1)))
+    cat(sprintf("  Multi-member clusters: %d\n", sum(clusters$csize > 1)))
     
     # Select representative from each cluster
     cluster_representatives <- integer(n_clusters)
     
     for (cluster_id in 1:n_clusters) {
-      cluster_members <- which(cluster_membership == cluster_id)
+      cluster_members <- which(clusters$membership == cluster_id)
       
       if (length(cluster_members) == 1) {
-        # Singleton cluster
         cluster_representatives[cluster_id] <- cluster_members[1]
       } else {
-        # Multi-member cluster - select based on lexicographic ordering
+        # Select best member by lex_score
         cluster_subset <- gene_unique_pairs[cluster_members, ]
-        
-        # Find best member (lowest lex_score)
         best_idx <- cluster_members[which.min(cluster_subset$lex_score)]
         cluster_representatives[cluster_id] <- best_idx
       }
@@ -318,7 +390,7 @@ if (nrow(gene_unique_pairs) == 0) {
     final_reo_r1 <- gene_unique_reo_r1[cluster_representatives, ]
     
     # Add cluster size information
-    final_pairs$cluster_size <- as.numeric(cluster_sizes[cluster_membership[cluster_representatives]])
+    final_pairs$cluster_size <- clusters$csize[clusters$membership[cluster_representatives]]
   }
   
   cat(sprintf("\n  Final deduplicated pairs: %d\n", nrow(final_pairs)))
@@ -336,9 +408,9 @@ cat("\n--- 4.5 Adding selection metadata ---\n")
 if (nrow(final_pairs) > 0) {
   # Record selection reasons
   final_pairs$selection_step <- "correlation_clustering"
-  final_pairs$dedup_method <- "greedy_selection_lexicographic"
+  final_pairs$dedup_method <- "max_bipartite_matching"
   
-  # Add cluster information if clustering was performed
+  # Add cluster information if not already present
   if (!"cluster_size" %in% names(final_pairs)) {
     final_pairs$cluster_size <- 1
   }
@@ -389,10 +461,14 @@ step4_data <- list(
   # Deduplication metadata
   dedup_stats = list(
     gene_unique_retention = nrow(gene_unique_pairs) / nrow(passed_pairs),
-    correlation_retention = nrow(final_pairs) / nrow(gene_unique_pairs),
+    correlation_retention = if(nrow(gene_unique_pairs) > 0) {
+      nrow(final_pairs) / nrow(gene_unique_pairs)
+    } else {
+      NA
+    },
     correlation_threshold_used = cor_threshold,
     correlation_method_used = cor_method,
-    n_correlation_clusters = ifelse(exists("n_clusters"), n_clusters, NA)
+    matching_type = ifelse(exists("matching") && matching$matching_size > 0, "bipartite", "greedy_fallback")
   ),
   
   # Sample info
@@ -433,7 +509,7 @@ if (nrow(final_pairs) > 0) {
 
 cat("\n=== STEP 4 SUMMARY ===\n")
 cat(sprintf("Input pairs: %d\n", nrow(passed_pairs)))
-cat(sprintf("After gene-unique selection: %d (%.1f%%)\n", 
+cat(sprintf("After bipartite matching: %d (%.1f%%)\n", 
             nrow(gene_unique_pairs),
             nrow(gene_unique_pairs) / nrow(passed_pairs) * 100))
 cat(sprintf("After correlation clustering: %d (%.1f%%)\n", 
@@ -442,6 +518,7 @@ cat(sprintf("After correlation clustering: %d (%.1f%%)\n",
 cat(sprintf("Final retention rate: %.1f%%\n", 
             nrow(final_pairs) / nrow(passed_pairs) * 100))
 cat(sprintf("Correlation parameters: %s (threshold=%.2f)\n", cor_method, cor_threshold))
+cat(sprintf("Matching method: %s\n", step4_data$dedup_stats$matching_type))
 cat(sprintf("Timestamp: %s\n", format(step4_data$timestamp)))
 
 # Final message
