@@ -133,12 +133,12 @@ calc_bayes_prob_greater_half <- function(successes, n) {
   return(pbeta(0.5, successes + 0.5, n - successes + 0.5, lower.tail = FALSE))
 }
 
-# Function to calculate Bayesian lower credible limit
+# Function to calculate Bayesian one-sided lower credible limit
 # Using Jeffreys prior Beta(0.5, 0.5)
 calc_bayes_lcl <- function(successes, n, level = 0.95) {
   # Posterior is Beta(k + 0.5, n - k + 0.5)
-  # Return lower credible limit
-  alpha <- (1 - level) / 2
+  # Return one-sided lower credible limit (level% from below)
+  alpha <- 1 - level  # For one-sided 95% LCL, use 5% quantile
   return(qbeta(alpha, successes + 0.5, n - successes + 0.5))
 }
 
@@ -151,7 +151,7 @@ cat("  R0: exceptions ≤ min(max(1, ceil(0.2*n)), 3)\n")
 cat("  R1: Pr(p > 0.5 | data) ≥ 0.95 AND n≥6 AND point estimate≥0.7\n")
 cat("  Relaxed logic: One subtype OK + other not contradicting\n")
 cat("  Non-contradiction: Pr(p > 0.5) ≥ 0.20 AND Wilson CI upper ≥ 0.55 (n≥5 required)\n")
-cat("  Veto: LCL_ok ≥ 0.7 AND UCL_other ≤ 0.5 → fail (both n≥5)\n\n")
+cat("  Veto: one-sided LCL_ok ≥ 0.7 AND UCL_other ≤ 0.5 → fail (both n≥5)\n\n")
 
 # Initialize results
 proxy_results <- data.frame(
@@ -284,7 +284,7 @@ for (i in 1:nrow(passed_pairs)) {
       # Bayesian approach with Jeffreys prior Beta(0.5, 0.5)
       bayes_prob <- calc_bayes_prob_greater_half(r1_ccdc6_reversals, n_r1_ccdc6_valid)
       
-      # Calculate Bayesian LCL for veto check
+      # Calculate one-sided Bayesian LCL for veto check
       bayes_lcl <- calc_bayes_lcl(r1_ccdc6_reversals, n_r1_ccdc6_valid, 0.95)
       
       # Also calculate Wilson CI for reference and non-contradiction check
@@ -334,7 +334,7 @@ for (i in 1:nrow(passed_pairs)) {
       # Bayesian approach with Jeffreys prior Beta(0.5, 0.5)
       bayes_prob <- calc_bayes_prob_greater_half(r1_non_ccdc6_reversals, n_r1_non_ccdc6_valid)
       
-      # Calculate Bayesian LCL for veto check
+      # Calculate one-sided Bayesian LCL for veto check
       bayes_lcl <- calc_bayes_lcl(r1_non_ccdc6_reversals, n_r1_non_ccdc6_valid, 0.95)
       
       # Also calculate Wilson CI for reference and non-contradiction check
@@ -396,7 +396,7 @@ for (i in 1:nrow(passed_pairs)) {
   } else if (!is.na(proxy_results$r1_ccdc6_n[i]) && !is.na(proxy_results$r1_non_ccdc6_n[i]) &&
              proxy_results$r1_ccdc6_n[i] >= 5 && proxy_results$r1_non_ccdc6_n[i] >= 5) {
     
-    # Calculate LCLs for veto check
+    # Calculate one-sided LCLs for veto check
     ccdc6_lcl <- calc_bayes_lcl(proxy_results$r1_ccdc6_reversal_count[i], 
                                 proxy_results$r1_ccdc6_n[i], 0.95)
     non_ccdc6_lcl <- calc_bayes_lcl(proxy_results$r1_non_ccdc6_reversal_count[i], 
@@ -1042,7 +1042,7 @@ if ("one_ok_not_contra" %in% names(pass_mode_table) && pass_mode_table["one_ok_n
 cat("\nBayesian criterion (Jeffreys prior):\n")
 cat(sprintf("  R1 OK criterion: Pr(p > 0.5) ≥ 0.95 AND n≥6 AND rate≥0.7\n"))
 cat(sprintf("  Non-contradiction: Pr(p > 0.5) ≥ 0.20 AND Wilson upper ≥ 0.55 (n≥5 required)\n"))
-cat(sprintf("  Veto: LCL≥0.7 AND UCL_other≤0.5 (both n≥5)\n"))
+cat(sprintf("  Veto: one-sided LCL≥0.7 AND UCL_other≤0.5 (both n≥5)\n"))
 
 # POC trend diagnosis summary (diagnostic only)
 cat("\nPOC trend diagnosis (R1, diagnostic only):\n")
