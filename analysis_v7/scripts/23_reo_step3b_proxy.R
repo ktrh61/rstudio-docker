@@ -868,6 +868,54 @@ step3b_results <- cbind(
   proxy_results[, -1]  # Remove duplicate pair_id
 )
 
+# Add columns to clearly identify which subtype was OK in one_ok_not_contra cases
+# and provide the decisive metrics
+step3b_results$ok_subtype_detail <- NA_character_
+step3b_results$ok_subtype_metrics <- NA_character_
+
+for (i in 1:nrow(step3b_results)) {
+  if (step3b_results$pass_mode[i] == "one_ok_not_contra" && !is.na(step3b_results$pass_mode[i])) {
+    if (step3b_results$pass_subtype[i] == "CCDC6" && !is.na(step3b_results$pass_subtype[i])) {
+      # CCDC6 was OK
+      step3b_results$ok_subtype_detail[i] <- "CCDC6"
+      step3b_results$ok_subtype_metrics[i] <- sprintf(
+        "CCDC6: n=%d, rate=%.3f, Pr=%.3f, CI=[%.3f,%.3f] | non-CCDC6: n=%d, CI_upper=%.3f",
+        step3b_results$r1_ccdc6_n[i],
+        step3b_results$r1_ccdc6_reversal_rate[i],
+        step3b_results$r1_ccdc6_bayes_prob[i],
+        step3b_results$r1_ccdc6_wilson_lower[i],
+        step3b_results$r1_ccdc6_wilson_upper[i],
+        ifelse(is.na(step3b_results$r1_non_ccdc6_n[i]), 0, step3b_results$r1_non_ccdc6_n[i]),
+        ifelse(is.na(step3b_results$r1_non_ccdc6_wilson_upper[i]), NA, step3b_results$r1_non_ccdc6_wilson_upper[i])
+      )
+    } else if (step3b_results$pass_subtype[i] == "non-CCDC6" && !is.na(step3b_results$pass_subtype[i])) {
+      # non-CCDC6 was OK
+      step3b_results$ok_subtype_detail[i] <- "non-CCDC6"
+      step3b_results$ok_subtype_metrics[i] <- sprintf(
+        "non-CCDC6: n=%d, rate=%.3f, Pr=%.3f, CI=[%.3f,%.3f] | CCDC6: n=%d, CI_upper=%.3f",
+        step3b_results$r1_non_ccdc6_n[i],
+        step3b_results$r1_non_ccdc6_reversal_rate[i],
+        step3b_results$r1_non_ccdc6_bayes_prob[i],
+        step3b_results$r1_non_ccdc6_wilson_lower[i],
+        step3b_results$r1_non_ccdc6_wilson_upper[i],
+        ifelse(is.na(step3b_results$r1_ccdc6_n[i]), 0, step3b_results$r1_ccdc6_n[i]),
+        ifelse(is.na(step3b_results$r1_ccdc6_wilson_upper[i]), NA, step3b_results$r1_ccdc6_wilson_upper[i])
+      )
+    }
+  } else if (step3b_results$pass_mode[i] == "both_ok" && !is.na(step3b_results$pass_mode[i])) {
+    step3b_results$ok_subtype_detail[i] <- "both"
+    step3b_results$ok_subtype_metrics[i] <- sprintf(
+      "CCDC6: n=%d, rate=%.3f, Pr=%.3f | non-CCDC6: n=%d, rate=%.3f, Pr=%.3f",
+      ifelse(is.na(step3b_results$r1_ccdc6_n[i]), 0, step3b_results$r1_ccdc6_n[i]),
+      ifelse(is.na(step3b_results$r1_ccdc6_reversal_rate[i]), 0, step3b_results$r1_ccdc6_reversal_rate[i]),
+      ifelse(is.na(step3b_results$r1_ccdc6_bayes_prob[i]), 0, step3b_results$r1_ccdc6_bayes_prob[i]),
+      ifelse(is.na(step3b_results$r1_non_ccdc6_n[i]), 0, step3b_results$r1_non_ccdc6_n[i]),
+      ifelse(is.na(step3b_results$r1_non_ccdc6_reversal_rate[i]), 0, step3b_results$r1_non_ccdc6_reversal_rate[i]),
+      ifelse(is.na(step3b_results$r1_non_ccdc6_bayes_prob[i]), 0, step3b_results$r1_non_ccdc6_bayes_prob[i])
+    )
+  }
+}
+
 step3b_data <- list(
   # Configuration (pass through)
   config = CONFIG,
@@ -928,6 +976,34 @@ write.csv(step3b_results[step3b_results$proxy_pass, ],
           paste0(paths$output, "step3b_passed_pairs.csv"),
           row.names = FALSE)
 cat("  Passed pairs exported to: step3b_passed_pairs.csv\n")
+
+# Export decision rationale summary for passed pairs
+# Ensure pass_subtype exists (for compatibility)
+if (!"pass_subtype" %in% names(step3b_results)) {
+  step3b_results$pass_subtype <- NA_character_
+}
+
+decision_summary <- step3b_results[step3b_results$proxy_pass, 
+                                   c("pair_id", "gene_up", "gene_down", 
+                                     "proxy_status", "pass_mode",
+                                     "ok_subtype_detail", "ok_subtype_metrics",
+                                     "r1_ccdc6_n", "r1_ccdc6_reversal_rate", 
+                                     "r1_ccdc6_bayes_prob", "r1_ccdc6_wilson_lower",
+                                     "r1_non_ccdc6_n", "r1_non_ccdc6_reversal_rate",
+                                     "r1_non_ccdc6_bayes_prob", "r1_non_ccdc6_wilson_lower")]
+write.csv(decision_summary,
+          paste0(paths$output, "step3b_decision_rationale.csv"),
+          row.names = FALSE)
+cat("  Decision rationale exported to: step3b_decision_rationale.csv\n")
+
+# Quick summary of one_ok_not_contra decisions
+if (sum(step3b_results$pass_mode == "one_ok_not_contra", na.rm = TRUE) > 0) {
+  cat("\n  One-OK decision breakdown in CSV:\n")
+  one_ok_ccdc6 <- sum(step3b_results$ok_subtype_detail == "CCDC6", na.rm = TRUE)
+  one_ok_non <- sum(step3b_results$ok_subtype_detail == "non-CCDC6", na.rm = TRUE)
+  cat(sprintf("    CCDC6 was decisive: %d pairs\n", one_ok_ccdc6))
+  cat(sprintf("    non-CCDC6 was decisive: %d pairs\n", one_ok_non))
+}
 
 # =============================================================================
 # STEP 3b SUMMARY (固定フォーマット)
