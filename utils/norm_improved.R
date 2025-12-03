@@ -131,7 +131,7 @@ muren_norm <- function(reads,
     cl <- parallel::makeCluster(workers, type = "PSOCK")
   }
   doSNOW::registerDoSNOW(cl)
-  parallel::clusterSetRNGStream(cl, 12345L)
+  parallel::clusterSetRNGStream(cl, 1986L)
   on.exit(if (isTRUE(own_cluster)) try(parallel::stopCluster(cl), silent = TRUE), add = TRUE)
   
   # ★ 各ワーカーでBLAS/OMPを1スレッドに固定（外側並列との二重化防止）

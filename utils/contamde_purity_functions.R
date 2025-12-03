@@ -1,21 +1,25 @@
 # ==============================================================================
-# ContamDE Purity Estimation Functions v7 (Enhanced Version)
+# ContamDE Purity Estimation Functions
 # contamde_purity_functions.R
+# Last modified: 2025-12-02
+# Changes:
+#   - 2025-12-02: Changed multiple testing correction from qvalue (bootstrap) to BH method
+#   - 2025-12-02: Removed qvalue package dependency
 # ==============================================================================
 # 
 # Purpose: Tumor purity estimation only (no DEG analysis)
-# Modifications for v7:
+# Features:
 # - Robust eBayes for outlier resistance
 # - Improved zero count handling
 # - Safe design matrix construction
-# - Enhanced p-value adjustment with 1000 gene limit (original contamDE)
+# - Top 1000 gene limit (original contamDE)
 
 # Note: Requires prior loading of:
 # source("./utils/utils_improved.R")
 # source("./utils/norm_improved.R")
 
 # Sanity check: required packages
-for (pkg in c("edgeR","limma","qvalue")) {
+for (pkg in c("edgeR", "limma")) {
   if (!requireNamespace(pkg, quietly = TRUE)) {
     stop("Package '", pkg, "' is required.")
   }
@@ -183,11 +187,8 @@ contamde_purity <- function(counts,
     p_limma <- p_limma[valid_genes]
     log2_fc_limma <- log2_fc_limma[valid_genes]
     
-    # Calculate adjusted p-values (qvalue required)
-    p_adj <- tryCatch(
-      qvalue::qvalue(p_limma, pi0.method = "bootstrap")$qvalues,
-      error = function(e) stop("qvalue calculation failed: ", e$message)
-    )
+    # Calculate adjusted p-values using BH method (deterministic)
+    p_adj <- stats::p.adjust(p_limma, method = "BH")
     
     # Limit to top 1000 genes (original contamDE approach)
     n_sig <- sum(p_adj < 0.1, na.rm = TRUE)
@@ -229,12 +230,11 @@ contamde_purity <- function(counts,
     sum.max <- max(sumup - sumdown)
     
     if (!is.finite(sum.max) || sum.max <= 0) {
-      warning("No informative genes found. Setting purity to 1.0.")
-      w_hat <- rep(1.0, ncol_counts)
-    } else {
-      w_hat <- (sumup - sumdown) / sum.max
-      w_hat <- pmax(0, pmin(1, w_hat))
+      stop("No informative genes found. Cannot estimate purity.")
     }
+    
+    w_hat <- (sumup - sumdown) / sum.max
+    w_hat <- pmax(0, pmin(1, w_hat))
     
     if (verbose) {
       cat(sprintf("  Purity summary: mean=%.3f, sd=%.3f\n", 
@@ -302,15 +302,15 @@ assess_purity_quality <- function(purity_result, threshold = 0.6, verbose = TRUE
   if (verbose) {
     cat("\n=== Purity Quality Assessment ===\n")
     cat(sprintf("Total samples: %d\n", n_samples))
-    cat(sprintf("Mean purity: %.3f Â± %.3f\n", 
+    cat(sprintf("Mean purity: %.3f +/- %.3f\n", 
                 purity_stats$mean_purity, purity_stats$sd_purity))
     cat(sprintf("Range: [%.3f, %.3f]\n", 
                 purity_stats$min_purity, purity_stats$max_purity))
-    cat(sprintf("High purity (â‰¥%.1f): %d/%d (%.1f%%)\n",
+    cat(sprintf("High purity (>=%.1f): %d/%d (%.1f%%)\n",
                 threshold, n_high_purity, n_samples, retention_rate * 100))
     
     if (retention_rate >= 0.7) {
-      cat("Retention: Excellent (â‰¥70%)\n")
+      cat("Retention: Excellent (>=70%)\n")
     } else if (retention_rate >= 0.5) {
       cat("Retention: Acceptable (50-70%)\n")
     } else {
@@ -379,7 +379,7 @@ create_purity_filtered_lists <- function(original_sample_lists, purity_results,
     )
     
     if (verbose) {
-      cat(sprintf("  %s: %d â†’ %d samples (%.1f%% retention)\n",
+      cat(sprintf("  %s: %d -> %d samples (%.1f%% retention)\n",
                   group_name, n_original, length(filtered_tumor),
                   length(filtered_tumor) / n_original * 100))
     }
@@ -389,9 +389,9 @@ create_purity_filtered_lists <- function(original_sample_lists, purity_results,
   return(filtered_lists)
 }
 
-cat("ContamDE purity functions v7 loaded successfully!\n")
-cat("Key improvements:\n")
-cat("  - Fixed voom normalization (none)\n")
+cat("ContamDE purity functions loaded successfully!\n")
+cat("Key features:\n")
+cat("  - BH method for multiple testing correction (deterministic)\n")
 cat("  - Robust eBayes for outlier resistance\n")
 cat("  - Top 1000 gene limit (original contamDE)\n")
 cat("Main functions:\n")

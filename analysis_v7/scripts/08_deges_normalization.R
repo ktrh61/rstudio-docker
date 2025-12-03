@@ -1,16 +1,16 @@
-# 08_deges_normalization.R - Stage 3 DEGES Iterative Normalization (REVISED)
+# 08_deges_normalization.R - Stage 3 DEGES Iterative Normalization
 # Purpose: Apply DEGES-MUREN normalization to high-purity paired samples
-# Method: filterByExpr -> Cook's distance -> MUREN (LTS) + GLM iteration
+# Method: filterByExpr -> Cook's distance -> MUREN (LTS) + Brunner-Munzel iteration
 # Input: thyr_case_master_stage2_filtered, thyr_se_strand2_nonzero  
 # Output: Normalized CPM values and DGEList objects with DEGES-MUREN factors
-# Version: v7.3 - Revised workflow with consistent gene sets
-# Date: 2025-01-20 (Revised: 2025-01-21)
+# Version: v7.5 - Brunner-Munzel DEG screening, Storey q-value (lambda=0.5)
+# Date: 2025-12-03
 
 source("analysis_v7/setup.R")
 
-cat("\n=== Stage 3: DEGES Normalization (v7.3 - Revised) ===\n")
+cat("\n=== Stage 3: DEGES Normalization (v7.5) ===\n")
 cat("Date:", as.character(Sys.Date()), "\n")
-cat("Method: filterByExpr -> Cook's -> DEGES-MUREN -> CPM output\n")
+cat("Method: filterByExpr -> Cook's -> DEGES-MUREN (Brunner-Munzel) -> CPM output\n")
 cat("Groups: R0/R1/B0/B1 high-purity pairs only\n")
 
 # Load packages
@@ -18,6 +18,7 @@ suppressPackageStartupMessages({
   library(SummarizedExperiment)
   library(edgeR)
   library(DESeq2)
+  library(brunnermunzel)
   library(qvalue)
   library(dplyr)
 })
@@ -52,6 +53,7 @@ cat("  Floor threshold:", sprintf("%.0f%%", CONFIG$CONVERGENCE_THRESHOLD * 100),
 cat("  Cook's quantile:", sprintf("%.0f%%", CONFIG$COOKS_QUANTILE * 100), "\n")
 cat("  MUREN method:", CONFIG$MUREN_METHOD, "\n")
 cat("  MUREN workers:", CONFIG$MUREN_WORKERS, "\n")
+cat("  DEG screening: Brunner-Munzel test + Storey q-value (lambda=0.5)\n")
 
 # Thread control
 if (requireNamespace("RhpcBLASctl", quietly = TRUE)) {
@@ -84,7 +86,7 @@ if (exists("thyr_se_strand2_nonzero")) {
   cat("Loading SE from file...\n")
   se <- readRDS(se_path)
 }
-cat("SE dimensions:", format(nrow(se), big.mark=","), "genes Ã— ", 
+cat("SE dimensions:", format(nrow(se), big.mark=","), "genes x ", 
     format(ncol(se), big.mark=","), "samples\n")
 
 # Load case_master_stage2_filtered
@@ -233,12 +235,48 @@ detect_cook_outliers <- function(count_matrix, sample_groups, quantile_cutoff = 
 }
 
 # ============================================================================
-# DEGES iteration function
+# Brunner-Munzel test for DEG screening
+# ============================================================================
+
+perform_bm_test <- function(cpm_matrix, sample_groups, group_levels) {
+  # Perform Brunner-Munzel test for each gene
+  # Input: normalized CPM matrix (genes x samples)
+  # Returns: vector of p-values
+  
+  group1_idx <- which(sample_groups == group_levels[1])
+  group2_idx <- which(sample_groups == group_levels[2])
+  
+  n_genes <- nrow(cpm_matrix)
+  pvalues <- numeric(n_genes)
+  
+  for (i in seq_len(n_genes)) {
+    x <- cpm_matrix[i, group1_idx]
+    y <- cpm_matrix[i, group2_idx]
+    
+    tryCatch({
+      if (length(unique(c(x, y))) > 1 && var(c(x, y), na.rm = TRUE) > 0) {
+        result <- brunnermunzel::brunnermunzel.test(x, y)
+        pvalues[i] <- result$p.value
+      } else {
+        pvalues[i] <- 1.0
+      }
+    }, error = function(e) {
+      pvalues[i] <<- 1.0
+    })
+  }
+  
+  return(pvalues)
+}
+
+# ============================================================================
+# DEGES iteration function (Brunner-Munzel-based)
 # ============================================================================
 
 perform_deges_iteration <- function(count_matrix, sample_groups, iteration = 0, 
                                     config = CONFIG) {
   cat(sprintf("    Iteration %d:\n", iteration))
+  
+  group_levels <- levels(factor(sample_groups))
   
   # Create DGEList (no additional filtering here - already filtered)
   dgelist <- DGEList(counts = count_matrix, group = factor(sample_groups))
@@ -246,58 +284,53 @@ perform_deges_iteration <- function(count_matrix, sample_groups, iteration = 0,
   # MUREN normalization
   cat("      Applying MUREN normalization...\n")
   
-  tryCatch({
-    muren_coeff <- muren_norm(
-      dgelist$counts,
-      refs = "saturated",
-      pairwise_method = config$MUREN_METHOD,
-      single_param = TRUE,
-      res_return = "scaling_coeff",
-      workers = config$MUREN_WORKERS
-    )
-    
-    # Apply MUREN factors
-    dgelist$samples$norm.factors <- muren_coeff / mean(muren_coeff)
-    
-  }, error = function(e) {
-    cat("      ERROR: MUREN failed:", e$message, "\n")
-    stop("MUREN normalization failed. Stopping execution.")
-  })
+  muren_coeff <- muren_norm(
+    dgelist$counts,
+    refs = "saturated",
+    pairwise_method = config$MUREN_METHOD,
+    single_param = TRUE,
+    res_return = "scaling_coeff",
+    workers = config$MUREN_WORKERS
+  )
   
-  # GLM fitting for differential expression
-  design <- model.matrix(~ sample_groups)
-  y <- voom(dgelist, design, plot = FALSE)
-  fit <- lmFit(y, design)
-  fit <- eBayes(fit)
+  # Validate coefficients
+  if (any(!is.finite(muren_coeff)) || any(muren_coeff <= 0)) {
+    stop("MUREN scaling coefficients contain non-finite or non-positive values.")
+  }
   
-  # Get p-values and apply Storey method
-  pvalues <- fit$p.value[, 2]  # Second column for group effect
+  # Apply MUREN factors
+  dgelist$samples$norm.factors <- muren_coeff / mean(muren_coeff)
   
-  # Storey q-value estimation
-  qobj <- tryCatch({
-    qvalue(pvalues, pi0.method = "bootstrap")
-  }, error = function(e) {
-    list(qvalues = p.adjust(pvalues, method = "BH"),
-         pi0 = 1.0)
-  })
+  # Calculate normalized CPM for Brunner-Munzel test
+  normalized_cpm <- cpm(dgelist, normalized.lib.sizes = TRUE, 
+                        prior.count = 0, log = FALSE)
   
-  qvalues <- qobj$qvalues
-  pi0 <- qobj$pi0
+  # Perform Brunner-Munzel test
+  cat("      Performing Brunner-Munzel tests...\n")
+  pvalues <- perform_bm_test(normalized_cpm, sample_groups, group_levels)
+  
+  # Apply Storey q-value (lambda = 0.5 fixed)
+  qval_result <- qvalue(pvalues, lambda = 0.5)
+  qvalues <- qval_result$qvalues
+  pi0_estimate <- qval_result$pi0
+  
+  cat(sprintf("      Estimated pi0: %.3f\n", pi0_estimate))
   
   # Count potential DEGs
   deg_count <- sum(qvalues < 0.10, na.rm = TRUE)
   deg_proportion <- deg_count / length(qvalues)
   
-  cat(sprintf("      Pi0: %.3f, DEGs: %d (%.2f%%)\n", 
-              pi0, deg_count, deg_proportion * 100))
+  cat(sprintf("      DEGs: %d (%.2f%%)\n", deg_count, deg_proportion * 100))
   
   # Determine potential DEGs and non-DEGs
   n_genes <- length(qvalues)
+  exclusion_method <- "none"  # Track which method was used
   
   if (deg_proportion > config$CONVERGENCE_THRESHOLD) {
     # More than 5% DEGs: use q < 0.10 as potential DEGs
     potential_deg_indices <- which(qvalues < 0.10)
     non_deg_indices <- which(qvalues >= 0.10)
+    exclusion_method <- "qvalue"
     
   } else {
     # 5% or fewer DEGs: apply floor processing
@@ -309,7 +342,8 @@ perform_deges_iteration <- function(count_matrix, sample_groups, iteration = 0,
       potential_deg_indices <- which(qvalues < q_threshold)
       non_deg_indices <- which(qvalues >= q_threshold)
       
-      if (deg_count == 0) {
+      if (length(potential_deg_indices) > 0) {
+        exclusion_method <- "floor"
         cat(sprintf("      Floor processing: selected %d genes (%.2f%%)\n", 
                     length(potential_deg_indices), 
                     length(potential_deg_indices) / n_genes * 100))
@@ -331,9 +365,12 @@ perform_deges_iteration <- function(count_matrix, sample_groups, iteration = 0,
     potential_deg_indices = potential_deg_indices,
     non_deg_indices = non_deg_indices,
     terminate = terminate,
-    pi0 = pi0,
     deg_count = deg_count,
-    deg_proportion = deg_proportion
+    deg_proportion = deg_proportion,
+    n_excluded = length(potential_deg_indices),
+    exclusion_method = exclusion_method,
+    pi0_estimate = pi0_estimate,
+    n_genes_input = n_genes
   ))
 }
 
@@ -425,7 +462,7 @@ for (comp_name in names(comparisons)) {
     cat(sprintf("  Protein coding genes: %d\n", nrow(count_matrix)))
     
     # ========================================================================
-    # NEW WORKFLOW: filterByExpr first
+    # WORKFLOW: filterByExpr first
     # ========================================================================
     
     # Step 1: Apply filterByExpr
@@ -497,7 +534,7 @@ for (comp_name in names(comparisons)) {
     
     # Create DGEList with filterByExpr-filtered genes (not Cook's filtered)
     dgelist_final <- DGEList(
-      counts = count_matrix_filtered,  # filterByExprå¾Œã€Cook'så‰
+      counts = count_matrix_filtered,  # After filterByExpr, before Cook's
       samples = data.frame(
         row.names = all_samples,
         group = factor(sample_groups),
@@ -537,6 +574,9 @@ for (comp_name in names(comparisons)) {
       n_genes_filtered = length(filtered_gene_set),
       cook_outliers = cook_result$outlier_count,
       iterations = length(iteration_results),
+      iteration_degs = sapply(iteration_results, function(x) x$deg_count),
+      iteration_excluded = unname(sapply(iteration_results, function(x) x$n_excluded)),
+      iteration_methods = unname(sapply(iteration_results, function(x) x$exclusion_method)),
       final_deg_count = final_result$deg_count,
       normalized_cpm = normalized_cpm
     )
@@ -544,25 +584,55 @@ for (comp_name in names(comparisons)) {
     # Save normalization factors
     thyr_norm_factors[[comp_tissue]] <- final_result$norm_factors
     
-    # Log processing details
+    # Log processing details (expanded)
     deges_processing_log$comparisons[[comp_tissue]] <- list(
+      # Basic info
       comparison = comp_name,
       tissue = tissue_type,
-      n_samples = list(group1 = length(samples1), group2 = length(samples2)),
-      sample_ids = all_samples,
+      date = Sys.Date(),
+      
+      # Sample info
+      n_samples = list(
+        group1 = length(samples1), 
+        group2 = length(samples2)
+      ),
+      sample_ids = list(
+        group1 = samples1,
+        group2 = samples2
+      ),
+      
+      # Gene filtering
       n_protein_coding = sum(is_protein_coding),
-      n_after_filter = length(filtered_gene_set),
+      n_after_filterByExpr = length(filtered_gene_set),
+      
+      # Cook's distance details
       cook_outliers = list(
         n_outliers = cook_result$outlier_count,
-        threshold = cook_result$threshold
+        threshold = cook_result$threshold,
+        outlier_gene_ids = cook_result$outlier_gene_ids
       ),
-      iterations_summary = lapply(iteration_results, function(x) {
+      
+      # DEGES iterations (detailed)
+      iterations_summary = lapply(names(iteration_results), function(iter_name) {
+        x <- iteration_results[[iter_name]]
         list(
-          pi0 = x$pi0,
+          iteration = iter_name,
+          n_genes_input = x$n_genes_input,
           deg_count = x$deg_count,
-          deg_proportion = x$deg_proportion
+          n_excluded = x$n_excluded,
+          exclusion_method = x$exclusion_method,
+          deg_proportion = x$deg_proportion,
+          non_deg_count = length(x$non_deg_indices),
+          pi0_estimate = x$pi0_estimate,
+          terminated = x$terminate
         )
-      })
+      }),
+      
+      # Final results
+      final_iteration = length(iteration_results),
+      final_deg_count = final_result$deg_count,
+      final_pi0 = final_result$pi0_estimate,
+      n_genes_output = nrow(count_matrix_filtered)
     )
   }
 }
@@ -577,6 +647,8 @@ summary_data <- data.frame()
 
 for (comp_name in names(thyr_deges_results)) {
   result <- thyr_deges_results[[comp_name]]
+  iter_excluded <- result$iteration_excluded
+  iter_methods <- result$iteration_methods
   
   summary_row <- data.frame(
     comparison = result$comparison,
@@ -587,6 +659,10 @@ for (comp_name in names(thyr_deges_results)) {
     genes_filtered = result$n_genes_filtered,
     cook_outliers = result$cook_outliers,
     iterations = result$iterations,
+    iter0_excluded = iter_excluded[1],
+    iter0_method = iter_methods[1],
+    iter1_excluded = ifelse(length(iter_excluded) > 1, iter_excluded[2], NA),
+    iter1_method = ifelse(length(iter_methods) > 1, iter_methods[2], NA),
     final_degs = result$final_deg_count,
     stringsAsFactors = FALSE
   )
@@ -610,7 +686,7 @@ deges_output <- list(
   sample_lists = sample_lists,
   results = thyr_deges_results,
   summary = summary_data,
-  version = "v7.3_revised"
+  version = "v7.5"
 )
 
 saveRDS(deges_output, paste0(paths$processed, "analysis_deges_results.rds"))
@@ -636,9 +712,10 @@ cat("  Processing log saved to logs/\n")
 # Final report
 # ============================================================================
 
-cat("\n=== DEGES Normalization Complete (Revised Version) ===\n")
+cat("\n=== DEGES Normalization Complete (v7.5) ===\n")
 cat("Configuration:\n")
 cat("  Workflow: filterByExpr -> Cook's -> DEGES iterations\n")
+cat("  DEG screening: Brunner-Munzel test + Storey q-value (lambda=0.5)\n")
 cat("  Gene set: Consistent (filterByExpr-filtered) throughout\n")
 cat("  Output: Normalized CPM values (prior.count = 0)\n")
 cat("\nProcessed comparisons:\n")

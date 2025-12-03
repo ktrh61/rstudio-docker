@@ -50,3 +50,14 @@ session_info_*.txt
 
 # Keep directory structure
 !**/.gitkeep
+# === Additional exclusions ===
+# Compressed data files
+*.tar.gz
+*.gtf.gz
+*.gz
+
+# GDC client binaries
+gdc-client*
+
+# Remove manifest inclusion (too many files)
+# Manifests should be documented in README instead

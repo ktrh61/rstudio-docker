@@ -1,6 +1,8 @@
 # ==============================================================================
-# utils.R — Improved helpers for MUREN normalization
-# Version: Enhanced performance and robustness
+# utils_improved.R — Improved helpers for MUREN normalization
+# Last modified: 2025-12-02
+# Changes:
+#   - 2025-12-02: Removed fallback mechanisms (fail-fast policy)
 # ==============================================================================
 
 # ---- Dependencies Check ----
@@ -70,48 +72,27 @@ reg_sp <- function(s_k, s_r, ...) {
   # Huber robust regression (M-estimator)
   if (method == "huber") {
     if (!requireNamespace("MASS", quietly = TRUE)) {
-      warning("MASS::rlm not available for Huber regression; falling back to median")
-      return(stats::median(y, na.rm = TRUE))
+      stop("MASS::rlm not available for Huber regression")
     }
-    tryCatch({
-      fit <- MASS::rlm(y ~ 1, psi = MASS::psi.huber, maxit = 20)
-      return(unname(coef(fit)[1]))
-    }, error = function(e) {
-      warning("Huber regression failed; falling back to median: ", e$message)
-      return(stats::median(y, na.rm = TRUE))
-    })
+    fit <- MASS::rlm(y ~ 1, psi = MASS::psi.huber, maxit = 20)
+    return(unname(coef(fit)[1]))
   }
   
-  # Default: LTS regression (backward compatible)
-  tryCatch({
-    .reg_backend(y ~ 1, ...)$coefficients[1]
-  }, error = function(e) {
-    warning("LTS regression failed; falling back to median: ", e$message)
-    return(stats::median(y, na.rm = TRUE))
-  })
+  # Default: LTS regression
+  .reg_backend(y ~ 1, ...)$coefficients[1]
 }
 
 # ---- Mode-Based Shift (Alternative Robust Location) ----
 # Returns the mode of the difference distribution
 mode_sp <- function(s_k, s_r, ...) {
-  tryCatch({
-    d <- stats::density(s_r - s_k, ...)
-    d$x[which.max(d$y)]
-  }, error = function(e) {
-    warning("Density estimation failed; falling back to median: ", e$message)
-    return(stats::median(s_r - s_k, na.rm = TRUE))
-  })
+  d <- stats::density(s_r - s_k, ...)
+  d$x[which.max(d$y)]
 }
 
 # ---- Double-Parameter Regression (Non-linear Correction) ----
 # Returns fitted values (vector of length = n_genes)
 reg_dp <- function(s_k, s_r, ...) {
-  tryCatch({
-    .reg_backend(s_r ~ s_k, ...)$fitted.values
-  }, error = function(e) {
-    warning("Double-parameter regression failed; returning input: ", e$message)
-    return(s_r)  # Return reference values if regression fails
-  })
+  .reg_backend(s_r ~ s_k, ...)$fitted.values
 }
 
 # ---- Legacy Task Builder (Backward Compatibility) ----
@@ -140,18 +121,13 @@ polish_coeff <- function(fitted_n, n_exp, locations, unused_refs, maxiter) {
   }
   
   # Apply median polish to extract sample effects
-  tryCatch({
-    m <- stats::medpolish(rs_mx, 
-                          na.rm = TRUE, 
-                          trace.iter = FALSE, 
-                          maxiter = maxiter)
-    
-    # Return column effects + overall (sample effects in log2 space)
-    m$overall + m$col
-  }, error = function(e) {
-    warning("Median polish failed; returning zero effects: ", e$message)
-    return(rep(0, ncol(rs_mx)))
-  })
+  m <- stats::medpolish(rs_mx, 
+                        na.rm = TRUE, 
+                        trace.iter = FALSE, 
+                        maxiter = maxiter)
+  
+  # Return column effects + overall (sample effects in log2 space)
+  m$overall + m$col
 }
 
 # ---- Median Polish Per Gene (Double-Parameter Path) ----
@@ -167,18 +143,13 @@ polish_one_gene <- function(fitted_n, n_exp, locations, unused_refs, maxiter) {
   }
   
   # Apply median polish for this gene
-  tryCatch({
-    m <- stats::medpolish(rs_mx, 
-                          na.rm = TRUE, 
-                          trace.iter = FALSE, 
-                          maxiter = maxiter)
-    
-    # Return column effects + overall (sample effects for this gene)
-    m$overall + m$col
-  }, error = function(e) {
-    warning("Gene-specific median polish failed; returning zero effects: ", e$message)
-    return(rep(0, ncol(rs_mx)))
-  })
+  m <- stats::medpolish(rs_mx, 
+                        na.rm = TRUE, 
+                        trace.iter = FALSE, 
+                        maxiter = maxiter)
+  
+  # Return column effects + overall (sample effects for this gene)
+  m$overall + m$col
 }
 
 # ---- Performance Enhancement Functions ----
@@ -221,7 +192,7 @@ check_muren_config <- function() {
   cat(sprintf("  MASS available: %s\n", has_mass))
   
   if (method %in% c("lts", "huber") && !has_mass && !has_robustbase) {
-    warning("Neither robustbase nor MASS available for robust regression. Consider installing robustbase for better performance.")
+    stop("Neither robustbase nor MASS available for robust regression.")
   }
   
   invisible(list(method = method, robustbase = has_robustbase, mass = has_mass))
@@ -237,6 +208,7 @@ initialize_muren <- function(n_genes = NULL, n_samples = NULL, priority = "balan
   invisible(TRUE)
 }
 
-# ---- End of utils.R ----
+# ---- End of utils_improved.R ----
 cat("Enhanced MUREN utils loaded successfully.\n")
+cat("Note: Fail-fast policy enabled (no fallback on errors).\n")
 cat("Use initialize_muren(n_genes, n_samples) to optimize configuration.\n")

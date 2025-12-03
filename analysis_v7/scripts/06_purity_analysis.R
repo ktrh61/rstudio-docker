@@ -3,12 +3,12 @@
 # Method: MUREN normalization with contamDE purity estimation
 # Input: thyr_case_master_stage1_filtered, thyr_se_strand2_nonzero
 # Output: thyr_case_master_stage2_filtered with tumor_purity and low_purity flags
-# Version: v7.0.1 - Fixed filtering logic for standalone execution
-# Date: 2025-01-20 (Fixed: 2025-01-21)
+# Version: v7.1 - Removed qvalue dependency (BH method in contamde)
+# Date: 2025-12-02
 
 source("analysis_v7/setup.R")
 
-cat("\n=== Stage 2: Tumor Purity Analysis (v7.0.1 - Fixed) ===\n")
+cat("\n=== Stage 2: Tumor Purity Analysis (v7.1) ===\n")
 cat("Date:", as.character(Sys.Date()), "\n")
 cat("Analysis: R0/R1/B0/B1 groups with clean paired samples\n")
 cat("Method: ContamDE with MUREN normalization\n")
@@ -18,7 +18,6 @@ suppressPackageStartupMessages({
   library(SummarizedExperiment)
   library(edgeR)
   library(limma)
-  library(qvalue)
   library(dplyr)
 })
 
@@ -230,7 +229,7 @@ for (group_name in c("R0", "R1", "B0", "B1")) {
   
   # Prepare counts matrix
   counts <- prepare_contamde_matrix(se, paired$normal, paired$tumor, keep_genes)
-  cat(sprintf("  Count matrix: %d genes × %d samples\n", nrow(counts), ncol(counts)))
+  cat(sprintf("  Count matrix: %d genes x %d samples\n", nrow(counts), ncol(counts)))
   
   # Run ContamDE purity estimation
   cat("  Running ContamDE...\n")
@@ -401,6 +400,7 @@ cat("Configuration:\n")
 cat("  Purity threshold:", sprintf("%.0f%%", CONFIG$PURITY_THRESHOLD * 100), "\n")
 cat("  Gene filtering: protein_coding + filterByExpr\n")
 cat("  MUREN method:", CONFIG$PAIRWISE_METHOD, "\n")
+cat("  Multiple testing correction: BH method\n")
 cat("\nResults:\n")
 cat("  Total cases:", total_cases, "\n")
 cat("  Clean cases (no outliers):", sum(thyr_case_master_stage2_filtered$has_outlier_tumor == 0 & 
