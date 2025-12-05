@@ -1,18 +1,20 @@
-# 05_pca_outlier_detection.R - Stage 1 PCA Outlier Detection (v7.9)
+# 05_pca_outlier_detection.R - Stage 1 PCA Outlier Detection (v7.11)
 # Purpose: Detect technical outliers using CDM and update case_master
 # Method: Cross-Data Matrix with Permutation Analysis and adaptive thresholds
-# Version: v7.9 - Case-master centric approach with outlier flags
+# Version: v7.11 - New group design (R0/R_Low/R_High/R1, B0/B_Low/B_High/B1)
+#                  PCA QC for paired samples only
 #          Outputs thyr_case_master_stage1_filtered with has_outlier_tumor/normal flags
-# Date: 2025-01-20
+# Date: 2025-12-06
 
 source("analysis_v7/setup.R")
 
-cat("\n=== Stage 1: PCA Outlier Detection (v7.9) ===\n")
+cat("\n=== Stage 1: PCA Outlier Detection (v7.11) ===\n")
 cat("Date:", as.character(Sys.Date()), "\n")
-cat("Analysis: 8 groups (R0/R1/B0/B1 × tumor/normal)\n")
+cat("Analysis: 12 groups (R0/R_Low/R_High/R1/B0/B1 x tumor/normal)\n")
+cat("Note: B_Low/B_High excluded (not used in validation)\n")
 cat("Sample types: Primary Tumor and Solid Tissue Normal only\n")
-cat("Sample filtering: _merged samples only\n")
-cat("Output: case_master with outlier flags (0/1)\n")
+cat("Sample filtering: _merged samples only, paired cases only\n")
+cat("Output: case_master with outlier flags (0/1/NA)\n")
 
 # Load packages
 suppressPackageStartupMessages({
@@ -107,7 +109,7 @@ if (exists("thyr_se_strand2_nonzero")) {
   cat("Loading SE from file...\n")
   se <- readRDS(se_path)
 }
-cat("SE dimensions:", format(nrow(se), big.mark=","), "genes ×", 
+cat("SE dimensions:", format(nrow(se), big.mark=","), "genes Ã—", 
     format(ncol(se), big.mark=","), "samples\n")
 
 # Load case master for group definitions
@@ -119,11 +121,14 @@ if (!file.exists(case_master_path)) {
 thyr_case_master <- readRDS(case_master_path)
 cat("Case master loaded:", nrow(thyr_case_master), "cases\n")
 
-# Filter to main analysis groups only
+# Filter to all analysis groups (paired samples only for PCA QC)
+# Note: All groups included, but PCA QC only runs on paired samples
 thyr_case_master_stage1_filtered <- thyr_case_master %>%
-  filter(group %in% c("R0", "R1", "B0", "B1"))
+  filter(group %in% c("R0", "R_Low", "R_High", "R1", "B0", "B_Low", "B_High", "B1"))
 
-cat("Main analysis groups:", nrow(thyr_case_master_stage1_filtered), "cases\n")
+cat("Analysis groups:", nrow(thyr_case_master_stage1_filtered), "cases\n")
+cat("  Paired:", sum(thyr_case_master_stage1_filtered$has_pair), "cases (PCA QC target)\n")
+cat("  Unpaired:", sum(!thyr_case_master_stage1_filtered$has_pair), "cases (no PCA QC)\n")
 
 # Get sample metadata
 sample_metadata <- as.data.frame(colData(se))
@@ -135,11 +140,14 @@ sample_metadata <- as.data.frame(colData(se))
 cat("\n--- Defining analysis groups ---\n")
 cat("Using only Primary Tumor and Solid Tissue Normal samples\n")
 cat("Filtering to _merged samples only for proper pairing\n")
+cat("PCA QC: paired samples only\n")
 
-# Function to extract samples for a group
+# Function to extract samples for a group (paired cases only for PCA QC)
 extract_group_samples <- function(group_name, sample_type_filter, case_master_df, sample_meta) {
-  # Get cases for this group
-  group_cases <- case_master_df$case_submitter_id[case_master_df$group == group_name]
+  # Get paired cases for this group (PCA QC requires paired samples)
+  group_cases <- case_master_df$case_submitter_id[
+    case_master_df$group == group_name & case_master_df$has_pair
+  ]
   
   if (length(group_cases) == 0) {
     return(character(0))
@@ -155,12 +163,19 @@ extract_group_samples <- function(group_name, sample_type_filter, case_master_df
   return(sample_ids)
 }
 
-# Create groups as lists of sample_submitter_ids
+# Create groups as lists of sample_submitter_ids (paired only)
+# Note: B_Low/B_High excluded from PCA QC (not used in validation)
 groups_ids <- list(
+  # RET groups (all for validation)
   R0_tumor = extract_group_samples("R0", "Primary Tumor", thyr_case_master_stage1_filtered, sample_metadata),
   R0_normal = extract_group_samples("R0", "Solid Tissue Normal", thyr_case_master_stage1_filtered, sample_metadata),
+  R_Low_tumor = extract_group_samples("R_Low", "Primary Tumor", thyr_case_master_stage1_filtered, sample_metadata),
+  R_Low_normal = extract_group_samples("R_Low", "Solid Tissue Normal", thyr_case_master_stage1_filtered, sample_metadata),
+  R_High_tumor = extract_group_samples("R_High", "Primary Tumor", thyr_case_master_stage1_filtered, sample_metadata),
+  R_High_normal = extract_group_samples("R_High", "Solid Tissue Normal", thyr_case_master_stage1_filtered, sample_metadata),
   R1_tumor = extract_group_samples("R1", "Primary Tumor", thyr_case_master_stage1_filtered, sample_metadata),
   R1_normal = extract_group_samples("R1", "Solid Tissue Normal", thyr_case_master_stage1_filtered, sample_metadata),
+  # BRAF groups (B0/B1 only for driver generalization validation)
   B0_tumor = extract_group_samples("B0", "Primary Tumor", thyr_case_master_stage1_filtered, sample_metadata),
   B0_normal = extract_group_samples("B0", "Solid Tissue Normal", thyr_case_master_stage1_filtered, sample_metadata),
   B1_tumor = extract_group_samples("B1", "Primary Tumor", thyr_case_master_stage1_filtered, sample_metadata),
@@ -220,7 +235,7 @@ pa_select_K <- function(X, R = 200, alpha = 0.05, L = 8, seed = 123) {
   RNGkind("L'Ecuyer-CMRG")
   set.seed(seed)
   
-  X_t <- t(X)  # samples × genes
+  X_t <- t(X)  # samples Ã— genes
   n <- nrow(X_t)
   p <- ncol(X_t)
   L <- min(L, n - 1L, p)
@@ -262,7 +277,7 @@ pa_select_K <- function(X, R = 200, alpha = 0.05, L = 8, seed = 123) {
 
 # Adaptive outlier detection function
 cdm_outlier_detection <- function(cdm_result, X, K, config = CONFIG) {
-  # Ensure X is samples × genes
+  # Ensure X is samples Ã— genes
   if (ncol(X) == nrow(cdm_result$vectors)) {
     Xuse <- X
   } else {
@@ -610,9 +625,22 @@ cat("Total unique outlier samples:", length(outlier_samples), "\n")
 
 cat("\n--- Updating case_master with outlier flags ---\n")
 
-# Initialize outlier flag columns right after has_pair
-thyr_case_master_stage1_filtered$has_outlier_tumor <- 0
-thyr_case_master_stage1_filtered$has_outlier_normal <- 0
+# Define QC target groups
+qc_target_groups <- c("R0", "R_Low", "R_High", "R1", "B0", "B1")
+
+# Initialize outlier flag columns
+# For unpaired samples or non-QC groups (B_Low/B_High), set NA
+# For paired samples in QC target groups, initialize to 0
+thyr_case_master_stage1_filtered$has_outlier_tumor <- ifelse(
+  thyr_case_master_stage1_filtered$has_pair & 
+    thyr_case_master_stage1_filtered$group %in% qc_target_groups, 
+  0, NA_integer_
+)
+thyr_case_master_stage1_filtered$has_outlier_normal <- ifelse(
+  thyr_case_master_stage1_filtered$has_pair & 
+    thyr_case_master_stage1_filtered$group %in% qc_target_groups, 
+  0, NA_integer_
+)
 
 # Reorder columns to place outlier flags after has_pair
 col_order <- names(thyr_case_master_stage1_filtered)
@@ -627,8 +655,12 @@ if (length(has_pair_idx) > 0) {
   thyr_case_master_stage1_filtered <- thyr_case_master_stage1_filtered[, ..new_order]
 }
 
-# For each case, check if its samples are outliers
+# For each paired case in QC target groups, check if its samples are outliers
 for (i in seq_len(nrow(thyr_case_master_stage1_filtered))) {
+  # Skip cases not in QC target (unpaired or B_Low/B_High)
+  if (!thyr_case_master_stage1_filtered$has_pair[i]) next
+  if (!(thyr_case_master_stage1_filtered$group[i] %in% qc_target_groups)) next
+  
   case_id <- thyr_case_master_stage1_filtered$case_submitter_id[i]
   
   # Find tumor samples for this case
@@ -662,22 +694,30 @@ outlier_summary <- thyr_case_master_stage1_filtered %>%
   group_by(group) %>%
   summarise(
     n_cases = n(),
-    n_tumor_outliers = sum(has_outlier_tumor),
-    n_normal_outliers = sum(has_outlier_normal),
-    n_both_outliers = sum(has_outlier_tumor == 1 & has_outlier_normal == 1),
-    n_clean = sum(has_outlier_tumor == 0 & has_outlier_normal == 0),
+    n_paired = sum(has_pair),
+    n_unpaired = sum(!has_pair),
+    n_tumor_outliers = sum(has_outlier_tumor == 1, na.rm = TRUE),
+    n_normal_outliers = sum(has_outlier_normal == 1, na.rm = TRUE),
+    n_both_outliers = sum(has_outlier_tumor == 1 & has_outlier_normal == 1, na.rm = TRUE),
+    n_clean = sum(has_outlier_tumor == 0 & has_outlier_normal == 0, na.rm = TRUE),
     .groups = "drop"
   )
 
 print(outlier_summary)
 
-# Overall statistics
-total_cases <- nrow(thyr_case_master_stage1_filtered)
-clean_cases <- sum(thyr_case_master_stage1_filtered$has_outlier_tumor == 0 & 
-                     thyr_case_master_stage1_filtered$has_outlier_normal == 0)
+# Overall statistics (QC target groups only)
+qc_target_cases <- thyr_case_master_stage1_filtered %>%
+  filter(group %in% qc_target_groups & has_pair)
+qc_target_count <- nrow(qc_target_cases)
+clean_qc_target <- sum(qc_target_cases$has_outlier_tumor == 0 & 
+                         qc_target_cases$has_outlier_normal == 0, na.rm = TRUE)
 
-cat(sprintf("\nOverall: %d/%d cases clean (%.1f%%)\n",
-            clean_cases, total_cases, clean_cases/total_cases*100))
+non_qc_cases <- sum(!(thyr_case_master_stage1_filtered$group %in% qc_target_groups) |
+                      !thyr_case_master_stage1_filtered$has_pair)
+
+cat(sprintf("\nQC target cases (R0/R_Low/R_High/R1/B0/B1 paired): %d - Clean: %d (%.1f%%)\n",
+            qc_target_count, clean_qc_target, clean_qc_target/qc_target_count*100))
+cat(sprintf("Non-QC cases (B_Low/B_High or unpaired): %d\n", non_qc_cases))
 
 # ============================================================================
 # Processing summary
@@ -713,8 +753,9 @@ cat("\n--- Saving results ---\n")
 output_file <- paste0(paths$processed, "thyr_case_master_stage1_filtered.rds")
 saveRDS(thyr_case_master_stage1_filtered, output_file)
 cat("  Updated case_master saved:", basename(output_file), "\n")
-cat(sprintf("    Contains: %d cases (R0/R1/B0/B1 only)\n", nrow(thyr_case_master_stage1_filtered)))
-cat("    New columns: has_outlier_tumor, has_outlier_normal (0/1 flags)\n")
+cat(sprintf("    Contains: %d cases (R0/R_Low/R_High/R1 + B0/B_Low/B_High/B1)\n", nrow(thyr_case_master_stage1_filtered)))
+cat("    Columns: has_outlier_tumor, has_outlier_normal (0/1/NA)\n")
+cat("    Note: NA = unpaired, PCA QC not performed\n")
 
 # Save processing details for diagnostic purposes
 processing_info <- list(
@@ -745,17 +786,19 @@ cat("  IQR multiplier:", CONFIG$IQR_MULTIPLIER, "\n")
 cat("  MAD multiplier:", CONFIG$MAD_MULTIPLIER, "\n")
 cat("  Max outliers:", sprintf("%.0f%%", CONFIG$MAX_OUTLIERS_PCT * 100), "\n")
 cat("\nProcessing:\n")
-cat("  Groups analyzed:", length(groups_ids), "(R0/R1/B0/B1 × tumor/normal)\n")
+cat("  Groups analyzed:", length(groups_ids), "(paired samples only)\n")
 cat("  Total time:", sprintf("%.1f seconds\n", as.numeric(total_time)))
 cat("\nResults:\n")
 cat("  Total outlier samples:", length(outlier_samples), "\n")
-cat("  Clean cases:", clean_cases, "/", total_cases, 
-    sprintf("(%.1f%%)\n", clean_cases/total_cases*100))
+cat("  QC target cases:", qc_target_count, "- Clean:", clean_qc_target, 
+    sprintf("(%.1f%%)\n", clean_qc_target/qc_target_count*100))
+cat("  Non-QC cases:", non_qc_cases, "(B_Low/B_High or unpaired)\n")
 cat("\nOutputs:\n")
 cat("  Main: thyr_case_master_stage1_filtered.rds\n")
 cat("  Info: stage1_pca_info.rds, stage1_outlier_summary.csv\n")
 cat("\nNext: Use thyr_case_master_stage1_filtered for downstream analysis\n")
-cat("      Filter cases with: has_outlier_tumor == 0 & has_outlier_normal == 0\n")
+cat("      For QC target: Filter with has_outlier_tumor == 0 & has_outlier_normal == 0\n")
+cat("      For non-QC (B_Low/B_High, unpaired): has_outlier_tumor/normal is NA\n")
 
 # Restore SE to original variable name
 thyr_se_strand2_nonzero <- se
@@ -763,4 +806,3 @@ thyr_se_strand2_nonzero <- se
 # Clean up
 rm(list = setdiff(ls(), c("paths", "thyr_case_master", "thyr_case_master_stage1_filtered", "thyr_se_strand2_nonzero")))
 gc()
-

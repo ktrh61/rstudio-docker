@@ -3,14 +3,15 @@
 # Method: Brunner-Munzel test with Storey (qvalue, lambda=0.5) correction
 # Input: analysis_dgelist_*.rds (from 08_deges_normalization.R)
 # Output: thyr_deg_results.rds with DEG lists and consistency evaluation
-# Version: v7.3 - Storey lambda=0.5, Cliff's delta effect size with descriptive statistics
-# Date: 2025-12-03
+# Version: v7.4 - PI as primary output from Brunner-Munzel, Cliff's delta derived
+# Date: 2025-12-04
 
 source("analysis_v7/setup.R")
 
-cat("\n=== DEG Analysis with Brunner-Munzel + Storey Method (v7.3) ===\n")
+cat("\n=== DEG Analysis with Brunner-Munzel + Storey Method (v7.4) ===\n")
 cat("Date:", as.character(Sys.Date()), "\n")
 cat("Method: Brunner-Munzel test with Storey correction (lambda=0.5)\n")
+cat("Effect size: PI (primary) with Cliff's delta (derived)\n")
 cat("Focus: R0 vs R1, B0 vs B1 comparisons (tumor/normal)\n")
 
 # Load packages
@@ -70,7 +71,7 @@ perform_brunner_munzel_test <- function(normalized_data, sample_groups,
   pvalues <- rep(NA_real_, n_genes)
   statistics <- rep(NA_real_, n_genes)
   fold_changes <- rep(NA_real_, n_genes)
-  cliffs_deltas <- rep(NA_real_, n_genes)
+  PI <- rep(NA_real_, n_genes)  # Probability of Superiority: P(Y>X) + 0.5*P(Y=X)
   group1_means <- rep(NA_real_, n_genes)
   group2_means <- rep(NA_real_, n_genes)
   
@@ -98,28 +99,21 @@ perform_brunner_munzel_test <- function(normalized_data, sample_groups,
     pseudocount <- 1
     fold_changes[i] <- log2(mean2 + pseudocount) - log2(mean1 + pseudocount)
     
-    # Cliff's delta (effect size, consistent with Brunner-Munzel)
-    # delta = P(X > Y) - P(X < Y), ranges from -1 to 1
-    dominance_matrix <- outer(group2_values, group1_values, function(a, b) sign(a - b))
-    cliffs_deltas[i] <- mean(dominance_matrix)
-    
     # Brunner-Munzel test
-    tryCatch({
-      # Check for sufficient variation
-      if (length(unique(c(group1_values, group2_values))) > 1 && 
-          var(c(group1_values, group2_values), na.rm = TRUE) > 0) {
-        
-        bm_result <- brunnermunzel::brunnermunzel.test(group1_values, group2_values)
-        pvalues[i] <- bm_result$p.value
-        statistics[i] <- bm_result$statistic
-      } else {
-        pvalues[i] <- 1.0
-        statistics[i] <- 0
-      }
-    }, error = function(e) {
+    # Check for sufficient variation
+    if (length(unique(c(group1_values, group2_values))) > 1 && 
+        var(c(group1_values, group2_values), na.rm = TRUE) > 0) {
+      
+      bm_out <- brunnermunzel::brunnermunzel.test(group1_values, group2_values)
+      pvalues[i] <- bm_out$p.value
+      statistics[i] <- bm_out$statistic
+      PI[i] <- bm_out$estimate  # P(Y>X) + 0.5*P(Y=X), primary output
+    } else {
+      # No variation: set neutral values
       pvalues[i] <- 1.0
       statistics[i] <- 0
-    })
+      PI[i] <- 0.5
+    }
   }
   
   cat("    Brunner-Munzel testing completed\n")
@@ -128,7 +122,7 @@ perform_brunner_munzel_test <- function(normalized_data, sample_groups,
     pvalues = pvalues,
     statistics = statistics,
     fold_changes = fold_changes,
-    cliffs_deltas = cliffs_deltas,
+    PI = PI,  # Primary output from Brunner-Munzel
     group1_means = group1_means,
     group2_means = group2_means,
     gene_names = rownames(normalized_data),
@@ -159,62 +153,41 @@ apply_storey_correction <- function(pvalues, alpha = 0.05) {
   cat(sprintf("    Valid p-values: %d/%d\n", sum(valid_pvals), length(pvalues)))
   
   # Apply Storey method (lambda = 0.5 fixed for reproducibility)
-  tryCatch({
-    qvalue_result <- qvalue(pvalues[valid_pvals], lambda = 0.5)
-    
-    # Create full qvalue vector
-    qvalues <- rep(NA_real_, length(pvalues))
-    qvalues[valid_pvals] <- qvalue_result$qvalues
-    
-    # Identify significant genes
-    significant <- qvalues < alpha & !is.na(qvalues)
-    n_significant <- sum(significant)
-    
-    cat(sprintf("    pi0 estimate: %.3f (lambda=0.5)\n", qvalue_result$pi0))
-    cat(sprintf("    Significant genes (q < %.2f): %d (%.1f%%)\n",
-                alpha, n_significant, n_significant/sum(valid_pvals)*100))
-    
-    return(list(
-      qvalues = qvalues,
-      pi0 = qvalue_result$pi0,
-      significant = significant,
-      n_significant = n_significant,
-      alpha = alpha
-    ))
-    
-  }, error = function(e) {
-    cat(sprintf("    Storey method failed: %s\n", e$message))
-    cat("    Falling back to Benjamini-Hochberg\n")
-    
-    # Fallback to BH
-    qvalues <- rep(NA_real_, length(pvalues))
-    qvalues[valid_pvals] <- p.adjust(pvalues[valid_pvals], method = "BH")
-    significant <- qvalues < alpha & !is.na(qvalues)
-    n_significant <- sum(significant)
-    
-    cat(sprintf("    Significant genes (BH q < %.2f): %d\n", alpha, n_significant))
-    
-    return(list(
-      qvalues = qvalues,
-      pi0 = NA_real_,
-      significant = significant,
-      n_significant = n_significant,
-      alpha = alpha,
-      method = "BH"
-    ))
-  })
+  qvalue_result <- qvalue(pvalues[valid_pvals], lambda = 0.5)
+  
+  # Create full qvalue vector
+  qvalues <- rep(NA_real_, length(pvalues))
+  qvalues[valid_pvals] <- qvalue_result$qvalues
+  
+  # Identify significant genes
+  significant <- qvalues < alpha & !is.na(qvalues)
+  n_significant <- sum(significant)
+  
+  cat(sprintf("    pi0 estimate: %.3f (lambda=0.5)\n", qvalue_result$pi0))
+  cat(sprintf("    Significant genes (q < %.2f): %d (%.1f%%)\n",
+              alpha, n_significant, n_significant/sum(valid_pvals)*100))
+  
+  return(list(
+    qvalues = qvalues,
+    pi0 = qvalue_result$pi0,
+    significant = significant,
+    n_significant = n_significant,
+    alpha = alpha
+  ))
 }
 
 # Create DEG results summary
 create_deg_summary <- function(bm_result, storey_result, comparison_name, gene_info_df) {
   
   # Create results data frame
+  # PI is primary output, cliffs_delta is derived (single conversion)
   results_df <- data.frame(
     gene_id = bm_result$gene_names,
     pvalue = bm_result$pvalues,
     qvalue = storey_result$qvalues,
     log2FC = bm_result$fold_changes,
-    cliffs_delta = bm_result$cliffs_deltas,
+    PI = bm_result$PI,                      # Primary output from Brunner-Munzel
+    cliffs_delta = 2 * bm_result$PI - 1,    # Derived: delta = 2*PI - 1
     statistic = bm_result$statistics,
     group1_mean = bm_result$group1_means,
     group2_mean = bm_result$group2_means,
@@ -263,12 +236,16 @@ create_deg_summary <- function(bm_result, storey_result, comparison_name, gene_i
     )
   }
   
-  # Effect size statistics for ALL genes (signed delta - primary)
+  # Effect size statistics for ALL genes (PI-based, primary)
+  # Using cliffs_delta for compatibility with existing visualizations
   all_delta_stats <- calc_effect_size_stats(results_df$cliffs_delta)
   # Also compute absolute delta median for reference
   all_abs_delta_median <- median(results_df$abs_cliffs_delta, na.rm = TRUE)
   
-  # Effect size statistics for DEGs (signed delta)
+  # PI statistics for ALL genes
+  all_pi_stats <- calc_effect_size_stats(results_df$PI)
+  
+  # Effect size statistics for DEGs
   sig_genes <- results_df[results_df$significant, ]
   deg_delta_stats <- calc_effect_size_stats(sig_genes$cliffs_delta)
   deg_abs_delta_median <- if (nrow(sig_genes) > 0) {
@@ -276,6 +253,7 @@ create_deg_summary <- function(bm_result, storey_result, comparison_name, gene_i
   } else {
     NA_real_
   }
+  deg_pi_stats <- calc_effect_size_stats(sig_genes$PI)
   
   # Summary statistics
   summary_stats <- list(
@@ -291,10 +269,12 @@ create_deg_summary <- function(bm_result, storey_result, comparison_name, gene_i
     group2_name = bm_result$group2_name,
     n_group1 = bm_result$n_group1,
     n_group2 = bm_result$n_group2,
-    # Effect size descriptive statistics for ALL genes (signed)
+    # PI descriptive statistics (primary)
+    all_pi_stats = all_pi_stats,
+    deg_pi_stats = deg_pi_stats,
+    # Cliff's delta descriptive statistics (derived, for compatibility)
     all_delta_stats = all_delta_stats,
     all_abs_delta_median = all_abs_delta_median,
-    # Effect size descriptive statistics for DEGs (signed)
     deg_delta_stats = deg_delta_stats,
     deg_abs_delta_median = deg_abs_delta_median
   )
@@ -412,20 +392,26 @@ for (comp_name in names(comparisons)) {
       cat(sprintf("  Pi0 estimate: %.3f\n", deg_summary$summary_stats$pi0))
     }
     
-    # Effect size descriptive statistics for ALL genes (signed)
-    es_all <- deg_summary$summary_stats$all_delta_stats
-    cat(sprintf("  Cliff's delta (ALL genes, n=%d):\n", es_all$n))
+    # PI statistics (primary)
+    pi_all <- deg_summary$summary_stats$all_pi_stats
+    cat(sprintf("  PI (ALL genes, n=%d):\n", pi_all$n))
     cat(sprintf("    5-num: %.3f, %.3f, %.3f, %.3f, %.3f (min, Q1, med, Q3, max)\n", 
+                pi_all$min, pi_all$q1, pi_all$median, pi_all$q3, pi_all$max))
+    
+    # Cliff's delta statistics (derived, for reference)
+    es_all <- deg_summary$summary_stats$all_delta_stats
+    cat(sprintf("  Cliff's delta (derived, ALL genes):\n"))
+    cat(sprintf("    5-num: %.3f, %.3f, %.3f, %.3f, %.3f\n", 
                 es_all$min, es_all$q1, es_all$median, es_all$q3, es_all$max))
-    cat(sprintf("    Mean=%.3f, SD=%.3f\n", es_all$mean, es_all$sd))
     cat(sprintf("    Median |d|=%.3f (absolute)\n", 
                 deg_summary$summary_stats$all_abs_delta_median))
     
     # Effect size for DEGs (if any)
     if (deg_summary$summary_stats$significant_genes > 0) {
+      pi_deg <- deg_summary$summary_stats$deg_pi_stats
       es_deg <- deg_summary$summary_stats$deg_delta_stats
-      cat(sprintf("  Cliff's delta (DEGs, n=%d): median=%.3f, |d| median=%.3f\n", 
-                  es_deg$n, es_deg$median, 
+      cat(sprintf("  DEGs: PI median=%.3f, delta median=%.3f, |d| median=%.3f\n", 
+                  pi_deg$median, es_deg$median, 
                   deg_summary$summary_stats$deg_abs_delta_median))
     }
   }
@@ -536,7 +522,9 @@ summary_data <- data.frame()
 for (comp_tissue in names(thyr_deg_results)) {
   result <- thyr_deg_results[[comp_tissue]]
   summary_stats <- result$deg_summary$summary_stats
+  pi_all <- summary_stats$all_pi_stats
   es_all <- summary_stats$all_delta_stats
+  pi_deg <- summary_stats$deg_pi_stats
   es_deg <- summary_stats$deg_delta_stats
   
   summary_row <- data.frame(
@@ -551,7 +539,10 @@ for (comp_tissue in names(thyr_deg_results)) {
     deg_rate = round(summary_stats$significant_genes / 
                        summary_stats$total_genes_tested * 100, 2),
     pi0 = round(summary_stats$pi0, 3),
-    # All genes Cliff's delta (signed, 5-number summary)
+    # PI statistics (primary)
+    all_pi_median = round(pi_all$median, 3),
+    deg_pi_median = round(pi_deg$median, 3),
+    # Cliff's delta statistics (derived)
     all_delta_min = round(es_all$min, 3),
     all_delta_q1 = round(es_all$q1, 3),
     all_delta_median = round(es_all$median, 3),
@@ -560,7 +551,6 @@ for (comp_tissue in names(thyr_deg_results)) {
     all_delta_mean = round(es_all$mean, 3),
     all_delta_sd = round(es_all$sd, 3),
     all_abs_delta_median = round(summary_stats$all_abs_delta_median, 3),
-    # DEG Cliff's delta
     deg_delta_median = round(es_deg$median, 3),
     deg_abs_delta_median = round(summary_stats$deg_abs_delta_median, 3),
     stringsAsFactors = FALSE
@@ -584,7 +574,7 @@ deg_output <- list(
   deg_results = thyr_deg_results,
   consistency_results = thyr_consistency_results,
   summary = summary_data,
-  version = "v7.3"
+  version = "v7.4"
 )
 
 saveRDS(deg_output, paste0(paths$processed, "thyr_deg_results.rds"))
@@ -930,16 +920,17 @@ if (length(volcano_plots_delta) >= 4) {
 # Final report
 # ============================================================================
 
-cat("\n=== DEG Analysis Complete (v7.3) ===\n")
+cat("\n=== DEG Analysis Complete (v7.4) ===\n")
 cat("Configuration:\n")
 cat("  Test: Brunner-Munzel\n")
 cat("  Correction: Storey method (qvalue, lambda=0.5)\n")
-cat("  Effect size: Cliff's delta\n")
+cat("  Effect size: PI (primary), Cliff's delta (derived)\n")
 cat("  Significance: q <", CONFIG$ALPHA, "\n")
 cat("\nProcessed comparisons:\n")
 
 for (comp_tissue in names(thyr_deg_results)) {
   result <- thyr_deg_results[[comp_tissue]]
+  pi_all <- result$deg_summary$summary_stats$all_pi_stats
   es_all <- result$deg_summary$summary_stats$all_delta_stats
   abs_med <- result$deg_summary$summary_stats$all_abs_delta_median
   n_genes <- result$deg_summary$summary_stats$total_genes_tested
@@ -948,8 +939,8 @@ for (comp_tissue in names(thyr_deg_results)) {
               comp_tissue,
               n_degs,
               n_genes))
-  cat(sprintf("    Cliff's delta: median=%.3f, |d| median=%.3f\n",
-              es_all$median, abs_med))
+  cat(sprintf("    PI: median=%.3f, Cliff's delta: median=%.3f, |d| median=%.3f\n",
+              pi_all$median, es_all$median, abs_med))
 }
 
 if (length(thyr_consistency_results) > 0) {
@@ -999,8 +990,8 @@ if ("R0_vs_R1_tumor" %in% names(thyr_deg_results)) {
       gene_name <- ifelse(is.na(sig_genes$gene_name[i]), 
                           sig_genes$gene_id[i], 
                           sig_genes$gene_name[i])
-      cat(sprintf("    %s: FC=%.2f, q=%.3e\n",
-                  gene_name, sig_genes$log2FC[i], sig_genes$qvalue[i]))
+      cat(sprintf("    %s: FC=%.2f, PI=%.3f, q=%.3e\n",
+                  gene_name, sig_genes$log2FC[i], sig_genes$PI[i], sig_genes$qvalue[i]))
     }
   }
 }
@@ -1018,8 +1009,8 @@ if (sum(summary_data$degs_total) > 20) {
 }
 
 # Clean up (preserve key objects)
-#rm(list = setdiff(ls(), c("paths", "thyr_deg_results", 
-                          #"thyr_consistency_results")))
+rm(list = setdiff(ls(), c("paths", "thyr_deg_results", 
+                          "thyr_consistency_results")))
 gc()
 
 cat("\nAnalysis completed successfully!\n")

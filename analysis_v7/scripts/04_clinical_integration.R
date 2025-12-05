@@ -2,12 +2,13 @@
 # Purpose: Create comprehensive case master table with all clinical/POC data
 # Input: thyr_se_strand2_nonzero.rds (for pair checking), clinical data, POC data
 # Output: thyr_case_master_full.rds (all cases), thyr_case_master.rds (grouped cases)
-# Version: v7.7 - Fixed BRAF mask to strictly match BRAF.MutV600E
-# Date: 2025-01-20
+# Version: v7.8 - New group design (R0/R_Low/R_High/R1, B0/B_Low/B_High/B1)
+#                 Added has_tumor, has_normal flags
+# Date: 2025-12-06
 
 source("analysis_v7/setup.R")
 
-cat("\n=== Clinical Data Integration and Group Definition (v7.7) ===\n")
+cat("\n=== Clinical Data Integration and Group Definition (v7.8) ===\n")
 cat("Date:", as.character(Sys.Date()), "\n")
 
 # Load required libraries
@@ -117,30 +118,40 @@ cat("Variables retained:", ncol(thyr_case_master_full), "\n")
 # ============================================================================
 # Identify paired samples
 # ============================================================================
-cat("\n--- Identifying paired samples ---\n")
+cat("\n--- Identifying sample availability ---\n")
 
-# Check which cases have both tumor and normal samples
-paired_info <- sample_metadata %>%
+# Check which cases have tumor and/or normal _merged samples
+# Note: _merged samples are properly paired and quality-controlled
+sample_info <- sample_metadata %>%
+  filter(grepl("_merged", sample_submitter_id)) %>%  # Only _merged samples
   group_by(case_submitter_id) %>%
   summarise(
     n_samples = n(),
     n_tumor = sum(grepl("Tumor", sample_type)),
     n_normal = sum(grepl("Normal", sample_type)),
-    has_pair = (n_tumor > 0) & (n_normal > 0),
     .groups = "drop"
+  ) %>%
+  mutate(
+    has_tumor = n_tumor > 0,
+    has_normal = n_normal > 0,
+    has_pair = has_tumor & has_normal
   )
 
 thyr_case_master_full <- merge(
   thyr_case_master_full,
-  paired_info[, c("case_submitter_id", "has_pair")],
+  sample_info[, c("case_submitter_id", "has_tumor", "has_normal", "has_pair")],
   by = "case_submitter_id",
   all.x = TRUE
 )
 
-# Set has_pair to FALSE for cases not in sample data
+# Set flags to FALSE for cases not in sample data
+thyr_case_master_full$has_tumor[is.na(thyr_case_master_full$has_tumor)] <- FALSE
+thyr_case_master_full$has_normal[is.na(thyr_case_master_full$has_normal)] <- FALSE
 thyr_case_master_full$has_pair[is.na(thyr_case_master_full$has_pair)] <- FALSE
 
-cat("Cases with paired samples:", sum(thyr_case_master_full$has_pair), "\n")
+cat("Cases with _merged tumor samples:", sum(thyr_case_master_full$has_tumor), "\n")
+cat("Cases with _merged normal samples:", sum(thyr_case_master_full$has_normal), "\n")
+cat("Cases with _merged paired samples:", sum(thyr_case_master_full$has_pair), "\n")
 
 # ============================================================================
 # Define driver groups based on multiple columns
@@ -204,47 +215,75 @@ cat("\n--- Defining analysis groups ---\n")
 thyr_case_master_full$group <- NA_character_
 thyr_case_master_full$group_type <- NA_character_
 
-# Main analysis groups (paired samples only)
-# R0: RET + POC=NA + paired
+# =============================================================================
+# RET groups (based on POC only, paired/unpaired distinguished by has_pair flag)
+# =============================================================================
+
+# R0: RET + POC=NA (non-exposed)
 idx_R0 <- thyr_case_master_full$driver == "RET" & 
-  is.na(thyr_case_master_full$POC) & 
-  thyr_case_master_full$has_pair
+  is.na(thyr_case_master_full$POC)
 thyr_case_master_full$group[idx_R0] <- "R0"
 
-# R1: RET + POC>=66.6 + paired
+# R_Low: RET + 0 < POC < 33.3%
+idx_R_Low <- thyr_case_master_full$driver == "RET" & 
+  !is.na(thyr_case_master_full$POC) &
+  thyr_case_master_full$POC > 0 &
+  thyr_case_master_full$POC < 33.3
+thyr_case_master_full$group[idx_R_Low] <- "R_Low"
+
+# R_High: RET + 33.3% <= POC < 66.6%
+idx_R_High <- thyr_case_master_full$driver == "RET" & 
+  !is.na(thyr_case_master_full$POC) &
+  thyr_case_master_full$POC >= 33.3 &
+  thyr_case_master_full$POC < 66.6
+thyr_case_master_full$group[idx_R_High] <- "R_High"
+
+# R1: RET + POC >= 66.6%
 idx_R1 <- thyr_case_master_full$driver == "RET" & 
   !is.na(thyr_case_master_full$POC) & 
-  thyr_case_master_full$POC >= 66.6 & 
-  thyr_case_master_full$has_pair
+  thyr_case_master_full$POC >= 66.6
 thyr_case_master_full$group[idx_R1] <- "R1"
 
-# B0: BRAF + POC=NA + paired
+# =============================================================================
+# BRAF groups (same logic as RET)
+# =============================================================================
+
+# B0: BRAF + POC=NA (non-exposed)
 idx_B0 <- thyr_case_master_full$driver == "BRAF" & 
-  is.na(thyr_case_master_full$POC) & 
-  thyr_case_master_full$has_pair
+  is.na(thyr_case_master_full$POC)
 thyr_case_master_full$group[idx_B0] <- "B0"
 
-# B1: BRAF + POC>=66.6 + paired
+# B_Low: BRAF + 0 < POC < 33.3%
+idx_B_Low <- thyr_case_master_full$driver == "BRAF" & 
+  !is.na(thyr_case_master_full$POC) &
+  thyr_case_master_full$POC > 0 &
+  thyr_case_master_full$POC < 33.3
+thyr_case_master_full$group[idx_B_Low] <- "B_Low"
+
+# B_High: BRAF + 33.3% <= POC < 66.6%
+idx_B_High <- thyr_case_master_full$driver == "BRAF" & 
+  !is.na(thyr_case_master_full$POC) &
+  thyr_case_master_full$POC >= 33.3 &
+  thyr_case_master_full$POC < 66.6
+thyr_case_master_full$group[idx_B_High] <- "B_High"
+
+# B1: BRAF + POC >= 66.6%
 idx_B1 <- thyr_case_master_full$driver == "BRAF" & 
   !is.na(thyr_case_master_full$POC) & 
-  thyr_case_master_full$POC >= 66.6 & 
-  thyr_case_master_full$has_pair
+  thyr_case_master_full$POC >= 66.6
 thyr_case_master_full$group[idx_B1] <- "B1"
 
-# Mark main analysis groups
-thyr_case_master_full$group_type[!is.na(thyr_case_master_full$group)] <- "main_analysis"
+# =============================================================================
+# Assign group types
+# =============================================================================
 
-# Test groups (unpaired or intermediate POC)
-# R_test: RET cases not in main analysis
-idx_R_test <- thyr_case_master_full$driver == "RET" & is.na(thyr_case_master_full$group)
-thyr_case_master_full$group[idx_R_test] <- "R_test"
+# Main analysis (used for panel construction)
+main_groups <- c("R0", "R1", "B0", "B1")
+thyr_case_master_full$group_type[thyr_case_master_full$group %in% main_groups] <- "main"
 
-# B_test: BRAF cases not in main analysis
-idx_B_test <- thyr_case_master_full$driver == "BRAF" & is.na(thyr_case_master_full$group)
-thyr_case_master_full$group[idx_B_test] <- "B_test"
-
-# Mark test groups
-thyr_case_master_full$group_type[thyr_case_master_full$group %in% c("R_test", "B_test")] <- "test"
+# Validation (intermediate POC, for internal validation)
+validation_groups <- c("R_Low", "R_High", "B_Low", "B_High")
+thyr_case_master_full$group_type[thyr_case_master_full$group %in% validation_groups] <- "validation"
 
 # ============================================================================
 # Create filtered version (grouped cases only)
@@ -268,7 +307,7 @@ priority_cols <- c(
   # Primary ID
   "case_submitter_id",
   # Analysis key variables
-  "driver", "POC", "group", "group_type", "has_pair",
+  "driver", "POC", "group", "group_type", "has_tumor", "has_normal", "has_pair",
   # Basic demographics
   "SEX", "AGE_SURGERY", "AGE_EXPOSURE", "DOSE",
   # Driver details
@@ -297,25 +336,37 @@ cat("  ", paste(head(names(thyr_case_master), 10), collapse=", "), "...\n")
 # ============================================================================
 cat("\n=== Group Summary ===\n")
 
-# Main analysis groups
-cat("Main analysis groups (paired samples required):\n")
-for (g in c("R0", "R1", "B0", "B1")) {
-  n_cases <- sum(thyr_case_master$group == g)
-  if (n_cases > 0) {
-    cat(sprintf("  %s: %d cases\n", g, n_cases))
+# Function to print group summary
+print_group_summary <- function(group_name, data) {
+  n_cases <- sum(data$group == group_name, na.rm = TRUE)
+  if (n_cases == 0) return()
+  
+  n_paired <- sum(data$group == group_name & data$has_pair, na.rm = TRUE)
+  n_unpaired <- n_cases - n_paired
+  
+  poc_vals <- data$POC[data$group == group_name]
+  poc_vals <- poc_vals[!is.na(poc_vals)]
+  
+  if (length(poc_vals) > 0) {
+    poc_info <- sprintf(", POC: %.1f-%.1f%%", min(poc_vals), max(poc_vals))
+  } else {
+    poc_info <- ", POC: NA"
   }
+  
+  cat(sprintf("  %s: %d cases (%d paired, %d unpaired)%s\n", 
+              group_name, n_cases, n_paired, n_unpaired, poc_info))
 }
 
-# Test groups
-cat("\nTest groups:\n")
-for (g in c("R_test", "B_test")) {
-  n_cases <- sum(thyr_case_master$group == g)
-  n_paired <- sum(thyr_case_master$group == g & thyr_case_master$has_pair)
-  n_unpaired <- n_cases - n_paired
-  if (n_cases > 0) {
-    cat(sprintf("  %s: %d cases (%d paired, %d unpaired)\n", 
-                g, n_cases, n_paired, n_unpaired))
-  }
+# RET groups
+cat("\nRET groups:\n")
+for (g in c("R0", "R_Low", "R_High", "R1")) {
+  print_group_summary(g, thyr_case_master)
+}
+
+# BRAF groups
+cat("\nBRAF groups:\n")
+for (g in c("B0", "B_Low", "B_High", "B1")) {
+  print_group_summary(g, thyr_case_master)
 }
 
 # RET fusion partner details
@@ -420,6 +471,10 @@ cat("  1. thyr_case_master_full: All", nrow(thyr_case_master_full),
     "cases with complete clinical data\n")
 cat("  2. thyr_case_master:", nrow(thyr_case_master), 
     "grouped cases (main working dataset)\n")
-cat("\nGroups defined: R0, R1, B0, B1, R_test, B_test\n")
+cat("\nGroups defined:\n")
+cat("  RET: R0 (POC=NA), R_Low (0-33.3%), R_High (33.3-66.6%), R1 (>=66.6%)\n")
+cat("  BRAF: B0 (POC=NA), B_Low (0-33.3%), B_High (33.3-66.6%), B1 (>=66.6%)\n")
+cat("  Note: has_pair flag distinguishes paired/unpaired samples\n")
+cat("\nNew flags: has_tumor, has_normal, has_pair\n")
 cat("Clinical variables preserved:", ncol(thyr_case_master), "\n")
 cat("\nNext: Use thyr_case_master for downstream analysis\n")

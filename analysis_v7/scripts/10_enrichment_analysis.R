@@ -3,12 +3,12 @@
 # Method: GSEA for all comparisons (primary), ORA for R0_vs_R1_tumor (supplementary)
 # Input: thyr_deg_results.rds (from 09_deg_analysis.R)
 # Output: Enrichment results for each comparison and cross-comparison analysis
-# Version: v7.6 - Refined GSEA strategy with selective comparisons
-# Date: 2025-12-03
+# Version: v7.7 - Removed tryCatch (errors stop execution)
+# Date: 2025-12-04
 
 source("analysis_v7/setup.R")
 
-cat("\n=== Enrichment Analysis for DEG Results (v7.6) ===\n")
+cat("\n=== Enrichment Analysis for DEG Results (v7.7) ===\n")
 cat("Date:", as.character(Sys.Date()), "\n")
 cat("Strategy:\n")
 cat("  - GSEA for 3 comparisons (excluding B0_vs_B1_normal)\n")
@@ -16,10 +16,8 @@ cat("  - Primary result: R0_vs_R1_tumor\n")
 cat("  - Cross-comparison 1: RET × BRAF (tumor vs tumor)\n")
 cat("  - Cross-comparison 2: Tumor × Normal (within RET)\n")
 cat("  - Supplementary: ORA for R0_vs_R1_tumor\n")
-cat("\nChanges from v7.5:\n")
-cat("  - GSEA ranking: delta × min(-log10(q), 10) (restored)\n")
-cat("  - Excluded: B0_vs_B1_normal (no biological signal)\n")
-cat("  - Added: Tumor × Normal cross-comparison\n")
+cat("\nChanges from v7.6:\n")
+cat("  - Removed all tryCatch (errors will stop execution)\n")
 
 # ============================================================================
 # Load packages
@@ -307,48 +305,27 @@ run_gsea_analysis <- function(comparison_name, thyr_deg_results, gene_mapping, h
               names(gene_list)[length(gene_list)], gene_list[length(gene_list)]))
   
   # Store results
-  
   gsea_results <- list()
   
   # 1. GO Biological Process
   cat("    Running GO BP GSEA...\n")
-  gsea_results[["GO_BP"]] <- tryCatch({
-    result <- perform_go_gsea(gene_list, "BP")
-    save_gsea_results(result, comparison_name, "GO_BP", output_dir)
-  }, error = function(e) {
-    cat(sprintf("      Error in GO BP: %s\n", e$message))
-    NULL
-  })
+  result <- perform_go_gsea(gene_list, "BP")
+  gsea_results[["GO_BP"]] <- save_gsea_results(result, comparison_name, "GO_BP", output_dir)
   
   # 2. KEGG
   cat("    Running KEGG GSEA...\n")
-  gsea_results[["KEGG"]] <- tryCatch({
-    result <- perform_kegg_gsea(gene_list)
-    save_gsea_results(result, comparison_name, "KEGG", output_dir)
-  }, error = function(e) {
-    cat(sprintf("      Error in KEGG: %s\n", e$message))
-    NULL
-  })
+  result <- perform_kegg_gsea(gene_list)
+  gsea_results[["KEGG"]] <- save_gsea_results(result, comparison_name, "KEGG", output_dir)
   
   # 3. Reactome
   cat("    Running Reactome GSEA...\n")
-  gsea_results[["Reactome"]] <- tryCatch({
-    result <- perform_reactome_gsea(gene_list)
-    save_gsea_results(result, comparison_name, "Reactome", output_dir)
-  }, error = function(e) {
-    cat(sprintf("      Error in Reactome: %s\n", e$message))
-    NULL
-  })
+  result <- perform_reactome_gsea(gene_list)
+  gsea_results[["Reactome"]] <- save_gsea_results(result, comparison_name, "Reactome", output_dir)
   
   # 4. Hallmark
   cat("    Running Hallmark GSEA...\n")
-  gsea_results[["Hallmark"]] <- tryCatch({
-    result <- perform_hallmark_gsea(gene_list, hallmark_t2g)
-    save_gsea_results(result, comparison_name, "Hallmark", output_dir)
-  }, error = function(e) {
-    cat(sprintf("      Error in Hallmark: %s\n", e$message))
-    NULL
-  })
+  result <- perform_hallmark_gsea(gene_list, hallmark_t2g)
+  gsea_results[["Hallmark"]] <- save_gsea_results(result, comparison_name, "Hallmark", output_dir)
   
   # Summary
   successful <- sum(!sapply(gsea_results, is.null))
@@ -505,43 +482,23 @@ run_ora_analysis <- function(comparison_name, thyr_deg_results, gene_mapping, ha
     
     # GO BP
     cat(sprintf("      Running GO BP (%s)...\n", direction))
-    ora_results[[paste0("GO_BP_", direction)]] <- tryCatch({
-      result <- perform_go_ora(gene_list, universe_list, "BP")
-      save_ora_results(result, comparison_name, "GO_BP", direction, output_dir)
-    }, error = function(e) {
-      cat(sprintf("        Error: %s\n", e$message))
-      NULL
-    })
+    result <- perform_go_ora(gene_list, universe_list, "BP")
+    ora_results[[paste0("GO_BP_", direction)]] <- save_ora_results(result, comparison_name, "GO_BP", direction, output_dir)
     
     # KEGG
     cat(sprintf("      Running KEGG (%s)...\n", direction))
-    ora_results[[paste0("KEGG_", direction)]] <- tryCatch({
-      result <- perform_kegg_ora(gene_list, universe_list)
-      save_ora_results(result, comparison_name, "KEGG", direction, output_dir)
-    }, error = function(e) {
-      cat(sprintf("        Error: %s\n", e$message))
-      NULL
-    })
+    result <- perform_kegg_ora(gene_list, universe_list)
+    ora_results[[paste0("KEGG_", direction)]] <- save_ora_results(result, comparison_name, "KEGG", direction, output_dir)
     
     # Reactome
     cat(sprintf("      Running Reactome (%s)...\n", direction))
-    ora_results[[paste0("Reactome_", direction)]] <- tryCatch({
-      result <- perform_reactome_ora(gene_list, universe_list)
-      save_ora_results(result, comparison_name, "Reactome", direction, output_dir)
-    }, error = function(e) {
-      cat(sprintf("        Error: %s\n", e$message))
-      NULL
-    })
+    result <- perform_reactome_ora(gene_list, universe_list)
+    ora_results[[paste0("Reactome_", direction)]] <- save_ora_results(result, comparison_name, "Reactome", direction, output_dir)
     
     # Hallmark
     cat(sprintf("      Running Hallmark (%s)...\n", direction))
-    ora_results[[paste0("Hallmark_", direction)]] <- tryCatch({
-      result <- perform_hallmark_ora(gene_list, universe_list, hallmark_t2g)
-      save_ora_results(result, comparison_name, "Hallmark", direction, output_dir)
-    }, error = function(e) {
-      cat(sprintf("        Error: %s\n", e$message))
-      NULL
-    })
+    result <- perform_hallmark_ora(gene_list, universe_list, hallmark_t2g)
+    ora_results[[paste0("Hallmark_", direction)]] <- save_ora_results(result, comparison_name, "Hallmark", direction, output_dir)
   }
   
   successful <- sum(!sapply(ora_results, is.null))
@@ -559,10 +516,10 @@ cat("\nPhase 4 complete!\n")
 
 cat("\n=== PHASE 5: EXECUTE ENRICHMENT ANALYSES ===\n")
 
-# Check for existing results
-results_file <- paste0(output_dir, "all_enrichment_results_v7.6.rds")
+# Check for existing results (cache)
+results_file <- paste0(output_dir, "all_enrichment_results_v7.7.rds")
 if (file.exists(results_file)) {
-  cat("Previous results detected. Loading...\n")
+  cat("Previous results detected. Loading from cache...\n")
   all_enrichment_results <- readRDS(results_file)
   cat("Loaded existing results.\n")
   cat("To force re-analysis, delete:", results_file, "\n")
@@ -857,12 +814,8 @@ if ("GSEA" %in% names(all_enrichment_results)) {
   }
   
   excel_file <- paste0(cross_comp_dir, "GSEA_cross_comparison_results.xlsx")
-  tryCatch({
-    saveWorkbook(wb, excel_file, overwrite = TRUE)
-    cat("  Saved:", basename(excel_file), "\n")
-  }, error = function(e) {
-    cat("  Warning: Could not save Excel file -", e$message, "\n")
-  })
+  saveWorkbook(wb, excel_file, overwrite = TRUE)
+  cat("  Saved:", basename(excel_file), "\n")
   
   # Update results
   all_enrichment_results[["cross_comparison"]] <- all_cross_comparison_results
@@ -878,7 +831,7 @@ cat("\nPhase 6 complete!\n")
 # Final Summary
 # ============================================================================
 
-cat("\n=== ENRICHMENT ANALYSIS COMPLETE (v7.6) ===\n")
+cat("\n=== ENRICHMENT ANALYSIS COMPLETE (v7.7) ===\n")
 cat("============================================\n")
 
 cat("\nAnalysis scope:\n")
