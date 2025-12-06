@@ -3,14 +3,17 @@
 # Method: MUREN normalization with contamDE purity estimation
 # Input: thyr_case_master_stage1_filtered, thyr_se_strand2_nonzero
 # Output: thyr_case_master_stage2_filtered with tumor_purity and low_purity flags
-# Version: v7.1 - Removed qvalue dependency (BH method in contamde)
-# Date: 2025-12-02
+# Version: v7.2 - New group design (R0/R_Low/R_High/R1/B0/B1)
+#                 B_Low/B_High excluded (not used in validation)
+#                 Output includes ALL cases (not just clean) for layer-based validation
+# Date: 2025-12-06
 
 source("analysis_v7/setup.R")
 
-cat("\n=== Stage 2: Tumor Purity Analysis (v7.1) ===\n")
+cat("\n=== Stage 2: Tumor Purity Analysis (v7.2) ===\n")
 cat("Date:", as.character(Sys.Date()), "\n")
-cat("Analysis: R0/R1/B0/B1 groups with clean paired samples\n")
+cat("Analysis: R0/R_Low/R_High/R1/B0/B1 groups with clean paired samples\n")
+cat("Note: B_Low/B_High excluded (not used in validation)\n")
 cat("Method: ContamDE with MUREN normalization\n")
 
 # Load packages
@@ -18,6 +21,7 @@ suppressPackageStartupMessages({
   library(SummarizedExperiment)
   library(edgeR)
   library(limma)
+  library(qvalue)
   library(dplyr)
 })
 
@@ -68,7 +72,7 @@ if (exists("thyr_se_strand2_nonzero")) {
   cat("Loading SE from file...\n")
   se <- readRDS(se_path)
 }
-cat("SE dimensions:", format(nrow(se), big.mark=","), "genes × ", 
+cat("SE dimensions:", format(nrow(se), big.mark=","), "genes Ãƒâ€” ", 
     format(ncol(se), big.mark=","), "samples\n")
 
 # Load case_master_stage1_filtered
@@ -209,7 +213,7 @@ cat("\n--- Processing groups ---\n")
 # Initialize results storage
 purity_results <- list()
 
-for (group_name in c("R0", "R1", "B0", "B1")) {
+for (group_name in c("R0", "R_Low", "R_High", "R1", "B0", "B1")) {
   cat(sprintf("\nProcessing %s...\n", group_name))
   
   # Extract paired samples
@@ -229,7 +233,7 @@ for (group_name in c("R0", "R1", "B0", "B1")) {
   
   # Prepare counts matrix
   counts <- prepare_contamde_matrix(se, paired$normal, paired$tumor, keep_genes)
-  cat(sprintf("  Count matrix: %d genes x %d samples\n", nrow(counts), ncol(counts)))
+  cat(sprintf("  Count matrix: %d genes Ãƒâ€” %d samples\n", nrow(counts), ncol(counts)))
   
   # Run ContamDE purity estimation
   cat("  Running ContamDE...\n")
@@ -279,16 +283,27 @@ for (group_name in c("R0", "R1", "B0", "B1")) {
 
 cat("\n--- Updating case_master with purity results ---\n")
 
-# Start with clean cases only (no outliers)
-thyr_case_master_stage2_filtered <- clean_cases
+# Start with ALL cases (not just clean cases)
+# This allows downstream filtering by different criteria
+thyr_case_master_stage2_filtered <- case_master
 
-# Initialize new columns and place them after has_outlier columns for readability
-thyr_case_master_stage2_filtered <- thyr_case_master_stage2_filtered %>%
-  mutate(
-    tumor_purity = NA_real_,
-    low_purity = NA_integer_
-  ) %>%
-  relocate(tumor_purity, low_purity, .after = has_outlier_normal)
+# Initialize new columns (NA by default)
+thyr_case_master_stage2_filtered$tumor_purity <- NA_real_
+thyr_case_master_stage2_filtered$low_purity <- NA_integer_
+
+# Reorder columns to place purity info after has_outlier columns
+col_order <- names(thyr_case_master_stage2_filtered)
+has_outlier_idx <- which(col_order == "has_outlier_normal")
+if (length(has_outlier_idx) > 0) {
+  new_order <- c(
+    col_order[1:has_outlier_idx],
+    "tumor_purity", "low_purity",
+    col_order[(has_outlier_idx + 1):(length(col_order) - 2)]  # Exclude the two purity columns at the end
+  )
+  # Use dplyr select for data.frame compatibility
+  thyr_case_master_stage2_filtered <- thyr_case_master_stage2_filtered %>%
+    select(all_of(new_order))
+}
 
 # Fill in purity values
 for (group_name in names(purity_results)) {
@@ -328,12 +343,15 @@ summary_stats <- thyr_case_master_stage2_filtered %>%
   group_by(group) %>%
   summarise(
     n_cases = n(),
-    n_with_outlier = sum(has_outlier_tumor == 1 | has_outlier_normal == 1),
+    n_paired = sum(has_pair),
+    n_qc_clean = sum(has_outlier_tumor == 0 & has_outlier_normal == 0, na.rm = TRUE),
+    n_qc_outlier = sum(has_outlier_tumor == 1 | has_outlier_normal == 1, na.rm = TRUE),
+    n_no_qc = sum(is.na(has_outlier_tumor)),
     n_purity_measured = sum(!is.na(tumor_purity)),
     mean_purity = mean(tumor_purity, na.rm = TRUE),
     median_purity = median(tumor_purity, na.rm = TRUE),
     n_low_purity = sum(low_purity == 1, na.rm = TRUE),
-    n_usable = sum(has_outlier_tumor == 0 & has_outlier_normal == 0 & low_purity == 0, na.rm = TRUE),
+    n_high_purity = sum(low_purity == 0, na.rm = TRUE),
     .groups = "drop"
   )
 
@@ -382,7 +400,7 @@ cat("  Summary CSV saved: stage2_purity_summary.csv\n")
 
 # Export case-level purity data for review
 case_purity_export <- thyr_case_master_stage2_filtered %>%
-  select(case_submitter_id, group, has_outlier_tumor, has_outlier_normal, 
+  select(case_submitter_id, group, has_pair, has_outlier_tumor, has_outlier_normal, 
          tumor_purity, low_purity) %>%
   arrange(group, case_submitter_id)
 
@@ -400,18 +418,26 @@ cat("Configuration:\n")
 cat("  Purity threshold:", sprintf("%.0f%%", CONFIG$PURITY_THRESHOLD * 100), "\n")
 cat("  Gene filtering: protein_coding + filterByExpr\n")
 cat("  MUREN method:", CONFIG$PAIRWISE_METHOD, "\n")
-cat("  Multiple testing correction: BH method\n")
 cat("\nResults:\n")
 cat("  Total cases:", total_cases, "\n")
-cat("  Clean cases (no outliers):", sum(thyr_case_master_stage2_filtered$has_outlier_tumor == 0 & 
-                                          thyr_case_master_stage2_filtered$has_outlier_normal == 0), "\n")
-cat("  High purity cases:", sum(thyr_case_master_stage2_filtered$low_purity == 0, na.rm = TRUE), "\n")
-cat("  Usable cases:", usable_cases, sprintf("(%.1f%%)\n", usable_cases/total_cases*100))
+
+# Layer statistics for validation
+n_qc_clean <- sum(thyr_case_master_stage2_filtered$has_outlier_tumor == 0 & 
+                    thyr_case_master_stage2_filtered$has_outlier_normal == 0, na.rm = TRUE)
+n_high_purity <- sum(thyr_case_master_stage2_filtered$low_purity == 0, na.rm = TRUE)
+n_no_qc <- sum(is.na(thyr_case_master_stage2_filtered$has_outlier_tumor))
+
+cat("  Layer 1 (QC clean + high purity):", usable_cases, "\n")
+cat("  Layer 2 (QC clean, any purity):", n_qc_clean, "\n")
+cat("  Layer 3 (No QC - unpaired/B_Low/B_High):", n_no_qc, "\n")
 cat("\nOutputs:\n")
 cat("  Main: thyr_case_master_stage2_filtered.rds\n")
 cat("  Details: stage2_purity_details.rds\n")
 cat("  Summaries: stage2_purity_summary.csv, stage2_case_purity.csv\n")
-cat("\nNext: Use cases with has_outlier_tumor==0 & has_outlier_normal==0 & low_purity==0 for downstream\n")
+cat("\nFiltering guide:\n")
+cat("  Layer 1: has_outlier_tumor==0 & has_outlier_normal==0 & low_purity==0\n")
+cat("  Layer 2: has_outlier_tumor==0 & has_outlier_normal==0\n")
+cat("  Layer 3: is.na(has_outlier_tumor)\n")
 
 # Restore SE to original name
 thyr_se_strand2_nonzero <- se
