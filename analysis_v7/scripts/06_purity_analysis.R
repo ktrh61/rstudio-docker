@@ -1,27 +1,30 @@
 # 06_purity_analysis.R - Stage 2 Tumor Purity Estimation
-# Purpose: Estimate tumor purity using ContamDE for clean paired samples
+# Purpose: Estimate relative tumor purity scores using ContamDE for clean paired samples
 # Method: MUREN normalization with contamDE purity estimation
+# Note: ContamDE outputs normalized proportions reflecting relative contamination intensities,
+#       not absolute tumor purity percentages. The highest-purity sample is scaled to ~1.0.
 # Input: thyr_case_master_stage1_filtered, thyr_se_strand2_nonzero
-# Output: thyr_case_master_stage2_filtered with tumor_purity and low_purity flags
-# Version: v7.2 - New group design (R0/R_Low/R_High/R1/B0/B1)
+# Output: thyr_case_master_stage2_filtered with tumor_purity (relative score) and low_purity flags
+# Version: v7.3 - Corrected terminology (relative score, not %), added has_pair check
+#                 New group design (R0/R_Low/R_High/R1/B0/B1)
 #                 B_Low/B_High excluded (not used in validation)
 #                 Output includes ALL cases (not just clean) for layer-based validation
-# Date: 2025-12-06
+# Date: 2025-12-07
 
 source("analysis_v7/setup.R")
 
-cat("\n=== Stage 2: Tumor Purity Analysis (v7.2) ===\n")
+cat("\n=== Stage 2: Tumor Purity Analysis (v7.3) ===\n")
 cat("Date:", as.character(Sys.Date()), "\n")
 cat("Analysis: R0/R_Low/R_High/R1/B0/B1 groups with clean paired samples\n")
 cat("Note: B_Low/B_High excluded (not used in validation)\n")
 cat("Method: ContamDE with MUREN normalization\n")
+cat("Output: Relative purity scores (normalized, not absolute %)\n")
 
 # Load packages
 suppressPackageStartupMessages({
   library(SummarizedExperiment)
   library(edgeR)
   library(limma)
-  library(qvalue)
   library(dplyr)
 })
 
@@ -35,7 +38,7 @@ source("utils/contamde_purity_functions.R")
 # ============================================================================
 
 CONFIG <- list(
-  PURITY_THRESHOLD = 0.6,      # 60% minimum purity
+  PURITY_THRESHOLD = 0.6,      # Relative score threshold (ContamDE outputs normalized scores, not absolute %)
   PAIRWISE_METHOD = "lts",     # MUREN method: lts, median, trim10
   WORKERS = 3,                 # Fixed 3 cores for MUREN internal parallelization
   PRIOR_COUNT = 1.0,           # Pseudocount for log ratio stability
@@ -43,7 +46,7 @@ CONFIG <- list(
 )
 
 cat("\nConfiguration:\n")
-cat("  Purity threshold:", sprintf("%.0f%%", CONFIG$PURITY_THRESHOLD * 100), "\n")
+cat("  Purity score threshold:", CONFIG$PURITY_THRESHOLD, "(relative, not %)\n")
 cat("  MUREN method:", CONFIG$PAIRWISE_METHOD, "\n")
 cat("  Prior count:", CONFIG$PRIOR_COUNT, "\n")
 
@@ -72,7 +75,7 @@ if (exists("thyr_se_strand2_nonzero")) {
   cat("Loading SE from file...\n")
   se <- readRDS(se_path)
 }
-cat("SE dimensions:", format(nrow(se), big.mark=","), "genes Ãƒâ€” ", 
+cat("SE dimensions:", format(nrow(se), big.mark=","), "genes x",
     format(ncol(se), big.mark=","), "samples\n")
 
 # Load case_master_stage1_filtered
@@ -121,8 +124,10 @@ print(clean_summary)
 
 # Extract paired samples for a group
 extract_paired_samples <- function(group_name, clean_cases_df, sample_meta) {
-  # Get cases for this group
-  group_cases <- clean_cases_df$case_submitter_id[clean_cases_df$group == group_name]
+  # Get paired cases for this group (explicit has_pair check for safety)
+  group_cases <- clean_cases_df$case_submitter_id[
+    clean_cases_df$group == group_name & clean_cases_df$has_pair
+  ]
   
   if (length(group_cases) == 0) {
     return(list(tumor = character(0), normal = character(0), cases = character(0)))
@@ -233,7 +238,7 @@ for (group_name in c("R0", "R_Low", "R_High", "R1", "B0", "B1")) {
   
   # Prepare counts matrix
   counts <- prepare_contamde_matrix(se, paired$normal, paired$tumor, keep_genes)
-  cat(sprintf("  Count matrix: %d genes Ãƒâ€” %d samples\n", nrow(counts), ncol(counts)))
+  cat(sprintf("  Count matrix: %d genes x %d samples\n", nrow(counts), ncol(counts)))
   
   # Run ContamDE purity estimation
   cat("  Running ContamDE...\n")
@@ -262,11 +267,11 @@ for (group_name in c("R0", "R_Low", "R_High", "R1", "B0", "B1")) {
     
     # Summary statistics
     purity_vals <- purity_result$proportion
-    cat(sprintf("  Purity: mean=%.3f, median=%.3f, sd=%.3f\n",
+    cat(sprintf("  Relative score: mean=%.3f, median=%.3f, sd=%.3f\n",
                 mean(purity_vals), median(purity_vals), sd(purity_vals)))
     cat(sprintf("  Range: [%.3f, %.3f]\n", min(purity_vals), max(purity_vals)))
-    cat(sprintf("  Above %.0f%%: %d/%d (%.1f%%)\n",
-                CONFIG$PURITY_THRESHOLD * 100,
+    cat(sprintf("  Above threshold (%.2f): %d/%d (%.1f%%)\n",
+                CONFIG$PURITY_THRESHOLD,
                 sum(purity_vals >= CONFIG$PURITY_THRESHOLD),
                 length(purity_vals),
                 sum(purity_vals >= CONFIG$PURITY_THRESHOLD) / length(purity_vals) * 100))
@@ -415,7 +420,7 @@ cat("  Case purity CSV saved: stage2_case_purity.csv\n")
 
 cat("\n=== Stage 2 Complete ===\n")
 cat("Configuration:\n")
-cat("  Purity threshold:", sprintf("%.0f%%", CONFIG$PURITY_THRESHOLD * 100), "\n")
+cat("  Purity score threshold:", CONFIG$PURITY_THRESHOLD, "(relative, not %)\n")
 cat("  Gene filtering: protein_coding + filterByExpr\n")
 cat("  MUREN method:", CONFIG$PAIRWISE_METHOD, "\n")
 cat("\nResults:\n")
@@ -427,8 +432,8 @@ n_qc_clean <- sum(thyr_case_master_stage2_filtered$has_outlier_tumor == 0 &
 n_high_purity <- sum(thyr_case_master_stage2_filtered$low_purity == 0, na.rm = TRUE)
 n_no_qc <- sum(is.na(thyr_case_master_stage2_filtered$has_outlier_tumor))
 
-cat("  Layer 1 (QC clean + high purity):", usable_cases, "\n")
-cat("  Layer 2 (QC clean, any purity):", n_qc_clean, "\n")
+cat("  Layer 1 (QC clean + high score):", usable_cases, "\n")
+cat("  Layer 2 (QC clean, any score):", n_qc_clean, "\n")
 cat("  Layer 3 (No QC - unpaired/B_Low/B_High):", n_no_qc, "\n")
 cat("\nOutputs:\n")
 cat("  Main: thyr_case_master_stage2_filtered.rds\n")

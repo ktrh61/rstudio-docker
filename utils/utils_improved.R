@@ -1,16 +1,15 @@
 # ==============================================================================
-# utils_improved.R — Improved helpers for MUREN normalization
-# Last modified: 2025-12-02
-# Changes:
-#   - 2025-12-02: Removed fallback mechanisms (fail-fast policy)
+# utils.R - Improved helpers for MUREN normalization
+# Version: Enhanced performance and robustness
 # ==============================================================================
 
 # ---- Dependencies Check ----
 if (!requireNamespace("matrixStats", quietly = TRUE))
   stop("Package 'matrixStats' is required for filter_gene_l().")
+if (!requireNamespace("robustbase", quietly = TRUE))
+  stop("Package 'robustbase' is required for LTS regression. MASS fallback is not supported due to inconsistent results.")
 if (!requireNamespace("MASS", quietly = TRUE))
-  stop("Package 'MASS' is required for robust regressions.")
-# robustbase is optional (preferred if available for speed)
+  stop("Package 'MASS' is required for Huber regression.")
 
 # ---- Constants ----
 TOL <- .Machine$double.eps ^ 0.5
@@ -39,17 +38,13 @@ filter_gene_l <- function(reads, trim) {
   (max_counts >= trim) & (min_samples >= 2)
 }
 
-# ---- Robust Regression Backend Selection ----
-# Prefer robustbase::ltsReg (fast C implementation) over MASS::ltsreg
+# ---- Robust Regression Backend ----
+# Uses robustbase::ltsReg (fast C implementation)
+# MASS fallback removed - robustbase is required
 .reg_backend <- function(formula, ...) {
-  if (requireNamespace("robustbase", quietly = TRUE)) {
-    # robustbase::ltsReg: fast C implementation
-    # Formula handling: ~1 for intercept-only, ~x for slope+intercept
-    robustbase::ltsReg(formula, ...)
-  } else {
-    # Fallback to MASS implementation
-    MASS::ltsreg(formula, ...)
-  }
+  # robustbase::ltsReg: fast C implementation
+  # Formula handling: ~1 for intercept-only, ~x for slope+intercept
+  robustbase::ltsReg(formula, ...)
 }
 
 # ---- Single-Parameter Regression (Location Shift) ----
@@ -71,14 +66,12 @@ reg_sp <- function(s_k, s_r, ...) {
   
   # Huber robust regression (M-estimator)
   if (method == "huber") {
-    if (!requireNamespace("MASS", quietly = TRUE)) {
-      stop("MASS::rlm not available for Huber regression")
-    }
+    # MASS is required for Huber (checked at startup)
     fit <- MASS::rlm(y ~ 1, psi = MASS::psi.huber, maxit = 20)
     return(unname(coef(fit)[1]))
   }
   
-  # Default: LTS regression
+  # Default: LTS regression (robustbase required, checked at startup)
   .reg_backend(y ~ 1, ...)$coefficients[1]
 }
 
@@ -188,11 +181,14 @@ check_muren_config <- function() {
   
   cat("MUREN Configuration:\n")
   cat(sprintf("  Method: %s\n", method))
-  cat(sprintf("  robustbase available: %s\n", has_robustbase))
-  cat(sprintf("  MASS available: %s\n", has_mass))
+  cat(sprintf("  robustbase available: %s (required for LTS)\n", has_robustbase))
+  cat(sprintf("  MASS available: %s (required for Huber)\n", has_mass))
   
-  if (method %in% c("lts", "huber") && !has_mass && !has_robustbase) {
-    stop("Neither robustbase nor MASS available for robust regression.")
+  if (method == "lts" && !has_robustbase) {
+    stop("robustbase is required for LTS method. Please install it with: install.packages('robustbase')")
+  }
+  if (method == "huber" && !has_mass) {
+    stop("MASS is required for Huber method.")
   }
   
   invisible(list(method = method, robustbase = has_robustbase, mass = has_mass))
@@ -208,7 +204,6 @@ initialize_muren <- function(n_genes = NULL, n_samples = NULL, priority = "balan
   invisible(TRUE)
 }
 
-# ---- End of utils_improved.R ----
+# ---- End of utils.R ----
 cat("Enhanced MUREN utils loaded successfully.\n")
-cat("Note: Fail-fast policy enabled (no fallback on errors).\n")
 cat("Use initialize_muren(n_genes, n_samples) to optimize configuration.\n")
