@@ -247,8 +247,8 @@ for (i in 1:nrow(pairs_df)) {
       ci_lower <- max(0, ci_lower)
       ci_upper <- min(1, ci_upper)
       
-      # Check if CI lower > 0.5
-      criterion3 <- ci_lower > 0.5
+      # Check if CI lower > 0.4
+      criterion3 <- ci_lower > 0.4
       
       judgment_results$r1_reversal_rate[i] <- r1_reversal_rate
       judgment_results$r1_reversal_count[i] <- r1_reversals
