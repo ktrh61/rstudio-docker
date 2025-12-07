@@ -1,40 +1,40 @@
-# utils/norm.R - MUREN core (consolidated fast path)
-# Dependencies: foreach, doSNOW, iterators, parallel, MASS, robustbase (required)
-# Requires: utils/utils.R sourced first (.reg_backend, reg_sp, mode_sp, reg_dp)
+# utils/norm_improved_fixed.R — MUREN core (fixed: include self in 'saturated')
+# 依存: foreach, doSNOW, iterators, parallel, MASS（任意: robustbase, RhpcBLASctl）
+# 事前に utils/utils_improved.R を source（.reg_backend, reg_sp, mode_sp, reg_dp,
+# polish_one_gene, polish_coeff, lg, ep, TOL, is.wholenumber, filter_gene_l 等）
 
 if (!requireNamespace("assertthat", quietly = TRUE)) stop("Package 'assertthat' is required.")
 if (!requireNamespace("foreach", quietly = TRUE))    stop("Package 'foreach' is required.")
 if (!requireNamespace("doSNOW", quietly = TRUE))     stop("Package 'doSNOW' is required.")
 if (!requireNamespace("iterators", quietly = TRUE))  stop("Package 'iterators' is required.")
 if (!requireNamespace("MASS", quietly = TRUE))       stop("Package 'MASS' is required.")
-if (!requireNamespace("robustbase", quietly = TRUE)) stop("Package 'robustbase' is required for LTS regression.")
 if (!requireNamespace("parallel", quietly = TRUE))   stop("Package 'parallel' is required.")
 `%dopar%` <- foreach::`%dopar%`
 
 muren_norm <- function(reads,
                        refs = 'saturated',
                        pairwise_method = "lts",   # "lts","mode","median","trim10","huber"
-                       refs_cap = Inf,            # Max number of references (sampled from median-near)
+                       refs_cap = Inf,            # 参照本数の上限（中央値近傍から抽出）
                        single_param = TRUE,
-                       res_return = 'counts',     # "counts" | "log_counts" | "scaling_coeff" (sp only)
+                       res_return = 'counts',     # "counts" | "log_counts" | "scaling_coeff"(spのみ)
                        filter_gene = TRUE,
                        trim = 10,
                        maxiter = 70,
-                       workers = 2,               # numeric, "auto", or existing cluster
-                       include_self = FALSE,
+                       workers = 2,               # 数値 or "auto" or 既存cluster
+                       include_self = TRUE,       # ← 既定を TRUE（元祖MUREN互換）
                        ...) {
   
-  # Pass pairwise_method to reg_sp via options
+  # reg_sp が読むスイッチを options で渡す
   old_m <- getOption("muren_pair_method", NULL)
   on.exit({ options(muren_pair_method = old_m) }, add = TRUE)
   options(muren_pair_method = pairwise_method)
   
-  # BLAS uses 1 thread (avoid double parallelization with outer parallel)
+  # BLAS は 1 スレ（外側並列と二重化しない）
   if (requireNamespace("RhpcBLASctl", quietly = TRUE)) {
     RhpcBLASctl::blas_set_num_threads(1L)
   }
   
-  # ---- Argument validation ----
+  # ---- 引数チェック ----
   assertthat::assert_that(is.logical(single_param))
   ok_methods <- c("lts","mode","median","trim10","huber")
   assertthat::assert_that(is.character(pairwise_method), pairwise_method %in% ok_methods)
@@ -48,12 +48,12 @@ muren_norm <- function(reads,
   
   raw_reads <- reads
   
-  # Extract numeric columns only
+  # 数値列のみ抽出
   i_sample <- rep(TRUE, ncol(raw_reads))
   if (is.data.frame(raw_reads)) i_sample <- sapply(raw_reads, is.numeric)
   reads <- as.matrix(raw_reads[, i_sample, drop = FALSE])
   
-  # Gene filter (group-independent, light conditions)
+  # 遺伝子フィルタ（群非依存の軽い条件）
   i_gene <- filter_gene_l(reads, trim)
   if (filter_gene) reads <- reads[i_gene, , drop = FALSE]
   
@@ -64,7 +64,7 @@ muren_norm <- function(reads,
   n_gene <- nrow(reads)
   REFSERR <- "Bad specification of references !"
   
-  # ---- Parse refs (exclude self-reference) ----
+  # ---- refs の解釈（自己参照の扱いを include_self で制御）----
   get_refs <- NULL
   if (is.character(refs)) {
     if (length(refs) == 1) {
@@ -72,18 +72,18 @@ muren_norm <- function(reads,
         get_refs <- function(k) if (include_self) seq_len(n_exp) else setdiff(seq_len(n_exp), k)
       } else if (refs %in% colnames(reads)) {
         ref_idx <- which(colnames(reads) %in% refs)
-        get_refs <- function(k) { v <- setdiff(ref_idx, k); if (length(v)==0) ref_idx else v }
+        get_refs <- function(k) { v <- if (include_self) ref_idx else setdiff(ref_idx, k); if (length(v)==0) ref_idx else v }
       } else stop(REFSERR)
     } else {
       if (all(refs %in% colnames(reads))) {
         ref_idx <- which(colnames(reads) %in% refs)
-        get_refs <- function(k) { v <- setdiff(ref_idx, k); if (length(v)==0) ref_idx else v }
+        get_refs <- function(k) { v <- if (include_self) ref_idx else setdiff(ref_idx, k); if (length(v)==0) ref_idx else v }
       } else stop(REFSERR)
     }
   } else if (all(is.wholenumber(refs))) {
     if (max(refs) <= n_exp) {
       if (length(refs) > 1) {
-        get_refs <- function(k) { v <- setdiff(refs, k); if (length(v)==0) refs else v }
+        get_refs <- function(k) { v <- if (include_self) refs else setdiff(refs, k); if (length(v)==0) refs else v }
       } else {
         single <- as.integer(refs)
         get_refs <- function(k) single
@@ -91,28 +91,39 @@ muren_norm <- function(reads,
     } else stop(REFSERR)
   } else stop(REFSERR)
   
-  # Regression method wrapper name (actual processing reads options in reg_sp)
+  # 回帰メソッドのラッパー名（実処理は reg_sp が options を読む）
   reg_wapper <- if (single_param) { if (pairwise_method == 'mode') 'mode_sp' else 'reg_sp' } else 'reg_dp'
   
-  # ---- Build reference set for each sample ----
+  # ---- 各サンプルの参照セットを作る ----
   refs_list <- lapply(seq_len(n_exp), get_refs)
   
-  # ---- refs_cap: limit to top N references near median library size ----
+  # ---- refs_cap: ライブラリサイズ中央値近傍から上限本数に絞る（自己参照を保持）----
   if (is.finite(refs_cap)) {
     lib <- colSums(reads)
-    pick_k <- function(r, k) {
+    pick_k_keep_self <- function(r, k, i) {
       if (!length(r)) return(r)
       m <- stats::median(lib[r])
-      r[order(abs(lib[r] - m))][seq_len(min(length(r), k))]
+      ord <- order(abs(lib[r] - m))
+      sel <- r[ord][seq_len(min(length(r), k))]
+      if (include_self && (i %in% r) && !(i %in% sel)) {
+        if (length(sel) < k) {
+          sel <- c(sel, i)
+        } else {
+          # 最も中央値から遠いものを自己参照で置換
+          worst <- which.max(abs(lib[sel] - m))
+          sel[worst] <- i
+        }
+      }
+      unique(sel)
     }
-    refs_list <- lapply(refs_list, pick_k, k = as.integer(refs_cap))
+    refs_list <- lapply(seq_len(n_exp), function(i) pick_k_keep_self(refs_list[[i]], as.integer(refs_cap), i))
   }
   
-  # Determine used/unused refs after cap
+  # cap 後に used/unused を確定
   used_refs   <- sort(unique(unlist(refs_list)))
   unused_refs <- setdiff(seq_len(n_exp), used_refs)
   
-  # ---- Pair indices ----
+  # ---- ペアインデックス ----
   pairs <- do.call(rbind, lapply(seq_len(n_exp), function(i) {
     if (length(refs_list[[i]]) == 0) return(NULL)
     cbind(i, refs_list[[i]])
@@ -120,7 +131,7 @@ muren_norm <- function(reads,
   if (is.null(pairs)) stop("No valid (sample, ref) pairs were generated.")
   locations <- pairs[,2] + (pairs[,1] - 1L) * n_exp
   
-  # ---- Parallel setup (auto/cluster compatible, reproducibility) ----
+  # ---- 並列設定（auto/cluster対応 & 再現性）----
   own_cluster <- TRUE
   if ((is.character(workers) && workers == "auto") || (is.numeric(workers) && workers == 0L)) {
     workers <- max(1L, parallel::detectCores() - 1L)
@@ -135,7 +146,7 @@ muren_norm <- function(reads,
   parallel::clusterSetRNGStream(cl, 12345L)
   on.exit(if (isTRUE(own_cluster)) try(parallel::stopCluster(cl), silent = TRUE), add = TRUE)
   
-  # Set BLAS/OMP to 1 thread in each worker (prevent double parallelization)
+  # 各ワーカーでBLAS/OMPを1スレッドに（外側並列との二重化防止）
   parallel::clusterCall(cl, function() {
     if (requireNamespace("RhpcBLASctl", quietly = TRUE)) {
       RhpcBLASctl::blas_set_num_threads(1L)
@@ -150,33 +161,30 @@ muren_norm <- function(reads,
     NULL
   })
   
-  # Pass pairwise_method to each worker
+  # 各ワーカーに pairwise_method を伝える（reg_sp が options を読む）
   parallel::clusterCall(cl, function(m) { options(muren_pair_method = m); NULL }, pairwise_method)
   
-  # Export required functions to workers
+  # ワーカーに必要な関数を配布（utils_improved.R 由来）
   needed <- c("reg_sp","mode_sp","reg_dp",".reg_backend",
               "polish_one_gene","polish_coeff","lg","ep","TOL")
   missing <- needed[!vapply(needed, exists, logical(1), envir = .GlobalEnv, inherits = TRUE)]
-  if (length(missing)) {
-    stop("Required MUREN helpers not found: ", paste(missing, collapse = ", "))
-  }
+  if (length(missing)) stop("Required MUREN helpers not found: ", paste(missing, collapse = ", "))
   parallel::clusterExport(cl, varlist = needed, envir = .GlobalEnv)
   
-  # robustbase is required (no MASS fallback)
-  pkgs <- c("MASS", "robustbase")
+  pkgs <- c("MASS")
+  if (requireNamespace("robustbase", quietly = TRUE)) pkgs <- c(pkgs, "robustbase")
   
-  # ---- Parallel execution with chunk distribution ----
+  # ---- チャンク配布で並列実行 ----
   n_pairs <- nrow(pairs)
   n_parts <- min(workers, n_pairs)
   split_idx <- split(seq_len(n_pairs),
                      rep(seq_len(n_parts), each = ceiling(n_pairs / n_parts), length.out = n_pairs))
   
   if (single_param) {
-    # reg_sp / mode_sp: 1 scalar per pair -> vector concatenation
+    # reg_sp / mode_sp：各ペア 1 スカラー → ベクトル連結
     res_chunks <- foreach::foreach(
       idx = iterators::iter(split_idx),
       .packages = pkgs,
-      # Export only functions; let foreach auto-capture data
       .export   = c("reg_sp","mode_sp",".reg_backend"),
       .combine  = "c"
     ) %dopar% {
@@ -191,7 +199,7 @@ muren_norm <- function(reads,
     res_pairwise <- as.numeric(res_chunks)
     
   } else {
-    # reg_dp: n_gene vector per pair -> matrix cbind
+    # reg_dp：各ペア n_gene ベクトル → 行列cbind
     res_chunks <- foreach::foreach(
       idx = iterators::iter(split_idx),
       .packages = pkgs,
@@ -209,12 +217,12 @@ muren_norm <- function(reads,
     res_pairwise <- as.matrix(res_chunks)
   }
   
-  # ---- Summarize results ----
+  # ---- まとめ ----
   if (single_param) {
     if (length(res_pairwise) != length(locations))
       stop("Pairwise result length mismatch (single_param).")
     
-    # Estimate sample effects (log2 coefficients)
+    # サンプル効果（log2係数）を推定
     coef_sp <- polish_coeff(
       fitted_n    = res_pairwise,
       n_exp       = n_exp,
@@ -227,7 +235,7 @@ muren_norm <- function(reads,
     
     if (res_return == 'scaling_coeff') return(1/coef_sp)
     
-    # Scale counts (avoid creating diagonal matrix)
+    # counts をスケール（diag生成を避ける）
     polished_mx <- sweep(as.matrix(raw_reads[, i_sample, drop = FALSE]), 2, coef_sp, `*`)
     if (res_return == 'log_counts') polished_mx <- lg(polished_mx)
     
@@ -250,19 +258,19 @@ muren_norm <- function(reads,
       )
     }
     
-    # Handle zero and negative values
+    # 0→0 と負の丸め
     polished_mx[log_raw_reads_mx < TOL | polished_mx < 0] <- 0
     
     if (res_return == 'counts') {
       polished_mx <- ep(polished_mx)  # 2^x - 1
     } else if (res_return == 'log_counts') {
-      # Keep as is
+      # そのまま
     } else if (res_return == 'scaling_coeff') {
       stop("res_return='scaling_coeff' is only valid when single_param=TRUE.")
     }
   }
   
-  # ---- Return result ----
+  # ---- 付帯情報/型 ----
   if (!is.null(rownames(raw_reads))) {
     if (single_param) rownames(polished_mx) <- rownames(raw_reads)
     else              rownames(polished_mx) <- rownames(reads)

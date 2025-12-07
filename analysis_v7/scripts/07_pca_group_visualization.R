@@ -1,16 +1,19 @@
 # 07_pca_group_visualization.R - PCA Group Visualization with CDM
-# Purpose: Visualize high-purity samples using CDM-based PCA for 4 groups
+# Purpose: Visualize high-purity samples using CDM-based PCA
+#          - Confirm R1 heterogeneity (radiation-induced + sporadic mixture)
+#          - Support rationale for REO-based approach over simple PCA classification
+#          - Provide supplementary figures for manuscript
 # Groups: RET_tumor, RET_normal, BRAF_tumor, BRAF_normal
 # Input: thyr_case_master_stage2_filtered, thyr_se_strand2_nonzero
 # Output: PCA plots colored by POC status (0/1)
-# Version: v7.1 - Serial outer loop with parallel CDM (BLAS 3 threads)
-# Date: 2025-09-16
+# Version: v7.2 - Naming convention update, RStudio display support
+# Date: 2025-12-07
 
 source("analysis_v7/setup.R")
 
-cat("\n=== PCA Group Visualization with CDM (v7.1) ===\n")
+cat("\n=== PCA Group Visualization with CDM (v7.2) ===\n")
 cat("Date:", as.character(Sys.Date()), "\n")
-cat("Analysis: 4 separate PCAs for RET/BRAF Ã— tumor/normal\n")
+cat("Analysis: 4 separate PCAs for RET/BRAF × tumor/normal\n")
 cat("Method: CDM with internal BLAS parallelization\n")
 cat("Processing: Serial groups, parallel CDM (3 threads)\n")
 
@@ -86,7 +89,7 @@ if (exists("thyr_se_strand2_nonzero")) {
   cat("Loading SE from file...\n")
   se <- readRDS(se_path)
 }
-cat("SE dimensions:", format(nrow(se), big.mark=","), "genes Ã— ", 
+cat("SE dimensions:", format(nrow(se), big.mark=","), "genes × ", 
     format(ncol(se), big.mark=","), "samples\n")
 
 # Load case_master_stage2_filtered
@@ -370,14 +373,14 @@ create_pca_plot <- function(cdm_result, title, pc_x = 1, pc_y = 2) {
     PC_y = scores[, pc_y],
     POC = factor(cdm_result$group_info$poc_status,
                  levels = c(0, 1),
-                 labels = c("POC=NA", "POCâ‰¥66.6")),
+                 labels = c("POC=NA", "POC≥66.6")),
     sample_id = cdm_result$group_info$sample_ids
   )
   
   # Create plot (without eigenvalue percentages)
   p <- ggplot(plot_df, aes(x = PC_x, y = PC_y, color = POC)) +
     geom_point(size = CONFIG$POINT_SIZE, alpha = CONFIG$ALPHA) +
-    scale_color_manual(values = c("POC=NA" = "#4A90E2", "POCâ‰¥66.6" = "#E94B3C"),
+    scale_color_manual(values = c("POC=NA" = "#4A90E2", "POC≥66.6" = "#E94B3C"),
                        name = "POC Status") +
     labs(
       title = title,
@@ -415,42 +418,52 @@ names(plot_list) <- names(cdm_results)
 plots <- plot_list[!sapply(plot_list, is.null)]
 
 # ============================================================================
-# Combine and save plots (stage3 naming)
+# Display and save plots
 # ============================================================================
 
 if (length(plots) > 0) {
-  cat("\n--- Saving plots ---\n")
+  cat("\n--- Displaying and saving plots ---\n")
+  
+  # Display individual plots in RStudio
+  for (group_name in names(plots)) {
+    cat(sprintf("  Displaying: %s\n", group_name))
+    print(plots[[group_name]])
+  }
   
   # Combine plots in 2x2 grid
   combined_plot <- gridExtra::grid.arrange(
     plots[["RET_tumor"]], plots[["RET_normal"]],
     plots[["BRAF_tumor"]], plots[["BRAF_normal"]],
     ncol = 2, nrow = 2,
-    top = "PCA Analysis - High Purity Samples (Stage 3)"
+    top = "PCA Analysis - High Purity Samples"
   )
   
-  # Save as PDF with stage3 naming
-  pdf_file <- paste0(paths$output, "stage3_pca_plots.pdf")
+  # Display combined plot in RStudio
+  cat("  Displaying: Combined plot\n")
+  print(combined_plot)
+  
+  # Save as PDF
+  pdf_file <- paste0(paths$output, "07_pca_plots.pdf")
   pdf(pdf_file, width = 12, height = 10)
   gridExtra::grid.arrange(
     plots[["RET_tumor"]], plots[["RET_normal"]],
     plots[["BRAF_tumor"]], plots[["BRAF_normal"]],
     ncol = 2, nrow = 2,
-    top = "PCA Analysis - High Purity Samples (Stage 3)"
+    top = "PCA Analysis - High Purity Samples"
   )
   dev.off()
   cat("  Saved combined plot:", basename(pdf_file), "\n")
   
-  # Save individual plots with stage3 naming
+  # Save individual plots
   for (group_name in names(plots)) {
-    png_file <- paste0(paths$output, sprintf("stage3_pca_%s.png", group_name))
+    png_file <- paste0(paths$output, sprintf("07_pca_%s.png", group_name))
     ggsave(png_file, plots[[group_name]], width = 8, height = 6, dpi = 300)
     cat("  Saved individual plot:", basename(png_file), "\n")
   }
 }
 
 # ============================================================================
-# Save CDM results (stage3 naming)
+# Save CDM results
 # ============================================================================
 
 cat("\n--- Saving CDM results ---\n")
@@ -464,14 +477,14 @@ cdm_output <- list(
   n_genes_used = sum(keep_genes)
 )
 
-saveRDS(cdm_output, paste0(paths$output, "stage3_pca_results.rds"))
-cat("  CDM results saved: stage3_pca_results.rds\n")
+saveRDS(cdm_output, paste0(paths$output, "07_pca_results.rds"))
+cat("  CDM results saved: 07_pca_results.rds\n")
 
 # ============================================================================
 # Final report
 # ============================================================================
 
-cat("\n=== Stage 3 Visualization Complete ===\n")
+cat("\n=== PCA Group Visualization Complete ===\n")
 cat("Configuration:\n")
 cat("  Method: CDM with internal BLAS parallelization\n")
 cat("  Processing: Serial groups, ", CONFIG$CDM_THREADS, " BLAS threads per CDM\n")
@@ -486,9 +499,9 @@ for (g in names(analysis_groups)) {
               g, n_total, n_poc0, n_poc1))
 }
 cat("\nOutputs:\n")
-cat("  Plots: stage3_pca_plots.pdf (combined)\n")
-cat("  Individual plots: stage3_pca_*.png\n")
-cat("  Data: stage3_pca_results.rds\n")
+cat("  Plots: 07_pca_plots.pdf (combined)\n")
+cat("  Individual plots: 07_pca_*.png\n")
+cat("  Data: 07_pca_results.rds\n")
 
 # Clean up (keep only essential objects)
 rm(list = setdiff(ls(), c("paths", "thyr_case_master_stage2_filtered", "thyr_se_strand2_nonzero")))

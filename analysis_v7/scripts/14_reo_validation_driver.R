@@ -1,11 +1,17 @@
 #!/usr/bin/env Rscript
 # =============================================================================
-# 14_reo_validation_poc.R
-# REO Panel Validation - Phase 8: POC Intermediate Value Validation
+# 14_reo_validation_driver.R
+# REO Panel Validation - Phase 9: Driver Generalization (Exploratory)
 # 
 # Purpose:
-#   - 8a: Evaluate panel performance on R_Low/R_High (QC-cleared samples)
-#   - 8b: Evaluate QC impact using non-cleared samples across all RET groups
+#   Assess REO panel behavior in BRAF V600E background (B0/B1)
+#   This is EXPLORATORY - generalization is NOT expected
+#
+# Scientific Rationale:
+#   - RET fusion: strongly associated with radiation-induced cancer (60-84%)
+#   - BRAF V600E: associated with sporadic thyroid cancer
+#   - Panel was constructed on RET background (R0/R1)
+#   - Testing on BRAF provides driver-specificity evidence
 #
 # Input:
 #   - thyr_case_master_stage2_filtered.rds (case metadata with QC flags)
@@ -13,10 +19,9 @@
 #   - thyr_se_strand2_nonzero.rds (expression data)
 #
 # Output:
-#   - reo_validation_poc_results.rds (all results)
-#   - reo_validation_poc_summary.csv (group-level summary)
-#   - reo_validation_poc_qc_impact.csv (QC impact assessment)
-#   - reo_validation_poc_samples.csv (sample-level results)
+#   - reo_validation_driver_results.rds (all results)
+#   - reo_validation_driver_summary.csv (group-level summary)
+#   - reo_validation_driver_samples.csv (sample-level results)
 #
 # Reference: REO_Panel_Implementation_Progress_v4.md
 # Date: 2025-12-07
@@ -25,8 +30,13 @@
 source("analysis_v7/setup.R")
 
 cat("\n=============================================================================\n")
-cat("14_reo_validation_poc.R - REO Panel POC Validation (Phase 8)\n")
+cat("14_reo_validation_driver.R - REO Panel Driver Generalization (Phase 9)\n")
 cat("=============================================================================\n\n")
+
+cat("=== EXPLORATORY ANALYSIS ===\n")
+cat("NOTE: BRAF V600E is associated with sporadic cancer.\n")
+cat("      Generalization of RET-derived panel is NOT expected.\n")
+cat("      This analysis assesses driver-specificity of the panel.\n\n")
 
 # Load additional packages
 suppressPackageStartupMessages({
@@ -52,7 +62,7 @@ cat(sprintf("Case master loaded: %d cases\n", nrow(case_master)))
 # Load REO panel
 panel_path <- file.path(paths$processed, "reo_final_panel.rds")
 if (!file.exists(panel_path)) {
-  stop("reo_final_panel.rds not found. Please run 13_reo_panel_finalize.R first.")
+  stop("reo_final_panel.rds not found. Please run 12_reo_panel_finalize.R first.")
 }
 panel_data <- readRDS(panel_path)
 selected_pairs <- panel_data$selected_pairs
@@ -69,7 +79,7 @@ if (!file.exists(se_path)) {
 }
 se <- readRDS(se_path)
 sample_metadata <- as.data.frame(colData(se))
-cat(sprintf("SE loaded: %d genes × %d samples\n", nrow(se), ncol(se)))
+cat(sprintf("SE loaded: %d genes x %d samples\n", nrow(se), ncol(se)))
 
 cat("\n")
 
@@ -89,28 +99,28 @@ rpk <- sweep(counts, 1, gene_lengths / 1000, "/")
 tpm <- sweep(rpk, 2, colSums(rpk) / 1e6, "/")
 log2_tpm <- log2(tpm + 1)
 
-cat(sprintf("log2(TPM+1) matrix: %d genes × %d samples\n", nrow(log2_tpm), ncol(log2_tpm)))
+cat(sprintf("log2(TPM+1) matrix: %d genes x %d samples\n", nrow(log2_tpm), ncol(log2_tpm)))
 cat("\n")
 
 # -----------------------------------------------------------------------------
-# Define Sample Categories
+# Define BRAF Sample Categories
 # -----------------------------------------------------------------------------
-cat("=== Defining Sample Categories ===\n")
+cat("=== Defining BRAF Sample Categories ===\n")
 
-# Filter to RET groups only
-ret_groups <- c("R0", "R_Low", "R_High", "R1")
-ret_cases <- case_master %>%
-  filter(group %in% ret_groups)
+# Filter to BRAF groups only
+braf_groups <- c("B0", "B1")
+braf_cases <- case_master %>%
+  filter(group %in% braf_groups)
 
-cat(sprintf("RET cases total: %d\n", nrow(ret_cases)))
+cat(sprintf("BRAF cases total: %d\n", nrow(braf_cases)))
 
-# Define QC status categories
+# Define QC status categories (same logic as Phase 8)
 # QC_clear: has_outlier_tumor=0 AND has_outlier_normal=0 AND low_purity=0
 # Outlier: has_outlier_tumor=1 OR has_outlier_normal=1
 # Low_purity: low_purity=1 (but not outlier)
 # Unpaired: is.na(has_outlier_tumor) - QC check was not possible
 
-ret_cases <- ret_cases %>%
+braf_cases <- braf_cases %>%
   mutate(
     qc_status = case_when(
       is.na(has_outlier_tumor) ~ "Unpaired",
@@ -123,7 +133,7 @@ ret_cases <- ret_cases %>%
 
 # Summary by group and QC status
 cat("\n--- Sample Distribution ---\n")
-qc_summary <- ret_cases %>%
+qc_summary <- braf_cases %>%
   group_by(group, qc_status) %>%
   summarise(n = n(), .groups = "drop") %>%
   pivot_wider(names_from = qc_status, values_from = n, values_fill = 0)
@@ -131,13 +141,10 @@ qc_summary <- ret_cases %>%
 print(as.data.frame(qc_summary))
 
 # -----------------------------------------------------------------------------
-# Helper Function: Compute Reversal Count
+# Helper Function: Compute Reversal Count (same as Phase 8)
 # -----------------------------------------------------------------------------
 compute_reversal_for_sample <- function(sample_id, selected_pairs, log2_tpm, 
                                         r0_majority_signs, dead_zone) {
-  # sample_id: sample_submitter_id of the tumor sample
-  # r0_majority_signs: named vector of majority signs for each pair (from panel construction)
-  
   n_pairs <- nrow(selected_pairs)
   reversal_count <- 0
   reversal_details <- rep(NA, n_pairs)
@@ -185,7 +192,7 @@ compute_reversal_for_sample <- function(sample_id, selected_pairs, log2_tpm,
 # -----------------------------------------------------------------------------
 # Get R0 Majority Signs from Panel Data
 # -----------------------------------------------------------------------------
-cat("\n=== Getting R0 Majority Signs ===\n")
+cat("\n=== R0 Majority Signs (from RET panel construction) ===\n")
 
 # Use the R0 samples from panel construction
 r0_samples_panel <- panel_data$r0_samples
@@ -200,144 +207,130 @@ r0_majority_signs <- sapply(1:nrow(selected_pairs), function(k) {
 })
 names(r0_majority_signs) <- selected_pairs$pair_id
 
-cat("R0 majority signs (from panel construction):\n")
+cat("R0 majority signs (reference from RET background):\n")
 print(r0_majority_signs)
 cat("\n")
 
 # -----------------------------------------------------------------------------
-# Process All Samples
+# Process All BRAF Samples
 # -----------------------------------------------------------------------------
-cat("=== Processing Samples ===\n")
+cat("=== Processing BRAF Samples ===\n")
 
 # Get tumor sample IDs for each case
 get_tumor_sample <- function(case_id, sample_meta) {
   sample_meta$sample_submitter_id[
     sample_meta$case_submitter_id == case_id &
-      sample_meta$sample_type == "Primary Tumor" &
-      grepl("_merged", sample_meta$sample_submitter_id)
+    sample_meta$sample_type == "Primary Tumor" &
+    grepl("_merged", sample_meta$sample_submitter_id)
   ][1]
 }
 
 # Process each case
 results_list <- list()
 
-for (i in 1:nrow(ret_cases)) {
-  case_id <- ret_cases$case_submitter_id[i]
-  group <- ret_cases$group[i]
-  qc_status <- ret_cases$qc_status[i]
-  poc <- ret_cases$POC[i]
-  purity <- ret_cases$tumor_purity[i]
+for (i in 1:nrow(braf_cases)) {
+  case_id <- braf_cases$case_submitter_id[i]
+  group <- braf_cases$group[i]
+  qc_status <- braf_cases$qc_status[i]
+  poc <- braf_cases$POC[i]
   
-  # Get tumor sample
+  # Get tumor sample ID
   tumor_sample <- get_tumor_sample(case_id, sample_metadata)
   
-  if (is.na(tumor_sample)) {
-    # No tumor sample available
+  if (is.na(tumor_sample) || !(tumor_sample %in% colnames(log2_tpm))) {
     results_list[[i]] <- data.frame(
-      case_submitter_id = case_id,
-      sample_id = NA_character_,
+      case_id = case_id,
+      tumor_sample = NA,
       group = group,
       qc_status = qc_status,
       POC = poc,
-      tumor_purity = purity,
-      reversal_count = NA_integer_,
-      panel_result = NA_character_,
-      stringsAsFactors = FALSE
+      reversal_count = NA,
+      panel_result = NA
     )
     next
   }
   
-  # Compute reversal
+  # Compute reversals
   rev_result <- compute_reversal_for_sample(
     tumor_sample, selected_pairs, log2_tpm,
     r0_majority_signs, dead_zone_threshold
   )
   
-  # Panel result
+  # Determine panel result
   panel_result <- ifelse(rev_result$count >= threshold_T, "Panel(+)", "Panel(-)")
   
   results_list[[i]] <- data.frame(
-    case_submitter_id = case_id,
-    sample_id = tumor_sample,
+    case_id = case_id,
+    tumor_sample = tumor_sample,
     group = group,
     qc_status = qc_status,
     POC = poc,
-    tumor_purity = purity,
     reversal_count = rev_result$count,
-    panel_result = panel_result,
-    stringsAsFactors = FALSE
+    panel_result = panel_result
   )
 }
 
-results_df <- bind_rows(results_list)
+results_df <- do.call(rbind, results_list)
 
-cat(sprintf("Processed: %d cases\n", nrow(results_df)))
-cat(sprintf("  With reversal data: %d\n", sum(!is.na(results_df$reversal_count))))
-cat(sprintf("  Missing tumor sample: %d\n", sum(is.na(results_df$sample_id))))
+cat(sprintf("Processed %d BRAF cases\n", nrow(results_df)))
+cat(sprintf("Valid results: %d\n", sum(!is.na(results_df$reversal_count))))
 cat("\n")
 
 # -----------------------------------------------------------------------------
-# Section 8a: QC-Cleared R_Low/R_High Results
+# B0/B1 Analysis
 # -----------------------------------------------------------------------------
-cat("=== Section 8a: QC-Cleared R_Low/R_High Results ===\n")
+cat("=== B0/B1 Analysis ===\n")
 
-qc_clear_validation <- results_df %>%
-  filter(group %in% c("R_Low", "R_High"), qc_status == "QC_clear")
+# B0: Non-exposed BRAF
+cat("\n--- B0 (Non-exposed BRAF) ---\n")
+b0_clear <- results_df %>%
+  filter(group == "B0", qc_status == "QC_clear", !is.na(reversal_count))
 
-if (nrow(qc_clear_validation) > 0) {
-  cat("\n--- R_Low (QC_clear) ---\n")
-  r_low_clear <- qc_clear_validation %>% filter(group == "R_Low")
-  if (nrow(r_low_clear) > 0) {
-    cat(sprintf("N = %d\n", nrow(r_low_clear)))
-    cat(sprintf("Reversal count: range=%d-%d, mean=%.1f, median=%.0f\n",
-                min(r_low_clear$reversal_count, na.rm = TRUE),
-                max(r_low_clear$reversal_count, na.rm = TRUE),
-                mean(r_low_clear$reversal_count, na.rm = TRUE),
-                median(r_low_clear$reversal_count, na.rm = TRUE)))
-    cat(sprintf("Panel(+): %d/%d (%.1f%%)\n",
-                sum(r_low_clear$panel_result == "Panel(+)", na.rm = TRUE),
-                nrow(r_low_clear),
-                sum(r_low_clear$panel_result == "Panel(+)", na.rm = TRUE) / nrow(r_low_clear) * 100))
-    cat("Distribution:\n")
-    print(table(r_low_clear$reversal_count, useNA = "ifany"))
-  } else {
-    cat("No QC-cleared samples\n")
-  }
-  
-  cat("\n--- R_High (QC_clear) ---\n")
-  r_high_clear <- qc_clear_validation %>% filter(group == "R_High")
-  if (nrow(r_high_clear) > 0) {
-    cat(sprintf("N = %d\n", nrow(r_high_clear)))
-    cat(sprintf("Reversal count: range=%d-%d, mean=%.1f, median=%.0f\n",
-                min(r_high_clear$reversal_count, na.rm = TRUE),
-                max(r_high_clear$reversal_count, na.rm = TRUE),
-                mean(r_high_clear$reversal_count, na.rm = TRUE),
-                median(r_high_clear$reversal_count, na.rm = TRUE)))
-    cat(sprintf("Panel(+): %d/%d (%.1f%%)\n",
-                sum(r_high_clear$panel_result == "Panel(+)", na.rm = TRUE),
-                nrow(r_high_clear),
-                sum(r_high_clear$panel_result == "Panel(+)", na.rm = TRUE) / nrow(r_high_clear) * 100))
-    cat("Distribution:\n")
-    print(table(r_high_clear$reversal_count, useNA = "ifany"))
-  } else {
-    cat("No QC-cleared samples\n")
-  }
+if (nrow(b0_clear) > 0) {
+  cat(sprintf("QC_clear: N=%d\n", nrow(b0_clear)))
+  cat(sprintf("  Reversal: range=%d-%d, mean=%.1f\n",
+              min(b0_clear$reversal_count),
+              max(b0_clear$reversal_count),
+              mean(b0_clear$reversal_count)))
+  cat(sprintf("  Panel(+): %d/%d (%.1f%%)\n",
+              sum(b0_clear$panel_result == "Panel(+)"),
+              nrow(b0_clear),
+              sum(b0_clear$panel_result == "Panel(+)") / nrow(b0_clear) * 100))
 } else {
-  cat("No QC-cleared samples in R_Low/R_High\n")
+  cat("No QC_clear samples\n")
+}
+
+# B1: Exposed BRAF
+cat("\n--- B1 (Exposed BRAF) ---\n")
+b1_clear <- results_df %>%
+  filter(group == "B1", qc_status == "QC_clear", !is.na(reversal_count))
+
+if (nrow(b1_clear) > 0) {
+  cat(sprintf("QC_clear: N=%d\n", nrow(b1_clear)))
+  cat(sprintf("  Reversal: range=%d-%d, mean=%.1f\n",
+              min(b1_clear$reversal_count),
+              max(b1_clear$reversal_count),
+              mean(b1_clear$reversal_count)))
+  cat(sprintf("  Panel(+): %d/%d (%.1f%%)\n",
+              sum(b1_clear$panel_result == "Panel(+)"),
+              nrow(b1_clear),
+              sum(b1_clear$panel_result == "Panel(+)") / nrow(b1_clear) * 100))
+} else {
+  cat("No QC_clear samples\n")
 }
 
 # -----------------------------------------------------------------------------
-# Section 8b: QC Non-Cleared/Difficult Samples
+# Non-QC-Clear BRAF Samples
 # -----------------------------------------------------------------------------
-cat("\n=== Section 8b: QC Non-Cleared/Difficult Samples ===\n")
+cat("\n=== Non-QC-Clear BRAF Samples ===\n")
 
-non_clear_samples <- results_df %>%
+non_clear_braf <- results_df %>%
   filter(qc_status != "QC_clear")
 
-for (g in ret_groups) {
-  cat(sprintf("\n--- %s (Non-QC-clear) ---\n", g))
+for (g in braf_groups) {
+  cat(sprintf("\n[%s] Non-QC-clear samples:\n", g))
   
-  group_non_clear <- non_clear_samples %>% filter(group == g)
+  group_non_clear <- non_clear_braf %>% filter(group == g)
   
   if (nrow(group_non_clear) == 0) {
     cat("No non-QC-clear samples\n")
@@ -389,113 +382,77 @@ summary_stats <- results_df %>%
 print(as.data.frame(summary_stats))
 
 # -----------------------------------------------------------------------------
-# QC Impact Assessment
+# Comparison with RET Results (Cross-Reference)
 # -----------------------------------------------------------------------------
-cat("\n=== QC Impact Assessment ===\n")
+cat("\n=== Comparison with RET Background (Cross-Reference) ===\n")
 
-# Compare QC_clear vs non-clear within each group
-qc_impact <- results_df %>%
-  filter(!is.na(reversal_count)) %>%
-  mutate(qc_category = ifelse(qc_status == "QC_clear", "QC_clear", "Non_clear")) %>%
-  group_by(group, qc_category) %>%
-  summarise(
-    n = n(),
-    rev_mean = round(mean(reversal_count), 2),
-    rev_sd = round(sd(reversal_count), 2),
-    panel_positive_pct = round(sum(panel_result == "Panel(+)") / n() * 100, 1),
-    .groups = "drop"
-  ) %>%
-  pivot_wider(
-    names_from = qc_category,
-    values_from = c(n, rev_mean, rev_sd, panel_positive_pct),
-    names_sep = "_"
+# Load Phase 8 results if available
+poc_results_path <- file.path(paths$processed, "reo_validation_poc_results.rds")
+if (file.exists(poc_results_path)) {
+  poc_results <- readRDS(poc_results_path)
+  ret_summary <- poc_results$summary_by_group_qc
+  
+  cat("\n--- RET Background (from Phase 8) ---\n")
+  ret_qc_clear <- ret_summary %>% filter(qc_status == "QC_clear")
+  print(as.data.frame(ret_qc_clear))
+  
+  cat("\n--- BRAF Background (current Phase 9) ---\n")
+  braf_qc_clear <- summary_stats %>% filter(qc_status == "QC_clear")
+  print(as.data.frame(braf_qc_clear))
+  
+  # Direct comparison table
+  cat("\n--- Direct Comparison (QC_clear only) ---\n")
+  comparison <- data.frame(
+    Background = c("RET (R0)", "RET (R1)", "BRAF (B0)", "BRAF (B1)"),
+    N = c(
+      ret_qc_clear$n[ret_qc_clear$group == "R0"],
+      ret_qc_clear$n[ret_qc_clear$group == "R1"],
+      ifelse(nrow(b0_clear) > 0, nrow(b0_clear), 0),
+      ifelse(nrow(b1_clear) > 0, nrow(b1_clear), 0)
+    ),
+    Rev_mean = c(
+      ret_qc_clear$rev_mean[ret_qc_clear$group == "R0"],
+      ret_qc_clear$rev_mean[ret_qc_clear$group == "R1"],
+      ifelse(nrow(b0_clear) > 0, round(mean(b0_clear$reversal_count), 1), NA),
+      ifelse(nrow(b1_clear) > 0, round(mean(b1_clear$reversal_count), 1), NA)
+    ),
+    Panel_positive_pct = c(
+      ret_qc_clear$panel_positive_pct[ret_qc_clear$group == "R0"],
+      ret_qc_clear$panel_positive_pct[ret_qc_clear$group == "R1"],
+      ifelse(nrow(b0_clear) > 0, 
+             round(sum(b0_clear$panel_result == "Panel(+)") / nrow(b0_clear) * 100, 1), NA),
+      ifelse(nrow(b1_clear) > 0, 
+             round(sum(b1_clear$panel_result == "Panel(+)") / nrow(b1_clear) * 100, 1), NA)
+    )
   )
-
-print(as.data.frame(qc_impact))
+  print(comparison)
+} else {
+  cat("Phase 8 results not found. Run 13_reo_validation_poc.R first for comparison.\n")
+}
 
 # -----------------------------------------------------------------------------
-# POC Monotonicity Check
+# POC Relationship in BRAF (Exploratory)
 # -----------------------------------------------------------------------------
-cat("\n=== POC Monotonicity Check ===\n")
+cat("\n=== POC vs Reversal in BRAF (Exploratory) ===\n")
 
-# For QC_clear samples only
-poc_check <- results_df %>%
+poc_braf <- results_df %>%
   filter(qc_status == "QC_clear", !is.na(POC), !is.na(reversal_count))
 
-if (nrow(poc_check) > 0) {
-  # Correlation between POC and reversal count
-  cor_result <- cor.test(poc_check$POC, poc_check$reversal_count, method = "spearman")
-  
+if (nrow(poc_braf) >= 5) {
+  cor_result <- cor.test(poc_braf$POC, poc_braf$reversal_count, method = "spearman")
   cat(sprintf("Spearman correlation (POC vs reversal_count):\n"))
   cat(sprintf("  rho = %.3f, p-value = %.4f\n", cor_result$estimate, cor_result$p.value))
   
-  # Group means
-  poc_group_means <- poc_check %>%
-    group_by(group) %>%
-    summarise(
-      n = n(),
-      poc_mean = mean(POC),
-      rev_mean = mean(reversal_count),
-      .groups = "drop"
-    )
-  
-  cat("\nGroup means (QC_clear only):\n")
-  print(as.data.frame(poc_group_means))
-}
-
-# -----------------------------------------------------------------------------
-# Comparison with Panel Construction Data (R0/R1)
-# -----------------------------------------------------------------------------
-cat("\n=== Comparison with Panel Construction (Reference) ===\n")
-
-# R0 from panel construction
-cat("R0 (from panel construction):\n")
-cat(sprintf("  N = %d\n", length(panel_data$r0_samples)))
-cat(sprintf("  Reversal: range=%d-%d, mean=%.1f\n",
-            min(panel_data$r0_reversals),
-            max(panel_data$r0_reversals),
-            mean(panel_data$r0_reversals)))
-cat(sprintf("  Panel(+): %d/%d\n",
-            sum(panel_data$r0_panel_positive),
-            length(panel_data$r0_samples)))
-
-# R1 from panel construction
-cat("\nR1 (from panel construction):\n")
-cat(sprintf("  N = %d\n", length(panel_data$r1_samples)))
-cat(sprintf("  Reversal: range=%d-%d, mean=%.1f\n",
-            min(panel_data$r1_reversals),
-            max(panel_data$r1_reversals),
-            mean(panel_data$r1_reversals)))
-cat(sprintf("  Panel(+): %d/%d\n",
-            sum(panel_data$r1_panel_positive),
-            length(panel_data$r1_samples)))
-
-# Current validation - R0 QC_clear
-cat("\nR0 (current validation, QC_clear):\n")
-r0_current <- results_df %>% filter(group == "R0", qc_status == "QC_clear", !is.na(reversal_count))
-if (nrow(r0_current) > 0) {
-  cat(sprintf("  N = %d\n", nrow(r0_current)))
-  cat(sprintf("  Reversal: range=%d-%d, mean=%.1f\n",
-              min(r0_current$reversal_count),
-              max(r0_current$reversal_count),
-              mean(r0_current$reversal_count)))
-  cat(sprintf("  Panel(+): %d/%d\n",
-              sum(r0_current$panel_result == "Panel(+)"),
-              nrow(r0_current)))
-}
-
-# Current validation - R1 QC_clear
-cat("\nR1 (current validation, QC_clear):\n")
-r1_current <- results_df %>% filter(group == "R1", qc_status == "QC_clear", !is.na(reversal_count))
-if (nrow(r1_current) > 0) {
-  cat(sprintf("  N = %d\n", nrow(r1_current)))
-  cat(sprintf("  Reversal: range=%d-%d, mean=%.1f\n",
-              min(r1_current$reversal_count),
-              max(r1_current$reversal_count),
-              mean(r1_current$reversal_count)))
-  cat(sprintf("  Panel(+): %d/%d\n",
-              sum(r1_current$panel_result == "Panel(+)"),
-              nrow(r1_current)))
+  cat("\nInterpretation:\n")
+  if (cor_result$p.value < 0.05 && cor_result$estimate > 0.3) {
+    cat("  Significant positive correlation detected.\n")
+    cat("  This suggests some POC-related signal even in BRAF background.\n")
+  } else {
+    cat("  No significant correlation or weak relationship.\n")
+    cat("  This is consistent with BRAF being primarily sporadic.\n")
+  }
+} else {
+  cat("Insufficient samples with POC data for correlation analysis\n")
 }
 
 # -----------------------------------------------------------------------------
@@ -514,66 +471,75 @@ output <- list(
   
   # Summary statistics
   summary_by_group_qc = summary_stats,
-  qc_impact = qc_impact,
   
-  # R0 majority signs used
+  # R0 majority signs used (from RET)
   r0_majority_signs = r0_majority_signs,
   
   # Metadata
+  analysis_type = "exploratory",
+  note = "BRAF V600E is associated with sporadic cancer. Generalization not expected.",
   timestamp = Sys.time(),
   version = "v1.0"
 )
 
-saveRDS(output, file.path(paths$processed, "reo_validation_poc_results.rds"))
-cat(sprintf("Saved: %s\n", file.path(paths$processed, "reo_validation_poc_results.rds")))
+saveRDS(output, file.path(paths$processed, "reo_validation_driver_results.rds"))
+cat(sprintf("Saved: %s\n", file.path(paths$processed, "reo_validation_driver_results.rds")))
 
 # Summary CSV
 write.csv(summary_stats, 
-          file.path(paths$output, "reo_validation_poc_summary.csv"),
+          file.path(paths$output, "reo_validation_driver_summary.csv"),
           row.names = FALSE)
-cat(sprintf("Saved: %s\n", file.path(paths$output, "reo_validation_poc_summary.csv")))
-
-# QC impact CSV
-write.csv(qc_impact,
-          file.path(paths$output, "reo_validation_poc_qc_impact.csv"),
-          row.names = FALSE)
-cat(sprintf("Saved: %s\n", file.path(paths$output, "reo_validation_poc_qc_impact.csv")))
+cat(sprintf("Saved: %s\n", file.path(paths$output, "reo_validation_driver_summary.csv")))
 
 # Sample-level results CSV
 write.csv(results_df,
-          file.path(paths$output, "reo_validation_poc_samples.csv"),
+          file.path(paths$output, "reo_validation_driver_samples.csv"),
           row.names = FALSE)
-cat(sprintf("Saved: %s\n", file.path(paths$output, "reo_validation_poc_samples.csv")))
+cat(sprintf("Saved: %s\n", file.path(paths$output, "reo_validation_driver_samples.csv")))
 
 # -----------------------------------------------------------------------------
 # Final Summary
 # -----------------------------------------------------------------------------
 cat("\n=============================================================================\n")
-cat("Phase 8 Validation Complete\n")
+cat("Phase 9 Exploratory Analysis Complete\n")
 cat("=============================================================================\n")
 
 cat("\n--- Key Findings ---\n")
 
-# R_Low/R_High QC_clear summary
-validation_summary <- results_df %>%
-  filter(group %in% c("R_Low", "R_High"), qc_status == "QC_clear", !is.na(reversal_count))
-
-if (nrow(validation_summary) > 0) {
-  cat(sprintf("\nPOC Intermediate (R_Low + R_High, QC_clear): N=%d\n", nrow(validation_summary)))
-  cat(sprintf("  Reversal range: %d-%d\n",
-              min(validation_summary$reversal_count),
-              max(validation_summary$reversal_count)))
-  cat(sprintf("  Panel(+) rate: %.1f%%\n",
-              sum(validation_summary$panel_result == "Panel(+)") / nrow(validation_summary) * 100))
+# B0 summary
+if (nrow(b0_clear) > 0) {
+  cat(sprintf("\nB0 (Non-exposed BRAF, QC_clear): N=%d\n", nrow(b0_clear)))
+  cat(sprintf("  Reversal: mean=%.1f, range=%d-%d\n",
+              mean(b0_clear$reversal_count),
+              min(b0_clear$reversal_count),
+              max(b0_clear$reversal_count)))
+  cat(sprintf("  Panel(+): %.1f%%\n",
+              sum(b0_clear$panel_result == "Panel(+)") / nrow(b0_clear) * 100))
 }
 
-# QC impact summary
-cat("\nQC Impact:\n")
-cat("  See reo_validation_poc_qc_impact.csv for detailed comparison\n")
+# B1 summary
+if (nrow(b1_clear) > 0) {
+  cat(sprintf("\nB1 (Exposed BRAF, QC_clear): N=%d\n", nrow(b1_clear)))
+  cat(sprintf("  Reversal: mean=%.1f, range=%d-%d\n",
+              mean(b1_clear$reversal_count),
+              min(b1_clear$reversal_count),
+              max(b1_clear$reversal_count)))
+  cat(sprintf("  Panel(+): %.1f%%\n",
+              sum(b1_clear$panel_result == "Panel(+)") / nrow(b1_clear) * 100))
+}
+
+cat("\n--- Interpretation Guidelines ---\n")
+cat("Expected outcome (if panel is RET-specific):\n")
+cat("  - B0 and B1 should show similar, low reversal patterns\n")
+cat("  - Both groups should have low Panel(+) rates\n")
+cat("  - No clear separation between B0 and B1\n")
+cat("\nAlternative outcome (if cross-driver signal exists):\n")
+cat("  - B1 shows elevated reversals compared to B0\n")
+cat("  - This would suggest radiation signature transcends driver mutation\n")
 
 cat("\n--- Next Steps ---\n")
-cat("1. Review POC monotonicity (POC↑ → reversal↑ expected)\n")
-cat("2. Decide on threshold T adjustment if needed\n")
-cat("3. Proceed to Phase 9: Driver generalization (B0/B1)\n")
+cat("1. Compare B0/B1 results with R0/R1 baseline\n")
+cat("2. Assess whether driver-specificity supports main findings\n")
+cat("3. Document exploratory results for supplementary material\n")
 
 cat("\n=== Done ===\n")

@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 # =============================================================================
-# 12_reo_pair_selection.R
+# 11_reo_pair_selection.R
 # REO Panel Construction - Phase 2-4: Pair Generation and Selection
 # 
 # Purpose: Generate gene pairs and apply selection criteria
@@ -8,18 +8,17 @@
 #   - thyr_se_strand2_nonzero.rds (expression data)
 #   - thyr_deg_results.rds (DEG results)
 #   - analysis_sample_lists.rds (R0/R1 sample lists)
-#   - reo_glmnet_qc_results.rds (Phase 1 QC results, optional)
 # Output:
 #   - reo_candidate_pairs.rds (filtered candidate pairs)
 #
 # Reference: REO_Panel_Protocol_v2.md
-# Date: 2025-12-05
+# Date: 2025-12-07
 # =============================================================================
 
 source("analysis_v7/setup.R")
 
 cat("\n=============================================================================\n")
-cat("12_reo_pair_selection.R - REO Pair Selection\n")
+cat("11_reo_pair_selection.R - REO Pair Selection\n")
 cat("=============================================================================\n\n")
 
 # -----------------------------------------------------------------------------
@@ -100,16 +99,6 @@ r0_samples <- sample_lists$R0$tumor
 r1_samples <- sample_lists$R1$tumor
 cat(sprintf("R0 samples: %d\n", length(r0_samples)))
 cat(sprintf("R1 samples: %d\n", length(r1_samples)))
-
-# Phase 1 QC results (optional - check for R0-like exclusion)
-qc_file <- file.path(paths$processed, "reo_glmnet_qc_results.rds")
-if (file.exists(qc_file)) {
-  qc_results <- readRDS(qc_file)
-  if (!is.null(qc_results$excluded_samples) && length(qc_results$excluded_samples) > 0) {
-    r1_samples <- setdiff(r1_samples, qc_results$excluded_samples)
-    cat(sprintf("After QC exclusion: %d R1 samples\n", length(r1_samples)))
-  }
-}
 
 cat("\n")
 
@@ -238,9 +227,9 @@ evaluate_pairs <- function(pair_grid, expr_up, expr_down, r0_samples, r1_samples
     
     # Compute r values: r = log2(UP) - log2(DOWN)
     r_r0 <- expr_up[i_chunk, r0_samples, drop = FALSE] - 
-      expr_down[j_chunk, r0_samples, drop = FALSE]
+            expr_down[j_chunk, r0_samples, drop = FALSE]
     r_r1 <- expr_up[i_chunk, r1_samples, drop = FALSE] - 
-      expr_down[j_chunk, r1_samples, drop = FALSE]
+            expr_down[j_chunk, r1_samples, drop = FALSE]
     
     # Dead zone check: |r| >= threshold
     dz_r0 <- rowSums(abs(r_r0) >= params$dead_zone_threshold)

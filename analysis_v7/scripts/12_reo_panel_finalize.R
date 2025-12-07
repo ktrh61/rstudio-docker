@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 # =============================================================================
-# 13_reo_panel_finalize.R
+# 12_reo_panel_finalize.R
 # REO Panel Construction - Phase 5-7: Finalization
 # 
 # Purpose: 
@@ -9,18 +9,18 @@
 #   - Phase 7: Set voting threshold T
 #
 # Input: 
-#   - reo_candidate_pairs.rds (from 12_reo_pair_selection.R)
+#   - reo_candidate_pairs.rds (from 11_reo_pair_selection.R)
 # Output:
 #   - reo_final_panel.rds (final 10-pair panel with threshold)
 #
 # Reference: REO_Panel_Protocol_v2.md
-# Date: 2025-12-05
+# Date: 2025-12-07
 # =============================================================================
 
 source("analysis_v7/setup.R")
 
 cat("\n=============================================================================\n")
-cat("13_reo_panel_finalize.R - REO Panel Finalization\n")
+cat("12_reo_panel_finalize.R - REO Panel Finalization\n")
 cat("=============================================================================\n\n")
 
 # -----------------------------------------------------------------------------
@@ -355,9 +355,9 @@ cat(sprintf("Saved: %s\n", file.path(paths$processed, "reo_final_panel.rds")))
 
 # Panel summary CSV
 panel_csv <- selected_pairs[, c("pair_id", "up_name", "down_name", 
-                                "up_gene", "down_gene",
-                                "dz_total", "r0_consistency", 
-                                "reversal", "wilson_lower")]
+                                 "up_gene", "down_gene",
+                                 "dz_total", "r0_consistency", 
+                                 "reversal", "wilson_lower")]
 write.csv(panel_csv, file.path(paths$output, "reo_final_panel.csv"), row.names = FALSE)
 cat(sprintf("Saved: %s\n", file.path(paths$output, "reo_final_panel.csv")))
 
