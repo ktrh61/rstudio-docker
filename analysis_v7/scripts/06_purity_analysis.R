@@ -5,7 +5,7 @@
 #       not absolute tumor purity percentages. The highest-purity sample is scaled to ~1.0.
 # Input: thyr_case_master_stage1_filtered, thyr_se_strand2_nonzero
 # Output: thyr_case_master_stage2_filtered with tumor_purity (relative score) and low_purity flags
-# Version: v7.3 - Corrected terminology (relative score, not %), added has_pair check
+# Version: v7.4 - Fixed dplyr::select namespace conflict
 #                 New group design (R0/R_Low/R_High/R1/B0/B1)
 #                 B_Low/B_High excluded (not used in validation)
 #                 Output includes ALL cases (not just clean) for layer-based validation
@@ -13,7 +13,7 @@
 
 source("analysis_v7/setup.R")
 
-cat("\n=== Stage 2: Tumor Purity Analysis (v7.3) ===\n")
+cat("\n=== Stage 2: Tumor Purity Analysis (v7.4) ===\n")
 cat("Date:", as.character(Sys.Date()), "\n")
 cat("Analysis: R0/R_Low/R_High/R1/B0/B1 groups with clean paired samples\n")
 cat("Note: B_Low/B_High excluded (not used in validation)\n")
@@ -307,7 +307,7 @@ if (length(has_outlier_idx) > 0) {
   )
   # Use dplyr select for data.frame compatibility
   thyr_case_master_stage2_filtered <- thyr_case_master_stage2_filtered %>%
-    select(all_of(new_order))
+    dplyr::select(all_of(new_order))
 }
 
 # Fill in purity values
@@ -405,8 +405,8 @@ cat("  Summary CSV saved: stage2_purity_summary.csv\n")
 
 # Export case-level purity data for review
 case_purity_export <- thyr_case_master_stage2_filtered %>%
-  select(case_submitter_id, group, has_pair, has_outlier_tumor, has_outlier_normal, 
-         tumor_purity, low_purity) %>%
+  dplyr::select(case_submitter_id, group, has_pair, has_outlier_tumor, has_outlier_normal, 
+                tumor_purity, low_purity) %>%
   arrange(group, case_submitter_id)
 
 write.csv(case_purity_export,

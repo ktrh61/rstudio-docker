@@ -1,16 +1,15 @@
-# 05_pca_outlier_detection.R - PCA Outlier Detection (v7.12)
+# 05_pca_outlier_detection.R - PCA Outlier Detection (v7.13)
 # Purpose: Detect technical outliers using CDM-PCA and update case_master
 #          - Protein coding genes only (consistent with downstream analysis)
 #          - Per-group filterByExpr (group-specific expression filtering)
 #          - MUREN normalization (consistent with 08_deges_normalization.R)
 # Method: Cross-Data Matrix with Permutation Analysis and adaptive thresholds
-# Version: v7.12 - Protein coding, per-group filterByExpr, MUREN normalization
-#                  SD vs OD diagnostic plots
-# Date: 2025-12-07
+# Version: v7.13 - Improved plot layout (RET DEG/Validation split), memory optimization
+# Date: 2025-12-08
 
 source("analysis_v7/setup.R")
 
-cat("\n=== PCA Outlier Detection (v7.12) ===\n")
+cat("\n=== PCA Outlier Detection (v7.13) ===\n")
 cat("Date:", as.character(Sys.Date()), "\n")
 cat("Analysis: 12 groups (R0/R_Low/R_High/R1/B0/B1 × tumor/normal)\n")
 cat("Note: B_Low/B_High excluded (not used in validation)\n")
@@ -641,119 +640,6 @@ total_time <- difftime(overall_end, overall_start, units = "secs")
 cat(sprintf("\nAll groups processed in %.1f seconds\n", as.numeric(total_time)))
 
 # ============================================================================
-# Create SD vs OD diagnostic plots
-# ============================================================================
-
-cat("\n--- Creating SD vs OD diagnostic plots ---\n")
-
-create_sd_od_plot <- function(result) {
-  if (is.null(result$SD) || is.null(result$OD) || 
-      all(is.na(result$SD)) || all(is.na(result$OD))) {
-    return(NULL)
-  }
-  
-  plot_df <- data.frame(
-    SD = result$SD,
-    OD = result$OD,
-    outlier = factor(result$outlier_flags, levels = c(FALSE, TRUE), 
-                     labels = c("Normal", "Outlier")),
-    sample_id = result$sample_ids
-  )
-  
-  thr_SD <- result$diagnostics$thr_SD
-  thr_OD <- result$diagnostics$thr_OD
-  
-  p <- ggplot(plot_df, aes(x = SD, y = OD, color = outlier)) +
-    geom_point(size = 3, alpha = 0.8) +
-    scale_color_manual(values = c("Normal" = "#4A90E2", "Outlier" = "#E94B3C"),
-                       name = "Status") +
-    geom_vline(xintercept = thr_SD, linetype = "dashed", color = "gray40") +
-    geom_hline(yintercept = thr_OD, linetype = "dashed", color = "gray40") +
-    labs(
-      title = sprintf("%s (n=%d, K=%d)", result$group, result$n_samples, result$K),
-      subtitle = sprintf("Genes: %d, Outliers: %d", result$n_genes, result$n_outliers),
-      x = "Score Distance (SD)",
-      y = "Orthogonal Distance (OD)"
-    ) +
-    theme_bw() +
-    theme(
-      plot.title = element_text(size = 11, face = "bold"),
-      plot.subtitle = element_text(size = 9, color = "gray40"),
-      legend.position = "bottom"
-    )
-  
-  return(p)
-}
-
-# Create plots for all groups
-all_plots <- lapply(results, create_sd_od_plot)
-all_plots <- all_plots[!sapply(all_plots, is.null)]
-
-# RET groups (4×2 layout)
-ret_groups <- c("R0_tumor", "R0_normal", "R_Low_tumor", "R_Low_normal",
-                "R_High_tumor", "R_High_normal", "R1_tumor", "R1_normal")
-ret_plots <- all_plots[names(all_plots) %in% ret_groups]
-
-if (length(ret_plots) > 0) {
-  # Reorder plots
-  ret_order <- intersect(ret_groups, names(ret_plots))
-  ret_plots <- ret_plots[ret_order]
-  
-  cat("  Displaying RET groups (4×2)...\n")
-  ret_combined <- gridExtra::grid.arrange(
-    grobs = ret_plots,
-    ncol = 2, nrow = 4,
-    top = grid::textGrob("RET Groups: SD vs OD Diagnostic", 
-                         gp = grid::gpar(fontsize = 14, fontface = "bold"))
-  )
-  print(ret_combined)
-}
-
-# BRAF groups (2×2 layout)
-braf_groups <- c("B0_tumor", "B0_normal", "B1_tumor", "B1_normal")
-braf_plots <- all_plots[names(all_plots) %in% braf_groups]
-
-if (length(braf_plots) > 0) {
-  # Reorder plots
-  braf_order <- intersect(braf_groups, names(braf_plots))
-  braf_plots <- braf_plots[braf_order]
-  
-  cat("  Displaying BRAF groups (2×2)...\n")
-  braf_combined <- gridExtra::grid.arrange(
-    grobs = braf_plots,
-    ncol = 2, nrow = 2,
-    top = grid::textGrob("BRAF Groups: SD vs OD Diagnostic", 
-                         gp = grid::gpar(fontsize = 14, fontface = "bold"))
-  )
-  print(braf_combined)
-}
-
-# Save plots to PDF
-pdf_file <- paste0(paths$output, "05_sd_od_diagnostic.pdf")
-pdf(pdf_file, width = 10, height = 14)
-
-if (length(ret_plots) > 0) {
-  gridExtra::grid.arrange(
-    grobs = ret_plots,
-    ncol = 2, nrow = 4,
-    top = grid::textGrob("RET Groups: SD vs OD Diagnostic", 
-                         gp = grid::gpar(fontsize = 14, fontface = "bold"))
-  )
-}
-
-if (length(braf_plots) > 0) {
-  gridExtra::grid.arrange(
-    grobs = braf_plots,
-    ncol = 2, nrow = 2,
-    top = grid::textGrob("BRAF Groups: SD vs OD Diagnostic", 
-                         gp = grid::gpar(fontsize = 14, fontface = "bold"))
-  )
-}
-
-dev.off()
-cat("  Saved: 05_sd_od_diagnostic.pdf\n")
-
-# ============================================================================
 # Create outlier mapping by sample_id
 # ============================================================================
 
@@ -904,7 +790,7 @@ cat("    Note: NA = unpaired, PCA QC not performed\n")
 # Save processing details for diagnostic purposes
 processing_info <- list(
   date = Sys.Date(),
-  version = "v7.12",
+  version = "v7.13",
   config = CONFIG,
   results = results,
   outlier_samples = outlier_samples,
@@ -926,7 +812,7 @@ cat("  Summary CSV saved: stage1_outlier_summary.csv\n")
 # Final report
 # ============================================================================
 
-cat("\n=== PCA Outlier Detection Complete (v7.12) ===\n")
+cat("\n=== PCA Outlier Detection Complete (v7.13) ===\n")
 cat("Configuration:\n")
 cat("  Gene filter: Protein coding + per-group filterByExpr\n")
 cat("  Normalization: MUREN (LTS)\n")
@@ -954,6 +840,167 @@ cat("      For non-QC (B_Low/B_High, unpaired): has_outlier_tumor/normal is NA\n
 # Restore SE to original variable name
 thyr_se_strand2_nonzero <- se
 
-# Clean up
+# ============================================================================
+# Memory cleanup before plotting
+# ============================================================================
+
+cat("\n--- Memory cleanup before plotting ---\n")
 rm(list = setdiff(ls(), c("paths", "thyr_case_master", "thyr_case_master_stage1_filtered", "thyr_se_strand2_nonzero")))
 gc()
+
+# ============================================================================
+# Create SD vs OD diagnostic plots (from saved results)
+# ============================================================================
+
+cat("\n--- Creating SD vs OD diagnostic plots ---\n")
+
+# Load saved processing info
+processing_info <- readRDS(paste0(paths$output, "stage1_pca_info.rds"))
+results <- processing_info$results
+
+# Require ggplot2 and gridExtra
+suppressPackageStartupMessages({
+  library(ggplot2)
+  library(gridExtra)
+})
+
+# Plot creation function
+create_sd_od_plot <- function(result) {
+  if (is.null(result$SD) || is.null(result$OD) || 
+      all(is.na(result$SD)) || all(is.na(result$OD))) {
+    return(NULL)
+  }
+  
+  plot_df <- data.frame(
+    SD = result$SD,
+    OD = result$OD,
+    outlier = factor(result$outlier_flags, levels = c(FALSE, TRUE), 
+                     labels = c("Normal", "Outlier")),
+    sample_id = result$sample_ids
+  )
+  
+  thr_SD <- result$diagnostics$thr_SD
+  thr_OD <- result$diagnostics$thr_OD
+  
+  p <- ggplot(plot_df, aes(x = SD, y = OD, color = outlier)) +
+    geom_point(size = 3, alpha = 0.8) +
+    scale_color_manual(values = c("Normal" = "#4A90E2", "Outlier" = "#E94B3C"),
+                       name = "Status") +
+    geom_vline(xintercept = thr_SD, linetype = "dashed", color = "gray40") +
+    geom_hline(yintercept = thr_OD, linetype = "dashed", color = "gray40") +
+    labs(
+      title = sprintf("%s (n=%d, K=%d)", result$group, result$n_samples, result$K),
+      subtitle = sprintf("Genes: %d, Outliers: %d", result$n_genes, result$n_outliers),
+      x = "Score Distance (SD)",
+      y = "Orthogonal Distance (OD)"
+    ) +
+    theme_bw() +
+    theme(
+      plot.title = element_text(size = 11, face = "bold"),
+      plot.subtitle = element_text(size = 9, color = "gray40"),
+      legend.position = "bottom"
+    )
+  
+  return(p)
+}
+
+# Create plots for all groups
+all_plots <- lapply(results, create_sd_od_plot)
+all_plots <- all_plots[!sapply(all_plots, is.null)]
+
+# --- RET DEG groups (2×2 layout) ---
+ret_deg_groups <- c("R0_tumor", "R0_normal", "R1_tumor", "R1_normal")
+ret_deg_plots <- all_plots[names(all_plots) %in% ret_deg_groups]
+
+if (length(ret_deg_plots) > 0) {
+  ret_deg_order <- intersect(ret_deg_groups, names(ret_deg_plots))
+  ret_deg_plots <- ret_deg_plots[ret_deg_order]
+  
+  cat("  Displaying RET DEG groups (2×2)...\n")
+  ret_deg_combined <- gridExtra::grid.arrange(
+    grobs = ret_deg_plots,
+    ncol = 2, nrow = 2,
+    top = grid::textGrob("RET DEG Groups (R0/R1): SD vs OD Diagnostic", 
+                         gp = grid::gpar(fontsize = 14, fontface = "bold"))
+  )
+  print(ret_deg_combined)
+}
+
+# --- RET Validation groups (2×2 layout) ---
+ret_val_groups <- c("R_Low_tumor", "R_Low_normal", "R_High_tumor", "R_High_normal")
+ret_val_plots <- all_plots[names(all_plots) %in% ret_val_groups]
+
+if (length(ret_val_plots) > 0) {
+  ret_val_order <- intersect(ret_val_groups, names(ret_val_plots))
+  ret_val_plots <- ret_val_plots[ret_val_order]
+  
+  cat("  Displaying RET Validation groups (2×2)...\n")
+  ret_val_combined <- gridExtra::grid.arrange(
+    grobs = ret_val_plots,
+    ncol = 2, nrow = 2,
+    top = grid::textGrob("RET Validation Groups (R_Low/R_High): SD vs OD Diagnostic", 
+                         gp = grid::gpar(fontsize = 14, fontface = "bold"))
+  )
+  print(ret_val_combined)
+}
+
+# --- BRAF groups (2×2 layout) ---
+braf_groups <- c("B0_tumor", "B0_normal", "B1_tumor", "B1_normal")
+braf_plots <- all_plots[names(all_plots) %in% braf_groups]
+
+if (length(braf_plots) > 0) {
+  braf_order <- intersect(braf_groups, names(braf_plots))
+  braf_plots <- braf_plots[braf_order]
+  
+  cat("  Displaying BRAF groups (2×2)...\n")
+  braf_combined <- gridExtra::grid.arrange(
+    grobs = braf_plots,
+    ncol = 2, nrow = 2,
+    top = grid::textGrob("BRAF Groups (B0/B1): SD vs OD Diagnostic", 
+                         gp = grid::gpar(fontsize = 14, fontface = "bold"))
+  )
+  print(braf_combined)
+}
+
+# Save plots to PDF (3 pages)
+pdf_file <- paste0(paths$output, "05_sd_od_diagnostic.pdf")
+pdf(pdf_file, width = 10, height = 8)
+
+if (length(ret_deg_plots) > 0) {
+  gridExtra::grid.arrange(
+    grobs = ret_deg_plots,
+    ncol = 2, nrow = 2,
+    top = grid::textGrob("RET DEG Groups (R0/R1): SD vs OD Diagnostic", 
+                         gp = grid::gpar(fontsize = 14, fontface = "bold"))
+  )
+}
+
+if (length(ret_val_plots) > 0) {
+  gridExtra::grid.arrange(
+    grobs = ret_val_plots,
+    ncol = 2, nrow = 2,
+    top = grid::textGrob("RET Validation Groups (R_Low/R_High): SD vs OD Diagnostic", 
+                         gp = grid::gpar(fontsize = 14, fontface = "bold"))
+  )
+}
+
+if (length(braf_plots) > 0) {
+  gridExtra::grid.arrange(
+    grobs = braf_plots,
+    ncol = 2, nrow = 2,
+    top = grid::textGrob("BRAF Groups (B0/B1): SD vs OD Diagnostic", 
+                         gp = grid::gpar(fontsize = 14, fontface = "bold"))
+  )
+}
+
+dev.off()
+cat("  Saved: 05_sd_od_diagnostic.pdf (3 pages)\n")
+
+# ============================================================================
+# Final cleanup
+# ============================================================================
+
+rm(list = setdiff(ls(), c("paths", "thyr_case_master", "thyr_case_master_stage1_filtered", "thyr_se_strand2_nonzero")))
+gc()
+
+cat("\n=== Done ===\n")

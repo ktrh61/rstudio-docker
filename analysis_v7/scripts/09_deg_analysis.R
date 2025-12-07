@@ -1,14 +1,14 @@
 # 09_deg_analysis.R - DEG Analysis with Brunner-Munzel and Storey Method
 # Purpose: Perform differential expression analysis on DEGES-normalized data
 # Method: Brunner-Munzel test with Storey (qvalue, lambda=0.5) correction
-# Input: analysis_dgelist_*.rds (from 08_deges_normalization.R)
+# Input: analysis_dgelist_*.rds (from 07_deges_normalization.R)
 # Output: thyr_deg_results.rds with DEG lists and consistency evaluation
-# Version: v7.4 - PI as primary output from Brunner-Munzel, Cliff's delta derived
-# Date: 2025-12-04
+# Version: v7.6 - Fixed histogram binwidth for new sample sizes (≈0.06)
+# Date: 2025-12-08
 
 source("analysis_v7/setup.R")
 
-cat("\n=== DEG Analysis with Brunner-Munzel + Storey Method (v7.4) ===\n")
+cat("\n=== DEG Analysis with Brunner-Munzel + Storey Method (v7.6) ===\n")
 cat("Date:", as.character(Sys.Date()), "\n")
 cat("Method: Brunner-Munzel test with Storey correction (lambda=0.5)\n")
 cat("Effect size: PI (primary) with Cliff's delta (derived)\n")
@@ -574,7 +574,7 @@ deg_output <- list(
   deg_results = thyr_deg_results,
   consistency_results = thyr_consistency_results,
   summary = summary_data,
-  version = "v7.4"
+  version = "v7.6"
 )
 
 saveRDS(deg_output, paste0(paths$processed, "thyr_deg_results.rds"))
@@ -622,8 +622,9 @@ for (comp_tissue in names(thyr_deg_results)) {
   
   # Create histogram (signed delta to preserve direction)
   # binwidth aligned with tie-parity discrete steps (2/(n1*n2)):
-  # R0/R1: 8/143 ≈ 0.056 (4x of 2/143), B0/B1: 14/260 ≈ 0.054 (7x of 2/260)
-  bw <- if (grepl("^R0", comp_tissue)) 8/143 else 14/260
+  # R0/R1 (11×12=132): 8/132 ≈ 0.0606, B0/B1 (26×10=260): 16/260 ≈ 0.0615
+  # Both approximately 0.06 for visual consistency
+  bw <- if (grepl("^R0", comp_tissue)) 8/132 else 16/260
   
   p <- ggplot(results_df, aes(x = cliffs_delta)) +
     geom_histogram(binwidth = bw, boundary = 0, fill = "steelblue", color = "white", alpha = 0.7) +
@@ -676,8 +677,8 @@ if (length(effect_size_plots) >= 2) {
     n_degs <- result$deg_summary$summary_stats$significant_genes
     
     # binwidth aligned with tie-parity discrete steps (2/(n1*n2)):
-    # R0/R1: 8/143 ≈ 0.056, B0/B1: 14/260 ≈ 0.054
-    bw <- if (grepl("^R0", comp_tissue)) 8/143 else 14/260
+    # R0/R1 (11×12=132): 8/132 ≈ 0.0606, B0/B1 (26×10=260): 16/260 ≈ 0.0615
+    bw <- if (grepl("^R0", comp_tissue)) 8/132 else 16/260
     
     p <- ggplot(results_df, aes(x = cliffs_delta)) +
       geom_histogram(binwidth = bw, boundary = 0, fill = "steelblue", color = "white", alpha = 0.7) +
@@ -920,7 +921,7 @@ if (length(volcano_plots_delta) >= 4) {
 # Final report
 # ============================================================================
 
-cat("\n=== DEG Analysis Complete (v7.4) ===\n")
+cat("\n=== DEG Analysis Complete (v7.6) ===\n")
 cat("Configuration:\n")
 cat("  Test: Brunner-Munzel\n")
 cat("  Correction: Storey method (qvalue, lambda=0.5)\n")

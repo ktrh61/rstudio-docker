@@ -1,17 +1,17 @@
-# 08_deges_normalization.R - Stage 3 DEGES Iterative Normalization
+# 07_deges_normalization.R - DEGES Iterative Normalization
 # Purpose: Apply DEGES-MUREN normalization to high-purity paired samples
 # Method: filterByExpr -> Cook's distance -> MUREN (LTS) + Brunner-Munzel iteration
 # Input: thyr_case_master_stage2_filtered, thyr_se_strand2_nonzero  
 # Output: Normalized CPM values and DGEList objects with DEGES-MUREN factors
-# Version: v7.6 - Explicit has_pair filter for new group design
-# Date: 2025-12-06
+# Version: v7.7 - Added iter2 columns to summary for MAX_ITERATIONS=3
+# Date: 2025-12-08
 
 source("analysis_v7/setup.R")
 
-cat("\n=== Stage 3: DEGES Normalization (v7.6) ===\n")
+cat("\n=== DEGES Normalization (v7.7) ===\n")
 cat("Date:", as.character(Sys.Date()), "\n")
 cat("Method: filterByExpr -> Cook's -> DEGES-MUREN (Brunner-Munzel) -> CPM output\n")
-cat("Groups: R0/R1/B0/B1 high-purity paired samples only\n")
+cat("Groups: R0/R1/B0/B1 high-purity pairs only\n")
 
 # Load packages
 suppressPackageStartupMessages({
@@ -107,21 +107,20 @@ cat("Case master loaded:", nrow(case_master), "cases\n")
 sample_metadata <- as.data.frame(colData(se))
 
 # ============================================================================
-# Filter to high-purity clean paired cases
+# Filter to high-purity clean cases
 # ============================================================================
 
-cat("\n--- Filtering to high-purity clean paired cases ---\n")
+cat("\n--- Filtering to high-purity clean cases ---\n")
 
-# Apply all quality filters (explicit has_pair for new group design)
+# Apply all quality filters
 high_purity_cases <- case_master %>%
   filter(
-    has_pair == TRUE &            # Must have paired samples
-      has_outlier_tumor == 0 &      # No tumor outliers
-      has_outlier_normal == 0 &     # No normal outliers  
-      low_purity == 0               # High tumor purity
+    has_outlier_tumor == 0 &    # No tumor outliers
+      has_outlier_normal == 0 &   # No normal outliers  
+      low_purity == 0              # High tumor purity
   )
 
-cat("High-purity clean paired cases:", nrow(high_purity_cases), "/", nrow(case_master), 
+cat("High-purity clean cases:", nrow(high_purity_cases), "/", nrow(case_master), 
     sprintf("(%.1f%%)\n", nrow(high_purity_cases)/nrow(case_master)*100))
 
 # Group distribution
@@ -664,6 +663,8 @@ for (comp_name in names(thyr_deges_results)) {
     iter0_method = iter_methods[1],
     iter1_excluded = ifelse(length(iter_excluded) > 1, iter_excluded[2], NA),
     iter1_method = ifelse(length(iter_methods) > 1, iter_methods[2], NA),
+    iter2_excluded = ifelse(length(iter_excluded) > 2, iter_excluded[3], NA),
+    iter2_method = ifelse(length(iter_methods) > 2, iter_methods[3], NA),
     final_degs = result$final_deg_count,
     stringsAsFactors = FALSE
   )
@@ -687,7 +688,7 @@ deges_output <- list(
   sample_lists = sample_lists,
   results = thyr_deges_results,
   summary = summary_data,
-  version = "v7.6"
+  version = "v7.7"
 )
 
 saveRDS(deges_output, paste0(paths$processed, "analysis_deges_results.rds"))
@@ -713,7 +714,7 @@ cat("  Processing log saved to logs/\n")
 # Final report
 # ============================================================================
 
-cat("\n=== DEGES Normalization Complete (v7.6) ===\n")
+cat("\n=== DEGES Normalization Complete (v7.7) ===\n")
 cat("Configuration:\n")
 cat("  Workflow: filterByExpr -> Cook's -> DEGES iterations\n")
 cat("  DEG screening: Brunner-Munzel test + Storey q-value (lambda=0.5)\n")

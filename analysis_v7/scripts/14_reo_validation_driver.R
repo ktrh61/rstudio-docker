@@ -24,7 +24,10 @@
 #   - reo_validation_driver_samples.csv (sample-level results)
 #
 # Reference: REO_Panel_Implementation_Progress_v4.md
-# Date: 2025-12-07
+# Date: 2025-12-08
+#
+# IMPORTANT: TPM calculation must match training (11_reo_pair_selection.R)
+#            Using log2(TPM) without +1 offset (data is zero-free)
 # =============================================================================
 
 source("analysis_v7/setup.R")
@@ -84,22 +87,29 @@ cat(sprintf("SE loaded: %d genes x %d samples\n", nrow(se), ncol(se)))
 cat("\n")
 
 # -----------------------------------------------------------------------------
-# Compute log2(TPM) matrix
+# Compute log2(TPM) matrix - MUST MATCH TRAINING
 # -----------------------------------------------------------------------------
 cat("=== Preparing log2(TPM) Matrix ===\n")
+cat("NOTE: Using log2(TPM) without +1 offset to match training data\n")
 
 # Get gene lengths
 gene_info <- as.data.frame(rowData(se))
 gene_lengths <- gene_info$gene_length
 names(gene_lengths) <- rownames(se)
 
-# Compute TPM
+# Compute TPM (same method as 11_reo_pair_selection.R)
 counts <- assay(se)
-rpk <- sweep(counts, 1, gene_lengths / 1000, "/")
-tpm <- sweep(rpk, 2, colSums(rpk) / 1e6, "/")
-log2_tpm <- log2(tpm + 1)
+calc_tpm <- function(counts, lengths) {
+  rate <- counts / lengths
+  rate / sum(rate) * 1e6
+}
+tpm_matrix <- apply(counts, 2, calc_tpm, lengths = gene_lengths)
+rownames(tpm_matrix) <- rownames(counts)
 
-cat(sprintf("log2(TPM+1) matrix: %d genes x %d samples\n", nrow(log2_tpm), ncol(log2_tpm)))
+# Log2 transform WITHOUT +1 offset (data is zero-free from thyr_se_strand2_nonzero.rds)
+log2_tpm <- log2(tpm_matrix)
+
+cat(sprintf("log2(TPM) matrix: %d genes x %d samples\n", nrow(log2_tpm), ncol(log2_tpm)))
 cat("\n")
 
 # -----------------------------------------------------------------------------
@@ -220,8 +230,8 @@ cat("=== Processing BRAF Samples ===\n")
 get_tumor_sample <- function(case_id, sample_meta) {
   sample_meta$sample_submitter_id[
     sample_meta$case_submitter_id == case_id &
-    sample_meta$sample_type == "Primary Tumor" &
-    grepl("_merged", sample_meta$sample_submitter_id)
+      sample_meta$sample_type == "Primary Tumor" &
+      grepl("_merged", sample_meta$sample_submitter_id)
   ][1]
 }
 
@@ -233,102 +243,112 @@ for (i in 1:nrow(braf_cases)) {
   group <- braf_cases$group[i]
   qc_status <- braf_cases$qc_status[i]
   poc <- braf_cases$POC[i]
+  purity <- braf_cases$tumor_purity[i]
   
-  # Get tumor sample ID
+  # Get tumor sample
   tumor_sample <- get_tumor_sample(case_id, sample_metadata)
   
-  if (is.na(tumor_sample) || !(tumor_sample %in% colnames(log2_tpm))) {
+  if (is.na(tumor_sample)) {
+    # No tumor sample available
     results_list[[i]] <- data.frame(
-      case_id = case_id,
-      tumor_sample = NA,
+      case_submitter_id = case_id,
+      sample_id = NA_character_,
       group = group,
       qc_status = qc_status,
       POC = poc,
-      reversal_count = NA,
-      panel_result = NA
+      tumor_purity = purity,
+      reversal_count = NA_integer_,
+      panel_result = NA_character_,
+      stringsAsFactors = FALSE
     )
     next
   }
   
-  # Compute reversals
+  # Compute reversal
   rev_result <- compute_reversal_for_sample(
     tumor_sample, selected_pairs, log2_tpm,
     r0_majority_signs, dead_zone_threshold
   )
   
-  # Determine panel result
+  # Panel result
   panel_result <- ifelse(rev_result$count >= threshold_T, "Panel(+)", "Panel(-)")
   
   results_list[[i]] <- data.frame(
-    case_id = case_id,
-    tumor_sample = tumor_sample,
+    case_submitter_id = case_id,
+    sample_id = tumor_sample,
     group = group,
     qc_status = qc_status,
     POC = poc,
+    tumor_purity = purity,
     reversal_count = rev_result$count,
-    panel_result = panel_result
+    panel_result = panel_result,
+    stringsAsFactors = FALSE
   )
 }
 
-results_df <- do.call(rbind, results_list)
+results_df <- bind_rows(results_list)
 
-cat(sprintf("Processed %d BRAF cases\n", nrow(results_df)))
-cat(sprintf("Valid results: %d\n", sum(!is.na(results_df$reversal_count))))
+cat(sprintf("Processed: %d cases\n", nrow(results_df)))
+cat(sprintf("  With reversal data: %d\n", sum(!is.na(results_df$reversal_count))))
+cat(sprintf("  Missing tumor sample: %d\n", sum(is.na(results_df$sample_id))))
 cat("\n")
 
 # -----------------------------------------------------------------------------
-# B0/B1 Analysis
+# Section 9a: QC-Cleared B0/B1 Results
 # -----------------------------------------------------------------------------
-cat("=== B0/B1 Analysis ===\n")
+cat("=== Section 9a: QC-Cleared B0/B1 Results ===\n")
 
-# B0: Non-exposed BRAF
-cat("\n--- B0 (Non-exposed BRAF) ---\n")
-b0_clear <- results_df %>%
-  filter(group == "B0", qc_status == "QC_clear", !is.na(reversal_count))
+qc_clear_braf <- results_df %>%
+  filter(qc_status == "QC_clear", !is.na(reversal_count))
 
+cat("\n--- B0 (QC_clear) ---\n")
+b0_clear <- qc_clear_braf %>% filter(group == "B0")
 if (nrow(b0_clear) > 0) {
-  cat(sprintf("QC_clear: N=%d\n", nrow(b0_clear)))
-  cat(sprintf("  Reversal: range=%d-%d, mean=%.1f\n",
+  cat(sprintf("N = %d\n", nrow(b0_clear)))
+  cat(sprintf("Reversal count: range=%d-%d, mean=%.1f, median=%.0f\n",
               min(b0_clear$reversal_count),
               max(b0_clear$reversal_count),
-              mean(b0_clear$reversal_count)))
-  cat(sprintf("  Panel(+): %d/%d (%.1f%%)\n",
+              mean(b0_clear$reversal_count),
+              median(b0_clear$reversal_count)))
+  cat(sprintf("Panel(+): %d/%d (%.1f%%)\n",
               sum(b0_clear$panel_result == "Panel(+)"),
               nrow(b0_clear),
               sum(b0_clear$panel_result == "Panel(+)") / nrow(b0_clear) * 100))
+  cat("Distribution:\n")
+  print(table(b0_clear$reversal_count, useNA = "ifany"))
 } else {
-  cat("No QC_clear samples\n")
+  cat("No QC-cleared samples\n")
 }
 
-# B1: Exposed BRAF
-cat("\n--- B1 (Exposed BRAF) ---\n")
-b1_clear <- results_df %>%
-  filter(group == "B1", qc_status == "QC_clear", !is.na(reversal_count))
-
+cat("\n--- B1 (QC_clear) ---\n")
+b1_clear <- qc_clear_braf %>% filter(group == "B1")
 if (nrow(b1_clear) > 0) {
-  cat(sprintf("QC_clear: N=%d\n", nrow(b1_clear)))
-  cat(sprintf("  Reversal: range=%d-%d, mean=%.1f\n",
+  cat(sprintf("N = %d\n", nrow(b1_clear)))
+  cat(sprintf("Reversal count: range=%d-%d, mean=%.1f, median=%.0f\n",
               min(b1_clear$reversal_count),
               max(b1_clear$reversal_count),
-              mean(b1_clear$reversal_count)))
-  cat(sprintf("  Panel(+): %d/%d (%.1f%%)\n",
+              mean(b1_clear$reversal_count),
+              median(b1_clear$reversal_count)))
+  cat(sprintf("Panel(+): %d/%d (%.1f%%)\n",
               sum(b1_clear$panel_result == "Panel(+)"),
               nrow(b1_clear),
               sum(b1_clear$panel_result == "Panel(+)") / nrow(b1_clear) * 100))
+  cat("Distribution:\n")
+  print(table(b1_clear$reversal_count, useNA = "ifany"))
 } else {
-  cat("No QC_clear samples\n")
+  cat("No QC-cleared samples\n")
 }
 
 # -----------------------------------------------------------------------------
-# Non-QC-Clear BRAF Samples
+# Section 9b: QC Non-Cleared BRAF Samples
 # -----------------------------------------------------------------------------
-cat("\n=== Non-QC-Clear BRAF Samples ===\n")
+cat("\n=== Section 9b: QC Non-Cleared BRAF Samples ===\n")
 
 non_clear_braf <- results_df %>%
   filter(qc_status != "QC_clear")
 
 for (g in braf_groups) {
-  cat(sprintf("\n[%s] Non-QC-clear samples:\n", g))
+  cat(sprintf("\n--- %s (Non-QC-clear) ---\n", g))
   
   group_non_clear <- non_clear_braf %>% filter(group == g)
   
@@ -479,7 +499,7 @@ output <- list(
   analysis_type = "exploratory",
   note = "BRAF V600E is associated with sporadic cancer. Generalization not expected.",
   timestamp = Sys.time(),
-  version = "v1.0"
+  version = "v1.1"  # Updated version to reflect TPM fix
 )
 
 saveRDS(output, file.path(paths$processed, "reo_validation_driver_results.rds"))
