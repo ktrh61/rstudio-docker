@@ -1,18 +1,21 @@
-# 05_pca_outlier_detection.R - Stage 1 PCA Outlier Detection (v7.11)
-# Purpose: Detect technical outliers using CDM and update case_master
+# 05_pca_outlier_detection.R - PCA Outlier Detection (v7.12)
+# Purpose: Detect technical outliers using CDM-PCA and update case_master
+#          - Protein coding genes only (consistent with downstream analysis)
+#          - Per-group filterByExpr (group-specific expression filtering)
+#          - MUREN normalization (consistent with 08_deges_normalization.R)
 # Method: Cross-Data Matrix with Permutation Analysis and adaptive thresholds
-# Version: v7.11 - New group design (R0/R_Low/R_High/R1, B0/B_Low/B_High/B1)
-#                  PCA QC for paired samples only
-#          Outputs thyr_case_master_stage1_filtered with has_outlier_tumor/normal flags
-# Date: 2025-12-06
+# Version: v7.12 - Protein coding, per-group filterByExpr, MUREN normalization
+#                  SD vs OD diagnostic plots
+# Date: 2025-12-07
 
 source("analysis_v7/setup.R")
 
-cat("\n=== Stage 1: PCA Outlier Detection (v7.11) ===\n")
+cat("\n=== PCA Outlier Detection (v7.12) ===\n")
 cat("Date:", as.character(Sys.Date()), "\n")
-cat("Analysis: 12 groups (R0/R_Low/R_High/R1/B0/B1 x tumor/normal)\n")
+cat("Analysis: 12 groups (R0/R_Low/R_High/R1/B0/B1 × tumor/normal)\n")
 cat("Note: B_Low/B_High excluded (not used in validation)\n")
-cat("Sample types: Primary Tumor and Solid Tissue Normal only\n")
+cat("Gene filtering: Protein coding only, per-group filterByExpr\n")
+cat("Normalization: MUREN (consistent with downstream)\n")
 cat("Sample filtering: _merged samples only, paired cases only\n")
 cat("Output: case_master with outlier flags (0/1/NA)\n")
 
@@ -24,6 +27,8 @@ suppressPackageStartupMessages({
   library(RcppArmadillo)
   library(parallel)
   library(dplyr)
+  library(ggplot2)
+  library(gridExtra)
 })
 
 # ============================================================================
@@ -35,7 +40,7 @@ CONFIG <- list(
   PA_R = 200,           # Permutation replicates
   PA_ALPHA = 0.05,      # Significance level for PA
   PA_L = 8,             # Maximum components to evaluate
-  PA_SEED = 123,        # Base seed for reproducibility
+  PA_SEED = 1986,       # Base seed for reproducibility
   
   # Adaptive outlier detection parameters
   MIN_OUTLIERS_PCT = 0.00,    # Minimum outlier percentage (0% = no forced outliers)
@@ -48,13 +53,19 @@ CONFIG <- list(
   # Processing parameters
   PRIOR_COUNT = 0.5,          # Pseudocount for logCPM
   MC_CORES = min(3L, max(1L, parallel::detectCores() - 1L)),  # Conservative setting
-  VERBOSE_CDM = FALSE         # Disable verbose in CDM for parallel processing
+  VERBOSE_CDM = FALSE,        # Disable verbose in CDM for parallel processing
+  
+  # MUREN parameters
+  MUREN_METHOD = "lts",       # LTS robust regression
+  MUREN_WORKERS = 3           # Workers for MUREN
 )
 
 cat("\nConfiguration:\n")
 cat("  Parallel cores:", CONFIG$MC_CORES, "\n")
 cat("  Adaptive thresholds:", CONFIG$USE_ADAPTIVE, "\n")
 cat("  Max outliers per group:", sprintf("%.0f%%", CONFIG$MAX_OUTLIERS_PCT * 100), "\n")
+cat("  MUREN method:", CONFIG$MUREN_METHOD, "\n")
+cat("  Seed:", CONFIG$PA_SEED, "\n")
 
 # ============================================================================
 # Thread control utilities
@@ -79,6 +90,11 @@ if (file.exists("utils/with_openblas_threads.R")) {
     )
   }
 }
+
+# Load utility functions (including MUREN)
+source("utils/utils_improved.R")
+source("utils/norm_improved.R")
+cat("  Utilities loaded: utils_improved.R, norm_improved.R\n")
 
 # Set RNG for reproducibility
 RNGkind("L'Ecuyer-CMRG")
@@ -109,7 +125,7 @@ if (exists("thyr_se_strand2_nonzero")) {
   cat("Loading SE from file...\n")
   se <- readRDS(se_path)
 }
-cat("SE dimensions:", format(nrow(se), big.mark=","), "genes Ã—", 
+cat("SE dimensions:", format(nrow(se), big.mark=","), "genes ×", 
     format(ncol(se), big.mark=","), "samples\n")
 
 # Load case master for group definitions
@@ -132,6 +148,19 @@ cat("  Unpaired:", sum(!thyr_case_master_stage1_filtered$has_pair), "cases (no P
 
 # Get sample metadata
 sample_metadata <- as.data.frame(colData(se))
+
+# ============================================================================
+# Protein coding gene identification
+# ============================================================================
+
+cat("\n--- Identifying protein coding genes ---\n")
+
+gene_info <- as.data.frame(rowData(se))
+is_protein_coding <- gene_info$gene_type == "protein_coding"
+
+cat(sprintf("Protein coding genes: %d / %d (%.1f%%)\n", 
+            sum(is_protein_coding), nrow(se), 
+            sum(is_protein_coding) / nrow(se) * 100))
 
 # ============================================================================
 # Define analysis groups
@@ -193,49 +222,20 @@ for (g in names(groups_ids)) {
 cat("Total groups:", length(groups_ids), "\n")
 
 # ============================================================================
-# Unified gene filtering
-# ============================================================================
-
-cat("\n--- Applying unified gene filtering ---\n")
-
-# Get all sample IDs from analysis groups
-all_analysis_sample_ids <- unlist(groups_ids, use.names = FALSE)
-
-# Extract counts for these samples
-all_analysis_counts <- assay(se)[, all_analysis_sample_ids, drop = FALSE]
-
-# Handle any NA values
-if (any(is.na(all_analysis_counts))) {
-  cat("  Warning: Found", sum(is.na(all_analysis_counts)), "NA values. Replacing with 0.\n")
-  all_analysis_counts[is.na(all_analysis_counts)] <- 0
-}
-
-# Create group labels for filterByExpr
-group_labels <- factor(rep(names(groups_ids), sapply(groups_ids, length)))
-
-# Apply filterByExpr with group consideration
-keep_genes <- filterByExpr(all_analysis_counts, group = group_labels)
-
-cat("Gene filtering results:\n")
-cat("  Starting genes:", nrow(se), "\n")
-cat("  After filterByExpr:", sum(keep_genes), "\n")
-cat("  Retention rate:", sprintf("%.1f%%\n", sum(keep_genes) / nrow(se) * 100))
-
-# ============================================================================
 # Helper functions
 # ============================================================================
 
 # Deterministic seed generation from group name
-seed_from_name <- function(name, base = 123L) {
+seed_from_name <- function(name, base = 1986L) {
   as.integer(max(1L, abs(sum(utf8ToInt(name)) * base) %% 2147483647L))
 }
 
 # Permutation Analysis function
-pa_select_K <- function(X, R = 200, alpha = 0.05, L = 8, seed = 123) {
+pa_select_K <- function(X, R = 200, alpha = 0.05, L = 8, seed = 1986) {
   RNGkind("L'Ecuyer-CMRG")
   set.seed(seed)
   
-  X_t <- t(X)  # samples Ã— genes
+  X_t <- t(X)  # samples × genes
   n <- nrow(X_t)
   p <- ncol(X_t)
   L <- min(L, n - 1L, p)
@@ -277,7 +277,7 @@ pa_select_K <- function(X, R = 200, alpha = 0.05, L = 8, seed = 123) {
 
 # Adaptive outlier detection function
 cdm_outlier_detection <- function(cdm_result, X, K, config = CONFIG) {
-  # Ensure X is samples Ã— genes
+  # Ensure X is samples × genes
   if (ncol(X) == nrow(cdm_result$vectors)) {
     Xuse <- X
   } else {
@@ -452,7 +452,7 @@ cdm_outlier_detection <- function(cdm_result, X, K, config = CONFIG) {
 }
 
 # Process one group function
-process_group <- function(group_name, group_sample_ids, se, keep_genes, config) {
+process_group <- function(group_name, group_sample_ids, se, is_protein_coding, config) {
   # Ensure single thread in worker
   if (requireNamespace("RhpcBLASctl", quietly = TRUE)) {
     RhpcBLASctl::blas_set_num_threads(1L)
@@ -461,15 +461,33 @@ process_group <- function(group_name, group_sample_ids, se, keep_genes, config) 
   
   start_time <- Sys.time()
   
-  # Extract counts using sample_ids directly
-  counts <- assay(se)[keep_genes, group_sample_ids, drop = FALSE]
-  if (any(is.na(counts))) {
-    counts[is.na(counts)] <- 0
+  # Extract counts for protein coding genes only
+  counts_pc <- assay(se)[is_protein_coding, group_sample_ids, drop = FALSE]
+  if (any(is.na(counts_pc))) {
+    counts_pc[is.na(counts_pc)] <- 0
   }
   
+  # Per-group filterByExpr
+  dge_initial <- DGEList(counts = counts_pc)
+  keep <- filterByExpr(dge_initial)
+  counts_filtered <- counts_pc[keep, , drop = FALSE]
+  n_genes_used <- nrow(counts_filtered)
+  
+  # MUREN normalization
+  muren_coeff <- muren_norm(
+    counts_filtered,
+    refs = "saturated",
+    pairwise_method = config$MUREN_METHOD,
+    single_param = TRUE,
+    res_return = "scaling_coeff",
+    workers = config$MUREN_WORKERS
+  )
+  
+  # Create DGEList with MUREN normalization factors
+  dge <- DGEList(counts = counts_filtered)
+  dge$samples$norm.factors <- muren_coeff / mean(muren_coeff)
+  
   # logCPM transformation
-  dge <- DGEList(counts = counts)
-  dge <- calcNormFactors(dge)
   logcpm <- cpm(dge, log = TRUE, prior.count = config$PRIOR_COUNT)
   
   # Permutation Analysis for K selection
@@ -504,14 +522,19 @@ process_group <- function(group_name, group_sample_ids, se, keep_genes, config) 
   end_time <- Sys.time()
   elapsed <- as.numeric(difftime(end_time, start_time, units = "secs"))
   
-  # Return results
+  # Return results (including SD/OD for plotting)
   list(
     group = group_name,
     n_samples = length(group_sample_ids),
+    n_genes = n_genes_used,
     n_outliers = outlier_result$n_outliers,
     outlier_ids = outlier_ids,
+    outlier_flags = outlier_result$outliers,
     K = pa_result$K,
     elapsed_time = elapsed,
+    sample_ids = group_sample_ids,
+    SD = outlier_result$SD,
+    OD = outlier_result$OD,
     diagnostics = list(
       hit_SD = outlier_result$hit_SD,
       hit_OD = outlier_result$hit_OD,
@@ -543,19 +566,24 @@ if (CONFIG$MC_CORES > 1L && .Platform$OS.type == "unix") {
       if (exists("with_openblas_threads") && is.function(with_openblas_threads)) {
         with_openblas_threads(
           threads = 1,
-          expr = process_group(gn, groups_ids[[gn]], se, keep_genes, CONFIG)
+          expr = process_group(gn, groups_ids[[gn]], se, is_protein_coding, CONFIG)
         )
       } else {
-        process_group(gn, groups_ids[[gn]], se, keep_genes, CONFIG)
+        process_group(gn, groups_ids[[gn]], se, is_protein_coding, CONFIG)
       }
     }, error = function(e) {
       list(
         group = gn,
         n_samples = length(groups_ids[[gn]]),
+        n_genes = NA,
         n_outliers = 0,
         outlier_ids = character(0),
+        outlier_flags = rep(FALSE, length(groups_ids[[gn]])),
         K = NA,
         elapsed_time = NA,
+        sample_ids = groups_ids[[gn]],
+        SD = rep(NA, length(groups_ids[[gn]])),
+        OD = rep(NA, length(groups_ids[[gn]])),
         error = e$message
       )
     })
@@ -582,20 +610,25 @@ if (CONFIG$MC_CORES > 1L && .Platform$OS.type == "unix") {
       if (exists("with_openblas_threads") && is.function(with_openblas_threads)) {
         results[[gn]] <- with_openblas_threads(
           threads = 1,
-          expr = process_group(gn, groups_ids[[gn]], se, keep_genes, CONFIG)
+          expr = process_group(gn, groups_ids[[gn]], se, is_protein_coding, CONFIG)
         )
       } else {
-        results[[gn]] <- process_group(gn, groups_ids[[gn]], se, keep_genes, CONFIG)
+        results[[gn]] <- process_group(gn, groups_ids[[gn]], se, is_protein_coding, CONFIG)
       }
     }, error = function(e) {
       cat("  Error:", e$message, "\n")
       results[[gn]] <- list(
         group = gn,
         n_samples = length(groups_ids[[gn]]),
+        n_genes = NA,
         n_outliers = 0,
         outlier_ids = character(0),
+        outlier_flags = rep(FALSE, length(groups_ids[[gn]])),
         K = NA,
         elapsed_time = NA,
+        sample_ids = groups_ids[[gn]],
+        SD = rep(NA, length(groups_ids[[gn]])),
+        OD = rep(NA, length(groups_ids[[gn]])),
         error = e$message
       )
     })
@@ -606,6 +639,119 @@ overall_end <- Sys.time()
 total_time <- difftime(overall_end, overall_start, units = "secs")
 
 cat(sprintf("\nAll groups processed in %.1f seconds\n", as.numeric(total_time)))
+
+# ============================================================================
+# Create SD vs OD diagnostic plots
+# ============================================================================
+
+cat("\n--- Creating SD vs OD diagnostic plots ---\n")
+
+create_sd_od_plot <- function(result) {
+  if (is.null(result$SD) || is.null(result$OD) || 
+      all(is.na(result$SD)) || all(is.na(result$OD))) {
+    return(NULL)
+  }
+  
+  plot_df <- data.frame(
+    SD = result$SD,
+    OD = result$OD,
+    outlier = factor(result$outlier_flags, levels = c(FALSE, TRUE), 
+                     labels = c("Normal", "Outlier")),
+    sample_id = result$sample_ids
+  )
+  
+  thr_SD <- result$diagnostics$thr_SD
+  thr_OD <- result$diagnostics$thr_OD
+  
+  p <- ggplot(plot_df, aes(x = SD, y = OD, color = outlier)) +
+    geom_point(size = 3, alpha = 0.8) +
+    scale_color_manual(values = c("Normal" = "#4A90E2", "Outlier" = "#E94B3C"),
+                       name = "Status") +
+    geom_vline(xintercept = thr_SD, linetype = "dashed", color = "gray40") +
+    geom_hline(yintercept = thr_OD, linetype = "dashed", color = "gray40") +
+    labs(
+      title = sprintf("%s (n=%d, K=%d)", result$group, result$n_samples, result$K),
+      subtitle = sprintf("Genes: %d, Outliers: %d", result$n_genes, result$n_outliers),
+      x = "Score Distance (SD)",
+      y = "Orthogonal Distance (OD)"
+    ) +
+    theme_bw() +
+    theme(
+      plot.title = element_text(size = 11, face = "bold"),
+      plot.subtitle = element_text(size = 9, color = "gray40"),
+      legend.position = "bottom"
+    )
+  
+  return(p)
+}
+
+# Create plots for all groups
+all_plots <- lapply(results, create_sd_od_plot)
+all_plots <- all_plots[!sapply(all_plots, is.null)]
+
+# RET groups (4×2 layout)
+ret_groups <- c("R0_tumor", "R0_normal", "R_Low_tumor", "R_Low_normal",
+                "R_High_tumor", "R_High_normal", "R1_tumor", "R1_normal")
+ret_plots <- all_plots[names(all_plots) %in% ret_groups]
+
+if (length(ret_plots) > 0) {
+  # Reorder plots
+  ret_order <- intersect(ret_groups, names(ret_plots))
+  ret_plots <- ret_plots[ret_order]
+  
+  cat("  Displaying RET groups (4×2)...\n")
+  ret_combined <- gridExtra::grid.arrange(
+    grobs = ret_plots,
+    ncol = 2, nrow = 4,
+    top = grid::textGrob("RET Groups: SD vs OD Diagnostic", 
+                         gp = grid::gpar(fontsize = 14, fontface = "bold"))
+  )
+  print(ret_combined)
+}
+
+# BRAF groups (2×2 layout)
+braf_groups <- c("B0_tumor", "B0_normal", "B1_tumor", "B1_normal")
+braf_plots <- all_plots[names(all_plots) %in% braf_groups]
+
+if (length(braf_plots) > 0) {
+  # Reorder plots
+  braf_order <- intersect(braf_groups, names(braf_plots))
+  braf_plots <- braf_plots[braf_order]
+  
+  cat("  Displaying BRAF groups (2×2)...\n")
+  braf_combined <- gridExtra::grid.arrange(
+    grobs = braf_plots,
+    ncol = 2, nrow = 2,
+    top = grid::textGrob("BRAF Groups: SD vs OD Diagnostic", 
+                         gp = grid::gpar(fontsize = 14, fontface = "bold"))
+  )
+  print(braf_combined)
+}
+
+# Save plots to PDF
+pdf_file <- paste0(paths$output, "05_sd_od_diagnostic.pdf")
+pdf(pdf_file, width = 10, height = 14)
+
+if (length(ret_plots) > 0) {
+  gridExtra::grid.arrange(
+    grobs = ret_plots,
+    ncol = 2, nrow = 4,
+    top = grid::textGrob("RET Groups: SD vs OD Diagnostic", 
+                         gp = grid::gpar(fontsize = 14, fontface = "bold"))
+  )
+}
+
+if (length(braf_plots) > 0) {
+  gridExtra::grid.arrange(
+    grobs = braf_plots,
+    ncol = 2, nrow = 2,
+    top = grid::textGrob("BRAF Groups: SD vs OD Diagnostic", 
+                         gp = grid::gpar(fontsize = 14, fontface = "bold"))
+  )
+}
+
+dev.off()
+cat("  Saved: 05_sd_od_diagnostic.pdf\n")
 
 # ============================================================================
 # Create outlier mapping by sample_id
@@ -619,58 +765,56 @@ outlier_samples <- unique(outlier_samples)
 
 cat("Total unique outlier samples:", length(outlier_samples), "\n")
 
+# Report by group
+cat("\nOutliers by group:\n")
+for (g in names(results)) {
+  r <- results[[g]]
+  if (!is.null(r$error)) {
+    cat(sprintf("  %s: ERROR - %s\n", g, r$error))
+  } else {
+    cat(sprintf("  %s: %d outliers (n=%d, K=%d, genes=%d)\n", 
+                g, r$n_outliers, r$n_samples, r$K, r$n_genes))
+    if (r$n_outliers > 0) {
+      cat(sprintf("    Samples: %s\n", paste(r$outlier_ids, collapse = ", ")))
+    }
+  }
+}
+
 # ============================================================================
 # Update case_master with outlier flags
 # ============================================================================
 
 cat("\n--- Updating case_master with outlier flags ---\n")
 
-# Define QC target groups
+# Initialize new columns with NA (for unpaired cases)
+thyr_case_master_stage1_filtered$has_outlier_tumor <- NA_integer_
+thyr_case_master_stage1_filtered$has_outlier_normal <- NA_integer_
+
+# For paired cases, initialize with 0
+paired_idx <- which(thyr_case_master_stage1_filtered$has_pair)
+thyr_case_master_stage1_filtered$has_outlier_tumor[paired_idx] <- 0L
+thyr_case_master_stage1_filtered$has_outlier_normal[paired_idx] <- 0L
+
+# Groups that were QC'd
 qc_target_groups <- c("R0", "R_Low", "R_High", "R1", "B0", "B1")
 
-# Initialize outlier flag columns
-# For unpaired samples or non-QC groups (B_Low/B_High), set NA
-# For paired samples in QC target groups, initialize to 0
-thyr_case_master_stage1_filtered$has_outlier_tumor <- ifelse(
-  thyr_case_master_stage1_filtered$has_pair & 
-    thyr_case_master_stage1_filtered$group %in% qc_target_groups, 
-  0, NA_integer_
-)
-thyr_case_master_stage1_filtered$has_outlier_normal <- ifelse(
-  thyr_case_master_stage1_filtered$has_pair & 
-    thyr_case_master_stage1_filtered$group %in% qc_target_groups, 
-  0, NA_integer_
-)
-
-# Reorder columns to place outlier flags after has_pair
-col_order <- names(thyr_case_master_stage1_filtered)
-has_pair_idx <- which(col_order == "has_pair")
-if (length(has_pair_idx) > 0) {
-  # Insert outlier columns after has_pair
-  new_order <- c(
-    col_order[1:has_pair_idx],
-    "has_outlier_tumor", "has_outlier_normal",
-    col_order[(has_pair_idx + 1):(length(col_order) - 2)]  # Exclude the two outlier columns at the end
-  )
-  thyr_case_master_stage1_filtered <- thyr_case_master_stage1_filtered[, ..new_order]
-}
-
-# For each paired case in QC target groups, check if its samples are outliers
+# Update flags based on outlier detection
 for (i in seq_len(nrow(thyr_case_master_stage1_filtered))) {
-  # Skip cases not in QC target (unpaired or B_Low/B_High)
-  if (!thyr_case_master_stage1_filtered$has_pair[i]) next
-  if (!(thyr_case_master_stage1_filtered$group[i] %in% qc_target_groups)) next
-  
   case_id <- thyr_case_master_stage1_filtered$case_submitter_id[i]
+  group <- thyr_case_master_stage1_filtered$group[i]
   
-  # Find tumor samples for this case
+  # Skip if not in QC target groups or not paired
+  if (!(group %in% qc_target_groups) || !thyr_case_master_stage1_filtered$has_pair[i]) {
+    next
+  }
+  
+  # Find tumor and normal samples for this case
   tumor_samples <- sample_metadata$sample_submitter_id[
     sample_metadata$case_submitter_id == case_id &
       sample_metadata$sample_type == "Primary Tumor" &
       grepl("_merged", sample_metadata$sample_submitter_id)
   ]
   
-  # Find normal samples for this case
   normal_samples <- sample_metadata$sample_submitter_id[
     sample_metadata$case_submitter_id == case_id &
       sample_metadata$sample_type == "Solid Tissue Normal" &
@@ -724,24 +868,24 @@ cat(sprintf("Non-QC cases (B_Low/B_High or unpaired): %d\n", non_qc_cases))
 # ============================================================================
 
 cat("\n=== Processing Summary ===\n")
-cat(sprintf("%-12s %6s %4s %8s %6s %6s %8s\n", 
-            "Group", "N_Samp", "K", "Outliers", "SD_Out", "OD_Out", "Time(s)"))
-cat(paste(rep("-", 60), collapse = ""), "\n")
+cat(sprintf("%-12s %6s %6s %4s %8s %6s %6s %8s\n", 
+            "Group", "N_Samp", "Genes", "K", "Outliers", "SD_Out", "OD_Out", "Time(s)"))
+cat(paste(rep("-", 70), collapse = ""), "\n")
 
 for (g in names(results)) {
   r <- results[[g]]
   if (!is.null(r$error)) {
-    cat(sprintf("%-12s %6d %4s %8s %6s %6s %8s ERROR\n",
-                g, r$n_samples, "NA", "NA", "NA", "NA", "NA"))
+    cat(sprintf("%-12s %6d %6s %4s %8s %6s %6s %8s ERROR\n",
+                g, r$n_samples, "NA", "NA", "NA", "NA", "NA", "NA"))
   } else {
-    cat(sprintf("%-12s %6d %4d %8d %6d %6d %8.1f\n",
-                g, r$n_samples, r$K, r$n_outliers,
+    cat(sprintf("%-12s %6d %6d %4d %8d %6d %6d %8.1f\n",
+                g, r$n_samples, r$n_genes, r$K, r$n_outliers,
                 r$diagnostics$hit_SD, r$diagnostics$hit_OD,
                 r$elapsed_time))
   }
 }
 
-cat(paste(rep("-", 60), collapse = ""), "\n")
+cat(paste(rep("-", 70), collapse = ""), "\n")
 
 # ============================================================================
 # Save results
@@ -760,11 +904,14 @@ cat("    Note: NA = unpaired, PCA QC not performed\n")
 # Save processing details for diagnostic purposes
 processing_info <- list(
   date = Sys.Date(),
+  version = "v7.12",
   config = CONFIG,
   results = results,
   outlier_samples = outlier_samples,
   processing_time = total_time,
-  summary = outlier_summary
+  summary = outlier_summary,
+  gene_filter = "protein_coding + per-group filterByExpr",
+  normalization = "MUREN"
 )
 saveRDS(processing_info, paste0(paths$output, "stage1_pca_info.rds"))
 cat("  Processing info saved: stage1_pca_info.rds\n")
@@ -779,12 +926,15 @@ cat("  Summary CSV saved: stage1_outlier_summary.csv\n")
 # Final report
 # ============================================================================
 
-cat("\n=== Stage 1 Complete ===\n")
+cat("\n=== PCA Outlier Detection Complete (v7.12) ===\n")
 cat("Configuration:\n")
+cat("  Gene filter: Protein coding + per-group filterByExpr\n")
+cat("  Normalization: MUREN (LTS)\n")
 cat("  Method: Adaptive thresholds (IQR/MAD)\n")
 cat("  IQR multiplier:", CONFIG$IQR_MULTIPLIER, "\n")
 cat("  MAD multiplier:", CONFIG$MAD_MULTIPLIER, "\n")
 cat("  Max outliers:", sprintf("%.0f%%", CONFIG$MAX_OUTLIERS_PCT * 100), "\n")
+cat("  Seed:", CONFIG$PA_SEED, "\n")
 cat("\nProcessing:\n")
 cat("  Groups analyzed:", length(groups_ids), "(paired samples only)\n")
 cat("  Total time:", sprintf("%.1f seconds\n", as.numeric(total_time)))
@@ -796,6 +946,7 @@ cat("  Non-QC cases:", non_qc_cases, "(B_Low/B_High or unpaired)\n")
 cat("\nOutputs:\n")
 cat("  Main: thyr_case_master_stage1_filtered.rds\n")
 cat("  Info: stage1_pca_info.rds, stage1_outlier_summary.csv\n")
+cat("  Plot: 05_sd_od_diagnostic.pdf\n")
 cat("\nNext: Use thyr_case_master_stage1_filtered for downstream analysis\n")
 cat("      For QC target: Filter with has_outlier_tumor == 0 & has_outlier_normal == 0\n")
 cat("      For non-QC (B_Low/B_High, unpaired): has_outlier_tumor/normal is NA\n")
