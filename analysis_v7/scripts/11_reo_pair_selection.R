@@ -1,82 +1,70 @@
 #!/usr/bin/env Rscript
 # =============================================================================
 # 11_reo_pair_selection.R
-# REO Panel Construction - Phase 2-4: Pair Generation and Selection
+# REO Panel Construction - Pair Generation and Selection
 # 
-# Purpose: Generate gene pairs and apply selection criteria
+# Purpose: Generate gene pairs from DEGs and apply selection criteria
 # Input: 
 #   - thyr_se_strand2_nonzero.rds (expression data)
 #   - thyr_deg_results.rds (DEG results)
 #   - analysis_sample_lists.rds (R0/R1 sample lists)
 # Output:
 #   - reo_candidate_pairs.rds (filtered candidate pairs)
+#   - reo_candidate_pairs.csv
 #
-# Reference: REO_Panel_Protocol_v2.md
-# Date: 2025-12-08
-# v1.3: Added separation score for ranking
-# v1.4: Fixed separation calculation for both R0 majority signs (+1 and -1)
+# Version: v7.1
+# Date: 2025-12-09
+#
+# Selection Criteria (New Policy):
+#   1. Dead zone: |r| < log2(1.2) → treated as "non-reversal"
+#   2. R0 conditions:
+#      - Sign consistency: all or max 1 exception (among dead zone外)
+#      - Strength: q10(|r|) >= log2(1.5) (all samples)
+#   3. R1 conditions:
+#      - Majority reversal: >50% reversal (denominator = total samples)
+#      - No full reversal: reversal < 100% (ban overfitting)
+#   4. Ranking: |median_r_R0 - median_r_R1| descending
+#   5. Constraints: no gene reuse, no high correlation pairs
 # =============================================================================
 
 source("analysis_v7/setup.R")
 
 cat("\n=============================================================================\n")
-cat("11_reo_pair_selection.R - REO Pair Selection\n")
+cat("11_reo_pair_selection.R - REO Pair Selection (v7.1)\n")
+cat("Date: 2025-12-09\n")
 cat("=============================================================================\n\n")
 
 # -----------------------------------------------------------------------------
 # Parameters
 # -----------------------------------------------------------------------------
-# Selection criteria and rationale:
-#
-# 1. Dead zone threshold: log2(1.5) = 0.585
-#    - 1.5-fold difference is commonly used as biological significance threshold
-#
-# 2. Dead zone min samples: 22/23 (~96%)
-#    - Allows 1 sample exception for technical noise
-#
-# 3. R0 consistency: 10/11 (~91%)
-#    - Allows 1 sample exception for biological variation
-#
-# 4. Wilson CI lower > 0.5
-#    - Statistical guarantee that true reversal rate exceeds 50%
-#
-# 5. Separation score
-#    - Measures gap between R0 and R1 distributions at boundary
-#    - For R0 negative (R1 positive expected): r1_k - max(R0)
-#    - For R0 positive (R1 negative expected): min(R0) - r1_k
-#    - k = 3: ignores 2 extreme R1 values (aligned with 10/12 Wilson CI)
-#    - Positive = distributions separated for 10/12 reversal
-#    - Used for ranking candidates (higher = more robust)
-
 PARAMS <- list(
-  dead_zone_threshold = log2(1.5),  # 0.585
-  dead_zone_min_samples = 22,       # out of 23 (~96%)
-  r0_consistency_min = 10,          # out of 11 (~91%)
-  wilson_alpha = 0.05,              # 95% confidence interval
-  correlation_threshold = 0.75      # for pair independence (used in Phase 5)
+  
+  # Dead zone threshold
+  dead_zone = log2(1.2),             # 0.263 - below this = non-reversal
+  
+  # R0 conditions
+  r0_exception_max = 1,              # max exceptions for sign consistency
+  r0_q10_threshold = log2(1.5),      # strength criterion (10th percentile)
+  
+  # R1 conditions
+  r1_majority_required = TRUE,       # >50% reversal required
+  r1_full_reversal_ban = TRUE,       # 100% reversal prohibited
+  
+  # Ranking method
+  ranking_method = "median_diff",    # |median_R0 - median_R1|
+  
+  # For later use (Phase 5)
+  correlation_threshold = 0.75       # Spearman correlation threshold
 )
 
 cat("=== Parameters ===\n")
-cat(sprintf("Dead zone threshold: log2(1.5) = %.3f\n", PARAMS$dead_zone_threshold))
-cat(sprintf("Dead zone min samples: %d\n", PARAMS$dead_zone_min_samples))
-cat(sprintf("R0 consistency min: %d\n", PARAMS$r0_consistency_min))
-cat(sprintf("R1 reversal: Wilson %.0f%% CI lower > 0.5\n", (1-PARAMS$wilson_alpha)*100))
-cat("Ranking: separation score (accounts for R0 majority sign)\n")
-cat("  separation > 0: R0/R1 distributions separated for 10/12 reversal\n")
+cat(sprintf("Dead zone: |r| < log2(1.2) = %.4f\n", PARAMS$dead_zone))
+cat(sprintf("R0 sign consistency: max %d exception(s) (among valid samples)\n", 
+            PARAMS$r0_exception_max))
+cat(sprintf("R0 strength (q10): >= log2(1.5) = %.4f\n", PARAMS$r0_q10_threshold))
+cat(sprintf("R1 reversal: >50%% required, 100%% prohibited\n"))
+cat(sprintf("Ranking: |median_R0 - median_R1| descending\n"))
 cat("\n")
-
-# -----------------------------------------------------------------------------
-# Wilson CI Function
-# -----------------------------------------------------------------------------
-wilson_ci_lower <- function(x, n, alpha = 0.05) {
-  if (n == 0) return(NA_real_)
-  p_hat <- x / n
-  z <- qnorm(1 - alpha/2)
-  denominator <- 1 + z^2/n
-  center <- (p_hat + z^2/(2*n)) / denominator
-  margin <- z * sqrt(p_hat*(1-p_hat)/n + z^2/(4*n^2)) / denominator
-  return(center - margin)
-}
 
 # -----------------------------------------------------------------------------
 # Load Data
@@ -103,41 +91,8 @@ cat(sprintf("R1 samples: %d\n", n_r1))
 
 cat("\n")
 
-# Show Wilson CI reference values
-cat(sprintf("=== Wilson CI Reference (n=%d, alpha=0.05) ===\n", n_r1))
-for (rev in max(1, n_r1-4):n_r1) {
-  ci_lower <- wilson_ci_lower(rev, n_r1, PARAMS$wilson_alpha)
-  status <- ifelse(ci_lower > 0.5, "PASS", "FAIL")
-  cat(sprintf("  %2d/%d reversal: CI lower = %.3f (%s)\n", rev, n_r1, ci_lower, status))
-}
-cat("\n")
-
 # -----------------------------------------------------------------------------
-# Prepare TPM Matrix
-# -----------------------------------------------------------------------------
-cat("=== Preparing TPM Matrix ===\n")
-
-counts <- assay(se, "counts")
-gene_lengths <- rowData(se)$gene_length
-
-calc_tpm <- function(counts, lengths) {
-  rate <- counts / lengths
-  rate / sum(rate) * 1e6
-}
-
-tpm_matrix <- apply(counts, 2, calc_tpm, lengths = gene_lengths)
-rownames(tpm_matrix) <- rownames(counts)
-
-log2_tpm <- log2(tpm_matrix)
-
-all_samples <- c(r0_samples, r1_samples)
-log2_tpm <- log2_tpm[, all_samples]
-
-cat(sprintf("TPM matrix: %d genes x %d samples\n", nrow(log2_tpm), ncol(log2_tpm)))
-cat("\n")
-
-# -----------------------------------------------------------------------------
-# Phase 2: Identify DEG UP and DOWN
+# Phase 2: Identify DEG UP and DOWN (before TPM to filter genes)
 # -----------------------------------------------------------------------------
 cat("=== Phase 2: Candidate Genes ===\n")
 
@@ -150,11 +105,40 @@ deg_down <- sig_deg[sig_deg$PI < 0.5, ]  # R1 < R0
 cat(sprintf("DEG UP (R1 > R0): %d genes\n", nrow(deg_up)))
 cat(sprintf("DEG DOWN (R1 < R0): %d genes\n", nrow(deg_down)))
 
-deg_up_ids <- intersect(deg_up$gene_id, rownames(log2_tpm))
-deg_down_ids <- intersect(deg_down$gene_id, rownames(log2_tpm))
+# Get DEG gene IDs present in SE
+deg_up_ids <- intersect(deg_up$gene_id, rownames(se))
+deg_down_ids <- intersect(deg_down$gene_id, rownames(se))
 
-cat(sprintf("DEG UP in expression matrix: %d genes\n", length(deg_up_ids)))
-cat(sprintf("DEG DOWN in expression matrix: %d genes\n", length(deg_down_ids)))
+cat(sprintf("DEG UP in SE: %d genes\n", length(deg_up_ids)))
+cat(sprintf("DEG DOWN in SE: %d genes\n", length(deg_down_ids)))
+
+# -----------------------------------------------------------------------------
+# Prepare TPM Matrix (DEG genes x R0/R1 samples only)
+# -----------------------------------------------------------------------------
+cat("\n=== Preparing TPM Matrix (filtered) ===\n")
+
+# Filter to required genes and samples only
+required_genes <- unique(c(deg_up_ids, deg_down_ids))
+required_samples <- c(r0_samples, r1_samples)
+
+cat(sprintf("Required genes: %d\n", length(required_genes)))
+cat(sprintf("Required samples: %d\n", length(required_samples)))
+
+# Extract subset of counts
+counts_subset <- assay(se, "counts")[required_genes, required_samples, drop = FALSE]
+gene_lengths_subset <- rowData(se)$gene_length[match(required_genes, rownames(se))]
+
+calc_tpm <- function(counts, lengths) {
+  rate <- counts / lengths
+  rate / sum(rate) * 1e6
+}
+
+tpm_matrix <- apply(counts_subset, 2, calc_tpm, lengths = gene_lengths_subset)
+rownames(tpm_matrix) <- required_genes
+
+log2_tpm <- log2(tpm_matrix)
+
+cat(sprintf("log2(TPM) matrix: %d genes x %d samples\n", nrow(log2_tpm), ncol(log2_tpm)))
 
 # Remove genes with -Inf
 has_inf_up <- sapply(deg_up_ids, function(g) any(is.infinite(log2_tpm[g, ])))
@@ -193,25 +177,37 @@ cat(sprintf("Pair grid created: %d pairs\n", nrow(pair_grid)))
 cat("\n")
 
 # -----------------------------------------------------------------------------
-# Phase 4: Apply Selection Criteria (Vectorized)
+# Phase 4: Apply Selection Criteria (New Policy)
 # -----------------------------------------------------------------------------
-cat("=== Phase 4: Selection Criteria ===\n")
+cat("=== Phase 4: Selection Criteria (New Policy v7.1) ===\n")
 
-cat("Computing r values and separation scores for all pairs...\n")
+cat("Evaluating pairs with new criteria...\n")
 
 expr_up <- log2_tpm[deg_up_ids, , drop = FALSE]
 expr_down <- log2_tpm[deg_down_ids, , drop = FALSE]
 
-evaluate_pairs <- function(pair_grid, expr_up, expr_down, r0_samples, r1_samples, params) {
+# Vectorized evaluation function
+evaluate_pairs_v71 <- function(pair_grid, expr_up, expr_down, 
+                               r0_samples, r1_samples, params) {
   
   n_pairs <- nrow(pair_grid)
   n_r0 <- length(r0_samples)
   n_r1 <- length(r1_samples)
   
-  chunk_size <- 10000
+  # q10 position for n_r0 samples (0.10 quantile)
+  # For n=11: pos = 0.10 * 10 + 1 = 2 (2nd smallest)
+  q10_pos <- max(1, ceiling(n_r0 * 0.10))
+  
+  # median position
+  median_pos_r0 <- (n_r0 + 1) / 2
+  median_pos_r1 <- (n_r1 + 1) / 2
+  
+  chunk_size <- 10000  # Conservative chunk size
   n_chunks <- ceiling(n_pairs / chunk_size)
   
   results_list <- vector("list", n_chunks)
+  
+  cat(sprintf("  Total chunks: %d (chunk size: %d)\n", n_chunks, chunk_size))
   
   for (chunk in 1:n_chunks) {
     start_idx <- (chunk - 1) * chunk_size + 1
@@ -228,73 +224,81 @@ evaluate_pairs <- function(pair_grid, expr_up, expr_down, r0_samples, r1_samples
     r_r1 <- expr_up[i_chunk, r1_samples, drop = FALSE] - 
       expr_down[j_chunk, r1_samples, drop = FALSE]
     
-    # Dead zone check
-    dz_r0 <- rowSums(abs(r_r0) >= params$dead_zone_threshold)
-    dz_r1 <- rowSums(abs(r_r1) >= params$dead_zone_threshold)
-    dz_total <- dz_r0 + dz_r1
+    # --- R0 Sign Consistency (among dead zone外 samples) ---
+    valid_r0 <- abs(r_r0) >= params$dead_zone
     
-    # R0 consistency
-    r0_pos <- rowSums(r_r0 > 0)
-    r0_neg <- rowSums(r_r0 < 0)
-    r0_consistency <- pmax(r0_pos, r0_neg)
-    r0_majority_sign <- ifelse(r0_pos > r0_neg, 1, -1)
+    r0_pos_valid <- rowSums((r_r0 > 0) & valid_r0)
+    r0_neg_valid <- rowSums((r_r0 < 0) & valid_r0)
+    n_valid_r0 <- rowSums(valid_r0)
     
-    # R1 reversal
-    r1_signs <- sign(r_r1)
-    reversal_matrix <- sweep(r1_signs, 1, r0_majority_sign, FUN = function(x, y) x != y)
-    reversal <- rowSums(reversal_matrix)
+    r0_majority_sign <- ifelse(r0_pos_valid >= r0_neg_valid, 1, -1)
+    r0_exceptions <- pmin(r0_pos_valid, r0_neg_valid)
+    pass_consistency <- r0_exceptions <= params$r0_exception_max
     
-    # Separation score
-    # Aligned with Wilson CI requirement:
-    #   Wilson CI > 0.5 requires >= 10/12 reversal
-    #   So 2 samples are allowed to not reverse
-    #   k = (allowed non-reversal) + 1 = 3
-    #
-    # For R0 majority sign = -1 (R0 negative, R1 positive expected):
-    #   r0_boundary = max(R0_r)  -- most positive (closest to boundary)
-    #   r1_boundary = k-th smallest R1_r  -- ignoring 2 lowest
-    #   separation = r1_boundary - r0_boundary
-    #
-    # For R0 majority sign = +1 (R0 positive, R1 negative expected):
-    #   r0_boundary = min(R0_r)  -- most negative (closest to boundary)
-    #   r1_boundary = k-th largest R1_r  -- ignoring 2 highest
-    #   separation = r0_boundary - r1_boundary
-    #
-    # In both cases, separation > 0 means distributions separated for 10/12 reversal
+    # --- R0 Strength: q10 criterion ---
+    # Use partial sort for efficiency (only find q10_pos-th smallest)
+    abs_r_r0 <- abs(r_r0)
+    q10_values <- numeric(n_chunk)
+    for (row in 1:n_chunk) {
+      q10_values[row] <- sort(abs_r_r0[row, ], partial = q10_pos)[q10_pos]
+    }
+    pass_q10 <- q10_values >= params$r0_q10_threshold
     
-    min_reversal_for_wilson <- 10
-    allowed_non_reversal <- n_r1 - min_reversal_for_wilson  # = 2
-    k <- allowed_non_reversal + 1  # = 3
+    # --- R1 Reversal ---
+    outside_dz_r1 <- abs(r_r1) >= params$dead_zone
+    opposite_sign <- sign(r_r1) != r0_majority_sign
+    reversal_count <- rowSums(outside_dz_r1 & opposite_sign)
+    reversal_rate <- reversal_count / n_r1
+    pass_majority <- reversal_rate > 0.5
+    pass_not_all <- reversal_count < n_r1
     
-    r0_max <- apply(r_r0, 1, max)
-    r0_min <- apply(r_r0, 1, min)
-    r1_k_small <- apply(r_r1, 1, function(x) sort(x, partial = k)[k])
-    r1_k_large <- apply(r_r1, 1, function(x) -sort(-x, partial = k)[k])
+    # --- Ranking: |median_R0 - median_R1| ---
+    # Use partial sort for median (faster than apply + median)
+    median_r0 <- numeric(n_chunk)
+    median_r1 <- numeric(n_chunk)
+    mid_r0 <- ceiling(n_r0 / 2)
+    mid_r1 <- ceiling(n_r1 / 2)
     
-    # Calculate separation based on R0 majority sign
-    separation <- ifelse(
-      r0_majority_sign == -1,
-      r1_k_small - r0_max,  # R0 negative case
-      r0_min - r1_k_large   # R0 positive case
-    )
+    for (row in 1:n_chunk) {
+      sorted_r0 <- sort(r_r0[row, ], partial = mid_r0)
+      sorted_r1 <- sort(r_r1[row, ], partial = mid_r1)
+      if (n_r0 %% 2 == 1) {
+        median_r0[row] <- sorted_r0[mid_r0]
+      } else {
+        median_r0[row] <- (sorted_r0[mid_r0] + sorted_r0[mid_r0 + 1]) / 2
+      }
+      if (n_r1 %% 2 == 1) {
+        median_r1[row] <- sorted_r1[mid_r1]
+      } else {
+        median_r1[row] <- (sorted_r1[mid_r1] + sorted_r1[mid_r1 + 1]) / 2
+      }
+    }
+    median_diff <- abs(median_r0 - median_r1)
     
-    # Store boundary values for reference
-    r0_boundary <- ifelse(r0_majority_sign == -1, r0_max, r0_min)
-    r1_boundary <- ifelse(r0_majority_sign == -1, r1_k_small, r1_k_large)
-    
+    # Store results
     results_list[[chunk]] <- data.frame(
       i = i_chunk,
       j = j_chunk,
-      dz_total = dz_total,
-      r0_consistency = r0_consistency,
+      # R0 metrics
+      n_valid_r0 = n_valid_r0,
       r0_majority_sign = r0_majority_sign,
-      reversal = reversal,
-      r0_boundary = r0_boundary,
-      r1_boundary = r1_boundary,
-      separation = separation
+      r0_exceptions = r0_exceptions,
+      q10 = q10_values,
+      # R1 metrics
+      reversal_count = reversal_count,
+      reversal_rate = reversal_rate,
+      # Ranking
+      median_r0 = median_r0,
+      median_r1 = median_r1,
+      median_diff = median_diff,
+      # Pass flags
+      pass_consistency = pass_consistency,
+      pass_q10 = pass_q10,
+      pass_majority = pass_majority,
+      pass_not_all = pass_not_all
     )
     
-    if (chunk %% 10 == 0) {
+    if (chunk %% 10 == 0 || chunk == n_chunks) {
       cat(sprintf("  Processed chunk %d/%d\n", chunk, n_chunks))
     }
   }
@@ -303,36 +307,64 @@ evaluate_pairs <- function(pair_grid, expr_up, expr_down, r0_samples, r1_samples
 }
 
 cat("Evaluating pairs...\n")
-pair_results <- evaluate_pairs(pair_grid, expr_up, expr_down, 
-                               r0_samples, r1_samples, PARAMS)
-
-# Calculate Wilson CI
-cat("Computing Wilson CI...\n")
-pair_results$wilson_lower <- sapply(pair_results$reversal, wilson_ci_lower, 
-                                    n = n_r1, alpha = PARAMS$wilson_alpha)
+pair_results <- evaluate_pairs_v71(pair_grid, expr_up, expr_down, 
+                                   r0_samples, r1_samples, PARAMS)
 
 cat("\n=== Filtering Results ===\n")
 
 cat(sprintf("Total pairs: %d\n", nrow(pair_results)))
 
-# Filter 1: Dead zone
-pass_dz <- pair_results$dz_total >= PARAMS$dead_zone_min_samples
-cat(sprintf("Passed dead zone (>= %d/%d): %d\n", 
-            PARAMS$dead_zone_min_samples, n_r0 + n_r1, sum(pass_dz)))
+# Filter summary
+cat(sprintf("\n--- Filter Step by Step ---\n"))
+cat(sprintf("Pass R0 consistency (<= %d exception): %d (%.1f%%)\n", 
+            PARAMS$r0_exception_max,
+            sum(pair_results$pass_consistency),
+            sum(pair_results$pass_consistency) / nrow(pair_results) * 100))
 
-# Filter 2: R0 consistency
-pass_r0 <- pair_results$r0_consistency >= PARAMS$r0_consistency_min
-cat(sprintf("Passed dead zone + R0 consistency (>= %d/%d): %d\n", 
-            PARAMS$r0_consistency_min, n_r0, sum(pass_dz & pass_r0)))
+cat(sprintf("Pass R0 q10 (>= %.3f): %d (%.1f%%)\n", 
+            PARAMS$r0_q10_threshold,
+            sum(pair_results$pass_q10),
+            sum(pair_results$pass_q10) / nrow(pair_results) * 100))
 
-# Filter 3: Wilson CI
-pass_wilson <- pair_results$wilson_lower > 0.5
-cat(sprintf("Passed all + Wilson CI lower > 0.5: %d\n", 
-            sum(pass_dz & pass_r0 & pass_wilson)))
+cat(sprintf("Pass R1 majority (>50%%): %d (%.1f%%)\n", 
+            sum(pair_results$pass_majority),
+            sum(pair_results$pass_majority) / nrow(pair_results) * 100))
+
+cat(sprintf("Pass R1 not-all (<100%%): %d (%.1f%%)\n", 
+            sum(pair_results$pass_not_all),
+            sum(pair_results$pass_not_all) / nrow(pair_results) * 100))
 
 # Combined filter
-pass_all <- pass_dz & pass_r0 & pass_wilson
-cat(sprintf("\nTotal candidates: %d\n", sum(pass_all)))
+pass_all <- pair_results$pass_consistency & 
+  pair_results$pass_q10 & 
+  pair_results$pass_majority & 
+  pair_results$pass_not_all
+
+cat(sprintf("\n--- Combined ---\n"))
+cat(sprintf("Pass all criteria: %d (%.2f%%)\n", sum(pass_all), 
+            sum(pass_all) / nrow(pair_results) * 100))
+
+# Check if any candidates remain
+if (sum(pass_all) == 0) {
+  cat("\n!!! WARNING: No candidates passed all criteria !!!\n")
+  cat("Consider relaxing parameters.\n")
+  
+  # Save diagnostic info
+  saveRDS(list(
+    params = PARAMS,
+    pair_results = pair_results,
+    pass_summary = data.frame(
+      criterion = c("consistency", "q10", "majority", "not_all", "all"),
+      n_pass = c(sum(pair_results$pass_consistency),
+                 sum(pair_results$pass_q10),
+                 sum(pair_results$pass_majority),
+                 sum(pair_results$pass_not_all),
+                 sum(pass_all))
+    )
+  ), file.path(paths$processed, "reo_diagnostic_no_candidates.rds"))
+  
+  stop("No candidates found. Diagnostic info saved.")
+}
 
 # Extract passing pairs
 candidates <- pair_results[pass_all, ]
@@ -347,36 +379,33 @@ candidates$down_name <- sapply(candidates$down_gene, function(g) {
   deg_df$gene_name[deg_df$gene_id == g]
 })
 
-# Sort by separation score (descending) - primary ranking criterion
-candidates <- candidates[order(-candidates$separation), ]
+# Sort by median_diff (descending) - primary ranking criterion
+candidates <- candidates[order(-candidates$median_diff), ]
 
-cat("\n=== Top Candidates (by Separation Score) ===\n")
-print(head(candidates[, c("up_name", "down_name", "separation", 
-                          "reversal", "r0_consistency", "dz_total")], 20))
+# Add rank
+candidates$rank <- 1:nrow(candidates)
+
+cat("\n=== Top Candidates (by |median_R0 - median_R1|) ===\n")
+print(head(candidates[, c("rank", "up_name", "down_name", "median_diff", 
+                          "reversal_count", "reversal_rate", "q10")], 20))
 
 # -----------------------------------------------------------------------------
 # Summary Statistics
 # -----------------------------------------------------------------------------
-cat("\n=== Separation Score Distribution ===\n")
-cat("  (gap between R0 and R1 boundary values, k=3)\n")
-cat(sprintf("  Range: %.2f to %.2f\n", min(candidates$separation), max(candidates$separation)))
-cat(sprintf("  Mean: %.2f\n", mean(candidates$separation)))
-cat(sprintf("  Median: %.2f\n", median(candidates$separation)))
-cat(sprintf("  Positive (separated for 10/12 reversal): %d (%.1f%%)\n", 
-            sum(candidates$separation > 0),
-            sum(candidates$separation > 0) / nrow(candidates) * 100))
+cat("\n=== Candidate Statistics ===\n")
 
-# R0 majority sign distribution
-cat("\n=== R0 Majority Sign Distribution ===\n")
-sign_table <- table(candidates$r0_majority_sign)
-cat(sprintf("  Negative (UP < DOWN in R0): %d\n", 
-            sum(candidates$r0_majority_sign == -1)))
-cat(sprintf("  Positive (UP > DOWN in R0): %d\n", 
-            sum(candidates$r0_majority_sign == 1)))
+cat(sprintf("Median diff range: %.3f to %.3f\n", 
+            min(candidates$median_diff), max(candidates$median_diff)))
+cat(sprintf("Median diff mean: %.3f\n", mean(candidates$median_diff)))
 
-cat("\n=== Reversal Distribution ===\n")
-rev_table <- table(candidates$reversal)
-print(rev_table)
+cat(sprintf("\nReversal count distribution:\n"))
+print(table(candidates$reversal_count))
+
+cat(sprintf("\nq10 range: %.3f to %.3f\n", 
+            min(candidates$q10), max(candidates$q10)))
+
+cat(sprintf("\nR0 exceptions distribution:\n"))
+print(table(candidates$r0_exceptions))
 
 # -----------------------------------------------------------------------------
 # Save Results
@@ -384,28 +413,45 @@ print(rev_table)
 cat("\n=== Saving Results ===\n")
 
 output <- list(
+  # Parameters
   params = PARAMS,
+  version = "v7.1",
+  date = "2025-12-09",
+  
+  # Gene lists
   deg_up_ids = deg_up_ids,
   deg_down_ids = deg_down_ids,
+  
+  # Results
   candidates = candidates,
   all_results = pair_results,
+  
+  # Expression data
   log2_tpm = log2_tpm,
+  
+  # Sample info
   r0_samples = r0_samples,
   r1_samples = r1_samples,
-  n_r0 = length(r0_samples),
-  n_r1 = length(r1_samples),
+  n_r0 = n_r0,
+  n_r1 = n_r1,
+  
+  # Metadata
   timestamp = Sys.time()
 )
 
 saveRDS(output, file.path(paths$processed, "reo_candidate_pairs.rds"))
 cat(sprintf("Saved: %s\n", file.path(paths$processed, "reo_candidate_pairs.rds")))
 
-write.csv(candidates[, c("up_name", "down_name", "up_gene", "down_gene",
-                         "separation", "r0_boundary", "r1_boundary", "reversal", 
-                         "r0_consistency", "dz_total", "wilson_lower")],
+# CSV output
+csv_cols <- c("rank", "up_name", "down_name", "up_gene", "down_gene",
+              "median_diff", "median_r0", "median_r1",
+              "reversal_count", "reversal_rate", "q10",
+              "r0_exceptions", "n_valid_r0")
+write.csv(candidates[, csv_cols],
           file.path(paths$output, "reo_candidate_pairs.csv"),
           row.names = FALSE)
 cat(sprintf("Saved: %s\n", file.path(paths$output, "reo_candidate_pairs.csv")))
 
 cat("\n=== Phase 2-4 Complete ===\n")
 cat(sprintf("Candidate pairs for Phase 5: %d\n", nrow(candidates)))
+cat(sprintf("Ranking criterion: |median_R0 - median_R1| (descending)\n"))

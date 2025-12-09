@@ -6,8 +6,8 @@
 # Input: thyr_case_master_stage1_filtered, thyr_se_strand2_nonzero
 # Output: thyr_case_master_stage2_filtered with tumor_purity (relative score) and low_purity flags
 # Version: v7.4 - Fixed dplyr::select namespace conflict
-#                 New group design (R0/R_Low/R_High/R1/B0/B1)
-#                 B_Low/B_High excluded (not used in validation)
+#                 New group design (R0/R_Low/R_Mid/R1/B0/B1)
+#                 B_Low/B_Mid excluded (not used in validation)
 #                 Output includes ALL cases (not just clean) for layer-based validation
 # Date: 2025-12-07
 
@@ -15,8 +15,8 @@ source("analysis_v7/setup.R")
 
 cat("\n=== Stage 2: Tumor Purity Analysis (v7.4) ===\n")
 cat("Date:", as.character(Sys.Date()), "\n")
-cat("Analysis: R0/R_Low/R_High/R1/B0/B1 groups with clean paired samples\n")
-cat("Note: B_Low/B_High excluded (not used in validation)\n")
+cat("Analysis: R0/R_Low/R_Mid/R1/B0/B1 groups with clean paired samples\n")
+cat("Note: B_Low/B_Mid excluded (not used in validation)\n")
 cat("Method: ContamDE with MUREN normalization\n")
 cat("Output: Relative purity scores (normalized, not absolute %)\n")
 
@@ -218,7 +218,7 @@ cat("\n--- Processing groups ---\n")
 # Initialize results storage
 purity_results <- list()
 
-for (group_name in c("R0", "R_Low", "R_High", "R1", "B0", "B1")) {
+for (group_name in c("R0", "R_Low", "R_Mid", "R1", "B0", "B1")) {
   cat(sprintf("\nProcessing %s...\n", group_name))
   
   # Extract paired samples
@@ -434,7 +434,7 @@ n_no_qc <- sum(is.na(thyr_case_master_stage2_filtered$has_outlier_tumor))
 
 cat("  Layer 1 (QC clean + high score):", usable_cases, "\n")
 cat("  Layer 2 (QC clean, any score):", n_qc_clean, "\n")
-cat("  Layer 3 (No QC - unpaired/B_Low/B_High):", n_no_qc, "\n")
+cat("  Layer 3 (No QC - unpaired/B_Low/B_Mid):", n_no_qc, "\n")
 cat("\nOutputs:\n")
 cat("  Main: thyr_case_master_stage2_filtered.rds\n")
 cat("  Details: stage2_purity_details.rds\n")

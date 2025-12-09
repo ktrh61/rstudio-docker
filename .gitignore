@@ -61,3 +61,4 @@ gdc-client*
 
 # Remove manifest inclusion (too many files)
 # Manifests should be documented in README instead
+analysis_v7/data/raw/manifest_*.tsv

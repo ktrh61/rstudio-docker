@@ -1,55 +1,50 @@
 #!/usr/bin/env Rscript
 # =============================================================================
 # 12_reo_panel_finalize.R
-# REO Panel Construction - Phase 5-7: Finalization
+# REO Panel Construction - Finalization with Boundary Zone
 # 
 # Purpose: 
 #   - Phase 5: Remove redundancy (gene overlap, high correlation)
-#   - Phase 6: Evaluate separation between R0 and R1
-#   - Phase 7: Set voting threshold T
+#   - Phase 6: Evaluate separation and set boundary zone (data-driven)
+#   - Phase 7: Define classification rules (negative/undetermined/positive)
 #
 # Input: 
 #   - reo_candidate_pairs.rds (from 11_reo_pair_selection.R)
 # Output:
-#   - reo_final_panel.rds (final panel with threshold, size depends on candidates)
+#   - reo_final_panel.rds (final panel with boundary zone)
+#   - reo_final_panel.csv
+#   - reo_sample_classification.csv
 #
-# Reference: REO_Panel_Protocol_v2.md
-# Date: 2025-12-08
-# v1.1: Spearman correlation for pair independence check, >= threshold
-# v1.2: Threshold T determined data-driven: max(R0 reversal) + 1
-# v1.3: Sorting by separation score (from 11_reo_pair_selection.R)
-# v1.4: Filter to separation > 0 only; max_panel_size as upper limit
+# Version: v7.1
+# Date: 2025-12-09
+#
+# Key Changes from v1:
+#   - Ranking by median_diff (not separation score)
+#   - Data-driven boundary zone: [max(R0)+1, min(R1)-1] = undetermined
+#   - Three-class output: negative / undetermined / positive
 # =============================================================================
 
 source("analysis_v7/setup.R")
 
 cat("\n=============================================================================\n")
-cat("12_reo_panel_finalize.R - REO Panel Finalization\n")
+cat("12_reo_panel_finalize.R - REO Panel Finalization (v7.1)\n")
+cat("Date: 2025-12-09\n")
 cat("=============================================================================\n\n")
 
 # -----------------------------------------------------------------------------
 # Parameters
 # -----------------------------------------------------------------------------
-# Rationale:
-# 1. Max panel size = 10: Upper limit, actual size depends on available candidates
-# 2. Separation > 0: Only use pairs with R0/R1 distributions fully separated
-# 3. Correlation threshold = 0.75: Spearman (rank-based, appropriate for REO)
-# 4. Selection: By separation score (from 11_reo_pair_selection.R)
-# 5. Threshold T: Data-driven, set to max(R0 reversal) + 1 to ensure 100% specificity
-
 PARAMS <- list(
-  max_panel_size = 10,
-  correlation_threshold = 0.75,    # Spearman correlation (REO-appropriate)
-  dead_zone_threshold = log2(1.5)  # For voting: |r| < this -> non-reversal
+  target_panel_size = 10,
+  correlation_threshold = 0.75,    # Spearman correlation threshold
+  dead_zone = log2(1.2)            # Must match 11_reo_pair_selection.R
 )
 
 cat("=== Parameters ===\n")
-cat(sprintf("Max panel size: %d\n", PARAMS$max_panel_size))
-cat(sprintf("Separation requirement: > 0 (R0/R1 fully separated)\n"))
+cat(sprintf("Target panel size: %d\n", PARAMS$target_panel_size))
 cat(sprintf("Correlation threshold: %.2f (Spearman)\n", PARAMS$correlation_threshold))
-cat(sprintf("Selection: by separation score (greedy, avoiding gene overlap)\n"))
-cat(sprintf("Dead zone for voting: |r| < %.3f -> non-reversal\n", 
-            PARAMS$dead_zone_threshold))
+cat(sprintf("Dead zone: |r| < %.4f -> non-reversal\n", PARAMS$dead_zone))
+cat(sprintf("Selection: by median_diff (greedy, avoiding gene overlap)\n"))
 cat("\n")
 
 # -----------------------------------------------------------------------------
@@ -59,38 +54,30 @@ cat("=== Loading Data ===\n")
 
 input <- readRDS(file.path(paths$processed, "reo_candidate_pairs.rds"))
 
-candidates_all <- input$candidates
+candidates <- input$candidates
 log2_tpm <- input$log2_tpm
 r0_samples <- input$r0_samples
 r1_samples <- input$r1_samples
 n_r0 <- length(r0_samples)
 n_r1 <- length(r1_samples)
 
-cat(sprintf("Candidate pairs (total): %d\n", nrow(candidates_all)))
-
-# Filter to separation > 0 only (R0/R1 distributions must be separated)
-candidates <- candidates_all[candidates_all$separation > 0, ]
-cat(sprintf("Candidate pairs (separation > 0): %d\n", nrow(candidates)))
+cat(sprintf("Candidate pairs: %d\n", nrow(candidates)))
 cat(sprintf("R0 samples: %d\n", n_r0))
 cat(sprintf("R1 samples: %d\n", n_r1))
-
-if (nrow(candidates) == 0) {
-  stop("No candidates with separation > 0. Consider relaxing selection criteria in 11_reo_pair_selection.R")
-}
+cat(sprintf("Input version: %s\n", input$version))
 cat("\n")
 
 # -----------------------------------------------------------------------------
-# Phase 5a: Sort by Priority (Separation Score)
+# Phase 5a: Sort by Priority (median_diff, already sorted in 11_)
 # -----------------------------------------------------------------------------
 cat("=== Phase 5a: Priority Sorting ===\n")
 
-# Already sorted by separation in 11_reo_pair_selection.R
-# Re-sort to ensure consistency
-candidates <- candidates[order(-candidates$separation), ]
+# Ensure sorted by median_diff descending
+candidates <- candidates[order(-candidates$median_diff), ]
 
-cat(sprintf("Top candidate: %s x %s (separation=%.2f, rev=%d)\n",
+cat(sprintf("Top candidate: %s x %s (median_diff=%.3f, rev=%d/%d)\n",
             candidates$up_name[1], candidates$down_name[1],
-            candidates$separation[1], candidates$reversal[1]))
+            candidates$median_diff[1], candidates$reversal_count[1], n_r1))
 cat("\n")
 
 # -----------------------------------------------------------------------------
@@ -116,20 +103,22 @@ for (k in 1:nrow(candidates)) {
   all_samples <- c(r0_samples, r1_samples)
   new_r <- log2_tpm[up_g, all_samples] - log2_tpm[down_g, all_samples]
   
-  # Skip if contains -Inf or Inf (log2(0) issue)
+  # Skip if contains -Inf or Inf
   if (any(is.infinite(new_r))) {
     cat(sprintf("  Skipped: %s x %s (contains Inf values)\n", up_name, down_name))
     next
   }
   
-  # Check correlation with already selected pairs (Spearman for REO consistency)
+  # Check correlation with already selected pairs (Spearman)
   if (!is.null(selected_r_matrix)) {
     cors <- apply(selected_r_matrix, 2, function(x) {
       abs(cor(x, new_r, method = "spearman", use = "complete.obs"))
     })
-    # Handle NA correlations (treat as acceptable)
     cors[is.na(cors)] <- 0
     if (any(cors >= PARAMS$correlation_threshold)) {
+      max_cor_idx <- which.max(cors)
+      cat(sprintf("  Skipped: %s x %s (cor=%.2f with P%d)\n", 
+                  up_name, down_name, max(cors), max_cor_idx))
       next
     }
   }
@@ -139,20 +128,20 @@ for (k in 1:nrow(candidates)) {
   used_genes <- c(used_genes, up_g, down_g)
   selected_r_matrix <- cbind(selected_r_matrix, new_r)
   
-  cat(sprintf("  P%d: %s x %s (sep=%.2f, rev=%d)\n",
+  cat(sprintf("  P%d: %s x %s (median_diff=%.3f, rev=%d/%d)\n",
               nrow(selected_pairs), up_name, down_name,
-              candidates$separation[k], candidates$reversal[k]))
+              candidates$median_diff[k], candidates$reversal_count[k], n_r1))
   
-  # Stop when max size reached
-  if (nrow(selected_pairs) >= PARAMS$max_panel_size) break
+  # Stop when target reached
+  if (nrow(selected_pairs) >= PARAMS$target_panel_size) break
 }
 
-if (nrow(selected_pairs) < PARAMS$max_panel_size) {
-  cat(sprintf("\n=== Selected %d pairs (all available with separation > 0) ===\n\n", 
-              nrow(selected_pairs)))
-} else {
-  cat(sprintf("\n=== Selected %d pairs (reached max panel size) ===\n\n", 
-              nrow(selected_pairs)))
+cat(sprintf("\n=== Selected %d pairs ===\n\n", nrow(selected_pairs)))
+
+# Check if enough pairs selected
+if (nrow(selected_pairs) < PARAMS$target_panel_size) {
+  cat(sprintf("WARNING: Only %d pairs selected (target: %d)\n", 
+              nrow(selected_pairs), PARAMS$target_panel_size))
 }
 
 # Assign pair IDs
@@ -163,8 +152,8 @@ rownames(selected_pairs) <- selected_pairs$pair_id
 # Display Final Panel
 # -----------------------------------------------------------------------------
 cat("=== Final Panel ===\n")
-print(selected_pairs[, c("pair_id", "up_name", "down_name", "separation",
-                         "reversal", "r0_consistency", "dz_total")])
+print(selected_pairs[, c("pair_id", "up_name", "down_name", "median_diff",
+                         "reversal_count", "reversal_rate", "q10")])
 
 # Correlation matrix (Spearman)
 if (nrow(selected_pairs) > 1) {
@@ -176,79 +165,77 @@ if (nrow(selected_pairs) > 1) {
   
   max_cor <- max(abs(cor_matrix[upper.tri(cor_matrix)]))
   cat(sprintf("\nMax off-diagonal correlation: %.2f\n", max_cor))
-  
-  # Warn if any high correlations slipped through
-  if (max_cor >= PARAMS$correlation_threshold) {
-    cat("!!! WARNING: High correlation pairs detected !!!\n")
-  }
 }
 
 # -----------------------------------------------------------------------------
-# Phase 6: Evaluate Separation
+# Phase 6: Compute Reversal Counts for All Samples
 # -----------------------------------------------------------------------------
-cat("\n=== Phase 6: Separation Evaluation ===\n")
+cat("\n=== Phase 6: Sample-level Reversal Evaluation ===\n")
 
-# Compute reversal count for each sample
-# Note: |r| < dead_zone is treated as NON-REVERSAL (conservative)
 compute_sample_reversals <- function(selected_pairs, log2_tpm, 
                                      r0_samples, r1_samples, dead_zone) {
   
   n_pairs <- nrow(selected_pairs)
   all_samples <- c(r0_samples, r1_samples)
+  n_all <- length(all_samples)
   
-  # Matrix to store reversal status (1 = reversed, 0 = not reversed)
-  reversal_matrix <- matrix(0, nrow = length(all_samples), ncol = n_pairs)
+  # Matrix to store r values
+  r_matrix <- matrix(NA, nrow = n_all, ncol = n_pairs)
+  rownames(r_matrix) <- all_samples
+  colnames(r_matrix) <- selected_pairs$pair_id
+  
+  # Matrix to store reversal status
+  reversal_matrix <- matrix(0, nrow = n_all, ncol = n_pairs)
   rownames(reversal_matrix) <- all_samples
   colnames(reversal_matrix) <- selected_pairs$pair_id
   
-  # Matrix to store dead zone status (for reference)
-  dz_matrix <- matrix(FALSE, nrow = length(all_samples), ncol = n_pairs)
-  rownames(dz_matrix) <- all_samples
-  colnames(dz_matrix) <- selected_pairs$pair_id
+  # R0 majority signs (pre-computed in selection)
+  r0_majority_signs <- selected_pairs$r0_majority_sign
+  names(r0_majority_signs) <- selected_pairs$pair_id
   
   for (k in 1:n_pairs) {
     up_g <- selected_pairs$up_gene[k]
     down_g <- selected_pairs$down_gene[k]
+    pair_id <- selected_pairs$pair_id[k]
     
-    # r values for all samples
+    # Compute r values
     r_all <- log2_tpm[up_g, all_samples] - log2_tpm[down_g, all_samples]
+    r_matrix[, k] <- r_all
     
-    # R0 majority sign (baseline for this pair)
-    r_r0 <- r_all[r0_samples]
-    majority_sign <- ifelse(sum(r_r0 > 0) > sum(r_r0 < 0), 1, -1)
+    # Reversal: outside dead zone AND opposite sign
+    majority_sign <- r0_majority_signs[pair_id]
+    outside_dz <- abs(r_all) >= dead_zone
+    opposite <- sign(r_all) != majority_sign
     
-    # Dead zone check
-    in_dead_zone <- abs(r_all) < dead_zone
-    dz_matrix[, k] <- in_dead_zone
-    
-    # Reversal: sign differs from majority AND not in dead zone
-    # If in dead zone -> treated as non-reversal (conservative)
-    is_reversed <- (sign(r_all) != majority_sign) & !in_dead_zone
-    reversal_matrix[, k] <- as.numeric(is_reversed)
+    reversal_matrix[, k] <- as.numeric(outside_dz & opposite)
   }
   
-  return(list(reversal = reversal_matrix, dead_zone = dz_matrix))
+  return(list(
+    r_matrix = r_matrix,
+    reversal_matrix = reversal_matrix,
+    r0_majority_signs = r0_majority_signs
+  ))
 }
 
 eval_result <- compute_sample_reversals(selected_pairs, log2_tpm, 
                                         r0_samples, r1_samples,
-                                        PARAMS$dead_zone_threshold)
-reversal_matrix <- eval_result$reversal
-dz_matrix <- eval_result$dead_zone
+                                        PARAMS$dead_zone)
+r_matrix <- eval_result$r_matrix
+reversal_matrix <- eval_result$reversal_matrix
 
-# R0 reversal counts
+# Reversal counts
 r0_reversals <- rowSums(reversal_matrix[r0_samples, , drop = FALSE])
+r1_reversals <- rowSums(reversal_matrix[r1_samples, , drop = FALSE])
+
 cat("\n--- R0 Sample Reversal Counts ---\n")
 cat("(Expected: low, as these are sporadic cases)\n")
 print(sort(r0_reversals, decreasing = TRUE))
 
-# R1 reversal counts  
-r1_reversals <- rowSums(reversal_matrix[r1_samples, , drop = FALSE])
 cat("\n--- R1 Sample Reversal Counts ---\n")
-cat("(Expected: high for radiation-induced, variable for mixed group)\n")
+cat("(Expected: variable, as R1 is a mixed group)\n")
 print(sort(r1_reversals, decreasing = TRUE))
 
-# Summary statistics
+# Summary
 cat("\n--- Summary ---\n")
 cat(sprintf("R0: range=%d-%d, mean=%.1f, median=%.0f\n", 
             min(r0_reversals), max(r0_reversals), 
@@ -257,91 +244,139 @@ cat(sprintf("R1: range=%d-%d, mean=%.1f, median=%.0f\n",
             min(r1_reversals), max(r1_reversals),
             mean(r1_reversals), median(r1_reversals)))
 
-# Dead zone summary
-r0_dz_count <- rowSums(dz_matrix[r0_samples, , drop = FALSE])
-r1_dz_count <- rowSums(dz_matrix[r1_samples, , drop = FALSE])
-cat(sprintf("\nDead zone (|r| < %.3f) occurrences:\n", PARAMS$dead_zone_threshold))
-cat(sprintf("  R0: mean=%.1f pairs/sample in DZ\n", mean(r0_dz_count)))
-cat(sprintf("  R1: mean=%.1f pairs/sample in DZ\n", mean(r1_dz_count)))
-
 # -----------------------------------------------------------------------------
-# Phase 7: Threshold Setting
+# Phase 7: Data-Driven Boundary Zone
 # -----------------------------------------------------------------------------
-cat("\n=== Phase 7: Threshold Setting ===\n")
+cat("\n=== Phase 7: Boundary Zone Definition ===\n")
 
 n_pairs <- nrow(selected_pairs)
+max_r0 <- max(r0_reversals)
+min_r1 <- min(r1_reversals)
 
-# Data-driven threshold: max(R0 reversal) + 1 ensures 100% R0 specificity
-max_r0_reversal <- max(r0_reversals)
-threshold_T <- max_r0_reversal + 1
+cat(sprintf("R0 max reversal: %d\n", max_r0))
+cat(sprintf("R1 min reversal: %d\n", min_r1))
 
-cat(sprintf("\n--- Data-Driven Threshold Selection ---\n"))
-cat(sprintf("R0 max reversal: %d\n", max_r0_reversal))
-cat(sprintf("Selected threshold T = %d (max R0 reversal + 1)\n", threshold_T))
-cat("Rationale: Minimum threshold ensuring 100%% R0 specificity\n\n")
+# Define boundary zone
+# negative: <= max_r0
+# positive: >= min_r1
+# undetermined: (max_r0, min_r1) if gap exists
 
-cat("--- Sensitivity Analysis ---\n")
-cat("Threshold T | R0 Panel(+) | R1 Panel(-) | R0 Specificity | R1 Sensitivity\n")
-cat("----------- | ----------- | ----------- | -------------- | --------------\n")
+if (max_r0 < min_r1) {
+  # Clear separation - gap exists
+  boundary <- list(
+    negative_max = max_r0,
+    positive_min = min_r1,
+    undetermined_range = if (min_r1 - max_r0 > 1) (max_r0 + 1):(min_r1 - 1) else NULL,
+    has_gap = TRUE,
+    gap_size = min_r1 - max_r0 - 1
+  )
+  cat(sprintf("\n*** Clear separation detected ***\n"))
+  cat(sprintf("Negative: reversal <= %d\n", boundary$negative_max))
+  cat(sprintf("Positive: reversal >= %d\n", boundary$positive_min))
+  if (!is.null(boundary$undetermined_range)) {
+    cat(sprintf("Undetermined: reversal in {%s}\n", 
+                paste(boundary$undetermined_range, collapse = ", ")))
+  } else {
+    cat("Undetermined: none (adjacent thresholds)\n")
+  }
+} else {
+  # Overlap exists
+  boundary <- list(
+    negative_max = max_r0,
+    positive_min = min_r1,
+    undetermined_range = min_r1:max_r0,
+    has_gap = FALSE,
+    overlap_size = max_r0 - min_r1 + 1
+  )
+  cat(sprintf("\n*** WARNING: Overlap detected ***\n"))
+  cat(sprintf("R0 max (%d) >= R1 min (%d)\n", max_r0, min_r1))
+  cat(sprintf("Overlap range: {%s}\n", 
+              paste(boundary$undetermined_range, collapse = ", ")))
+  cat("Consider: values in overlap range = undetermined\n")
+}
+
+# Classification function
+classify_sample <- function(reversal_count, boundary) {
+  if (reversal_count <= boundary$negative_max && 
+      (boundary$has_gap || reversal_count < boundary$positive_min)) {
+    return("negative")
+  } else if (reversal_count >= boundary$positive_min && 
+             (boundary$has_gap || reversal_count > boundary$negative_max)) {
+    return("positive")
+  } else {
+    return("undetermined")
+  }
+}
+
+# Apply classification
+r0_class <- sapply(r0_reversals, classify_sample, boundary = boundary)
+r1_class <- sapply(r1_reversals, classify_sample, boundary = boundary)
+
+cat("\n--- Classification Results ---\n")
+cat("\nR0 (sporadic, expected: negative):\n")
+print(table(r0_class))
+
+cat("\nR1 (mixed, expected: mostly positive with some negative/undetermined):\n")
+print(table(r1_class))
+
+# -----------------------------------------------------------------------------
+# Sensitivity Analysis: Threshold Sweep
+# -----------------------------------------------------------------------------
+cat("\n=== Threshold Sensitivity Analysis ===\n")
+cat("(For reference - showing performance at different thresholds)\n\n")
+
+cat("Threshold | R0 neg | R0 und | R0 pos | R1 neg | R1 und | R1 pos\n")
+cat("--------- | ------ | ------ | ------ | ------ | ------ | ------\n")
 
 threshold_results <- data.frame()
 
-for (T in 1:min(10, n_pairs)) {
-  r0_positive <- sum(r0_reversals >= T)  # False positives
-  r1_negative <- sum(r1_reversals < T)   # "Negatives" (may include sporadic in R1)
-  r0_specificity <- (n_r0 - r0_positive) / n_r0 * 100
-  r1_sensitivity <- (n_r1 - r1_negative) / n_r1 * 100  # Note: R1 is mixed
+for (T in 0:n_pairs) {
+  # Simple threshold: < T = negative, >= T = positive
+  r0_pos_simple <- sum(r0_reversals >= T)
+  r0_neg_simple <- sum(r0_reversals < T)
+  r1_pos_simple <- sum(r1_reversals >= T)
+  r1_neg_simple <- sum(r1_reversals < T)
   
-  marker <- ifelse(T == threshold_T, " <-- selected", "")
-  
-  cat(sprintf("T = %d       | %d/%d         | %d/%d         | %.1f%%          | %.1f%%%s\n", 
-              T, r0_positive, n_r0, r1_negative, n_r1, 
-              r0_specificity, r1_sensitivity, marker))
+  cat(sprintf("T = %2d    | %2d     | -      | %2d     | %2d     | -      | %2d\n",
+              T, r0_neg_simple, r0_pos_simple, r1_neg_simple, r1_pos_simple))
   
   threshold_results <- rbind(threshold_results, data.frame(
     T = T,
-    r0_positive = r0_positive,
-    r1_negative = r1_negative,
-    r0_specificity = r0_specificity,
-    r1_sensitivity = r1_sensitivity
+    r0_negative = r0_neg_simple,
+    r0_positive = r0_pos_simple,
+    r1_negative = r1_neg_simple,
+    r1_positive = r1_pos_simple,
+    r0_specificity = r0_neg_simple / n_r0 * 100,
+    r1_positive_rate = r1_pos_simple / n_r1 * 100
   ))
 }
 
-cat(sprintf("\n--- Final Threshold: T = %d ---\n", threshold_T))
-cat("Note: R1 'sensitivity' is approximate as R1 contains mixed cases\n")
+# Highlight data-driven boundary
+cat(sprintf("\n--- Data-Driven Boundary ---\n"))
+cat(sprintf("Negative threshold: <= %d (all R0 classified as negative)\n", max_r0))
+cat(sprintf("Positive threshold: >= %d (based on R1 minimum)\n", min_r1))
 
-# Final classification
-cat("\n--- Classification with T = %d ---\n", threshold_T)
+# -----------------------------------------------------------------------------
+# Notable Samples
+# -----------------------------------------------------------------------------
+cat("\n=== Notable Samples ===\n")
 
-r0_panel_positive <- r0_reversals >= threshold_T
-r1_panel_positive <- r1_reversals >= threshold_T
-
-cat(sprintf("R0 (sporadic): %d Panel(+), %d Panel(-)\n",
-            sum(r0_panel_positive), sum(!r0_panel_positive)))
-cat(sprintf("R1 (high POC): %d Panel(+), %d Panel(-)\n",
-            sum(r1_panel_positive), sum(!r1_panel_positive)))
-
-# Identify notable samples
-cat("\n--- Notable Samples ---\n")
-
-# R0 with high reversal (potential false positives)
-if (any(r0_reversals >= threshold_T - 1)) {
-  cat("\nR0 samples near/above threshold:\n")
-  high_r0 <- r0_samples[r0_reversals >= threshold_T - 1]
-  for (s in high_r0) {
-    status <- ifelse(r0_reversals[s] >= threshold_T, "Panel(+) - CAUTION", "Panel(-)")
-    cat(sprintf("  %s: %d/%d reversals -> %s\n", s, r0_reversals[s], n_pairs, status))
-  }
+# R0 with highest reversal
+cat("\nR0 samples with highest reversal:\n")
+r0_sorted <- sort(r0_reversals, decreasing = TRUE)
+for (i in 1:min(3, length(r0_sorted))) {
+  s <- names(r0_sorted)[i]
+  cat(sprintf("  %s: %d/%d reversals -> %s\n", 
+              s, r0_reversals[s], n_pairs, r0_class[s]))
 }
 
-# R1 with low reversal (sporadic within R1)
-if (any(r1_reversals < threshold_T + 1)) {
-  cat("\nR1 samples near/below threshold:\n")
-  low_r1 <- r1_samples[r1_reversals < threshold_T + 1]
-  for (s in low_r1) {
-    status <- ifelse(r1_reversals[s] >= threshold_T, "Panel(+)", "Panel(-) - likely sporadic")
-    cat(sprintf("  %s: %d/%d reversals -> %s\n", s, r1_reversals[s], n_pairs, status))
-  }
+# R1 with lowest reversal
+cat("\nR1 samples with lowest reversal:\n")
+r1_sorted <- sort(r1_reversals, decreasing = FALSE)
+for (i in 1:min(3, length(r1_sorted))) {
+  s <- names(r1_sorted)[i]
+  cat(sprintf("  %s: %d/%d reversals -> %s (likely sporadic in R1)\n", 
+              s, r1_reversals[s], n_pairs, r1_class[s]))
 }
 
 # -----------------------------------------------------------------------------
@@ -350,35 +385,43 @@ if (any(r1_reversals < threshold_T + 1)) {
 cat("\n=== Saving Results ===\n")
 
 output <- list(
+  # Version info
+  version = "v7.1",
+  date = "2025-12-09",
+  
   # Parameters
   params = PARAMS,
-  threshold_T = threshold_T,
+  
+  # Boundary zone (data-driven)
+  boundary = boundary,
   
   # Panel definition
   selected_pairs = selected_pairs,
-  correlation_matrix = cor_matrix,
+  correlation_matrix = if (exists("cor_matrix")) cor_matrix else NULL,
   
-  # Evaluation matrices
+  # R0 majority signs
+  r0_majority_signs = eval_result$r0_majority_signs,
+  
+  # Raw data matrices
+  r_matrix = r_matrix,
   reversal_matrix = reversal_matrix,
-  dead_zone_matrix = dz_matrix,
   
   # Sample-level results
   r0_reversals = r0_reversals,
   r1_reversals = r1_reversals,
-  r0_panel_positive = r0_panel_positive,
-  r1_panel_positive = r1_panel_positive,
+  r0_class = r0_class,
+  r1_class = r1_class,
   
   # Threshold analysis
   threshold_results = threshold_results,
   
-  # Data references
+  # Expression data reference
   log2_tpm = log2_tpm,
   r0_samples = r0_samples,
   r1_samples = r1_samples,
   
   # Metadata
-  timestamp = Sys.time(),
-  version = "v1.0"
+  timestamp = Sys.time()
 )
 
 saveRDS(output, file.path(paths$processed, "reo_final_panel.rds"))
@@ -387,8 +430,8 @@ cat(sprintf("Saved: %s\n", file.path(paths$processed, "reo_final_panel.rds")))
 # Panel summary CSV
 panel_csv <- selected_pairs[, c("pair_id", "up_name", "down_name", 
                                 "up_gene", "down_gene",
-                                "dz_total", "r0_consistency", 
-                                "reversal", "wilson_lower")]
+                                "median_diff", "reversal_count", 
+                                "reversal_rate", "q10")]
 write.csv(panel_csv, file.path(paths$output, "reo_final_panel.csv"), row.names = FALSE)
 cat(sprintf("Saved: %s\n", file.path(paths$output, "reo_final_panel.csv")))
 
@@ -397,17 +440,39 @@ sample_results <- data.frame(
   sample_id = c(r0_samples, r1_samples),
   group = c(rep("R0", n_r0), rep("R1", n_r1)),
   reversal_count = c(r0_reversals, r1_reversals),
-  panel_result = c(ifelse(r0_panel_positive, "Panel(+)", "Panel(-)"),
-                   ifelse(r1_panel_positive, "Panel(+)", "Panel(-)"))
+  classification = c(r0_class, r1_class)
 )
 write.csv(sample_results, file.path(paths$output, "reo_sample_classification.csv"), 
           row.names = FALSE)
 cat(sprintf("Saved: %s\n", file.path(paths$output, "reo_sample_classification.csv")))
 
-cat("\n=== Phase 5-7 Complete ===\n")
-cat(sprintf("Final panel: %d pairs\n", nrow(selected_pairs)))
-cat(sprintf("Voting threshold: T = %d\n", threshold_T))
-cat(sprintf("R0 specificity: %.1f%%\n", 
-            threshold_results$r0_specificity[threshold_results$T == threshold_T]))
-cat(sprintf("R1 Panel(+) rate: %.1f%%\n", 
-            threshold_results$r1_sensitivity[threshold_results$T == threshold_T]))
+# -----------------------------------------------------------------------------
+# Final Summary
+# -----------------------------------------------------------------------------
+cat("\n=============================================================================\n")
+cat("Phase 5-7 Complete\n")
+cat("=============================================================================\n")
+
+cat(sprintf("\nFinal panel: %d pairs\n", nrow(selected_pairs)))
+cat(sprintf("Ranking: |median_R0 - median_R1| (top = %.3f)\n", 
+            selected_pairs$median_diff[1]))
+
+cat(sprintf("\nBoundary Zone:\n"))
+cat(sprintf("  Negative: reversal <= %d\n", boundary$negative_max))
+cat(sprintf("  Positive: reversal >= %d\n", boundary$positive_min))
+if (boundary$has_gap && !is.null(boundary$undetermined_range)) {
+  cat(sprintf("  Undetermined: {%s}\n", 
+              paste(boundary$undetermined_range, collapse = ", ")))
+}
+
+cat(sprintf("\nClassification Summary:\n"))
+cat(sprintf("  R0: %d negative, %d undetermined, %d positive\n",
+            sum(r0_class == "negative"), 
+            sum(r0_class == "undetermined"),
+            sum(r0_class == "positive")))
+cat(sprintf("  R1: %d negative, %d undetermined, %d positive\n",
+            sum(r1_class == "negative"),
+            sum(r1_class == "undetermined"),
+            sum(r1_class == "positive")))
+
+cat("\n=== Done ===\n")

@@ -2,7 +2,7 @@
 # Purpose: Create comprehensive case master table with all clinical/POC data
 # Input: thyr_se_strand2_nonzero.rds (for pair checking), clinical data, POC data
 # Output: thyr_case_master_full.rds (all cases), thyr_case_master.rds (grouped cases)
-# Version: v7.8 - New group design (R0/R_Low/R_High/R1, B0/B_Low/B_High/B1)
+# Version: v7.8 - New group design (R0/R_Low/R_Mid/R1, B0/B_Low/B_Mid/B1)
 #                 Added has_tumor, has_normal flags
 # Date: 2025-12-06
 
@@ -200,7 +200,7 @@ if (any(braf_mask, na.rm = TRUE)) {
   
   # Verify all are BRAF.MutV600E
   if (length(unique_designated) == 1 && unique_designated[1] == "BRAF.MutV600E") {
-    cat("  âœ“ All BRAF cases are correctly BRAF.MutV600E\n")
+    cat("  Ã¢Å“â€œ All BRAF cases are correctly BRAF.MutV600E\n")
   } else {
     warning("Unexpected Designated_Driver values in BRAF cases!")
   }
@@ -231,12 +231,12 @@ idx_R_Low <- thyr_case_master_full$driver == "RET" &
   thyr_case_master_full$POC < 33.3
 thyr_case_master_full$group[idx_R_Low] <- "R_Low"
 
-# R_High: RET + 33.3% <= POC < 66.6%
-idx_R_High <- thyr_case_master_full$driver == "RET" & 
+# R_Mid: RET + 33.3% <= POC < 66.6%
+idx_R_Mid <- thyr_case_master_full$driver == "RET" & 
   !is.na(thyr_case_master_full$POC) &
   thyr_case_master_full$POC >= 33.3 &
   thyr_case_master_full$POC < 66.6
-thyr_case_master_full$group[idx_R_High] <- "R_High"
+thyr_case_master_full$group[idx_R_Mid] <- "R_Mid"
 
 # R1: RET + POC >= 66.6%
 idx_R1 <- thyr_case_master_full$driver == "RET" & 
@@ -260,12 +260,12 @@ idx_B_Low <- thyr_case_master_full$driver == "BRAF" &
   thyr_case_master_full$POC < 33.3
 thyr_case_master_full$group[idx_B_Low] <- "B_Low"
 
-# B_High: BRAF + 33.3% <= POC < 66.6%
-idx_B_High <- thyr_case_master_full$driver == "BRAF" & 
+# B_Mid: BRAF + 33.3% <= POC < 66.6%
+idx_B_Mid <- thyr_case_master_full$driver == "BRAF" & 
   !is.na(thyr_case_master_full$POC) &
   thyr_case_master_full$POC >= 33.3 &
   thyr_case_master_full$POC < 66.6
-thyr_case_master_full$group[idx_B_High] <- "B_High"
+thyr_case_master_full$group[idx_B_Mid] <- "B_Mid"
 
 # B1: BRAF + POC >= 66.6%
 idx_B1 <- thyr_case_master_full$driver == "BRAF" & 
@@ -282,7 +282,7 @@ main_groups <- c("R0", "R1", "B0", "B1")
 thyr_case_master_full$group_type[thyr_case_master_full$group %in% main_groups] <- "main"
 
 # Validation (intermediate POC, for internal validation)
-validation_groups <- c("R_Low", "R_High", "B_Low", "B_High")
+validation_groups <- c("R_Low", "R_Mid", "B_Low", "B_Mid")
 thyr_case_master_full$group_type[thyr_case_master_full$group %in% validation_groups] <- "validation"
 
 # ============================================================================
@@ -292,7 +292,7 @@ cat("\n--- Creating filtered case master ---\n")
 
 thyr_case_master <- thyr_case_master_full[!is.na(thyr_case_master_full$group), ]
 
-cat(sprintf("Total cases: %d â†’ Grouped cases: %d (%.1f%%)\n",
+cat(sprintf("Total cases: %d Ã¢â€ â€™ Grouped cases: %d (%.1f%%)\n",
             nrow(thyr_case_master_full),
             nrow(thyr_case_master),
             nrow(thyr_case_master) / nrow(thyr_case_master_full) * 100))
@@ -359,13 +359,13 @@ print_group_summary <- function(group_name, data) {
 
 # RET groups
 cat("\nRET groups:\n")
-for (g in c("R0", "R_Low", "R_High", "R1")) {
+for (g in c("R0", "R_Low", "R_Mid", "R1")) {
   print_group_summary(g, thyr_case_master)
 }
 
 # BRAF groups
 cat("\nBRAF groups:\n")
-for (g in c("B0", "B_Low", "B_High", "B1")) {
+for (g in c("B0", "B_Low", "B_Mid", "B1")) {
   print_group_summary(g, thyr_case_master)
 }
 
@@ -392,7 +392,7 @@ if (nrow(braf_cases) > 0) {
     warning("Found non-BRAF.MutV600E cases in BRAF group!")
     print(unique(braf_cases$Designated_Driver[non_v600e]))
   } else {
-    cat("  âœ“ All BRAF cases are correctly BRAF.MutV600E\n")
+    cat("  Ã¢Å“â€œ All BRAF cases are correctly BRAF.MutV600E\n")
   }
 }
 
@@ -472,8 +472,8 @@ cat("  1. thyr_case_master_full: All", nrow(thyr_case_master_full),
 cat("  2. thyr_case_master:", nrow(thyr_case_master), 
     "grouped cases (main working dataset)\n")
 cat("\nGroups defined:\n")
-cat("  RET: R0 (POC=NA), R_Low (0-33.3%), R_High (33.3-66.6%), R1 (>=66.6%)\n")
-cat("  BRAF: B0 (POC=NA), B_Low (0-33.3%), B_High (33.3-66.6%), B1 (>=66.6%)\n")
+cat("  RET: R0 (POC=NA), R_Low (0-33.3%), R_Mid (33.3-66.6%), R1 (>=66.6%)\n")
+cat("  BRAF: B0 (POC=NA), B_Low (0-33.3%), B_Mid (33.3-66.6%), B1 (>=66.6%)\n")
 cat("  Note: has_pair flag distinguishes paired/unpaired samples\n")
 cat("\nNew flags: has_tumor, has_normal, has_pair\n")
 cat("Clinical variables preserved:", ncol(thyr_case_master), "\n")

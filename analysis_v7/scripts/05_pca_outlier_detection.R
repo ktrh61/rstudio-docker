@@ -11,8 +11,8 @@ source("analysis_v7/setup.R")
 
 cat("\n=== PCA Outlier Detection (v7.13) ===\n")
 cat("Date:", as.character(Sys.Date()), "\n")
-cat("Analysis: 12 groups (R0/R_Low/R_High/R1/B0/B1 × tumor/normal)\n")
-cat("Note: B_Low/B_High excluded (not used in validation)\n")
+cat("Analysis: 12 groups (R0/R_Low/R_Mid/R1/B0/B1 Ã— tumor/normal)\n")
+cat("Note: B_Low/B_Mid excluded (not used in validation)\n")
 cat("Gene filtering: Protein coding only, per-group filterByExpr\n")
 cat("Normalization: MUREN (consistent with downstream)\n")
 cat("Sample filtering: _merged samples only, paired cases only\n")
@@ -124,7 +124,7 @@ if (exists("thyr_se_strand2_nonzero")) {
   cat("Loading SE from file...\n")
   se <- readRDS(se_path)
 }
-cat("SE dimensions:", format(nrow(se), big.mark=","), "genes ×", 
+cat("SE dimensions:", format(nrow(se), big.mark=","), "genes Ã—", 
     format(ncol(se), big.mark=","), "samples\n")
 
 # Load case master for group definitions
@@ -139,7 +139,7 @@ cat("Case master loaded:", nrow(thyr_case_master), "cases\n")
 # Filter to all analysis groups (paired samples only for PCA QC)
 # Note: All groups included, but PCA QC only runs on paired samples
 thyr_case_master_stage1_filtered <- thyr_case_master %>%
-  filter(group %in% c("R0", "R_Low", "R_High", "R1", "B0", "B_Low", "B_High", "B1"))
+  filter(group %in% c("R0", "R_Low", "R_Mid", "R1", "B0", "B_Low", "B_Mid", "B1"))
 
 cat("Analysis groups:", nrow(thyr_case_master_stage1_filtered), "cases\n")
 cat("  Paired:", sum(thyr_case_master_stage1_filtered$has_pair), "cases (PCA QC target)\n")
@@ -192,15 +192,15 @@ extract_group_samples <- function(group_name, sample_type_filter, case_master_df
 }
 
 # Create groups as lists of sample_submitter_ids (paired only)
-# Note: B_Low/B_High excluded from PCA QC (not used in validation)
+# Note: B_Low/B_Mid excluded from PCA QC (not used in validation)
 groups_ids <- list(
   # RET groups (all for validation)
   R0_tumor = extract_group_samples("R0", "Primary Tumor", thyr_case_master_stage1_filtered, sample_metadata),
   R0_normal = extract_group_samples("R0", "Solid Tissue Normal", thyr_case_master_stage1_filtered, sample_metadata),
   R_Low_tumor = extract_group_samples("R_Low", "Primary Tumor", thyr_case_master_stage1_filtered, sample_metadata),
   R_Low_normal = extract_group_samples("R_Low", "Solid Tissue Normal", thyr_case_master_stage1_filtered, sample_metadata),
-  R_High_tumor = extract_group_samples("R_High", "Primary Tumor", thyr_case_master_stage1_filtered, sample_metadata),
-  R_High_normal = extract_group_samples("R_High", "Solid Tissue Normal", thyr_case_master_stage1_filtered, sample_metadata),
+  R_Mid_tumor = extract_group_samples("R_Mid", "Primary Tumor", thyr_case_master_stage1_filtered, sample_metadata),
+  R_Mid_normal = extract_group_samples("R_Mid", "Solid Tissue Normal", thyr_case_master_stage1_filtered, sample_metadata),
   R1_tumor = extract_group_samples("R1", "Primary Tumor", thyr_case_master_stage1_filtered, sample_metadata),
   R1_normal = extract_group_samples("R1", "Solid Tissue Normal", thyr_case_master_stage1_filtered, sample_metadata),
   # BRAF groups (B0/B1 only for driver generalization validation)
@@ -234,7 +234,7 @@ pa_select_K <- function(X, R = 200, alpha = 0.05, L = 8, seed = 1986) {
   RNGkind("L'Ecuyer-CMRG")
   set.seed(seed)
   
-  X_t <- t(X)  # samples × genes
+  X_t <- t(X)  # samples Ã— genes
   n <- nrow(X_t)
   p <- ncol(X_t)
   L <- min(L, n - 1L, p)
@@ -276,7 +276,7 @@ pa_select_K <- function(X, R = 200, alpha = 0.05, L = 8, seed = 1986) {
 
 # Adaptive outlier detection function
 cdm_outlier_detection <- function(cdm_result, X, K, config = CONFIG) {
-  # Ensure X is samples × genes
+  # Ensure X is samples Ã— genes
   if (ncol(X) == nrow(cdm_result$vectors)) {
     Xuse <- X
   } else {
@@ -682,7 +682,7 @@ thyr_case_master_stage1_filtered$has_outlier_tumor[paired_idx] <- 0L
 thyr_case_master_stage1_filtered$has_outlier_normal[paired_idx] <- 0L
 
 # Groups that were QC'd
-qc_target_groups <- c("R0", "R_Low", "R_High", "R1", "B0", "B1")
+qc_target_groups <- c("R0", "R_Low", "R_Mid", "R1", "B0", "B1")
 
 # Update flags based on outlier detection
 for (i in seq_len(nrow(thyr_case_master_stage1_filtered))) {
@@ -745,9 +745,9 @@ clean_qc_target <- sum(qc_target_cases$has_outlier_tumor == 0 &
 non_qc_cases <- sum(!(thyr_case_master_stage1_filtered$group %in% qc_target_groups) |
                       !thyr_case_master_stage1_filtered$has_pair)
 
-cat(sprintf("\nQC target cases (R0/R_Low/R_High/R1/B0/B1 paired): %d - Clean: %d (%.1f%%)\n",
+cat(sprintf("\nQC target cases (R0/R_Low/R_Mid/R1/B0/B1 paired): %d - Clean: %d (%.1f%%)\n",
             qc_target_count, clean_qc_target, clean_qc_target/qc_target_count*100))
-cat(sprintf("Non-QC cases (B_Low/B_High or unpaired): %d\n", non_qc_cases))
+cat(sprintf("Non-QC cases (B_Low/B_Mid or unpaired): %d\n", non_qc_cases))
 
 # ============================================================================
 # Processing summary
@@ -783,7 +783,7 @@ cat("\n--- Saving results ---\n")
 output_file <- paste0(paths$processed, "thyr_case_master_stage1_filtered.rds")
 saveRDS(thyr_case_master_stage1_filtered, output_file)
 cat("  Updated case_master saved:", basename(output_file), "\n")
-cat(sprintf("    Contains: %d cases (R0/R_Low/R_High/R1 + B0/B_Low/B_High/B1)\n", nrow(thyr_case_master_stage1_filtered)))
+cat(sprintf("    Contains: %d cases (R0/R_Low/R_Mid/R1 + B0/B_Low/B_Mid/B1)\n", nrow(thyr_case_master_stage1_filtered)))
 cat("    Columns: has_outlier_tumor, has_outlier_normal (0/1/NA)\n")
 cat("    Note: NA = unpaired, PCA QC not performed\n")
 
@@ -828,14 +828,14 @@ cat("\nResults:\n")
 cat("  Total outlier samples:", length(outlier_samples), "\n")
 cat("  QC target cases:", qc_target_count, "- Clean:", clean_qc_target, 
     sprintf("(%.1f%%)\n", clean_qc_target/qc_target_count*100))
-cat("  Non-QC cases:", non_qc_cases, "(B_Low/B_High or unpaired)\n")
+cat("  Non-QC cases:", non_qc_cases, "(B_Low/B_Mid or unpaired)\n")
 cat("\nOutputs:\n")
 cat("  Main: thyr_case_master_stage1_filtered.rds\n")
 cat("  Info: stage1_pca_info.rds, stage1_outlier_summary.csv\n")
 cat("  Plot: 05_sd_od_diagnostic.pdf\n")
 cat("\nNext: Use thyr_case_master_stage1_filtered for downstream analysis\n")
 cat("      For QC target: Filter with has_outlier_tumor == 0 & has_outlier_normal == 0\n")
-cat("      For non-QC (B_Low/B_High, unpaired): has_outlier_tumor/normal is NA\n")
+cat("      For non-QC (B_Low/B_Mid, unpaired): has_outlier_tumor/normal is NA\n")
 
 # Restore SE to original variable name
 thyr_se_strand2_nonzero <- se
@@ -908,7 +908,7 @@ create_sd_od_plot <- function(result) {
 all_plots <- lapply(results, create_sd_od_plot)
 all_plots <- all_plots[!sapply(all_plots, is.null)]
 
-# --- RET DEG groups (2×2 layout) ---
+# --- RET DEG groups (2Ã—2 layout) ---
 ret_deg_groups <- c("R0_tumor", "R0_normal", "R1_tumor", "R1_normal")
 ret_deg_plots <- all_plots[names(all_plots) %in% ret_deg_groups]
 
@@ -916,7 +916,7 @@ if (length(ret_deg_plots) > 0) {
   ret_deg_order <- intersect(ret_deg_groups, names(ret_deg_plots))
   ret_deg_plots <- ret_deg_plots[ret_deg_order]
   
-  cat("  Displaying RET DEG groups (2×2)...\n")
+  cat("  Displaying RET DEG groups (2Ã—2)...\n")
   ret_deg_combined <- gridExtra::grid.arrange(
     grobs = ret_deg_plots,
     ncol = 2, nrow = 2,
@@ -926,25 +926,25 @@ if (length(ret_deg_plots) > 0) {
   print(ret_deg_combined)
 }
 
-# --- RET Validation groups (2×2 layout) ---
-ret_val_groups <- c("R_Low_tumor", "R_Low_normal", "R_High_tumor", "R_High_normal")
+# --- RET Validation groups (2Ã—2 layout) ---
+ret_val_groups <- c("R_Low_tumor", "R_Low_normal", "R_Mid_tumor", "R_Mid_normal")
 ret_val_plots <- all_plots[names(all_plots) %in% ret_val_groups]
 
 if (length(ret_val_plots) > 0) {
   ret_val_order <- intersect(ret_val_groups, names(ret_val_plots))
   ret_val_plots <- ret_val_plots[ret_val_order]
   
-  cat("  Displaying RET Validation groups (2×2)...\n")
+  cat("  Displaying RET Validation groups (2Ã—2)...\n")
   ret_val_combined <- gridExtra::grid.arrange(
     grobs = ret_val_plots,
     ncol = 2, nrow = 2,
-    top = grid::textGrob("RET Validation Groups (R_Low/R_High): SD vs OD Diagnostic", 
+    top = grid::textGrob("RET Validation Groups (R_Low/R_Mid): SD vs OD Diagnostic", 
                          gp = grid::gpar(fontsize = 14, fontface = "bold"))
   )
   print(ret_val_combined)
 }
 
-# --- BRAF groups (2×2 layout) ---
+# --- BRAF groups (2Ã—2 layout) ---
 braf_groups <- c("B0_tumor", "B0_normal", "B1_tumor", "B1_normal")
 braf_plots <- all_plots[names(all_plots) %in% braf_groups]
 
@@ -952,7 +952,7 @@ if (length(braf_plots) > 0) {
   braf_order <- intersect(braf_groups, names(braf_plots))
   braf_plots <- braf_plots[braf_order]
   
-  cat("  Displaying BRAF groups (2×2)...\n")
+  cat("  Displaying BRAF groups (2Ã—2)...\n")
   braf_combined <- gridExtra::grid.arrange(
     grobs = braf_plots,
     ncol = 2, nrow = 2,
@@ -979,7 +979,7 @@ if (length(ret_val_plots) > 0) {
   gridExtra::grid.arrange(
     grobs = ret_val_plots,
     ncol = 2, nrow = 2,
-    top = grid::textGrob("RET Validation Groups (R_Low/R_High): SD vs OD Diagnostic", 
+    top = grid::textGrob("RET Validation Groups (R_Low/R_Mid): SD vs OD Diagnostic", 
                          gp = grid::gpar(fontsize = 14, fontface = "bold"))
   )
 }
