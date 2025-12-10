@@ -11,7 +11,7 @@ source("analysis_v7/setup.R")
 
 cat("\n=== PCA Outlier Detection (v7.13) ===\n")
 cat("Date:", as.character(Sys.Date()), "\n")
-cat("Analysis: 12 groups (R0/R_Low/R_Mid/R1/B0/B1 Ã— tumor/normal)\n")
+cat("Analysis: 12 groups (R0/R_Low/R_Mid/R1/B0/B1 x tumor/normal)\n")
 cat("Note: B_Low/B_Mid excluded (not used in validation)\n")
 cat("Gene filtering: Protein coding only, per-group filterByExpr\n")
 cat("Normalization: MUREN (consistent with downstream)\n")
@@ -124,7 +124,7 @@ if (exists("thyr_se_strand2_nonzero")) {
   cat("Loading SE from file...\n")
   se <- readRDS(se_path)
 }
-cat("SE dimensions:", format(nrow(se), big.mark=","), "genes Ã—", 
+cat("SE dimensions:", format(nrow(se), big.mark=","), "genes x", 
     format(ncol(se), big.mark=","), "samples\n")
 
 # Load case master for group definitions
@@ -234,7 +234,7 @@ pa_select_K <- function(X, R = 200, alpha = 0.05, L = 8, seed = 1986) {
   RNGkind("L'Ecuyer-CMRG")
   set.seed(seed)
   
-  X_t <- t(X)  # samples Ã— genes
+  X_t <- t(X)  # samples x genes
   n <- nrow(X_t)
   p <- ncol(X_t)
   L <- min(L, n - 1L, p)
@@ -276,7 +276,7 @@ pa_select_K <- function(X, R = 200, alpha = 0.05, L = 8, seed = 1986) {
 
 # Adaptive outlier detection function
 cdm_outlier_detection <- function(cdm_result, X, K, config = CONFIG) {
-  # Ensure X is samples Ã— genes
+  # Ensure X is samples x genes
   if (ncol(X) == nrow(cdm_result$vectors)) {
     Xuse <- X
   } else {
@@ -908,7 +908,7 @@ create_sd_od_plot <- function(result) {
 all_plots <- lapply(results, create_sd_od_plot)
 all_plots <- all_plots[!sapply(all_plots, is.null)]
 
-# --- RET DEG groups (2Ã—2 layout) ---
+# --- RET DEG groups (2x2 layout) ---
 ret_deg_groups <- c("R0_tumor", "R0_normal", "R1_tumor", "R1_normal")
 ret_deg_plots <- all_plots[names(all_plots) %in% ret_deg_groups]
 
@@ -916,7 +916,7 @@ if (length(ret_deg_plots) > 0) {
   ret_deg_order <- intersect(ret_deg_groups, names(ret_deg_plots))
   ret_deg_plots <- ret_deg_plots[ret_deg_order]
   
-  cat("  Displaying RET DEG groups (2Ã—2)...\n")
+  cat("  Displaying RET DEG groups (2x2)...\n")
   ret_deg_combined <- gridExtra::grid.arrange(
     grobs = ret_deg_plots,
     ncol = 2, nrow = 2,
@@ -926,7 +926,7 @@ if (length(ret_deg_plots) > 0) {
   print(ret_deg_combined)
 }
 
-# --- RET Validation groups (2Ã—2 layout) ---
+# --- RET Validation groups (2x2 layout) ---
 ret_val_groups <- c("R_Low_tumor", "R_Low_normal", "R_Mid_tumor", "R_Mid_normal")
 ret_val_plots <- all_plots[names(all_plots) %in% ret_val_groups]
 
@@ -934,7 +934,7 @@ if (length(ret_val_plots) > 0) {
   ret_val_order <- intersect(ret_val_groups, names(ret_val_plots))
   ret_val_plots <- ret_val_plots[ret_val_order]
   
-  cat("  Displaying RET Validation groups (2Ã—2)...\n")
+  cat("  Displaying RET Validation groups (2x2)...\n")
   ret_val_combined <- gridExtra::grid.arrange(
     grobs = ret_val_plots,
     ncol = 2, nrow = 2,
@@ -944,7 +944,7 @@ if (length(ret_val_plots) > 0) {
   print(ret_val_combined)
 }
 
-# --- BRAF groups (2Ã—2 layout) ---
+# --- BRAF groups (2x2 layout) ---
 braf_groups <- c("B0_tumor", "B0_normal", "B1_tumor", "B1_normal")
 braf_plots <- all_plots[names(all_plots) %in% braf_groups]
 
@@ -952,7 +952,7 @@ if (length(braf_plots) > 0) {
   braf_order <- intersect(braf_groups, names(braf_plots))
   braf_plots <- braf_plots[braf_order]
   
-  cat("  Displaying BRAF groups (2Ã—2)...\n")
+  cat("  Displaying BRAF groups (2x2)...\n")
   braf_combined <- gridExtra::grid.arrange(
     grobs = braf_plots,
     ncol = 2, nrow = 2,

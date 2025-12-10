@@ -200,7 +200,7 @@ if (any(braf_mask, na.rm = TRUE)) {
   
   # Verify all are BRAF.MutV600E
   if (length(unique_designated) == 1 && unique_designated[1] == "BRAF.MutV600E") {
-    cat("  Ã¢Å“â€œ All BRAF cases are correctly BRAF.MutV600E\n")
+    cat("  [OK] All BRAF cases are correctly BRAF.MutV600E\n")
   } else {
     warning("Unexpected Designated_Driver values in BRAF cases!")
   }
@@ -292,7 +292,7 @@ cat("\n--- Creating filtered case master ---\n")
 
 thyr_case_master <- thyr_case_master_full[!is.na(thyr_case_master_full$group), ]
 
-cat(sprintf("Total cases: %d Ã¢â€ â€™ Grouped cases: %d (%.1f%%)\n",
+cat(sprintf("Total cases: %d -> Grouped cases: %d (%.1f%%)\n",
             nrow(thyr_case_master_full),
             nrow(thyr_case_master),
             nrow(thyr_case_master) / nrow(thyr_case_master_full) * 100))
@@ -377,6 +377,69 @@ if (nrow(ret_cases) > 0) {
   rna_partners <- table(ret_cases$RNA_CandidateDriverFusion, useNA = "ifany")
   cat("RNA-based fusion partners:\n")
   print(sort(rna_partners[rna_partners > 0], decreasing = TRUE))
+  
+  # Summary statistics
+  n_ret_total <- nrow(ret_cases)
+  rna_partners_sorted <- sort(rna_partners[rna_partners > 0], decreasing = TRUE)
+  
+  cat("\nSummary:\n")
+  cat(sprintf("  Total RET fusion cases: %d\n", n_ret_total))
+  
+  # Top fusion partners with percentages
+  for (i in seq_along(rna_partners_sorted)) {
+    partner_name <- names(rna_partners_sorted)[i]
+    partner_count <- rna_partners_sorted[i]
+    partner_pct <- partner_count / n_ret_total * 100
+    cat(sprintf("  %s: %d (%.1f%%)\n", partner_name, partner_count, partner_pct))
+  }
+}
+
+# RET fusion subtype by group (cross-tabulation)
+cat("\n=== RET Fusion Subtype by Group ===\n")
+if (nrow(ret_cases) > 0) {
+  # Create cross-tabulation
+  ret_crosstab <- table(
+    Fusion = ret_cases$RNA_CandidateDriverFusion,
+    Group = ret_cases$group
+  )
+  
+  # Ensure column order
+  ret_groups <- c("R0", "R_Low", "R_Mid", "R1")
+  ret_groups_present <- ret_groups[ret_groups %in% colnames(ret_crosstab)]
+  
+  if (length(ret_groups_present) > 0) {
+    ret_crosstab_ordered <- ret_crosstab[, ret_groups_present, drop = FALSE]
+    
+    # Add row totals
+    ret_crosstab_with_total <- cbind(ret_crosstab_ordered, 
+                                     Total = rowSums(ret_crosstab_ordered))
+    
+    # Add column totals
+    col_totals <- colSums(ret_crosstab_with_total)
+    ret_crosstab_final <- rbind(ret_crosstab_with_total, Total = col_totals)
+    
+    print(ret_crosstab_final)
+    
+    # Summary by group with percentages
+    cat("\nSummary by Group:\n")
+    for (grp in ret_groups_present) {
+      grp_cases <- ret_cases[ret_cases$group == grp, ]
+      n_grp <- nrow(grp_cases)
+      cat(sprintf("\n%s (n=%d):\n", grp, n_grp))
+      
+      if (n_grp > 0) {
+        grp_partners <- table(grp_cases$RNA_CandidateDriverFusion)
+        grp_partners_sorted <- sort(grp_partners[grp_partners > 0], decreasing = TRUE)
+        
+        for (j in seq_along(grp_partners_sorted)) {
+          partner_name <- names(grp_partners_sorted)[j]
+          partner_count <- grp_partners_sorted[j]
+          partner_pct <- partner_count / n_grp * 100
+          cat(sprintf("  %s: %d (%.1f%%)\n", partner_name, partner_count, partner_pct))
+        }
+      }
+    }
+  }
 }
 
 # BRAF mutation details (verification)
@@ -392,7 +455,7 @@ if (nrow(braf_cases) > 0) {
     warning("Found non-BRAF.MutV600E cases in BRAF group!")
     print(unique(braf_cases$Designated_Driver[non_v600e]))
   } else {
-    cat("  Ã¢Å“â€œ All BRAF cases are correctly BRAF.MutV600E\n")
+    cat("  [OK] All BRAF cases are correctly BRAF.MutV600E\n")
   }
 }
 

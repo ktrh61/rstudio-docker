@@ -3,12 +3,14 @@
 # Method: filterByExpr -> Cook's distance -> MUREN (LTS) + Brunner-Munzel iteration
 # Input: thyr_case_master_stage2_filtered, thyr_se_strand2_nonzero  
 # Output: Normalized CPM values and DGEList objects with DEGES-MUREN factors
-# Version: v7.7 - Added iter2 columns to summary for MAX_ITERATIONS=3
-# Date: 2025-12-08
+# Version: v7.8 - Fixed norm.factors bug (must set after DGEList creation)
+#                 Removed tryCatch in BM test (fail-fast on unexpected errors)
+#                 Added MA plots for normalization quality assessment
+# Date: 2025-12-09
 
 source("analysis_v7/setup.R")
 
-cat("\n=== DEGES Normalization (v7.7) ===\n")
+cat("\n=== DEGES Normalization (v7.8) ===\n")
 cat("Date:", as.character(Sys.Date()), "\n")
 cat("Method: filterByExpr -> Cook's -> DEGES-MUREN (Brunner-Munzel) -> CPM output\n")
 cat("Groups: R0/R1/B0/B1 high-purity pairs only\n")
@@ -253,16 +255,12 @@ perform_bm_test <- function(cpm_matrix, sample_groups, group_levels) {
     x <- cpm_matrix[i, group1_idx]
     y <- cpm_matrix[i, group2_idx]
     
-    tryCatch({
-      if (length(unique(c(x, y))) > 1 && var(c(x, y), na.rm = TRUE) > 0) {
-        result <- brunnermunzel::brunnermunzel.test(x, y)
-        pvalues[i] <- result$p.value
-      } else {
-        pvalues[i] <- 1.0
-      }
-    }, error = function(e) {
-      pvalues[i] <<- 1.0
-    })
+    if (length(unique(c(x, y))) > 1 && var(c(x, y), na.rm = TRUE) > 0) {
+      result <- brunnermunzel::brunnermunzel.test(x, y)
+      pvalues[i] <- result$p.value
+    } else {
+      pvalues[i] <- 1.0
+    }
   }
   
   return(pvalues)
@@ -533,15 +531,19 @@ for (comp_name in names(comparisons)) {
     final_result <- iteration_results[[length(iteration_results)]]
     
     # Create DGEList with filterByExpr-filtered genes (not Cook's filtered)
+    # NOTE: norm.factors must be set AFTER DGEList creation (edgeR ignores it in samples arg)
     dgelist_final <- DGEList(
       counts = count_matrix_filtered,  # After filterByExpr, before Cook's
-      samples = data.frame(
-        row.names = all_samples,
-        group = factor(sample_groups),
-        norm.factors = final_result$norm_factors[all_samples]
-      ),
+      group = factor(sample_groups),
       genes = gene_info_filtered
     )
+    
+    # Apply DEGES-MUREN normalization factors
+    dgelist_final$samples$norm.factors <- final_result$norm_factors[all_samples]
+    
+    # Verify norm.factors were applied correctly
+    nf_range <- range(dgelist_final$samples$norm.factors)
+    cat(sprintf("  Norm factors applied: range [%.4f, %.4f]\n", nf_range[1], nf_range[2]))
     
     # Calculate normalized CPM values
     cat("  Calculating normalized CPM values...\n")
@@ -663,8 +665,6 @@ for (comp_name in names(thyr_deges_results)) {
     iter0_method = iter_methods[1],
     iter1_excluded = ifelse(length(iter_excluded) > 1, iter_excluded[2], NA),
     iter1_method = ifelse(length(iter_methods) > 1, iter_methods[2], NA),
-    iter2_excluded = ifelse(length(iter_excluded) > 2, iter_excluded[3], NA),
-    iter2_method = ifelse(length(iter_methods) > 2, iter_methods[3], NA),
     final_degs = result$final_deg_count,
     stringsAsFactors = FALSE
   )
@@ -688,7 +688,7 @@ deges_output <- list(
   sample_lists = sample_lists,
   results = thyr_deges_results,
   summary = summary_data,
-  version = "v7.7"
+  version = "v7.8"
 )
 
 saveRDS(deges_output, paste0(paths$processed, "analysis_deges_results.rds"))
@@ -711,10 +711,101 @@ saveRDS(deges_processing_log, log_file)
 cat("  Processing log saved to logs/\n")
 
 # ============================================================================
+# MA Plots for normalization quality assessment
+# ============================================================================
+
+cat("\n--- Generating MA Plots ---\n")
+
+library(ggplot2)
+
+ma_plot_data <- list()
+
+for (comp_tissue in names(thyr_deges_results)) {
+  cat(sprintf("  Processing %s...\n", comp_tissue))
+  
+  # Load DGEList
+  dgelist_file <- paste0(paths$processed, "analysis_dgelist_", comp_tissue, ".rds")
+  if (!file.exists(dgelist_file)) {
+    cat(sprintf("    Skipping: DGEList not found\n"))
+    next
+  }
+  
+  dgelist <- readRDS(dgelist_file)
+  
+  # Calculate normalized log2 CPM
+  cpm_log2 <- cpm(dgelist, normalized.lib.sizes = TRUE, prior.count = 1, log = TRUE)
+  
+  # Get group information
+  groups <- levels(dgelist$samples$group)
+  group1_samples <- rownames(dgelist$samples)[dgelist$samples$group == groups[1]]
+  group2_samples <- rownames(dgelist$samples)[dgelist$samples$group == groups[2]]
+  
+  # Calculate M and A values
+  mean_g1 <- rowMeans(cpm_log2[, group1_samples, drop = FALSE])
+  mean_g2 <- rowMeans(cpm_log2[, group2_samples, drop = FALSE])
+  
+  M <- mean_g2 - mean_g1  # log2 FC (group2 vs group1)
+  A <- (mean_g2 + mean_g1) / 2
+  
+  # Store statistics
+  ma_plot_data[[comp_tissue]] <- list(
+    M_median = median(M),
+    M_mean = mean(M),
+    pct_positive = sum(M > 0) / length(M) * 100,
+    n_genes = length(M),
+    nf_g1_median = median(dgelist$samples$norm.factors[dgelist$samples$group == groups[1]]),
+    nf_g2_median = median(dgelist$samples$norm.factors[dgelist$samples$group == groups[2]])
+  )
+  
+  # Create MA plot
+  ma_df <- data.frame(A = A, M = M)
+  
+  p <- ggplot(ma_df, aes(x = A, y = M)) +
+    geom_point(alpha = 0.2, size = 0.5, color = "gray30") +
+    geom_hline(yintercept = 0, color = "red", linetype = "dashed", linewidth = 0.8) +
+    geom_hline(yintercept = median(M), color = "blue", linewidth = 0.8) +
+    geom_smooth(method = "loess", formula = y ~ x, se = FALSE, 
+                color = "darkgreen", linewidth = 1) +
+    annotate("text", x = max(A) - 2, y = 2.5, 
+             label = sprintf("M median = %.3f", median(M)), 
+             color = "blue", size = 4) +
+    labs(
+      title = sprintf("MA Plot: %s (DEGES-MUREN normalized)", comp_tissue),
+      subtitle = sprintf("n=%d genes | Red=0, Blue=median, Green=loess | %s vs %s",
+                         nrow(ma_df), groups[2], groups[1]),
+      x = "A (Average log2 expression)",
+      y = sprintf("M (log2 FC: %s vs %s)", groups[2], groups[1])
+    ) +
+    theme_bw() +
+    coord_cartesian(ylim = c(-3, 3))
+  
+  # Display in RStudio
+  print(p)
+  
+  # Save PDF
+  pdf_file <- paste0(paths$output, "maplot_", comp_tissue, ".pdf")
+  ggsave(pdf_file, p, width = 8, height = 6)
+  cat(sprintf("    Saved: %s\n", basename(pdf_file)))
+}
+
+# Print MA plot summary
+cat("\n=== MA Plot Summary ===\n")
+cat(sprintf("%-20s %10s %10s %12s %10s %10s\n", 
+            "Comparison", "M_median", "M_mean", "Pct_M>0", "NF_G1_med", "NF_G2_med"))
+cat(paste(rep("-", 75), collapse = ""), "\n")
+
+for (comp_tissue in names(ma_plot_data)) {
+  stats <- ma_plot_data[[comp_tissue]]
+  cat(sprintf("%-20s %10.4f %10.4f %11.1f%% %10.3f %10.3f\n",
+              comp_tissue, stats$M_median, stats$M_mean, stats$pct_positive,
+              stats$nf_g1_median, stats$nf_g2_median))
+}
+
+# ============================================================================
 # Final report
 # ============================================================================
 
-cat("\n=== DEGES Normalization Complete (v7.7) ===\n")
+cat("\n=== DEGES Normalization Complete (v7.8) ===\n")
 cat("Configuration:\n")
 cat("  Workflow: filterByExpr -> Cook's -> DEGES iterations\n")
 cat("  DEG screening: Brunner-Munzel test + Storey q-value (lambda=0.5)\n")
@@ -735,6 +826,7 @@ cat("  Main: analysis_deges_results.rds\n")
 cat("  Factors: analysis_norm_factors.rds\n")
 cat("  DGELists: analysis_dgelist_*.rds (4 files)\n")
 cat("  CPM values: analysis_cpm_*.rds (4 files)\n")
+cat("  MA plots: maplot_*.pdf (4 files)\n")
 cat("  Summary: analysis_deges_summary.csv\n")
 cat("\nNext: Run 09_deg_analysis.R for differential expression\n")
 
