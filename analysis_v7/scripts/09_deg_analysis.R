@@ -2,13 +2,13 @@
 # Purpose: Perform differential expression analysis on DEGES-normalized data
 # Method: Brunner-Munzel test with Storey (qvalue, lambda=0.5) correction
 # Input: analysis_dgelist_*.rds (from 07_deges_normalization.R)
-# Output: thyr_deg_results.rds with DEG lists and consistency evaluation
-# Version: v7.6 - Fixed prior.count to 0 (consistent with 07)
-# Date: 2025-12-09
+# Output: thyr_deg_results.rds with DEG lists
+# Version: v7.5 - Updated dependency reference (08 â†’ 07)
+# Date: 2025-12-08
 
 source("analysis_v7/setup.R")
 
-cat("\n=== DEG Analysis with Brunner-Munzel + Storey Method (v7.6) ===\n")
+cat("\n=== DEG Analysis with Brunner-Munzel + Storey Method (v7.5) ===\n")
 cat("Date:", as.character(Sys.Date()), "\n")
 cat("Method: Brunner-Munzel test with Storey correction (lambda=0.5)\n")
 cat("Effect size: PI (primary) with Cliff's delta (derived)\n")
@@ -22,6 +22,7 @@ suppressPackageStartupMessages({
   library(ggplot2)
   library(gridExtra)
   library(brunnermunzel)
+  library(openxlsx)
 })
 
 # ============================================================================
@@ -45,10 +46,10 @@ cat("  Significance threshold (q-value):", CONFIG$ALPHA, "\n")
 
 # Prepare normalized counts from DGEList
 prepare_normalized_counts <- function(dgelist) {
-  # Calculate normalized counts (CPM)
+  # Calculate normalized counts (CPM with prior count)
   # norm.factors already in dgelist$samples
   normalized_counts <- cpm(dgelist, normalized.lib.sizes = TRUE, 
-                           prior.count = 0, log = FALSE)
+                           prior.count = 0.5, log = FALSE)
   
   return(normalized_counts)
 }
@@ -418,100 +419,6 @@ for (comp_name in names(comparisons)) {
 }
 
 # ============================================================================
-# Consistency analysis between tumor and normal
-# ============================================================================
-
-cat("\n--- Evaluating tumor-normal consistency ---\n")
-
-thyr_consistency_results <- list()
-
-for (comp_name in names(comparisons)) {
-  tumor_name <- paste(comp_name, "tumor", sep = "_")
-  normal_name <- paste(comp_name, "normal", sep = "_")
-  
-  if (!tumor_name %in% names(thyr_deg_results) || 
-      !normal_name %in% names(thyr_deg_results)) {
-    cat(sprintf("%s: Missing tumor or normal results\n", comp_name))
-    next
-  }
-  
-  cat(sprintf("\n%s consistency analysis:\n", comp_name))
-  
-  # Get DEG results
-  tumor_degs <- thyr_deg_results[[tumor_name]]$deg_summary$results_df
-  normal_degs <- thyr_deg_results[[normal_name]]$deg_summary$results_df
-  
-  # Find common genes
-  common_genes <- intersect(tumor_degs$gene_id, normal_degs$gene_id)
-  cat(sprintf("  Common genes tested: %d\n", length(common_genes)))
-  
-  # Extract significant genes
-  tumor_sig <- tumor_degs[tumor_degs$significant, ]
-  normal_sig <- normal_degs[normal_degs$significant, ]
-  
-  # Find overlapping significant genes
-  overlap_sig <- intersect(tumor_sig$gene_id, normal_sig$gene_id)
-  cat(sprintf("  Overlapping significant genes: %d\n", length(overlap_sig)))
-  
-  if (length(overlap_sig) > 0) {
-    # Check direction consistency (simple sign check)
-    consistent_genes <- character()
-    inconsistent_genes <- character()
-    
-    for (gene in overlap_sig) {
-      tumor_fc <- tumor_sig$log2FC[tumor_sig$gene_id == gene]
-      normal_fc <- normal_sig$log2FC[normal_sig$gene_id == gene]
-      
-      # Check if same direction
-      if (sign(tumor_fc) == sign(normal_fc)) {
-        consistent_genes <- c(consistent_genes, gene)
-      } else {
-        inconsistent_genes <- c(inconsistent_genes, gene)
-      }
-    }
-    
-    cat(sprintf("  Consistent direction: %d\n", length(consistent_genes)))
-    cat(sprintf("  Inconsistent direction: %d\n", length(inconsistent_genes)))
-    
-    # Store consistency results
-    thyr_consistency_results[[comp_name]] <- list(
-      common_genes = common_genes,
-      tumor_sig_count = nrow(tumor_sig),
-      normal_sig_count = nrow(normal_sig),
-      overlap_sig = overlap_sig,
-      consistent_genes = consistent_genes,
-      inconsistent_genes = inconsistent_genes,
-      consistency_rate = if(length(overlap_sig) > 0) length(consistent_genes) / length(overlap_sig) else NA
-    )
-    
-    # Show top consistent genes
-    if (length(consistent_genes) > 0) {
-      cat("\n  Top consistent genes:\n")
-      for (i in seq_len(min(5, length(consistent_genes)))) {
-        gene <- consistent_genes[i]
-        tumor_row <- tumor_sig[tumor_sig$gene_id == gene, ]
-        normal_row <- normal_sig[normal_sig$gene_id == gene, ]
-        gene_name <- ifelse(is.na(tumor_row$gene_name[1]), gene, tumor_row$gene_name[1])
-        cat(sprintf("    %s: tumor FC=%.2f (q=%.3e), normal FC=%.2f (q=%.3e)\n",
-                    gene_name, 
-                    tumor_row$log2FC[1], tumor_row$qvalue[1],
-                    normal_row$log2FC[1], normal_row$qvalue[1]))
-      }
-    }
-  } else {
-    thyr_consistency_results[[comp_name]] <- list(
-      common_genes = common_genes,
-      tumor_sig_count = nrow(tumor_sig),
-      normal_sig_count = nrow(normal_sig),
-      overlap_sig = character(),
-      consistent_genes = character(),
-      inconsistent_genes = character(),
-      consistency_rate = NA_real_
-    )
-  }
-}
-
-# ============================================================================
 # Create overall summary
 # ============================================================================
 
@@ -572,7 +479,6 @@ deg_output <- list(
   date = Sys.Date(),
   config = CONFIG,
   deg_results = thyr_deg_results,
-  consistency_results = thyr_consistency_results,
   summary = summary_data,
   version = "v7.5"
 )
@@ -580,30 +486,58 @@ deg_output <- list(
 saveRDS(deg_output, paste0(paths$processed, "thyr_deg_results.rds"))
 cat("  DEG results saved: thyr_deg_results.rds\n")
 
-# Export summary as CSV
-write.csv(summary_data, 
-          paste0(paths$output, "deg_analysis_summary.csv"),
-          row.names = FALSE)
-cat("  Summary CSV saved: deg_analysis_summary.csv\n")
+# Export to Excel
+cat("  Creating Excel report...\n")
 
-# Export individual DEG lists
+wb <- createWorkbook()
+header_style <- createStyle(fontColour = "white", fgFill = "#4F81BD",
+                            halign = "center", textDecoration = "bold")
+
+# Summary sheet
+addWorksheet(wb, "Summary")
+writeData(wb, "Summary", summary_data)
+addStyle(wb, "Summary", header_style, rows = 1, cols = 1:ncol(summary_data), gridExpand = TRUE)
+setColWidths(wb, "Summary", cols = 1:ncol(summary_data), widths = "auto")
+
+# Individual comparison sheets (all genes and significant genes)
 for (comp_tissue in names(thyr_deg_results)) {
   results_df <- thyr_deg_results[[comp_tissue]]$deg_summary$results_df
   
-  # Export all genes
-  write.csv(results_df,
-            paste0(paths$output, sprintf("deg_results_%s_all.csv", comp_tissue)),
-            row.names = FALSE)
+  # Round numeric columns for readability
+  numeric_cols <- names(results_df)[sapply(results_df, is.numeric)]
+  results_df_display <- results_df
+  for (col in numeric_cols) {
+    if (col %in% c("pvalue", "qvalue")) {
+      # Keep scientific notation for p-values
+      results_df_display[[col]] <- signif(results_df[[col]], 4)
+    } else {
+      results_df_display[[col]] <- round(results_df[[col]], 4)
+    }
+  }
   
-  # Export significant genes only
-  sig_df <- results_df[results_df$significant, ]
+  # All genes sheet
+  sheet_name_all <- paste0(comp_tissue, "_all")
+  if (nchar(sheet_name_all) > 31) sheet_name_all <- substr(sheet_name_all, 1, 31)
+  addWorksheet(wb, sheet_name_all)
+  writeData(wb, sheet_name_all, results_df_display)
+  addStyle(wb, sheet_name_all, header_style, rows = 1, cols = 1:ncol(results_df_display), gridExpand = TRUE)
+  setColWidths(wb, sheet_name_all, cols = 1:ncol(results_df_display), widths = "auto")
+  
+  # Significant genes sheet
+  sig_df <- results_df_display[results_df$significant, ]
   if (nrow(sig_df) > 0) {
-    write.csv(sig_df,
-              paste0(paths$output, sprintf("deg_results_%s_significant.csv", comp_tissue)),
-              row.names = FALSE)
+    sheet_name_sig <- paste0(comp_tissue, "_sig")
+    if (nchar(sheet_name_sig) > 31) sheet_name_sig <- substr(sheet_name_sig, 1, 31)
+    addWorksheet(wb, sheet_name_sig)
+    writeData(wb, sheet_name_sig, sig_df)
+    addStyle(wb, sheet_name_sig, header_style, rows = 1, cols = 1:ncol(sig_df), gridExpand = TRUE)
+    setColWidths(wb, sheet_name_sig, cols = 1:ncol(sig_df), widths = "auto")
   }
 }
-cat("  Individual DEG lists exported to output/\n")
+
+excel_file <- paste0(paths$output, "deg_analysis_results.xlsx")
+saveWorkbook(wb, excel_file, overwrite = TRUE)
+cat("  Saved:", basename(excel_file), "\n")
 
 # ============================================================================
 # Effect size distribution visualization
@@ -622,7 +556,7 @@ for (comp_tissue in names(thyr_deg_results)) {
   
   # Create histogram (signed delta to preserve direction)
   # binwidth aligned with tie-parity discrete steps (2/(n1*n2)):
-  # R0/R1: 8/143 ~= 0.056 (4x of 2/143), B0/B1: 14/260 ~= 0.054 (7x of 2/260)
+  # R0/R1: 8/143 Ã¢â€°Ë† 0.056 (4x of 2/143), B0/B1: 14/260 Ã¢â€°Ë† 0.054 (7x of 2/260)
   bw <- if (grepl("^R0", comp_tissue)) 8/143 else 14/260
   
   p <- ggplot(results_df, aes(x = cliffs_delta)) +
@@ -676,7 +610,7 @@ if (length(effect_size_plots) >= 2) {
     n_degs <- result$deg_summary$summary_stats$significant_genes
     
     # binwidth aligned with tie-parity discrete steps (2/(n1*n2)):
-    # R0/R1: 8/143 ~= 0.056, B0/B1: 14/260 ~= 0.054
+    # R0/R1: 8/143 Ã¢â€°Ë† 0.056, B0/B1: 14/260 Ã¢â€°Ë† 0.054
     bw <- if (grepl("^R0", comp_tissue)) 8/143 else 14/260
     
     p <- ggplot(results_df, aes(x = cliffs_delta)) +
@@ -943,21 +877,6 @@ for (comp_tissue in names(thyr_deg_results)) {
               pi_all$median, es_all$median, abs_med))
 }
 
-if (length(thyr_consistency_results) > 0) {
-  cat("\nConsistency analysis:\n")
-  for (comp_name in names(thyr_consistency_results)) {
-    cons <- thyr_consistency_results[[comp_name]]
-    if (length(cons$consistent_genes) > 0) {
-      cat(sprintf("  %s: %d consistent genes (%.0f%% of overlap)\n",
-                  comp_name,
-                  length(cons$consistent_genes),
-                  cons$consistency_rate * 100))
-    } else {
-      cat(sprintf("  %s: No overlapping DEGs\n", comp_name))
-    }
-  }
-}
-
 cat("\nOutputs:\n")
 cat("  Main: thyr_deg_results.rds\n")
 cat("  Summary: deg_analysis_summary.csv\n")
@@ -1009,8 +928,7 @@ if (sum(summary_data$degs_total) > 20) {
 }
 
 # Clean up (preserve key objects)
-rm(list = setdiff(ls(), c("paths", "thyr_deg_results", 
-                          "thyr_consistency_results")))
+rm(list = setdiff(ls(), c("paths", "thyr_deg_results")))
 gc()
 
 cat("\nAnalysis completed successfully!\n")
