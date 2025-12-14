@@ -3,14 +3,14 @@
 # Method: filterByExpr -> Cook's distance -> MUREN (LTS) + Brunner-Munzel iteration
 # Input: thyr_case_master_stage2_filtered, thyr_se_strand2_nonzero  
 # Output: Normalized CPM values and DGEList objects with DEGES-MUREN factors
-# Version: v7.8 - Fixed norm.factors bug (must set after DGEList creation)
-#                 Removed tryCatch in BM test (fail-fast on unexpected errors)
-#                 Added MA plots for normalization quality assessment
-# Date: 2025-12-09
+# Version: v7.9 - Separated MA plot generation from DEGES processing
+#                 MA plots can now be re-generated independently
+#                 Added memory cleanup between processing and visualization
+# Date: 2025-12-14
 
 source("analysis_v7/setup.R")
 
-cat("\n=== DEGES Normalization (v7.8) ===\n")
+cat("\n=== DEGES Normalization (v7.9) ===\n")
 cat("Date:", as.character(Sys.Date()), "\n")
 cat("Method: filterByExpr -> Cook's -> DEGES-MUREN (Brunner-Munzel) -> CPM output\n")
 cat("Groups: R0/R1/B0/B1 high-purity pairs only\n")
@@ -711,16 +711,44 @@ saveRDS(deges_processing_log, log_file)
 cat("  Processing log saved to logs/\n")
 
 # ============================================================================
+# DEGES Processing Complete - Clean up before visualization
+# ============================================================================
+
+cat("\n=== DEGES Processing Complete ===\n")
+cat("All results saved. Cleaning up intermediate variables...\n")
+
+# Keep only essential objects for next steps
+rm(list = setdiff(ls(), c("paths", "thyr_case_master_stage2_filtered", 
+                          "thyr_se_strand2_nonzero", "CONFIG")))
+gc()
+
+cat("Memory cleaned. MA Plot generation can be run independently from here.\n")
+
+# ============================================================================
 # MA Plots for normalization quality assessment
+# (This section can be re-run independently after DEGES processing)
 # ============================================================================
 
 cat("\n--- Generating MA Plots ---\n")
+
+# Ensure paths is available (for independent execution)
+if (!exists("paths")) {
+  source("analysis_v7/setup.R")
+}
+
+# Load saved results
+cat("Loading saved DEGES results...\n")
+deges_output <- readRDS(paste0(paths$processed, "analysis_deges_results.rds"))
+comparison_names <- names(deges_output$results)
+cat(sprintf("  Found %d comparisons: %s\n", 
+            length(comparison_names), 
+            paste(comparison_names, collapse = ", ")))
 
 library(ggplot2)
 
 ma_plot_data <- list()
 
-for (comp_tissue in names(thyr_deges_results)) {
+for (comp_tissue in comparison_names) {
   cat(sprintf("  Processing %s...\n", comp_tissue))
   
   # Load DGEList
@@ -805,7 +833,7 @@ for (comp_tissue in names(ma_plot_data)) {
 # Final report
 # ============================================================================
 
-cat("\n=== DEGES Normalization Complete (v7.8) ===\n")
+cat("\n=== DEGES Normalization Complete (v7.9) ===\n")
 cat("Configuration:\n")
 cat("  Workflow: filterByExpr -> Cook's -> DEGES iterations\n")
 cat("  DEG screening: Brunner-Munzel test + Storey q-value (lambda=0.5)\n")
@@ -813,8 +841,8 @@ cat("  Gene set: Consistent (filterByExpr-filtered) throughout\n")
 cat("  Output: Normalized CPM values (prior.count = 0)\n")
 cat("\nProcessed comparisons:\n")
 
-for (comp_name in names(thyr_deges_results)) {
-  result <- thyr_deges_results[[comp_name]]
+for (comp_name in comparison_names) {
+  result <- deges_output$results[[comp_name]]
   cat(sprintf("  %s: %d genes, %d iterations\n",
               comp_name, 
               result$n_genes_filtered,
@@ -830,8 +858,7 @@ cat("  MA plots: maplot_*.pdf (4 files)\n")
 cat("  Summary: analysis_deges_summary.csv\n")
 cat("\nNext: Run 09_deg_analysis.R for differential expression\n")
 
-# Clean up
+# Clean up (keep SE and case_master for potential subsequent scripts)
 rm(list = setdiff(ls(), c("paths", "thyr_case_master_stage2_filtered", 
-                          "thyr_se_strand2_nonzero", "thyr_deges_results", 
-                          "thyr_norm_factors")))
+                          "thyr_se_strand2_nonzero")))
 gc()
