@@ -4,12 +4,12 @@
 # Method: Standard PCA (prcomp) on DEGES-normalized logCPM
 # Input: thyr_normalized_counts.rds (from 07), thyr_case_master_stage2_filtered.rds (from 06)
 # Output: PCA plots for R0/R1 and B0/B1 comparisons
-# Version: v7.3
-# Date: 2025-12-08
+# Version: v7.4
+# Date: 2025-12-14
 
 source("analysis_v7/setup.R")
 
-cat("\n=== PCA Visualization (v7.3) ===\n")
+cat("\n=== PCA Visualization (v7.4) ===\n")
 cat("Date:", as.character(Sys.Date()), "\n")
 cat("Purpose: Quality checkpoint - visualize normalized data before DEG analysis\n")
 cat("Method: PCA with POC coloring\n")
@@ -29,7 +29,7 @@ suppressPackageStartupMessages({
 
 CONFIG <- list(
   PRIOR_COUNT = 0.5,   # For logCPM transformation
-  N_TOP_VAR = 2000     # Top variable genes for PCA (NULL = use all)
+  N_TOP_VAR = NULL     # Use all genes for PCA (set to integer to limit)
 )
 
 cat("\nConfiguration:\n")
@@ -313,7 +313,7 @@ cat("  Saved: 08_pca_visualization.pdf (2 pages)\n")
 
 pca_output <- list(
   date = Sys.Date(),
-  version = "v7.3",
+  version = "v7.4",
   config = CONFIG,
   results = pca_results
 )
@@ -325,7 +325,7 @@ cat("  Saved: 08_pca_results.rds\n")
 # Summary
 # ============================================================================
 
-cat("\n=== PCA Visualization Complete (v7.3) ===\n")
+cat("\n=== PCA Visualization Complete (v7.4) ===\n")
 cat("\nSummary:\n")
 
 for (comp in names(pca_results)) {
@@ -340,8 +340,7 @@ cat("  Plot: 08_pca_visualization.pdf\n")
 cat("  Data: 08_pca_results.rds\n")
 
 cat("\nInterpretation guide:\n")
-cat("  - POC coloring: Blue (0) → White (50) → Red (100)\n
-")
+cat("  - POC coloring: Blue (0) → White (50) → Red (100)\n")
 cat("  - Shape indicates group (R0/R1 or B0/B1)\n")
 cat("  - If groups cluster separately, there may be batch effects\n")
 cat("  - If POC gradient visible, radiation signature may be detectable\n")
