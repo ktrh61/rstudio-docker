@@ -1,23 +1,19 @@
-# 10_enrichment_analysis.R - Enrichment Analysis for R0_vs_R1_tumor
-# Purpose: Perform GO/KEGG/Reactome/Hallmark enrichment analysis on R0_vs_R1_tumor DEGs
-# Method: GSEA (4 databases) + ORA (3 databases × 3 patterns)
+# 10_enrichment_analysis.R - GSEA Enrichment Analysis for R0_vs_R1_tumor
+# Purpose: Perform GO/KEGG/Reactome/Hallmark GSEA on R0_vs_R1_tumor DEGs
+# Method: GSEA with ranked gene list (Cliff's delta × -log10(q))
 # Input: thyr_deg_results.rds (from 09_deg_analysis.R)
-# Output: Enrichment results with Excel reports and visualizations
-# Version: v7.9 - R0_vs_R1_tumor specialized
-# Date: 2025-12-10
+# Output: GSEA results with Excel report and visualizations
+# Version: v7.10 - GSEA only, visualization can be re-generated independently
+# Date: 2025-12-15
 
 source("analysis_v7/setup.R")
 
-cat("\n=== Enrichment Analysis for R0_vs_R1_tumor (v7.9) ===\n")
+cat("\n=== GSEA Enrichment Analysis (v7.10) ===\n")
 cat("Date:", as.character(Sys.Date()), "\n")
-cat("Target: R0_vs_R1_tumor only\n")
-cat("GSEA: GO_BP, KEGG, Reactome, Hallmark\n")
-cat("ORA: GO_BP, KEGG, Reactome (Up/Down/All)\n")
+cat("Target: R0_vs_R1_tumor\n")
+cat("Databases: GO_BP, KEGG, Reactome, Hallmark\n")
 
-# ============================================================================
 # Load packages
-# ============================================================================
-
 suppressPackageStartupMessages({
   library(clusterProfiler)
   library(org.Hs.eg.db)
@@ -37,37 +33,28 @@ cat("  clusterProfiler:", as.character(packageVersion("clusterProfiler")), "\n")
 cat("  msigdbr:", as.character(packageVersion("msigdbr")), "\n")
 cat("  KEGG data: Current online version\n")
 
-# Set seed for reproducibility
 set.seed(1986)
-cat("\n  Random seed set to: 1986\n")
+cat("  Random seed: 1986\n")
 
 # ============================================================================
 # Configuration
 # ============================================================================
 
 CONFIG <- list(
-  # Statistical threshold
-  FDR_CUTOFF = 0.05,          # FDR threshold (BH method)
-  
-  # GSEA ranking cap
-  Q_CAP = 10,                 # Cap for -log10(q) in ranking
-  
-  # Gene set size limits
-  MIN_GENESET_SIZE = 10,      # Minimum genes in a set
-  MAX_GENESET_SIZE = 500,     # Maximum genes in a set
-  
-  # Output control
-  VERBOSE = TRUE              # Verbose output
+  FDR_CUTOFF = 0.05,
+  Q_CAP = 10,
+  MIN_GENESET_SIZE = 10,
+  MAX_GENESET_SIZE = 500
 )
 
 cat("\nConfiguration:\n")
 cat("  FDR correction: BH method\n")
 cat("  FDR threshold:", CONFIG$FDR_CUTOFF, "\n")
-cat("  GSEA ranking: delta x min(-log10(q),", CONFIG$Q_CAP, ")\n")
+cat("  GSEA ranking: delta × min(-log10(q),", CONFIG$Q_CAP, ")\n")
 cat("  Gene set size:", CONFIG$MIN_GENESET_SIZE, "-", CONFIG$MAX_GENESET_SIZE, "\n")
 
 # ============================================================================
-# Load DEG results
+# Loading DEG results
 # ============================================================================
 
 cat("\n--- Loading DEG results ---\n")
@@ -80,7 +67,6 @@ if (!file.exists(deg_results_path)) {
 deg_output <- readRDS(deg_results_path)
 thyr_deg_results <- deg_output$deg_results
 
-# Extract R0_vs_R1_tumor only
 if (!"R0_vs_R1_tumor" %in% names(thyr_deg_results)) {
   stop("R0_vs_R1_tumor not found in DEG results.")
 }
@@ -100,91 +86,70 @@ output_dir <- paste0(paths$output, "enrichment_analysis/")
 dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
 
 # ============================================================================
-# Phase 1: Gene ID Mapping
+# Gene ID Mapping
 # ============================================================================
 
-cat("\n=== PHASE 1: GENE ID MAPPING ===\n")
+cat("\n--- Gene ID Mapping ---\n")
 
-# Clean Ensembl IDs (remove version)
 all_gene_ids_clean <- sub("\\..*", "", results_df$gene_id)
 cat("  Total genes:", length(all_gene_ids_clean), "\n")
 
-# Map Ensembl to Entrez
 gene_mapping <- AnnotationDbi::select(org.Hs.eg.db,
                                       keys = all_gene_ids_clean,
                                       columns = c("ENTREZID", "SYMBOL"),
                                       keytype = "ENSEMBL")
 
-# Remove NA mappings
 gene_mapping <- gene_mapping[!is.na(gene_mapping$ENTREZID), ]
 
-# Handle 1:many mappings (use first match)
 n_multi <- sum(duplicated(gene_mapping$ENSEMBL))
 if (n_multi > 0) {
-  cat(sprintf("  Note: %d Ensembl IDs map to multiple Entrez IDs (using first match)\n", n_multi))
+  cat(sprintf("  Note: %d Ensembl IDs map to multiple Entrez IDs (using first)\n", n_multi))
 }
 gene_mapping <- gene_mapping[!duplicated(gene_mapping$ENSEMBL), ]
 
 cat("  Successfully mapped:", nrow(gene_mapping), "genes\n")
-cat("  Unmapped genes:", length(all_gene_ids_clean) - nrow(gene_mapping), "\n")
 
-# Add clean Ensembl ID to results_df
 results_df$ensembl_clean <- sub("\\..*", "", results_df$gene_id)
-
-# Merge mapping
 results_df_mapped <- merge(results_df, gene_mapping,
                            by.x = "ensembl_clean", by.y = "ENSEMBL",
                            all.x = FALSE)
 
 cat(sprintf("  Genes with Entrez mapping: %d\n", nrow(results_df_mapped)))
 
-cat("\nPhase 1 complete!\n")
-
 # ============================================================================
-# Phase 2: Prepare Hallmark Gene Sets
+# Prepare Hallmark Gene Sets
 # ============================================================================
 
-cat("\n=== PHASE 2: PREPARE HALLMARK GENE SETS ===\n")
+cat("\n--- Prepare Hallmark Gene Sets ---\n")
 
-# Get Hallmark gene sets
 hallmark_df <- msigdbr(species = "Homo sapiens", collection = "H")
 cat("  Loaded MSigDB Hallmark:", length(unique(hallmark_df$gs_name)), "gene sets\n")
 
-# Create TERM2GENE format for clusterProfiler
 hallmark_t2g <- hallmark_df %>%
   dplyr::select(gs_name, ncbi_gene) %>%
   dplyr::mutate(gs_name = gsub("^HALLMARK_", "", gs_name))
 
-cat("\nPhase 2 complete!\n")
-
 # ============================================================================
-# Phase 3: GSEA Analysis
+# GSEA Analysis
 # ============================================================================
 
-cat("\n=== PHASE 3: GSEA ANALYSIS ===\n")
+cat("\n--- GSEA Analysis ---\n")
 
-# Prepare ranked gene list for GSEA
-# Ranking: cliffs_delta × min(-log10(qvalue), Q_CAP)
+# Prepare ranked gene list
 results_df_mapped$neg_log10_q <- pmin(-log10(pmax(results_df_mapped$qvalue, 1e-300)), CONFIG$Q_CAP)
 results_df_mapped$rank_metric <- results_df_mapped$cliffs_delta * results_df_mapped$neg_log10_q
 
-# Create named vector
 gene_list <- results_df_mapped$rank_metric
 names(gene_list) <- results_df_mapped$ENTREZID
-
-# Sort by ranking metric (descending)
 gene_list <- sort(gene_list, decreasing = TRUE)
-
-# Remove duplicates
 gene_list <- gene_list[!duplicated(names(gene_list))]
 
 cat(sprintf("  Prepared gene list: %d genes\n", length(gene_list)))
 cat(sprintf("  Rank range: %.2f to %.2f\n", min(gene_list), max(gene_list)))
 
-# Storage for GSEA results
 gsea_results <- list()
 
-# --- GO Biological Process GSEA ---
+# GO Biological Process
 cat("\n  Running GO BP GSEA...\n")
 gsea_go_bp <- gseGO(
   geneList = gene_list,
@@ -198,7 +163,6 @@ gsea_go_bp <- gseGO(
   seed = 1986
 )
 
-# Filter by FDR
 gsea_go_bp_sig <- gsea_go_bp
 if (nrow(gsea_go_bp@result) > 0) {
   gsea_go_bp_sig@result <- gsea_go_bp@result[gsea_go_bp@result$p.adjust < CONFIG$FDR_CUTOFF, ]
@@ -206,7 +170,7 @@ if (nrow(gsea_go_bp@result) > 0) {
 gsea_results[["GO_BP"]] <- gsea_go_bp_sig
 cat(sprintf("    Significant pathways: %d\n", nrow(gsea_go_bp_sig@result)))
 
-# --- KEGG GSEA ---
+# KEGG
 cat("\n  Running KEGG GSEA...\n")
 gsea_kegg <- gseKEGG(
   geneList = gene_list,
@@ -226,7 +190,7 @@ if (nrow(gsea_kegg@result) > 0) {
 gsea_results[["KEGG"]] <- gsea_kegg_sig
 cat(sprintf("    Significant pathways: %d\n", nrow(gsea_kegg_sig@result)))
 
-# --- Reactome GSEA ---
+# Reactome
 cat("\n  Running Reactome GSEA...\n")
 gsea_reactome <- gsePathway(
   geneList = gene_list,
@@ -246,7 +210,7 @@ if (nrow(gsea_reactome@result) > 0) {
 gsea_results[["Reactome"]] <- gsea_reactome_sig
 cat(sprintf("    Significant pathways: %d\n", nrow(gsea_reactome_sig@result)))
 
-# --- Hallmark GSEA ---
+# Hallmark
 cat("\n  Running Hallmark GSEA...\n")
 gsea_hallmark <- GSEA(
   geneList = gene_list,
@@ -266,142 +230,35 @@ if (nrow(gsea_hallmark@result) > 0) {
 gsea_results[["Hallmark"]] <- gsea_hallmark_sig
 cat(sprintf("    Significant pathways: %d\n", nrow(gsea_hallmark_sig@result)))
 
-cat("\nPhase 3 complete!\n")
-
 # ============================================================================
-# Phase 4: ORA Analysis
+# Saving results
 # ============================================================================
 
-cat("\n=== PHASE 4: ORA ANALYSIS ===\n")
-
-# Prepare DEG lists
-sig_genes <- results_df_mapped[results_df_mapped$significant, ]
-up_genes <- sig_genes[sig_genes$direction == "UP", "ENTREZID"]
-down_genes <- sig_genes[sig_genes$direction == "DOWN", "ENTREZID"]
-all_degs <- sig_genes$ENTREZID
-
-# Background: all tested genes with Entrez mapping
-universe <- results_df_mapped$ENTREZID
-
-cat(sprintf("  DEGs with Entrez mapping:\n"))
-cat(sprintf("    Up: %d\n", length(up_genes)))
-cat(sprintf("    Down: %d\n", length(down_genes)))
-cat(sprintf("    All: %d\n", length(all_degs)))
-cat(sprintf("    Universe: %d\n", length(universe)))
-
-# Storage for ORA results
-ora_results <- list(Up = list(), Down = list(), All = list())
-
-# Function to perform ORA for all databases
-perform_ora <- function(gene_list, universe, label) {
-  results <- list()
-  
-  # GO BP
-  cat(sprintf("    %s: GO BP...\n", label))
-  ora_go <- enrichGO(
-    gene = gene_list,
-    universe = universe,
-    OrgDb = org.Hs.eg.db,
-    ont = "BP",
-    pAdjustMethod = "BH",
-    pvalueCutoff = 1,
-    qvalueCutoff = 1,
-    minGSSize = CONFIG$MIN_GENESET_SIZE,
-    maxGSSize = CONFIG$MAX_GENESET_SIZE
-  )
-  if (!is.null(ora_go) && nrow(ora_go@result) > 0) {
-    ora_go@result <- ora_go@result[ora_go@result$p.adjust < CONFIG$FDR_CUTOFF, ]
-  }
-  results[["GO_BP"]] <- ora_go
-  
-  # KEGG
-  cat(sprintf("    %s: KEGG...\n", label))
-  ora_kegg <- enrichKEGG(
-    gene = gene_list,
-    universe = universe,
-    organism = "hsa",
-    pAdjustMethod = "BH",
-    pvalueCutoff = 1,
-    qvalueCutoff = 1,
-    minGSSize = CONFIG$MIN_GENESET_SIZE,
-    maxGSSize = CONFIG$MAX_GENESET_SIZE
-  )
-  if (!is.null(ora_kegg) && nrow(ora_kegg@result) > 0) {
-    ora_kegg@result <- ora_kegg@result[ora_kegg@result$p.adjust < CONFIG$FDR_CUTOFF, ]
-  }
-  results[["KEGG"]] <- ora_kegg
-  
-  # Reactome
-  cat(sprintf("    %s: Reactome...\n", label))
-  ora_reactome <- enrichPathway(
-    gene = gene_list,
-    universe = universe,
-    organism = "human",
-    pAdjustMethod = "BH",
-    pvalueCutoff = 1,
-    qvalueCutoff = 1,
-    minGSSize = CONFIG$MIN_GENESET_SIZE,
-    maxGSSize = CONFIG$MAX_GENESET_SIZE
-  )
-  if (!is.null(ora_reactome) && nrow(ora_reactome@result) > 0) {
-    ora_reactome@result <- ora_reactome@result[ora_reactome@result$p.adjust < CONFIG$FDR_CUTOFF, ]
-  }
-  results[["Reactome"]] <- ora_reactome
-  
-  return(results)
-}
-
-# Perform ORA for each direction
-cat("\n  Running ORA for Up-regulated genes...\n")
-ora_results[["Up"]] <- perform_ora(up_genes, universe, "Up")
-
-cat("\n  Running ORA for Down-regulated genes...\n")
-ora_results[["Down"]] <- perform_ora(down_genes, universe, "Down")
-
-cat("\n  Running ORA for All DEGs...\n")
-ora_results[["All"]] <- perform_ora(all_degs, universe, "All")
-
-# Summary
-cat("\n  ORA Results Summary:\n")
-for (direction in c("Up", "Down", "All")) {
-  for (db in c("GO_BP", "KEGG", "Reactome")) {
-    n_sig <- 0
-    if (!is.null(ora_results[[direction]][[db]])) {
-      n_sig <- nrow(ora_results[[direction]][[db]]@result)
-    }
-    cat(sprintf("    %s-%s: %d\n", direction, db, n_sig))
-  }
-}
-
-cat("\nPhase 4 complete!\n")
-
-# ============================================================================
-# Phase 5: Save Results and Create Excel Reports
-# ============================================================================
-
-cat("\n=== PHASE 5: SAVE RESULTS ===\n")
+cat("\n--- Saving results ---\n")
 
 # Save RDS
-all_enrichment_results <- list(
+thyr_enrichment_results <- list(
   GSEA = gsea_results,
-  ORA = ora_results,
+  gene_list = gene_list,
   gene_mapping = gene_mapping,
-  config = CONFIG
+  config = CONFIG,
+  date = Sys.Date(),
+  version = "v7.10"
 )
 
 results_file <- paste0(paths$processed, "thyr_enrichment_results.rds")
-saveRDS(all_enrichment_results, results_file)
+saveRDS(thyr_enrichment_results, results_file)
 cat("  Saved:", basename(results_file), "\n")
 
-# --- Create GSEA Excel Report ---
-cat("\n  Creating GSEA Excel report...\n")
+# Create Excel report
+cat("  Creating Excel report...\n")
 
-wb_gsea <- createWorkbook()
+wb <- createWorkbook()
 header_style <- createStyle(fontColour = "white", fgFill = "#4F81BD",
                             halign = "center", textDecoration = "bold")
 
 # Overview sheet
-addWorksheet(wb_gsea, "Overview")
+addWorksheet(wb, "Overview")
 overview_data <- data.frame(
   Database = c("GO_BP", "KEGG", "Reactome", "Hallmark"),
   Significant_Pathways = sapply(c("GO_BP", "KEGG", "Reactome", "Hallmark"), function(db) {
@@ -409,98 +266,72 @@ overview_data <- data.frame(
   }),
   stringsAsFactors = FALSE
 )
-writeData(wb_gsea, "Overview", overview_data)
-addStyle(wb_gsea, "Overview", header_style, rows = 1, cols = 1:2, gridExpand = TRUE)
+writeData(wb, "Overview", overview_data)
+addStyle(wb, "Overview", header_style, rows = 1, cols = 1:2, gridExpand = TRUE)
 
-# Detail sheets for each database
+# Detail sheets
 for (db in c("GO_BP", "KEGG", "Reactome", "Hallmark")) {
   if (!is.null(gsea_results[[db]]) && nrow(gsea_results[[db]]@result) > 0) {
-    addWorksheet(wb_gsea, db)
+    addWorksheet(wb, db)
     result_df <- as.data.frame(gsea_results[[db]]@result)
     
-    # Select key columns
     cols_to_keep <- intersect(
       c("ID", "Description", "setSize", "enrichmentScore", "NES", "pvalue", "p.adjust", "core_enrichment"),
       colnames(result_df)
     )
     result_df <- result_df[, cols_to_keep]
     
-    # Round numeric columns
     numeric_cols <- names(result_df)[sapply(result_df, is.numeric)]
     result_df[numeric_cols] <- lapply(result_df[numeric_cols], function(x) round(x, 4))
     
-    writeData(wb_gsea, db, result_df)
-    addStyle(wb_gsea, db, header_style, rows = 1, cols = 1:ncol(result_df), gridExpand = TRUE)
-    setColWidths(wb_gsea, db, cols = 1:ncol(result_df), widths = "auto")
+    writeData(wb, db, result_df)
+    addStyle(wb, db, header_style, rows = 1, cols = 1:ncol(result_df), gridExpand = TRUE)
+    setColWidths(wb, db, cols = 1:ncol(result_df), widths = "auto")
   }
 }
 
-gsea_excel_file <- paste0(output_dir, "GSEA_R0_vs_R1_tumor.xlsx")
-saveWorkbook(wb_gsea, gsea_excel_file, overwrite = TRUE)
-cat("  Saved:", basename(gsea_excel_file), "\n")
+excel_file <- paste0(output_dir, "GSEA_R0_vs_R1_tumor.xlsx")
+saveWorkbook(wb, excel_file, overwrite = TRUE)
+cat("  Saved:", basename(excel_file), "\n")
 
-# --- Create ORA Excel Report ---
-cat("\n  Creating ORA Excel report...\n")
+# ============================================================================
+# GSEA Processing Complete - Clean up before visualization
+# ============================================================================
 
-wb_ora <- createWorkbook()
+cat("\n=== GSEA Processing Complete ===\n")
+cat("All results saved. Cleaning up intermediate variables...\n")
 
-# Overview sheet
-addWorksheet(wb_ora, "Overview")
-ora_overview <- data.frame(
-  Direction = rep(c("Up", "Down", "All"), each = 3),
-  Database = rep(c("GO_BP", "KEGG", "Reactome"), 3),
-  Significant_Terms = sapply(1:9, function(i) {
-    dir <- c("Up", "Down", "All")[ceiling(i/3)]
-    db <- c("GO_BP", "KEGG", "Reactome")[((i-1) %% 3) + 1]
-    if (!is.null(ora_results[[dir]][[db]])) nrow(ora_results[[dir]][[db]]@result) else 0
-  }),
-  stringsAsFactors = FALSE
-)
-writeData(wb_ora, "Overview", ora_overview)
-addStyle(wb_ora, "Overview", header_style, rows = 1, cols = 1:3, gridExpand = TRUE)
+rm(list = setdiff(ls(), c("paths", "CONFIG")))
+gc()
 
-# Detail sheets
-for (direction in c("Up", "Down", "All")) {
-  for (db in c("GO_BP", "KEGG", "Reactome")) {
-    ora_result <- ora_results[[direction]][[db]]
-    if (!is.null(ora_result) && nrow(ora_result@result) > 0) {
-      sheet_name <- paste0(direction, "_", db)
-      addWorksheet(wb_ora, sheet_name)
-      
-      result_df <- as.data.frame(ora_result@result)
-      
-      # Select key columns
-      cols_to_keep <- intersect(
-        c("ID", "Description", "GeneRatio", "BgRatio", "pvalue", "p.adjust", "qvalue", "geneID", "Count"),
-        colnames(result_df)
-      )
-      result_df <- result_df[, cols_to_keep]
-      
-      # Round numeric columns
-      numeric_cols <- names(result_df)[sapply(result_df, is.numeric)]
-      result_df[numeric_cols] <- lapply(result_df[numeric_cols], function(x) round(x, 4))
-      
-      writeData(wb_ora, sheet_name, result_df)
-      addStyle(wb_ora, sheet_name, header_style, rows = 1, cols = 1:ncol(result_df), gridExpand = TRUE)
-      setColWidths(wb_ora, sheet_name, cols = 1:ncol(result_df), widths = "auto")
-    }
-  }
+cat("Memory cleaned. Visualization can be run independently from here.\n")
+
+# ============================================================================
+# Generating Plots
+# (This section can be re-run independently after GSEA processing)
+# ============================================================================
+
+cat("\n--- Generating Plots ---\n")
+
+if (!exists("paths")) {
+  source("analysis_v7/setup.R")
 }
 
-ora_excel_file <- paste0(output_dir, "ORA_R0_vs_R1_tumor.xlsx")
-saveWorkbook(wb_ora, ora_excel_file, overwrite = TRUE)
-cat("  Saved:", basename(ora_excel_file), "\n")
+# Load saved results
+cat("Loading saved GSEA results...\n")
+enrichment_output <- readRDS(paste0(paths$processed, "thyr_enrichment_results.rds"))
+gsea_results <- enrichment_output$GSEA
 
-cat("\nPhase 5 complete!\n")
+cat(sprintf("  Found %d databases\n", length(gsea_results)))
 
-# ============================================================================
-# Phase 6: Visualization
-# ============================================================================
+library(ggplot2)
+library(enrichplot)
 
-cat("\n=== PHASE 6: VISUALIZATION ===\n")
+output_dir <- paste0(paths$output, "enrichment_analysis/")
+dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
 
-# --- GSEA Dotplots ---
-cat("\n  Creating GSEA dotplots...\n")
+# Dotplots
+cat("\n  Creating dotplots...\n")
 
 for (db in c("GO_BP", "KEGG", "Reactome", "Hallmark")) {
   gsea_result <- gsea_results[[db]]
@@ -520,35 +351,12 @@ for (db in c("GO_BP", "KEGG", "Reactome", "Hallmark")) {
   }
 }
 
-# --- ORA Dotplots ---
-cat("\n  Creating ORA dotplots...\n")
-
-for (direction in c("Up", "Down", "All")) {
-  for (db in c("GO_BP", "KEGG", "Reactome")) {
-    ora_result <- ora_results[[direction]][[db]]
-    if (!is.null(ora_result) && nrow(ora_result@result) > 0) {
-      n_show <- min(20, nrow(ora_result@result))
-      
-      p <- dotplot(ora_result, showCategory = n_show) +
-        ggtitle(paste0("ORA: ", db, " - ", direction, " DEGs (R0_vs_R1_tumor)")) +
-        theme(plot.title = element_text(hjust = 0.5))
-      
-      ggsave(
-        filename = paste0(output_dir, "ORA_dotplot_", direction, "_", db, ".pdf"),
-        plot = p, width = 10, height = 8
-      )
-      cat(sprintf("    Saved: ORA_dotplot_%s_%s.pdf\n", direction, db))
-    }
-  }
-}
-
-# --- GSEA Running Score Plots (Top 5 per database) ---
-cat("\n  Creating GSEA running score plots...\n")
+# Running score plots (top 5 per database)
+cat("\n  Creating running score plots...\n")
 
 for (db in c("GO_BP", "KEGG", "Reactome", "Hallmark")) {
   gsea_result <- gsea_results[[db]]
   if (!is.null(gsea_result) && nrow(gsea_result@result) > 0) {
-    # Get top 5 by absolute NES
     result_df <- gsea_result@result
     result_df <- result_df[order(abs(result_df$NES), decreasing = TRUE), ]
     top_ids <- head(result_df$ID, 5)
@@ -566,22 +374,15 @@ for (db in c("GO_BP", "KEGG", "Reactome", "Hallmark")) {
   }
 }
 
-cat("\nPhase 6 complete!\n")
-
 # ============================================================================
 # Final Summary
 # ============================================================================
 
-cat("\n=== ENRICHMENT ANALYSIS COMPLETE (v7.9) ===\n")
-cat("============================================\n")
+cat("\n=== GSEA Enrichment Analysis Complete (v7.10) ===\n")
 
 cat("\nTarget: R0_vs_R1_tumor\n")
-cat(sprintf("  Total DEGs: %d (Up: %d, Down: %d)\n",
-            summary_stats$significant_genes,
-            summary_stats$upregulated,
-            summary_stats$downregulated))
 
-cat("\n--- GSEA Results ---\n")
+cat("\nGSEA Results:\n")
 cat(sprintf("%-12s %8s\n", "Database", "Pathways"))
 cat(paste(rep("-", 22), collapse = ""), "\n")
 for (db in c("GO_BP", "KEGG", "Reactome", "Hallmark")) {
@@ -589,39 +390,19 @@ for (db in c("GO_BP", "KEGG", "Reactome", "Hallmark")) {
   cat(sprintf("%-12s %8d\n", db, n_sig))
 }
 
-cat("\n--- ORA Results ---\n")
-cat(sprintf("%-8s %-12s %8s\n", "Direction", "Database", "Terms"))
-cat(paste(rep("-", 32), collapse = ""), "\n")
-for (direction in c("Up", "Down", "All")) {
-  for (db in c("GO_BP", "KEGG", "Reactome")) {
-    n_sig <- if (!is.null(ora_results[[direction]][[db]])) nrow(ora_results[[direction]][[db]]@result) else 0
-    cat(sprintf("%-8s %-12s %8d\n", direction, db, n_sig))
-  }
-}
-
 cat("\nMethodology:\n")
-cat("  GSEA ranking: delta × min(-log10(q),", CONFIG$Q_CAP, ")\n")
+cat("  Ranking: Cliff's delta × min(-log10(q), 10)\n")
 cat("  FDR correction: BH method\n")
-cat("  FDR threshold:", CONFIG$FDR_CUTOFF, "\n")
+cat("  FDR threshold: 0.05\n")
 
-cat("\nDatabases:\n")
-cat("  - GO Biological Process\n")
-cat("  - KEGG Pathways\n")
-cat("  - Reactome Pathways\n")
-cat("  - MSigDB Hallmark (GSEA only)\n")
-
-cat("\nOutput files:\n")
-cat("  - thyr_enrichment_results.rds (processed/)\n")
-cat("  - GSEA_R0_vs_R1_tumor.xlsx\n")
-cat("  - ORA_R0_vs_R1_tumor.xlsx\n")
-cat("  - GSEA_dotplot_*.pdf\n")
-cat("  - ORA_dotplot_*.pdf\n")
-cat("  - GSEA_running_*.pdf\n")
+cat("\nOutputs:\n")
+cat("  Results: thyr_enrichment_results.rds\n")
+cat("  Excel: GSEA_R0_vs_R1_tumor.xlsx\n")
+cat("  Plots: GSEA_dotplot_*.pdf, GSEA_running_*.pdf\n")
 
 cat("\nOutput location:", output_dir, "\n")
 
-# Cleanup
-rm(list = setdiff(ls(), c("paths", "all_enrichment_results")))
+rm(list = setdiff(ls(), c("paths")))
 gc()
 
 cat("\n=== Script Complete ===\n")
