@@ -256,9 +256,26 @@ cat(sprintf("    Significant pathways: %d\n", nrow(gsea_hallmark_sig@result)))
 
 cat("\n--- Saving results ---\n")
 
+# Apply simplify() to GO_BP and save
+go_bp_simplified <- NULL
+if (!is.null(gsea_results[["GO_BP"]]) && nrow(gsea_results[["GO_BP"]]@result) > 0) {
+  cat("  Applying simplify() to GO_BP (cutoff=0.7, by=p.adjust)...\n")
+  go_bp_simplified <- clusterProfiler::simplify(
+    gsea_results[["GO_BP"]],
+    cutoff = 0.7,
+    by = "p.adjust",
+    select_fun = min
+  )
+  n_before <- nrow(gsea_results[["GO_BP"]]@result)
+  n_after <- nrow(go_bp_simplified@result)
+  cat(sprintf("    Reduced: %d -> %d pathways (%.1f%% reduction)\n", 
+              n_before, n_after, (1 - n_after/n_before) * 100))
+}
+
 # Save RDS
 thyr_enrichment_results <- list(
   GSEA = gsea_results,
+  GO_BP_simplified = go_bp_simplified,
   gene_list = gene_list,
   gene_mapping = gene_mapping,
   config = CONFIG,
@@ -349,27 +366,6 @@ library(enrichplot)
 
 output_dir <- paste0(paths$output, "enrichment_analysis/")
 dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
-
-# Dotplots
-cat("\n  Creating dotplots...\n")
-
-for (db in c("GO_BP", "KEGG", "Reactome", "Hallmark")) {
-  gsea_result <- gsea_results[[db]]
-  if (!is.null(gsea_result) && nrow(gsea_result@result) > 0) {
-    n_show <- min(20, nrow(gsea_result@result))
-    
-    p <- dotplot(gsea_result, showCategory = n_show, split = ".sign") +
-      facet_grid(.~.sign) +
-      ggtitle(paste0("GSEA: ", db, " (R0_vs_R1_tumor)")) +
-      theme(plot.title = element_text(hjust = 0.5))
-    
-    ggsave(
-      filename = paste0(output_dir, "GSEA_dotplot_", db, ".pdf"),
-      plot = p, width = 12, height = 8
-    )
-    cat(sprintf("    Saved: GSEA_dotplot_%s.pdf\n", db))
-  }
-}
 
 # Running score plots (top 5 per database)
 cat("\n  Creating running score plots...\n")
@@ -481,20 +477,14 @@ display_top_pathways <- function(result_df, n = 10, direction_label = "") {
 cat("\n[GO_BP - with simplify()]\n")
 
 go_bp_result <- gsea_results[["GO_BP"]]
-if (!is.null(go_bp_result) && nrow(go_bp_result@result) > 0) {
-  
-  # Apply simplify() to reduce redundancy
-  cat("  Applying simplify() (cutoff=0.7, by=p.adjust)...\n")
-  go_bp_simplified <- clusterProfiler::simplify(
-    go_bp_result,
-    cutoff = 0.7,
-    by = "p.adjust",
-    select_fun = min
-  )
+go_bp_simplified <- enrichment_output$GO_BP_simplified
+
+if (!is.null(go_bp_simplified) && nrow(go_bp_simplified@result) > 0) {
   
   simplified_df <- go_bp_simplified@result
   n_before <- nrow(go_bp_result@result)
   n_after <- nrow(simplified_df)
+  cat(sprintf("  Using saved simplify() result (cutoff=0.7, by=p.adjust)\n"))
   cat(sprintf("  Reduced: %d -> %d pathways (%.1f%% reduction)\n", 
               n_before, n_after, (1 - n_after/n_before) * 100))
   
@@ -511,7 +501,7 @@ if (!is.null(go_bp_result) && nrow(go_bp_result@result) > 0) {
   display_top_pathways(neg_df, 10)
   
 } else {
-  cat("  No GO_BP results available\n")
+  cat("  No GO_BP simplified results available\n")
 }
 
 # --- KEGG ---
@@ -577,6 +567,476 @@ if (!is.null(hallmark_result) && nrow(hallmark_result@result) > 0) {
   cat("  No Hallmark results available\n")
 }
 
+# ============================================================================
+# NES Direction Dotplots (Per Database)
+# ============================================================================
+
+cat("\n--- NES Direction Dotplots ---\n")
+
+# Ensure output_dir is defined
+output_dir <- paste0(paths$output, "enrichment_analysis/")
+dir.create(output_dir, showWarnings = FALSE, recursive = TRUE)
+
+# Helper function to extract top N pathways by NES direction
+extract_top_pathways <- function(result_df, n_each = 5) {
+  if (is.null(result_df) || nrow(result_df) == 0) {
+    return(NULL)
+  }
+  
+  # NES > 0: top n by p.adjust
+  pos_df <- result_df[result_df$NES > 0, ]
+  if (nrow(pos_df) > 0) {
+    pos_df <- head(pos_df[order(pos_df$p.adjust), ], n_each)
+  }
+  
+  # NES < 0: top n by p.adjust
+  neg_df <- result_df[result_df$NES < 0, ]
+  if (nrow(neg_df) > 0) {
+    neg_df <- head(neg_df[order(neg_df$p.adjust), ], n_each)
+  }
+  
+  rbind(pos_df, neg_df)
+}
+
+# Helper function to create dotplot for a single database
+create_nes_dotplot <- function(plot_df, db_name, output_dir) {
+  if (is.null(plot_df) || nrow(plot_df) == 0) {
+    cat(sprintf("    %s: No data available\n", db_name))
+    return(NULL)
+  }
+  
+  # Wrap description at 50 characters
+  plot_df$Description_wrapped <- stringr::str_wrap(plot_df$Description, width = 50)
+  
+  # Create the plot
+  p <- ggplot(plot_df, aes(x = NES, 
+                           y = reorder(Description_wrapped, NES),
+                           size = setSize,
+                           color = p.adjust)) +
+    geom_point() +
+    geom_vline(xintercept = 0, linetype = "dashed", color = "gray50") +
+    scale_color_gradient(low = "red", high = "blue", 
+                         trans = "log10",
+                         name = "FDR\n(p.adjust)") +
+    scale_size_continuous(name = "Gene Set\nSize", range = c(3, 10)) +
+    labs(
+      title = paste0("GSEA: ", db_name, " (R0 vs R1 Tumor)"),
+      subtitle = "Top 5 pathways by FDR for each NES direction",
+      x = "Normalized Enrichment Score (NES)",
+      y = NULL
+    ) +
+    theme_bw() +
+    theme(
+      plot.title = element_text(hjust = 0.5, face = "bold", size = 14),
+      plot.subtitle = element_text(hjust = 0.5, size = 10),
+      axis.text.y = element_text(size = 10),
+      legend.position = "right",
+      panel.grid.minor = element_blank()
+    )
+  
+  # Display in RStudio
+  print(p)
+  
+  # Save PDF
+  plot_file <- paste0(output_dir, "GSEA_NES_dotplot_", db_name, ".pdf")
+  ggsave(plot_file, p, width = 10, height = 6)
+  
+  n_pos <- sum(plot_df$NES > 0)
+  n_neg <- sum(plot_df$NES < 0)
+  cat(sprintf("    %s: %d pathways (NES>0: %d, NES<0: %d) -> Saved\n", 
+              db_name, nrow(plot_df), n_pos, n_neg))
+  
+  return(invisible(p))
+}
+
+cat("  Creating individual dotplots per database...\n\n")
+
+# GO_BP (use simplify() result)
+go_bp_top <- NULL
+if (!is.null(go_bp_simplified) && nrow(go_bp_simplified@result) > 0) {
+  go_bp_top <- extract_top_pathways(go_bp_simplified@result, 5)
+  create_nes_dotplot(go_bp_top, "GO_BP", output_dir)
+}
+
+# KEGG
+kegg_top <- NULL
+if (!is.null(kegg_result) && nrow(kegg_result@result) > 0) {
+  kegg_top <- extract_top_pathways(kegg_result@result, 5)
+  create_nes_dotplot(kegg_top, "KEGG", output_dir)
+}
+
+# Reactome
+reactome_top <- NULL
+if (!is.null(reactome_result) && nrow(reactome_result@result) > 0) {
+  reactome_top <- extract_top_pathways(reactome_result@result, 5)
+  create_nes_dotplot(reactome_top, "Reactome", output_dir)
+}
+
+# Hallmark
+hallmark_top <- NULL
+if (!is.null(hallmark_result) && nrow(hallmark_result@result) > 0) {
+  hallmark_top <- extract_top_pathways(hallmark_result@result, 5)
+  create_nes_dotplot(hallmark_top, "Hallmark", output_dir)
+}
+
+cat("\n  Dotplot generation complete.\n")
+
+# ============================================================================
+# GO_BP Emapplot (Semantic Similarity Network)
+# ============================================================================
+
+cat("\n--- GO_BP Emapplot ---\n")
+
+if (!is.null(go_bp_simplified) && nrow(go_bp_simplified@result) > 0) {
+  
+  result_df <- go_bp_simplified@result
+  
+  # --- NES > 0 (Up in R1) ---
+  pos_df <- result_df[result_df$NES > 0, ]
+  if (nrow(pos_df) >= 5) {
+    cat(sprintf("  NES > 0: %d pathways available\n", nrow(pos_df)))
+    
+    # Select top 50 by p.adjust
+    n_show_pos <- min(50, nrow(pos_df))
+    top_pos_ids <- head(pos_df[order(pos_df$p.adjust), "ID"], n_show_pos)
+    
+    # Create subset object FIRST, then calculate pairwise similarity
+    go_bp_pos <- go_bp_simplified
+    go_bp_pos@result <- result_df[result_df$ID %in% top_pos_ids, ]
+    
+    cat(sprintf("    Calculating pairwise similarity for %d pathways...\n", n_show_pos))
+    go_bp_pos <- pairwise_termsim(go_bp_pos)
+    
+    cat(sprintf("    Plotting...\n"))
+    
+    p_pos <- emapplot(go_bp_pos, 
+                      showCategory = n_show_pos,
+                      color = "NES",
+                      layout = "kk") +
+      scale_fill_gradient2(low = "blue", mid = "white", high = "red", 
+                           midpoint = 0, name = "NES") +
+      labs(title = "GO_BP: NES > 0 (Up in R1)",
+           subtitle = sprintf("Top %d pathways by FDR", n_show_pos)) +
+      theme(plot.title = element_text(hjust = 0.5, face = "bold"),
+            plot.subtitle = element_text(hjust = 0.5))
+    
+    print(p_pos)
+    
+    emapplot_pos_file <- paste0(output_dir, "GSEA_emapplot_GO_BP_positive.pdf")
+    ggsave(emapplot_pos_file, p_pos, width = 10, height = 10)
+    cat(sprintf("    Saved: %s\n", basename(emapplot_pos_file)))
+    
+  } else {
+    cat("  NES > 0: Not enough pathways for emapplot\n")
+  }
+  
+  # --- NES < 0 (Down in R1) ---
+  neg_df <- result_df[result_df$NES < 0, ]
+  if (nrow(neg_df) >= 5) {
+    cat(sprintf("  NES < 0: %d pathways available\n", nrow(neg_df)))
+    
+    # Select top 50 by p.adjust
+    n_show_neg <- min(50, nrow(neg_df))
+    top_neg_ids <- head(neg_df[order(neg_df$p.adjust), "ID"], n_show_neg)
+    
+    # Create subset object FIRST, then calculate pairwise similarity
+    go_bp_neg <- go_bp_simplified
+    go_bp_neg@result <- result_df[result_df$ID %in% top_neg_ids, ]
+    
+    cat(sprintf("    Calculating pairwise similarity for %d pathways...\n", n_show_neg))
+    go_bp_neg <- pairwise_termsim(go_bp_neg)
+    
+    cat(sprintf("    Plotting...\n"))
+    
+    p_neg <- emapplot(go_bp_neg,
+                      showCategory = n_show_neg,
+                      color = "NES",
+                      layout = "kk") +
+      scale_fill_gradient2(low = "blue", mid = "white", high = "red",
+                           midpoint = 0, name = "NES") +
+      labs(title = "GO_BP: NES < 0 (Down in R1)",
+           subtitle = sprintf("Top %d pathways by FDR", n_show_neg)) +
+      theme(plot.title = element_text(hjust = 0.5, face = "bold"),
+            plot.subtitle = element_text(hjust = 0.5))
+    
+    print(p_neg)
+    
+    emapplot_neg_file <- paste0(output_dir, "GSEA_emapplot_GO_BP_negative.pdf")
+    ggsave(emapplot_neg_file, p_neg, width = 10, height = 10)
+    cat(sprintf("    Saved: %s\n", basename(emapplot_neg_file)))
+    
+  } else {
+    cat("  NES < 0: Not enough pathways for emapplot\n")
+  }
+  
+  cat("\n  Emapplot generation complete.\n")
+  
+} else {
+  cat("  No GO_BP simplified results available for emapplot\n")
+}
+
+# ============================================================================
+# Leading-Edge Heatmap (Immune/Inflammatory Pathways)
+# ============================================================================
+
+cat("\n--- Leading-Edge Heatmap ---\n")
+
+# Target pathways (immune/inflammatory theme, NES < 0)
+target_pathways <- c(
+  "GO:0032609",  # type II interferon production
+  "GO:0032640",  # tumor necrosis factor production
+  "GO:0071621",  # granulocyte chemotaxis
+  "GO:0001909"   # leukocyte mediated cytotoxicity
+)
+
+# Get GO_BP result (use original, not simplified, for core_enrichment)
+go_bp_full <- gsea_results[["GO_BP"]]
+
+if (!is.null(go_bp_full) && nrow(go_bp_full@result) > 0) {
+  
+  go_bp_df <- go_bp_full@result
+  
+  # Check which pathways are available
+  available_pathways <- target_pathways[target_pathways %in% go_bp_df$ID]
+  missing_pathways <- target_pathways[!target_pathways %in% go_bp_df$ID]
+  
+  cat(sprintf("  Target pathways found: %d/%d\n", 
+              length(available_pathways), length(target_pathways)))
+  
+  if (length(missing_pathways) > 0) {
+    cat("  Missing pathways:\n")
+    for (mp in missing_pathways) {
+      cat(sprintf("    - %s\n", mp))
+    }
+  }
+  
+  if (length(available_pathways) >= 2) {
+    
+    # Step 1: Extract leading-edge genes from each pathway
+    cat("  Extracting leading-edge genes...\n")
+    
+    pathway_genes <- list()
+    for (pathway_id in available_pathways) {
+      pathway_row <- go_bp_df[go_bp_df$ID == pathway_id, ]
+      pathway_name <- pathway_row$Description
+      
+      # core_enrichment contains "/" separated ENTREZID
+      core_genes <- unlist(strsplit(pathway_row$core_enrichment, "/"))
+      pathway_genes[[pathway_id]] <- core_genes
+      
+      cat(sprintf("    %s: %d genes\n", pathway_name, length(core_genes)))
+    }
+    
+    # Step 2: Count gene occurrences across pathways
+    all_genes <- unlist(pathway_genes)
+    gene_counts <- table(all_genes)
+    gene_counts_sorted <- sort(gene_counts, decreasing = TRUE)
+    
+    cat(sprintf("  Total unique genes: %d\n", length(gene_counts)))
+    cat(sprintf("  Genes in 2+ pathways: %d\n", sum(gene_counts >= 2)))
+    cat(sprintf("  Genes in 3+ pathways: %d\n", sum(gene_counts >= 3)))
+    
+    # Step 3: Select genes (prioritize multi-pathway, limit to 30)
+    # First take genes in 2+ pathways, then fill with single-pathway genes
+    multi_pathway_genes <- names(gene_counts_sorted[gene_counts_sorted >= 2])
+    single_pathway_genes <- names(gene_counts_sorted[gene_counts_sorted == 1])
+    
+    n_target <- 30
+    if (length(multi_pathway_genes) >= n_target) {
+      selected_genes <- head(multi_pathway_genes, n_target)
+    } else {
+      n_fill <- n_target - length(multi_pathway_genes)
+      selected_genes <- c(multi_pathway_genes, head(single_pathway_genes, n_fill))
+    }
+    
+    cat(sprintf("  Selected genes: %d\n", length(selected_genes)))
+    
+    # Step 4: Convert ENTREZID to SYMBOL
+    gene_symbols <- AnnotationDbi::mapIds(
+      org.Hs.eg.db::org.Hs.eg.db,
+      keys = selected_genes,
+      column = "SYMBOL",
+      keytype = "ENTREZID",
+      multiVals = "first"
+    )
+    
+    # Remove NA mappings
+    valid_idx <- !is.na(gene_symbols)
+    selected_genes <- selected_genes[valid_idx]
+    gene_symbols <- gene_symbols[valid_idx]
+    
+    cat(sprintf("  Genes with valid symbols: %d\n", length(gene_symbols)))
+    
+    # Step 5: Convert ENTREZID to ENSEMBL using gene_mapping from enrichment_output
+    cat("  Converting ENTREZID to ENSEMBL...\n")
+    
+    gene_mapping <- enrichment_output$gene_mapping
+    
+    # Create ENTREZID -> ENSEMBL lookup
+    entrez_to_ensembl <- gene_mapping$ENSEMBL
+    names(entrez_to_ensembl) <- gene_mapping$ENTREZID
+    
+    # Convert selected genes
+    selected_ensembl <- entrez_to_ensembl[selected_genes]
+    valid_ensembl <- !is.na(selected_ensembl)
+    
+    selected_genes <- selected_genes[valid_ensembl]
+    selected_ensembl <- selected_ensembl[valid_ensembl]
+    gene_symbols <- gene_symbols[valid_ensembl]
+    
+    cat(sprintf("  Genes with valid ENSEMBL: %d\n", length(selected_ensembl)))
+    
+    # Step 6: Load normalized expression data
+    cat("  Loading normalized expression data...\n")
+    
+    dgelist_file <- paste0(paths$processed, "analysis_dgelist_R0_vs_R1_tumor.rds")
+    
+    if (file.exists(dgelist_file)) {
+      dgelist <- readRDS(dgelist_file)
+      
+      # Calculate normalized CPM
+      norm_cpm <- edgeR::cpm(dgelist, normalized.lib.sizes = TRUE, log = TRUE)
+      
+      # DGEList rownames have version numbers (e.g., ENSG00000000003.15)
+      # Create lookup: base ENSEMBL -> versioned ENSEMBL
+      dgelist_ensembl_base <- sub("\\.\\d+$", "", rownames(norm_cpm))
+      names(dgelist_ensembl_base) <- rownames(norm_cpm)
+      versioned_lookup <- setNames(names(dgelist_ensembl_base), dgelist_ensembl_base)
+      
+      # Match genes using base ENSEMBL IDs
+      matched_versioned <- versioned_lookup[selected_ensembl]
+      valid_match <- !is.na(matched_versioned)
+      
+      available_versioned <- matched_versioned[valid_match]
+      available_symbols <- gene_symbols[valid_match]
+      available_entrez <- selected_genes[valid_match]
+      
+      cat(sprintf("  Genes matched in expression data: %d\n", length(available_versioned)))
+      
+      if (length(available_versioned) >= 10) {
+        
+        # Subset expression matrix
+        expr_matrix <- norm_cpm[available_versioned, , drop = FALSE]
+        
+        # Use gene symbols as rownames
+        rownames(expr_matrix) <- available_symbols
+        
+        cat(sprintf("  Expression matrix: %d genes x %d samples\n", 
+                    nrow(expr_matrix), ncol(expr_matrix)))
+        
+        # Step 7: Gene-wise Z-score transformation
+        expr_zscore <- t(scale(t(expr_matrix)))
+        
+        # Step 8: Prepare sample annotation
+        sample_groups <- as.character(dgelist$samples$group)
+        names(sample_groups) <- rownames(dgelist$samples)
+        
+        # Order samples: R0 first, then R1
+        r0_samples <- names(sample_groups)[sample_groups == "R0"]
+        r1_samples <- names(sample_groups)[sample_groups == "R1"]
+        sample_order <- c(r0_samples, r1_samples)
+        
+        expr_zscore_ordered <- expr_zscore[, sample_order, drop = FALSE]
+        
+        cat(sprintf("  Sample order: R0 (%d) -> R1 (%d)\n", 
+                    length(r0_samples), length(r1_samples)))
+        
+        # Step 9: Create heatmap with ComplexHeatmap
+        cat("  Creating heatmap...\n")
+        
+        library(ComplexHeatmap)
+        library(circlize)
+        
+        # Column annotation
+        col_annotation <- HeatmapAnnotation(
+          Group = factor(sample_groups[sample_order], levels = c("R0", "R1")),
+          col = list(Group = c("R0" = "#3498db", "R1" = "#e74c3c")),
+          annotation_name_side = "left"
+        )
+        
+        # Color scale for Z-score (-3 to +3 to cover full data range)
+        col_fun <- colorRamp2(c(-3, 0, 3), c("blue", "white", "red"))
+        
+        # Row annotation: pathway membership count
+        gene_membership <- gene_counts[available_entrez]
+        names(gene_membership) <- available_symbols
+        gene_membership_ordered <- gene_membership[rownames(expr_zscore_ordered)]
+        
+        row_annotation <- rowAnnotation(
+          Pathways = anno_barplot(
+            as.numeric(gene_membership_ordered),
+            width = unit(1.5, "cm"),
+            gp = gpar(fill = "#95a5a6")
+          ),
+          annotation_name_rot = 0
+        )
+        
+        # Create heatmap
+        ht <- Heatmap(
+          expr_zscore_ordered,
+          name = "Z-score",
+          col = col_fun,
+          
+          # Clustering
+          cluster_rows = TRUE,
+          cluster_columns = FALSE,
+          
+          # Annotations
+          top_annotation = col_annotation,
+          right_annotation = row_annotation,
+          
+          # Labels
+          row_names_gp = gpar(fontsize = 8),
+          show_column_names = FALSE,
+          
+          # Title
+          column_title = "Leading-edge genes from immune/inflammatory pathways\ndownregulated in R1",
+          column_title_gp = gpar(fontsize = 11, fontface = "bold"),
+          
+          # Legend
+          heatmap_legend_param = list(
+            title = "Z-score",
+            at = c(-3, -2, -1, 0, 1, 2, 3),
+            labels = c("-3", "-2", "-1", "0", "1", "2", "3")
+          )
+        )
+        
+        # Display
+        draw(ht)
+        
+        # Save PDF
+        heatmap_file <- paste0(output_dir, "GSEA_leading_edge_heatmap.pdf")
+        pdf(heatmap_file, width = 10, height = 8)
+        draw(ht)
+        dev.off()
+        cat(sprintf("  Saved: %s\n", basename(heatmap_file)))
+        
+        # Report pathway info
+        cat("\n  Pathways included:\n")
+        for (pathway_id in available_pathways) {
+          pathway_row <- go_bp_df[go_bp_df$ID == pathway_id, ]
+          cat(sprintf("    - %s (NES=%.2f)\n", 
+                      pathway_row$Description, pathway_row$NES))
+        }
+        
+        cat("\n  Leading-edge heatmap complete.\n")
+        
+      } else {
+        cat("  Not enough genes found in expression data\n")
+      }
+      
+    } else {
+      cat(sprintf("  DGEList file not found: %s\n", basename(dgelist_file)))
+    }
+    
+  } else {
+    cat("  Not enough target pathways found\n")
+  }
+  
+} else {
+  cat("  No GO_BP results available\n")
+}
+
 # Configuration from saved data
 cat("\nMethodology:\n")
 cat("  Ranking: Cliff's delta\n")
@@ -592,9 +1052,9 @@ cat("  Date:", as.character(enrichment_output$date), "\n")
 cat("\nOutputs:\n")
 cat("  Results: thyr_enrichment_results.rds\n")
 cat("  Excel: GSEA_R0_vs_R1_tumor.xlsx\n")
-cat("  Plots: GSEA_dotplot_*.pdf, GSEA_running_*.pdf\n")
+cat("  Plots: GSEA_NES_dotplot_*.pdf, GSEA_running_*.pdf, GSEA_emapplot_*.pdf\n")
+cat("         GSEA_leading_edge_heatmap.pdf\n")
 
-output_dir <- paste0(paths$output, "enrichment_analysis/")
 cat("\nOutput location:", output_dir, "\n")
 
 # ============================================================================
