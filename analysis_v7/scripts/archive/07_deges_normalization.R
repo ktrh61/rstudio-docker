@@ -3,15 +3,14 @@
 # Method: filterByExpr -> Cook's distance -> MUREN (LTS) + Brunner-Munzel iteration
 # Input: thyr_case_master_stage2_filtered, thyr_se_strand2_nonzero  
 # Output: Normalized CPM values and DGEList objects with DEGES-MUREN factors
-# Version: v7.10 - Switched to BH (Benjamini-Hochberg) correction
-#                  Separated MA plot generation from DEGES processing
-#                  MA plots can now be re-generated independently
-#                  Added memory cleanup between processing and visualization
-# Date: 2025-12-15
+# Version: v7.9 - Separated MA plot generation from DEGES processing
+#                 MA plots can now be re-generated independently
+#                 Added memory cleanup between processing and visualization
+# Date: 2025-12-14
 
 source("analysis_v7/setup.R")
 
-cat("\n=== DEGES Normalization (v7.10) ===\n")
+cat("\n=== DEGES Normalization (v7.9) ===\n")
 cat("Date:", as.character(Sys.Date()), "\n")
 cat("Method: filterByExpr -> Cook's -> DEGES-MUREN (Brunner-Munzel) -> CPM output\n")
 cat("Groups: R0/R1/B0/B1 high-purity pairs only\n")
@@ -22,6 +21,7 @@ suppressPackageStartupMessages({
   library(edgeR)
   library(DESeq2)
   library(brunnermunzel)
+  library(qvalue)
   library(dplyr)
 })
 
@@ -55,7 +55,7 @@ cat("  Floor threshold:", sprintf("%.0f%%", CONFIG$CONVERGENCE_THRESHOLD * 100),
 cat("  Cook's quantile:", sprintf("%.0f%%", CONFIG$COOKS_QUANTILE * 100), "\n")
 cat("  MUREN method:", CONFIG$MUREN_METHOD, "\n")
 cat("  MUREN workers:", CONFIG$MUREN_WORKERS, "\n")
-cat("  DEG screening: Brunner-Munzel test + BH (Benjamini-Hochberg) correction\n")
+cat("  DEG screening: Brunner-Munzel test + Storey q-value (lambda=0.5)\n")
 
 # Thread control
 if (requireNamespace("RhpcBLASctl", quietly = TRUE)) {
@@ -267,7 +267,7 @@ perform_bm_test <- function(cpm_matrix, sample_groups, group_levels) {
 }
 
 # ============================================================================
-# DEGES iteration function (Brunner-Munzel-based, BH correction)
+# DEGES iteration function (Brunner-Munzel-based)
 # ============================================================================
 
 perform_deges_iteration <- function(count_matrix, sample_groups, iteration = 0, 
@@ -307,8 +307,12 @@ perform_deges_iteration <- function(count_matrix, sample_groups, iteration = 0,
   cat("      Performing Brunner-Munzel tests...\n")
   pvalues <- perform_bm_test(normalized_cpm, sample_groups, group_levels)
   
-  # Apply BH (Benjamini-Hochberg) correction
-  qvalues <- p.adjust(pvalues, method = "BH")
+  # Apply Storey q-value (lambda = 0.5 fixed)
+  qval_result <- qvalue(pvalues, lambda = 0.5)
+  qvalues <- qval_result$qvalues
+  pi0_estimate <- qval_result$pi0
+  
+  cat(sprintf("      Estimated pi0: %.3f\n", pi0_estimate))
   
   # Count potential DEGs
   deg_count <- sum(qvalues < 0.10, na.rm = TRUE)
@@ -363,6 +367,7 @@ perform_deges_iteration <- function(count_matrix, sample_groups, iteration = 0,
     deg_proportion = deg_proportion,
     n_excluded = length(potential_deg_indices),
     exclusion_method = exclusion_method,
+    pi0_estimate = pi0_estimate,
     n_genes_input = n_genes
   ))
 }
@@ -620,6 +625,7 @@ for (comp_name in names(comparisons)) {
           exclusion_method = x$exclusion_method,
           deg_proportion = x$deg_proportion,
           non_deg_count = length(x$non_deg_indices),
+          pi0_estimate = x$pi0_estimate,
           terminated = x$terminate
         )
       }),
@@ -627,6 +633,7 @@ for (comp_name in names(comparisons)) {
       # Final results
       final_iteration = length(iteration_results),
       final_deg_count = final_result$deg_count,
+      final_pi0 = final_result$pi0_estimate,
       n_genes_output = nrow(count_matrix_filtered)
     )
   }
@@ -681,7 +688,7 @@ deges_output <- list(
   sample_lists = sample_lists,
   results = thyr_deges_results,
   summary = summary_data,
-  version = "v7.10"
+  version = "v7.8"
 )
 
 saveRDS(deges_output, paste0(paths$processed, "analysis_deges_results.rds"))
@@ -826,10 +833,10 @@ for (comp_tissue in names(ma_plot_data)) {
 # Final report
 # ============================================================================
 
-cat("\n=== DEGES Normalization Complete (v7.10) ===\n")
+cat("\n=== DEGES Normalization Complete (v7.9) ===\n")
 cat("Configuration:\n")
 cat("  Workflow: filterByExpr -> Cook's -> DEGES iterations\n")
-cat("  DEG screening: Brunner-Munzel test + BH (Benjamini-Hochberg) correction\n")
+cat("  DEG screening: Brunner-Munzel test + Storey q-value (lambda=0.5)\n")
 cat("  Gene set: Consistent (filterByExpr-filtered) throughout\n")
 cat("  Output: Normalized CPM values (prior.count = 0)\n")
 cat("\nProcessed comparisons:\n")

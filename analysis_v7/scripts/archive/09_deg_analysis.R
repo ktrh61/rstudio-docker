@@ -1,24 +1,24 @@
-# 09_deg_analysis.R - DEG Analysis with Brunner-Munzel and BH Method
+# 09_deg_analysis.R - DEG Analysis with Brunner-Munzel and Storey Method
 # Purpose: Perform differential expression analysis on DEGES-normalized data
-# Method: Brunner-Munzel test with BH (Benjamini-Hochberg) correction
+# Method: Brunner-Munzel test with Storey (qvalue, lambda=0.5) correction
 # Input: analysis_dgelist_*.rds (from 07_deges_normalization.R)
 # Output: thyr_deg_results.rds with DEG lists
-# Version: v7.7 - Switched to BH (Benjamini-Hochberg) correction
-#                 Separated visualization from analysis (independent re-run)
+# Version: v7.6 - Separated visualization from analysis (independent re-run)
 #                 Dynamic binwidth and Y-axis calculation
-# Date: 2025-12-15
+# Date: 2025-12-14
 
 source("analysis_v7/setup.R")
 
-cat("\n=== DEG Analysis with Brunner-Munzel + BH Method (v7.7) ===\n")
+cat("\n=== DEG Analysis with Brunner-Munzel + Storey Method (v7.6) ===\n")
 cat("Date:", as.character(Sys.Date()), "\n")
-cat("Method: Brunner-Munzel test with BH (Benjamini-Hochberg) correction\n")
+cat("Method: Brunner-Munzel test with Storey correction (lambda=0.5)\n")
 cat("Effect size: PI (primary) with Cliff's delta (derived)\n")
 cat("Focus: R0 vs R1, B0 vs B1 comparisons (tumor/normal)\n")
 
 # Load packages
 suppressPackageStartupMessages({
   library(edgeR)
+  library(qvalue)
   library(dplyr)
   library(ggplot2)
   library(gridExtra)
@@ -135,9 +135,9 @@ perform_brunner_munzel_test <- function(normalized_data, sample_groups,
   ))
 }
 
-# Apply BH (Benjamini-Hochberg) correction
-apply_bh_correction <- function(pvalues, alpha = 0.05) {
-  cat("  Applying BH (Benjamini-Hochberg) method for multiple testing correction...\n")
+# Apply Storey correction
+apply_storey_correction <- function(pvalues, alpha = 0.05) {
+  cat("  Applying Storey method for multiple testing correction...\n")
   
   # Remove NA p-values
   valid_pvals <- !is.na(pvalues) & is.finite(pvalues)
@@ -146,6 +146,7 @@ apply_bh_correction <- function(pvalues, alpha = 0.05) {
     cat("    No valid p-values for correction\n")
     return(list(
       qvalues = rep(NA_real_, length(pvalues)),
+      pi0 = NA_real_,
       significant = rep(FALSE, length(pvalues)),
       n_significant = 0L
     ))
@@ -153,22 +154,24 @@ apply_bh_correction <- function(pvalues, alpha = 0.05) {
   
   cat(sprintf("    Valid p-values: %d/%d\n", sum(valid_pvals), length(pvalues)))
   
-  # Apply BH correction
-  qvalues_valid <- p.adjust(pvalues[valid_pvals], method = "BH")
+  # Apply Storey method (lambda = 0.5 fixed for reproducibility)
+  qvalue_result <- qvalue(pvalues[valid_pvals], lambda = 0.5)
   
   # Create full qvalue vector
   qvalues <- rep(NA_real_, length(pvalues))
-  qvalues[valid_pvals] <- qvalues_valid
+  qvalues[valid_pvals] <- qvalue_result$qvalues
   
   # Identify significant genes
   significant <- qvalues < alpha & !is.na(qvalues)
   n_significant <- sum(significant)
   
+  cat(sprintf("    pi0 estimate: %.3f (lambda=0.5)\n", qvalue_result$pi0))
   cat(sprintf("    Significant genes (q < %.2f): %d (%.1f%%)\n",
               alpha, n_significant, n_significant/sum(valid_pvals)*100))
   
   return(list(
     qvalues = qvalues,
+    pi0 = qvalue_result$pi0,
     significant = significant,
     n_significant = n_significant,
     alpha = alpha
@@ -176,21 +179,21 @@ apply_bh_correction <- function(pvalues, alpha = 0.05) {
 }
 
 # Create DEG results summary
-create_deg_summary <- function(bm_result, correction_result, comparison_name, gene_info_df) {
+create_deg_summary <- function(bm_result, storey_result, comparison_name, gene_info_df) {
   
   # Create results data frame
   # PI is primary output, cliffs_delta is derived (single conversion)
   results_df <- data.frame(
     gene_id = bm_result$gene_names,
     pvalue = bm_result$pvalues,
-    qvalue = correction_result$qvalues,
+    qvalue = storey_result$qvalues,
     log2FC = bm_result$fold_changes,
     PI = bm_result$PI,                      # Primary output from Brunner-Munzel
     cliffs_delta = 2 * bm_result$PI - 1,    # Derived: delta = 2*PI - 1
     statistic = bm_result$statistics,
     group1_mean = bm_result$group1_means,
     group2_mean = bm_result$group2_means,
-    significant = correction_result$significant,
+    significant = storey_result$significant,
     stringsAsFactors = FALSE
   )
   
@@ -259,8 +262,9 @@ create_deg_summary <- function(bm_result, correction_result, comparison_name, ge
     comparison = comparison_name,
     total_genes_tested = nrow(results_df),
     valid_tests = sum(!is.na(results_df$pvalue)),
-    significant_genes = correction_result$n_significant,
-    alpha = correction_result$alpha,
+    significant_genes = storey_result$n_significant,
+    pi0 = storey_result$pi0,
+    alpha = storey_result$alpha,
     upregulated = sum(results_df$significant & results_df$direction == "UP"),
     downregulated = sum(results_df$significant & results_df$direction == "DOWN"),
     group1_name = bm_result$group1_name,
@@ -354,11 +358,11 @@ for (comp_name in names(comparisons)) {
       groups[2]
     )
     
-    # Apply BH correction
-    correction_result <- apply_bh_correction(bm_result$pvalues, CONFIG$ALPHA)
+    # Apply Storey correction
+    storey_result <- apply_storey_correction(bm_result$pvalues, CONFIG$ALPHA)
     
     # Create summary
-    deg_summary <- create_deg_summary(bm_result, correction_result, comp_tissue, 
+    deg_summary <- create_deg_summary(bm_result, storey_result, comp_tissue, 
                                       dgelist_filtered$genes)
     
     # Store results
@@ -371,7 +375,7 @@ for (comp_name in names(comparisons)) {
         group2 = rownames(dgelist_filtered$samples)[dgelist_filtered$samples$group == groups[2]]
       ),
       bm_result = bm_result,
-      correction_result = correction_result,
+      storey_result = storey_result,
       deg_summary = deg_summary,
       norm_factors_used = norm_factors,
       analysis_date = Sys.time()
@@ -386,6 +390,9 @@ for (comp_name in names(comparisons)) {
                   deg_summary$summary_stats$total_genes_tested * 100))
     cat(sprintf("  Upregulated: %d\n", deg_summary$summary_stats$upregulated))
     cat(sprintf("  Downregulated: %d\n", deg_summary$summary_stats$downregulated))
+    if (!is.na(deg_summary$summary_stats$pi0)) {
+      cat(sprintf("  Pi0 estimate: %.3f\n", deg_summary$summary_stats$pi0))
+    }
     
     # PI statistics (primary)
     pi_all <- deg_summary$summary_stats$all_pi_stats
@@ -439,6 +446,7 @@ for (comp_tissue in names(thyr_deg_results)) {
     degs_down = summary_stats$downregulated,
     deg_rate = round(summary_stats$significant_genes / 
                        summary_stats$total_genes_tested * 100, 2),
+    pi0 = round(summary_stats$pi0, 3),
     # PI statistics (primary)
     all_pi_median = round(pi_all$median, 3),
     deg_pi_median = round(pi_deg$median, 3),
@@ -473,7 +481,7 @@ deg_output <- list(
   config = CONFIG,
   deg_results = thyr_deg_results,
   summary = summary_data,
-  version = "v7.7"
+  version = "v7.6"
 )
 
 saveRDS(deg_output, paste0(paths$processed, "thyr_deg_results.rds"))
@@ -926,10 +934,10 @@ if (length(volcano_plots_delta) >= 4) {
 # Final report
 # ============================================================================
 
-cat("\n=== DEG Analysis Complete (v7.7) ===\n")
+cat("\n=== DEG Analysis Complete (v7.6) ===\n")
 cat("Configuration:\n")
 cat("  Test: Brunner-Munzel\n")
-cat("  Correction: BH (Benjamini-Hochberg) method\n")
+cat("  Correction: Storey method (qvalue, lambda=0.5)\n")
 cat("  Effect size: PI (primary), Cliff's delta (derived)\n")
 cat("  Significance: q < 0.05\n")
 cat("\nProcessed comparisons:\n")
@@ -951,9 +959,9 @@ for (comp_tissue in comparison_names) {
 
 cat("\nOutputs:\n")
 cat("  Main: thyr_deg_results.rds\n")
-cat("  Summary: deg_analysis_results.xlsx\n")
+cat("  Summary: deg_analysis_summary.csv\n")
+cat("  DEG lists: deg_results_*_all.csv, deg_results_*_significant.csv\n")
 cat("  Effect size plots: effect_size_hist_*.pdf, effect_size_distributions_combined.pdf\n")
-cat("  Volcano plots: volcano_cliffs_delta.pdf, volcano_log2fc.pdf\n")
 
 # Highlight key findings
 cat("\n=== Key Findings ===\n")

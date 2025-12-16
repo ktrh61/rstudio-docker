@@ -1,14 +1,14 @@
 # 10_enrichment_analysis.R - GSEA Enrichment Analysis for R0_vs_R1_tumor
 # Purpose: Perform GO/KEGG/Reactome/Hallmark GSEA on R0_vs_R1_tumor DEGs
-# Method: GSEA with ranked gene list (Cliff's delta × -log10(q))
+# Method: GSEA with Cliff's delta ranking (p-value tiebreaker for reproducibility)
 # Input: thyr_deg_results.rds (from 09_deg_analysis.R)
 # Output: GSEA results with Excel report and visualizations
-# Version: v7.10 - GSEA only, visualization can be re-generated independently
+# Version: v7.11 - Delta-only ranking with p-value tiebreaker
 # Date: 2025-12-15
 
 source("analysis_v7/setup.R")
 
-cat("\n=== GSEA Enrichment Analysis (v7.10) ===\n")
+cat("\n=== GSEA Enrichment Analysis (v7.11) ===\n")
 cat("Date:", as.character(Sys.Date()), "\n")
 cat("Target: R0_vs_R1_tumor\n")
 cat("Databases: GO_BP, KEGG, Reactome, Hallmark\n")
@@ -42,15 +42,16 @@ cat("  Random seed: 1986\n")
 
 CONFIG <- list(
   FDR_CUTOFF = 0.05,
-  Q_CAP = 10,
   MIN_GENESET_SIZE = 10,
-  MAX_GENESET_SIZE = 500
+  MAX_GENESET_SIZE = 500,
+  TIEBREAKER_EPSILON = 1e-10
 )
 
 cat("\nConfiguration:\n")
 cat("  FDR correction: BH method\n")
 cat("  FDR threshold:", CONFIG$FDR_CUTOFF, "\n")
-cat("  GSEA ranking: delta × min(-log10(q),", CONFIG$Q_CAP, ")\n")
+cat("  GSEA ranking: Cliff's delta\n")
+cat("  Tiebreaker: p-value -> ENTREZID (deterministic)\n")
 cat("  Gene set size:", CONFIG$MIN_GENESET_SIZE, "-", CONFIG$MAX_GENESET_SIZE, "\n")
 
 # ============================================================================
@@ -136,16 +137,35 @@ hallmark_t2g <- hallmark_df %>%
 cat("\n--- GSEA Analysis ---\n")
 
 # Prepare ranked gene list
-results_df_mapped$neg_log10_q <- pmin(-log10(pmax(results_df_mapped$qvalue, 1e-300)), CONFIG$Q_CAP)
-results_df_mapped$rank_metric <- results_df_mapped$cliffs_delta * results_df_mapped$neg_log10_q
+# Sorting priority: delta (desc) -> p-value (asc) -> ENTREZID (asc)
+cat("  Sorting genes: delta -> p-value -> ENTREZID\n")
 
-gene_list <- results_df_mapped$rank_metric
-names(gene_list) <- results_df_mapped$ENTREZID
-gene_list <- sort(gene_list, decreasing = TRUE)
+results_df_sorted <- results_df_mapped[order(
+  -results_df_mapped$cliffs_delta,
+  results_df_mapped$pvalue,
+  results_df_mapped$ENTREZID
+), ]
+
+n <- nrow(results_df_sorted)
+
+# Add negligible perturbation to preserve sorting order in GSEA
+# Higher rank gets larger perturbation value
+perturbation <- seq(CONFIG$TIEBREAKER_EPSILON, 0, length.out = n)
+
+rank_metric <- results_df_sorted$cliffs_delta + perturbation
+
+# Check for ties
+n_base_ties <- sum(duplicated(results_df_sorted$cliffs_delta))
+n_final_ties <- sum(duplicated(rank_metric))
+cat(sprintf("  Base delta ties: %d\n", n_base_ties))
+cat(sprintf("  Final ranking ties: %d\n", n_final_ties))
+
+gene_list <- rank_metric
+names(gene_list) <- results_df_sorted$ENTREZID
 gene_list <- gene_list[!duplicated(names(gene_list))]
 
 cat(sprintf("  Prepared gene list: %d genes\n", length(gene_list)))
-cat(sprintf("  Rank range: %.2f to %.2f\n", min(gene_list), max(gene_list)))
+cat(sprintf("  Rank range: %.6f to %.6f\n", min(gene_list), max(gene_list)))
 
 gsea_results <- list()
 
@@ -243,7 +263,7 @@ thyr_enrichment_results <- list(
   gene_mapping = gene_mapping,
   config = CONFIG,
   date = Sys.Date(),
-  version = "v7.10"
+  version = "v7.11"
 )
 
 results_file <- paste0(paths$processed, "thyr_enrichment_results.rds")
@@ -301,10 +321,10 @@ cat("  Saved:", basename(excel_file), "\n")
 cat("\n=== GSEA Processing Complete ===\n")
 cat("All results saved. Cleaning up intermediate variables...\n")
 
-rm(list = setdiff(ls(), c("paths", "CONFIG")))
+rm(list = setdiff(ls(), c("paths")))
 gc()
 
-cat("Memory cleaned. Visualization can be run independently from here.\n")
+cat("Memory cleaned. Visualization and summary can be run independently from here.\n")
 
 # ============================================================================
 # Generating Plots
@@ -374,33 +394,212 @@ for (db in c("GO_BP", "KEGG", "Reactome", "Hallmark")) {
   }
 }
 
+cat("\nPlot generation complete.\n")
+
 # ============================================================================
-# Final Summary
+# Summary
+# (This section can be re-run independently)
 # ============================================================================
 
-cat("\n=== GSEA Enrichment Analysis Complete (v7.10) ===\n")
+cat("\n--- Summary ---\n")
+
+if (!exists("paths")) {
+  source("analysis_v7/setup.R")
+}
+
+# Load saved results if not already loaded
+if (!exists("enrichment_output")) {
+  enrichment_output <- readRDS(paste0(paths$processed, "thyr_enrichment_results.rds"))
+  gsea_results <- enrichment_output$GSEA
+}
 
 cat("\nTarget: R0_vs_R1_tumor\n")
 
+# GSEA results with NES breakdown
 cat("\nGSEA Results:\n")
-cat(sprintf("%-12s %8s\n", "Database", "Pathways"))
-cat(paste(rep("-", 22), collapse = ""), "\n")
+cat(sprintf("%-12s %8s %8s %8s\n", "Database", "Total", "NES>0", "NES<0"))
+cat(paste(rep("-", 40), collapse = ""), "\n")
+
 for (db in c("GO_BP", "KEGG", "Reactome", "Hallmark")) {
-  n_sig <- if (!is.null(gsea_results[[db]])) nrow(gsea_results[[db]]@result) else 0
-  cat(sprintf("%-12s %8d\n", db, n_sig))
+  if (!is.null(gsea_results[[db]]) && nrow(gsea_results[[db]]@result) > 0) {
+    result_df <- gsea_results[[db]]@result
+    n_total <- nrow(result_df)
+    n_pos <- sum(result_df$NES > 0, na.rm = TRUE)
+    n_neg <- sum(result_df$NES < 0, na.rm = TRUE)
+    cat(sprintf("%-12s %8d %8d %8d\n", db, n_total, n_pos, n_neg))
+  } else {
+    cat(sprintf("%-12s %8d %8d %8d\n", db, 0, 0, 0))
+  }
 }
 
+# Top pathways per database
+cat("\nTop 5 pathways by |NES| per database:\n")
+
+for (db in c("GO_BP", "KEGG", "Reactome", "Hallmark")) {
+  if (!is.null(gsea_results[[db]]) && nrow(gsea_results[[db]]@result) > 0) {
+    cat(sprintf("\n  [%s]\n", db))
+    result_df <- gsea_results[[db]]@result
+    result_df <- result_df[order(abs(result_df$NES), decreasing = TRUE), ]
+    top5 <- head(result_df, 5)
+    
+    for (i in 1:nrow(top5)) {
+      direction <- ifelse(top5$NES[i] > 0, "+", "-")
+      cat(sprintf("    %d. %s (NES=%s%.2f, q=%.2e)\n", 
+                  i, 
+                  substr(top5$Description[i], 1, 50),
+                  direction,
+                  abs(top5$NES[i]),
+                  top5$p.adjust[i]))
+    }
+  }
+}
+
+# ============================================================================
+# Detailed Results by NES Direction
+# ============================================================================
+
+cat("\n--- Detailed Results by NES Direction ---\n")
+
+# Helper function to display top N pathways
+display_top_pathways <- function(result_df, n = 10, direction_label = "") {
+  if (nrow(result_df) == 0) {
+    cat(sprintf("    No pathways found\n"))
+    return()
+  }
+  
+  n_show <- min(n, nrow(result_df))
+  top_df <- head(result_df[order(result_df$p.adjust), ], n_show)
+  
+  for (i in 1:nrow(top_df)) {
+    cat(sprintf("    %2d. %s\n", i, top_df$Description[i]))
+    cat(sprintf("        NES=%.2f, p.adjust=%.2e, size=%d\n",
+                top_df$NES[i], top_df$p.adjust[i], top_df$setSize[i]))
+  }
+}
+
+# --- GO_BP with simplify() ---
+cat("\n[GO_BP - with simplify()]\n")
+
+go_bp_result <- gsea_results[["GO_BP"]]
+if (!is.null(go_bp_result) && nrow(go_bp_result@result) > 0) {
+  
+  # Apply simplify() to reduce redundancy
+  cat("  Applying simplify() (cutoff=0.7, by=p.adjust)...\n")
+  go_bp_simplified <- clusterProfiler::simplify(
+    go_bp_result,
+    cutoff = 0.7,
+    by = "p.adjust",
+    select_fun = min
+  )
+  
+  simplified_df <- go_bp_simplified@result
+  n_before <- nrow(go_bp_result@result)
+  n_after <- nrow(simplified_df)
+  cat(sprintf("  Reduced: %d -> %d pathways (%.1f%% reduction)\n", 
+              n_before, n_after, (1 - n_after/n_before) * 100))
+  
+  # Split by NES direction
+  pos_df <- simplified_df[simplified_df$NES > 0, ]
+  neg_df <- simplified_df[simplified_df$NES < 0, ]
+  
+  cat(sprintf("  After simplify: NES>0: %d, NES<0: %d\n", nrow(pos_df), nrow(neg_df)))
+  
+  cat("\n  NES > 0 (Up in R1) - Top 10:\n")
+  display_top_pathways(pos_df, 10)
+  
+  cat("\n  NES < 0 (Down in R1) - Top 10:\n")
+  display_top_pathways(neg_df, 10)
+  
+} else {
+  cat("  No GO_BP results available\n")
+}
+
+# --- KEGG ---
+cat("\n[KEGG]\n")
+
+kegg_result <- gsea_results[["KEGG"]]
+if (!is.null(kegg_result) && nrow(kegg_result@result) > 0) {
+  kegg_df <- kegg_result@result
+  pos_df <- kegg_df[kegg_df$NES > 0, ]
+  neg_df <- kegg_df[kegg_df$NES < 0, ]
+  
+  cat(sprintf("  NES>0: %d, NES<0: %d\n", nrow(pos_df), nrow(neg_df)))
+  
+  cat("\n  NES > 0 (Up in R1) - Top 10:\n")
+  display_top_pathways(pos_df, 10)
+  
+  cat("\n  NES < 0 (Down in R1) - Top 10:\n")
+  display_top_pathways(neg_df, 10)
+  
+} else {
+  cat("  No KEGG results available\n")
+}
+
+# --- Reactome ---
+cat("\n[Reactome]\n")
+
+reactome_result <- gsea_results[["Reactome"]]
+if (!is.null(reactome_result) && nrow(reactome_result@result) > 0) {
+  reactome_df <- reactome_result@result
+  pos_df <- reactome_df[reactome_df$NES > 0, ]
+  neg_df <- reactome_df[reactome_df$NES < 0, ]
+  
+  cat(sprintf("  NES>0: %d, NES<0: %d\n", nrow(pos_df), nrow(neg_df)))
+  
+  cat("\n  NES > 0 (Up in R1) - Top 10:\n")
+  display_top_pathways(pos_df, 10)
+  
+  cat("\n  NES < 0 (Down in R1) - Top 10:\n")
+  display_top_pathways(neg_df, 10)
+  
+} else {
+  cat("  No Reactome results available\n")
+}
+
+# --- Hallmark ---
+cat("\n[Hallmark]\n")
+
+hallmark_result <- gsea_results[["Hallmark"]]
+if (!is.null(hallmark_result) && nrow(hallmark_result@result) > 0) {
+  hallmark_df <- hallmark_result@result
+  pos_df <- hallmark_df[hallmark_df$NES > 0, ]
+  neg_df <- hallmark_df[hallmark_df$NES < 0, ]
+  
+  cat(sprintf("  NES>0: %d, NES<0: %d\n", nrow(pos_df), nrow(neg_df)))
+  
+  cat("\n  NES > 0 (Up in R1) - Top 10:\n")
+  display_top_pathways(pos_df, 10)
+  
+  cat("\n  NES < 0 (Down in R1) - Top 10:\n")
+  display_top_pathways(neg_df, 10)
+  
+} else {
+  cat("  No Hallmark results available\n")
+}
+
+# Configuration from saved data
 cat("\nMethodology:\n")
-cat("  Ranking: Cliff's delta × min(-log10(q), 10)\n")
+cat("  Ranking: Cliff's delta\n")
+cat("  Tiebreaker: p-value (asc) -> ENTREZID (asc)\n")
+cat("  Perturbation: 1e-10 scale to preserve order\n")
 cat("  FDR correction: BH method\n")
-cat("  FDR threshold: 0.05\n")
+cat("  FDR threshold:", enrichment_output$config$FDR_CUTOFF, "\n")
+cat("  Gene set size:", enrichment_output$config$MIN_GENESET_SIZE, "-", 
+    enrichment_output$config$MAX_GENESET_SIZE, "\n")
+cat("  Version:", enrichment_output$version, "\n")
+cat("  Date:", as.character(enrichment_output$date), "\n")
 
 cat("\nOutputs:\n")
 cat("  Results: thyr_enrichment_results.rds\n")
 cat("  Excel: GSEA_R0_vs_R1_tumor.xlsx\n")
 cat("  Plots: GSEA_dotplot_*.pdf, GSEA_running_*.pdf\n")
 
+output_dir <- paste0(paths$output, "enrichment_analysis/")
 cat("\nOutput location:", output_dir, "\n")
+
+# ============================================================================
+# Script Complete
+# ============================================================================
 
 rm(list = setdiff(ls(), c("paths")))
 gc()
