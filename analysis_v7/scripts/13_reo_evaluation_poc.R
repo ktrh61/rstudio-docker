@@ -17,9 +17,10 @@
 #   - reo_evaluation_results.rds (all results)
 #   - reo_evaluation_summary.csv (group-level summary)
 #   - reo_evaluation_samples.csv (sample-level results)
+#   - reo_poc_vs_reversal.png (POC vs reversal count plot)
 #
-# Version: v7.1
-# Date: 2025-12-09
+# Version: v7.2
+# Date: 2025-12-17
 #
 # IMPORTANT: 
 #   - This script does NOT modify the panel or boundary zone
@@ -30,8 +31,8 @@
 source("analysis_v7/setup.R")
 
 cat("\n=============================================================================\n")
-cat("13_reo_evaluation_poc.R - REO Panel Evaluation (v7.1)\n")
-cat("Date: 2025-12-09\n")
+cat("13_reo_evaluation_poc.R - REO Panel Evaluation (v7.2)\n")
+cat("Date: 2025-12-17\n")
 cat("=============================================================================\n\n")
 
 cat("*** NOTE: This is an exploratory/descriptive analysis only ***\n")
@@ -416,9 +417,9 @@ if (nrow(group_means) >= 2) {
   means <- group_means$mean_rev
   is_monotonic <- all(diff(means) >= 0)
   if (is_monotonic) {
-    cat("\n✓ Monotonically increasing (as expected)\n")
+    cat("\nâœ“ Monotonically increasing (as expected)\n")
   } else {
-    cat("\n⚠ Not strictly monotonic (may warrant investigation)\n")
+    cat("\nâš  Not strictly monotonic (may warrant investigation)\n")
   }
 }
 
@@ -429,8 +430,8 @@ cat("\n=== Saving Results ===\n")
 
 output <- list(
   # Version info
-  version = "v7.1",
-  date = "2025-12-09",
+  version = "v7.2",
+  date = "2025-12-17",
   
   # Panel info used
   panel_version = panel_data$version,
@@ -461,6 +462,126 @@ write.csv(results_df,
           file.path(paths$output, "reo_evaluation_samples.csv"),
           row.names = FALSE)
 cat(sprintf("Saved: %s\n", file.path(paths$output, "reo_evaluation_samples.csv")))
+
+# -----------------------------------------------------------------------------
+# Visualization: POC vs Reversal Count
+# -----------------------------------------------------------------------------
+cat("\n=== Visualization ===\n")
+
+suppressPackageStartupMessages({
+  library(ggplot2)
+})
+
+# Prepare plot data
+# R0/R1: QC_clear only (training data)
+# R_Low/R_Mid: all samples (evaluation target)
+# R0 POC is NA -> treat as 0
+set.seed(1986)  # For reproducible jitter
+
+plot_data <- results_df %>%
+  filter(!is.na(reversal_count)) %>%
+  mutate(
+    POC_plot = ifelse(is.na(POC), 0, POC),
+    include = case_when(
+      group %in% c("R0", "R1") & qc_status == "QC_clear" ~ TRUE,
+      group %in% c("R_Low", "R_Mid") ~ TRUE,
+      TRUE ~ FALSE
+    )
+  ) %>%
+  filter(include) %>%
+  mutate(
+    # Define layer: training (R0/R1) vs evaluation (R_Low/R_Mid)
+    layer = ifelse(group %in% c("R0", "R1"), "training", "evaluation"),
+    # Round POC for jitter grouping (within 1% treated as same)
+    POC_rounded = round(POC_plot)
+  )
+
+# Apply jitter only to duplicates at same (reversal_count, POC_rounded)
+plot_data <- plot_data %>%
+  group_by(reversal_count, POC_rounded) %>%
+  mutate(
+    n_at_pos = n(),
+    # Fixed spacing (0.08) from center, max width ±0.35
+    jitter_x = if_else(
+      n_at_pos > 1,
+      reversal_count + (rank(tumor_id, ties.method = "first") - (n() + 1) / 2) * 0.08,
+      as.numeric(reversal_count)
+    )
+  ) %>%
+  ungroup()
+
+cat(sprintf("Plot data: %d samples\n", nrow(plot_data)))
+cat(sprintf("  R0 (QC_clear, training): %d\n", sum(plot_data$group == "R0")))
+cat(sprintf("  R1 (QC_clear, training): %d\n", sum(plot_data$group == "R1")))
+cat(sprintf("  R_Low (all, evaluation): %d\n", sum(plot_data$group == "R_Low")))
+cat(sprintf("  R_Mid (all, evaluation): %d\n", sum(plot_data$group == "R_Mid")))
+
+# Boundary zone
+neg_max <- boundary$negative_max
+pos_min <- boundary$positive_min
+
+# Group boundaries (POC thresholds)
+poc_low_mid_boundary <- 33.3  # R_Low/R_Mid boundary
+poc_mid_r1_boundary <- 66.6   # R_Mid/R1 boundary
+
+# Build plot
+p <- ggplot(plot_data, aes(x = jitter_x, y = POC_plot)) +
+  # Background shading: R1 region only (POC >= 66.6%)
+  annotate("rect", xmin = -Inf, xmax = Inf, ymin = poc_mid_r1_boundary, ymax = 100,
+           fill = "gray90", alpha = 0.6) +
+  # Horizontal lines (POC group boundaries) - dashed
+  geom_hline(yintercept = poc_low_mid_boundary, linetype = "dashed", color = "gray50") +
+  geom_hline(yintercept = poc_mid_r1_boundary, linetype = "dashed", color = "gray50") +
+  # Vertical lines (classification boundaries)
+  geom_vline(xintercept = neg_max + 0.5, linetype = "dashed", color = "gray40") +
+  geom_vline(xintercept = pos_min - 0.5, linetype = "dashed", color = "gray40") +
+  # Training data (R0: triangle, R1: circle) - blue color, smaller size
+  geom_point(data = plot_data %>% filter(group == "R0"),
+             aes(shape = "R0 (training)"), 
+             size = 1.9, alpha = 0.7, color = "#4477AA") +
+  geom_point(data = plot_data %>% filter(group == "R1"),
+             aes(shape = "R1 (training)"), 
+             size = 1.9, alpha = 0.7, color = "#4477AA") +
+  # Evaluation data (R_Low/R_Mid: circle) - dark gray
+  geom_point(data = plot_data %>% filter(group %in% c("R_Low", "R_Mid")),
+             aes(shape = "R_Low/R_Mid (evaluation)"), 
+             size = 2.5, alpha = 0.8, color = "gray30") +
+  # Shape scale
+  scale_shape_manual(
+    name = "Group",
+    values = c("R0 (training)" = 17,           # triangle
+               "R1 (training)" = 16,            # circle
+               "R_Low/R_Mid (evaluation)" = 16) # circle
+  ) +
+  # Scales
+  scale_x_continuous(breaks = 0:nrow(selected_pairs),
+                     limits = c(-0.5, nrow(selected_pairs) + 0.5)) +
+  scale_y_continuous(breaks = c(0, 33.3, 66.6, 100),
+                     limits = c(0, 100)) +
+  # Labels
+  labs(
+    title = "REO Panel Evaluation: POC vs Reversal Count",
+    subtitle = sprintf("Panel: %d pairs | Boundary: negative < %d, positive > %d",
+                       nrow(selected_pairs), pos_min, neg_max),
+    x = "Reversal Count",
+    y = "POC (%)"
+  ) +
+  # Theme
+  theme_bw() +
+  theme(
+    plot.title = element_text(size = 12, face = "bold"),
+    plot.subtitle = element_text(size = 10, color = "gray40"),
+    legend.position = "right",
+    panel.grid.minor = element_blank()
+  )
+
+# Display in RStudio plot pane
+print(p)
+
+# Save to file
+plot_path <- file.path(paths$output, "reo_poc_vs_reversal.png")
+ggsave(plot_path, p, width = 8, height = 6, dpi = 150)
+cat(sprintf("Saved: %s\n", plot_path))
 
 # -----------------------------------------------------------------------------
 # Final Summary
