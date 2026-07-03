@@ -52,8 +52,8 @@ CONFIG <- list(
   
   # Processing parameters
   PRIOR_COUNT = 0.5,          # Pseudocount for logCPM
-  MC_CORES = min(3L, max(1L, parallel::detectCores() - 1L)),  # Conservative setting
-  VERBOSE_CDM = FALSE,        # Disable verbose in CDM for parallel processing
+  MC_CORES = 1L,              # Sequential processing (avoid nested parallelism with MUREN)
+  VERBOSE_CDM = FALSE,        # Disable verbose in CDM
   
   # MUREN parameters
   MUREN_METHOD = "lts",       # LTS robust regression
@@ -473,14 +473,14 @@ process_group <- function(group_name, group_sample_ids, se, is_protein_coding, c
   counts_filtered <- counts_pc[keep, , drop = FALSE]
   n_genes_used <- nrow(counts_filtered)
   
-  # MUREN normalization
+  # MUREN normalization (can use parallelism since outer loop is sequential)
   muren_coeff <- muren_norm(
     counts_filtered,
     refs = "saturated",
     pairwise_method = config$MUREN_METHOD,
     single_param = TRUE,
     res_return = "scaling_coeff",
-    workers = config$MUREN_WORKERS
+    workers = config$MUREN_WORKERS  # Safe: sequential outer loop
   )
   
   # Create DGEList with MUREN normalization factors
