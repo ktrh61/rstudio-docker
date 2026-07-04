@@ -1,8 +1,8 @@
 # 00_prepare_gene_lengths.R - Prepare Gene Lengths from GENCODE GTF
 # Purpose: Calculate exon union lengths for all genes from GENCODE v36 GTF
 # Output: gene_lengths.rds with ENSG ID to length mapping
-# Version: v1.0 - For TPM calculation in downstream analyses
-# Date: 2025-01-23
+# Version: v1.1 - Removed redundant spot check code
+# Date: 2025-12-23
 
 source("analysis_v7/setup.R")
 
@@ -202,33 +202,6 @@ for (i in seq_along(length_quantiles)) {
   cat(sprintf("  %3s%%: %s bp\n", 
               names(length_quantiles)[i], 
               format(round(length_quantiles[i]), big.mark = ",")))
-}
-
-# Check for common genes
-common_genes <- c("GAPDH", "ACTB", "TP53", "EGFR", "KRAS")
-cat("\nSpot check of common genes:\n")
-for (gene in common_genes) {
-  # Find gene (may have version number in original)
-  gene_pattern <- paste0("^", gene, "($|\\.)")
-  matching <- grep(gene_pattern, names(gene_lengths))
-  
-  if (length(matching) > 0) {
-    gene_id <- names(gene_lengths)[matching[1]]
-    cat(sprintf("  %s (%s): %s bp\n", 
-                gene, gene_id,
-                format(gene_lengths[matching[1]], big.mark = ",")))
-  } else {
-    # Try searching in the original gene names
-    matching_orig <- grep(gene, exons$gene_name)
-    if (length(matching_orig) > 0) {
-      gene_id_orig <- unique(exons$gene_id_clean[matching_orig])[1]
-      if (gene_id_orig %in% names(gene_lengths)) {
-        cat(sprintf("  %s (%s): %s bp\n", 
-                    gene, gene_id_orig,
-                    format(gene_lengths[gene_id_orig], big.mark = ",")))
-      }
-    }
-  }
 }
 
 # ============================================================================
