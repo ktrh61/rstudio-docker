@@ -22,8 +22,8 @@
 再現性は次の三層で担保する。renv は不要（役割が三層でカバーされ、層を増やさないため）。
 
 - **(A) 日付スナップショット固定**: 世代指定（`version="3.22"`）だけではパッチ版は固定されない（3.22 ブランチ内で edgeR 等にバグ修正パッチが降り得る）。P3M の日付スナップショットで取得元を固定すると CRAN・Bioconductor 双方のその日のパッチ版が一意に決まり、いつ・どの環境で install しても同一版が入る。FDA の R 提出パイロットでも採用された標準的手法。→ 個別層は D-003。
-- **(B) Docker イメージ凍結**: 版固定した状態を、パッケージ版・システムライブラリ（OpenBLAS）・R 本体まで丸ごと固定する。本番で構築したイメージを `docker save`/`load` で他環境へ移送し、install 再実行による版ずれを回避する（イメージは GitHub 同期外のため Dockerfile の Git 管理＋イメージ移送を併用）。→ 器は D-006。
-- **(C) テキスト記録**: イメージ内部は外から見えない。査読者・共著者への提示、Methods 転記、イメージ喪失時の復元のため、パッケージ版を人間可読・Git 追跡可能なテキストで別途記録する。→ 環境記録は D-011、metadata の扱いは D-012。
+- **(B) Docker イメージ凍結**: 版固定した状態を、パッケージ版・システムライブラリ（OpenBLAS）・R 本体まで丸ごと固定する。本番で構築したイメージを `docker save`/`load` で他環境へ移送し、install 再実行による版ずれを回避する（イメージは GitHub 同期外のため Dockerfile の Git 管理＋イメージ移送を併用）。→ 器は D-005。
+- **(C) テキスト記録**: イメージ内部は外から見えない。査読者・共著者への提示、Methods 転記、イメージ喪失時の復元のため、パッケージ版を人間可読・Git 追跡可能なテキストで別途記録する。→ 環境記録は D-009、metadata の扱いは D-010。
 
 ### P3M 2026-04-09 確定の全経緯（D-003）
 
@@ -39,13 +39,45 @@
 - **CRAN も同日 2026-04-09 に固定**: P3M が 3.22 に対し CRAN スナップショット `cran/2026-04-09` を自動提示。Bioconductor の CRAN 依存（Rcpp, ggplot2 等）を同日固定し依存関係全体を一意固定する。2026-04-09 は木曜（営業日）でスナップショット存在の見込み。CRAN 側の有効性は install 実行時に最終検証（worklog B）。
 - 参考: Bioconductor の日付スナップショット対応は Posit Package Manager 2024.08.0（2024年8月）導入・2025.12.0 で全面対応。「日付スナップショットは CRAN のみ」は 2024年8月以前の認識。
 
-### rocker/rstudio:4.5.3 採用の検証詳細（D-006）
+### rocker/rstudio:4.5.3 採用の検証詳細（D-005）
 
 - **変更**: `bioconductor/bioconductor_docker:RELEASE_3_22` → `rocker/rstudio:4.5.3`（Ubuntu 24.04 noble、R 4.5.3）。
 - **理由**: (1) `bioconductor_docker:RELEASE_3_22` の実 R は 4.5.2 で production 定石（D-001）と不一致。(2) 本プロジェクトは CRAN パッケージと手元書き換えの野良スクリプト（MUREN `norm_improved.R`、contamDE `gls.cpp`）を含み純 Bioconductor でない。(3) R バージョン選定の根拠はイメージ選定の根拠より査読で説明しやすい。よって R 版を主軸に据えた rocker を器とする。
 - **検証結果**（rocker/rstudio:4.5.3 上、使い捨てコンテナ `docker run --rm -i` による多段確認）: P3M 2026-04-09 設定が機能し BiocManager が Bioconductor 3.22 を認識。主要パッケージ版: edgeR 4.8.2、limma 3.66.0、fgsea 1.36.2、RcppArmadillo 15.2.4.1、brunnermunzel 2.0、clusterProfiler 4.18.4、GenomicDataCommons 1.34.1。
 - **システムライブラリ暫定リスト（8件）**: `libpng-dev`, `libcurl4-openssl-dev`, `libxml2-dev`, `libfontconfig1-dev`, `zlib1g-dev`, `libicu-dev`, `cmake`, `libcairo2-dev`。`cmake` は `fs` 2.0.1 が libuv 1.52.0 をバンドルし cmake で静的ビルドするため必要（`libuv1-dev` ではない。fs 公式 SystemRequirements で確認）。**検証2パッケージ（clusterProfiler / GenomicDataCommons）限定の暫定リストであり、最終確定は 4-2 のスクリプト単独の依存分析による。**
 - **contamDE / MUREN は器の検証対象から除外**（GitHub install ではなく手元書き換えスクリプトを使用するため）。
+
+### ubuntu ベース転換と 4-1b 成果（2026-07-09・OMEN）（D-019 / D-018 / D-020）
+
+- **環境の性格**: rocker/rstudio ベース（[D-005](decisions.md#d-005-ベースイメージrockerrstudio453)）を廃し、ubuntu ベース＋ R 4.5.3 自前ソースビルドへ転換。RStudio Server も廃止（プロダクトは対話環境を前提としない）。OS(apt=4/10)・R パッケージ(P3M=4/09)・R 本体(4.5.3) の三層を固定。本記録は OMEN 開発環境での 4-1b 成果であり、本番（ThinkPad）はこの材料を元に別途構築する。
+
+- **1. ベースイメージ**: `ubuntu:noble-20260410`、digest `sha256:c4a8d5503dfb2a3eb8ab5f807da5bc69a85730fb49b5cfca2330194ebcc41c7b`（Created 2026-04-10）。日付タグ（不変）を採用。タグ名だけで再現性が担保されるが、究極の固定は digest 指定。根拠: `ubuntu:24.04`（ローリングタグ）は再ビルドで apt 層が動き再現性が崩れる。ポイントリリース明示タグ（24.04.4 等）は存在しない。日付タグ `noble-YYYYMMDD` は特定日ビルドで不変。P3M（4/09）近傍として 4/10 を選択。
+
+- **2. apt 層**: 取得元 `https://snapshot.ubuntu.com/ubuntu/20260410T000000Z`（HTTPS、deb822 形式 `ubuntu.sources`、Suites = noble/noble-updates/noble-backports/noble-security）。ベースの apt 層（4/10 ビルド）と snapshot 固定日を一致させ版ずれを回避（[D-018](decisions.md#d-018-apt-層の日付固定snapshotubuntucom-2026-04-10level-2)）。
+    - **ca-certificates 導入の順序問題（鶏卵問題）**: 素の ubuntu には ca-certificates が無く、snapshot は HTTPS 強制のため初回だけ TLS 検証ができない。対処: apt の TLS 検証を一時無効化（`Acquire::https::Verify-Peer=false`）して snapshot 4/10 から `ca-certificates` を導入 → 以降は正規の TLS 検証で運用。GPG 署名検証（keyring）は生きているため真正性は担保。この方式なら `ca-certificates`/`openssl`/`libssl3t64` も 4/10 版で揃い、archive 経由（6〜7月版混入）を避けられる。
+    - **導入 apt パッケージ（すべて snapshot 4/10）**:
+        - 証明書（初回、Verify-Peer 無効化で導入）: `ca-certificates`（依存で `openssl`, `libssl3t64` が入る。すべて 4/10 版、`libssl3t64` の upgrade なし）。
+        - R ビルド依存: `build-essential`, `gfortran`, `libreadline-dev`, `libpcre2-dev`, `zlib1g-dev`, `libbz2-dev`, `liblzma-dev`, `libcurl4-openssl-dev`, `libicu-dev`, `libncurses-dev`。
+        - BLAS（開発環境）: `libopenblas0-pthread`, `libopenblas-dev`, `liblapack-dev`（[D-020](decisions.md#d-020-開発環境の-blas-構成openblas-pthreadupdate-alternatives-方式)）。`update-alternatives` で `libblas.so.3`/`liblapack.so.3` が OpenBLAS pthread（priority 100、auto）を指す。
+        - 作図（cairo、X11 なし）: `libcairo2-dev`, `libfontconfig1-dev`, `libfreetype6-dev`, `libpng-dev`, `libjpeg-dev`, `libtiff-dev`。`--with-x=no` でビルドするが cairo 有効化で png/pdf/jpeg/tiff が出力可能（`capabilities()` で png/jpeg/tiff/cairo すべて TRUE を実地確認）。
+        - 補助: `xz-utils`, `wget`。
+        - R パッケージビルド用追加（因果確立分）: `libxml2-dev`（GenomicFeatures/rtracklayer 等の XML 依存）、`cmake`（`fs` が libuv を静的ビルドするのに必要、既知）、**`libssl-dev`（今回初判明。R の `openssl` パッケージビルドに必須。無いと openssl→httr→httr2→AnnotationDbi→biomaRt/rtracklayer/clusterProfiler/GenomicFeatures 等が連鎖失敗。rocker には同梱されていたため従来は顕在化せず）**。← 鶏検証の「システムライブラリ暫定リスト（8件）」への追補。
+
+- **3. R 本体**: `R-4.5.3.tar.gz`（`https://cran.r-project.org/src/base/R-4/R-4.5.3.tar.gz`）。SHA-256 = `aa5c1ed4293c7271ac513d654670356ac0e8a6ad5e42be014365d11150b5b8f2`（R Core 公式アナウンス値と一致）。configure: `--prefix=/usr/local --enable-R-shlib --with-x=no --with-cairo --with-blas --with-lapack`。configure サマリ: External libraries に BLAS(OpenBLAS)/LAPACK(in blas)、Additional capabilities に PNG/JPEG/TIFF/NLS/cairo/ICU、shared R library 有効。ビルド: `make -j$(nproc)` → `make install`（real 2m4s、OMEN）。実行時確認: R version 4.5.3 (2026-03-11)、`La_library` が openblas-pthread（`libopenblasp-r0.3.26.so`）。無害な警告: texinfo/LaTeX/browser/PDF ビューア不在によるマニュアル生成不可（解析実行に無関係）。
+
+- **4. Rprofile.site**（`/usr/local/lib/R/etc/Rprofile.site`）: `.libPaths(c("/opt/r-extra-lib", .libPaths()))` で永続ライブラリを先頭に。P3M（2026-04-09、[D-003](decisions.md#d-003-パッケージ版固定p3m-日付スナップショット-2026-04-09)）: `options(repos = c(CRAN="https://packagemanager.posit.co/cran/2026-04-09"))`、`options(BioC_mirror=".../bioconductor/2026-04-09")`、`options(BIOCONDUCTOR_CONFIG_FILE=".../bioconductor/2026-04-09/config.yaml")`、`Sys.setenv("R_BIOC_VERSION"="3.22")`。Bioc 3.22 と 4/09 の対応: 3.22 のパッケージパスは P3M で 4/09 が取得可能な最終日（4/10 で `packages/3.22/bioc` が 404、edgeR 4.8.2 を 4/09 で実測）。config.yaml は 4/09 時点で既に `release_version: 3.23` だが、`R_BIOC_VERSION="3.22"` 明示で 3.22 が正しく解決（`BiocManager::version()` = 3.22 を実測）。
+
+- **5. ライブラリ永続化**: ホスト `~/r-libs-r453` をコンテナ `/opt/r-extra-lib` にマウント（開発環境。本番では再検討）。`.libPaths()` 先頭が `/opt/r-extra-lib`、書き込み権限あり（作業ユーザー UID 1000 ＝ ホスト UID 1000）。
+
+- **6. R パッケージ（明示49）**: `BiocManager` 経由で一括導入（`update=FALSE, ask=FALSE`）。依存含め総216。
+    - CRAN(32): R.utils, ROCR, Rcpp, RcppArmadillo, RhpcBLASctl, UpSetR, assertthat, brunnermunzel, circlize, data.table, doSNOW, dplyr, foreach, future, future.apply, ggplot2, glmnet, gridExtra, httr, igraph, iterators, jsonlite, matrixStats, openxlsx, pROC, pheatmap, randomForest, readxl, robustbase, statmod, stringr, tidyr。
+    - Bioconductor(17): AnnotationDbi, ComplexHeatmap, DESeq2, GenomicDataCommons, GenomicFeatures, GenomicRanges, ReactomePA, SummarizedExperiment, clusterProfiler, edgeR, enrichplot, limma, msigdbr, org.Hs.eg.db, qvalue, rtracklayer, txdbmaker。
+    - 版確認（Bioc 3.22 解決の裏付け）: edgeR 4.8.2 / limma 3.66.0 / clusterProfiler 4.18.4 / GenomicDataCommons 1.34.1（rocker 検証時と一致）。
+    - 除外（パッケージ化しない）: MUREN, contamDE — 手元書き換えの野良スクリプト（`norm_improved.R`, `contamde_purity_functions.R`, `contamde_gls.cpp`）として `/workspace` から使用。
+
+- **7. コンテナ構成（開発）**: 名前 `rebc-r453-dev`、常駐 `sleep infinity`（素の ubuntu は CMD 無しだと終了）、マウント `~/rstudio-docker`→`/workspace`・`~/r-libs-r453`→`/opt/r-extra-lib`、作業ユーザー `ubuntu`（UID 1000、noble 標準既存ユーザーを流用。名前は本番で調整可）、ポート公開なし（RStudio 廃止）。
+
+- **未確定・持ち越し（4-2 で育てる）**: (1) R パッケージ用システムライブラリは因果確立分のみ先回り導入済み。明示49は完走したが、4-2 でスクリプトを実際に動かす際にさらに別の system-lib 不足（例: `contamde_gls.cpp` のコンパイル依存）が出る可能性は残る。(2) 暫定 Dockerfile 化はこの材料を元に別途。(3) `contamde_gls.cpp`（RcppArmadillo 経由 C++）のコンパイル・実行確認は未実施（次段）。
 
 ---
 
@@ -70,13 +102,14 @@
 
 ### 本記録文書自体の Git 配置に関する旧判断
 
-- 旧判断では、プロセス文書の Git 配置を当面行わず手元保持＋プロジェクトナレッジで保持するとしていた（既存プロセス文書は Git 追跡外と確認済み）。この旧判断は [D-015](decisions.md#d-015-全文書を-docs-配下で-git-管理github-越しにプロジェクト同期)（docs/ 配下で Git 管理・同期一系統）で上書きされた。
+- 旧判断では、プロセス文書の Git 配置を当面行わず手元保持＋プロジェクトナレッジで保持するとしていた（既存プロセス文書は Git 追跡外と確認済み）。この旧判断は [D-013](decisions.md#d-013-全文書を-docs-配下で-git-管理github-越しにプロジェクト同期)（docs/ 配下で Git 管理・同期一系統）で上書きされた。
 
 ---
 
 ## negative data
 
-- **snapshot.ubuntu.com の 503 障害**（D-005 の昇格条件と対応）: 検証時、`https://snapshot.ubuntu.com/ubuntu/20260409T000000Z` の noble / noble-updates / noble-backports / noble-security の InRelease 取得がすべて **503 Service Unavailable**（IP 185.125.189.69）で失敗し、当該実行の system library install が `Unable to locate package` で落ちた。503 の一時性／継続性は未判定。稼働確認が済むまで apt 層の日付固定は確定扱いにしない。
+- **snapshot.ubuntu.com の 503 障害**（apt 層＝[D-004](decisions.md#d-004-apt-層の日付固定snapshotubuntucom-2026-04-09level-2) の残点と対応）: 検証時、`https://snapshot.ubuntu.com/ubuntu/20260409T000000Z` の noble / noble-updates / noble-backports / noble-security の InRelease 取得がすべて **503 Service Unavailable**（IP 185.125.189.69）で失敗し、当該実行の system library install が `Unable to locate package` で落ちた。503 の一時性／継続性は未判定。稼働確認が済むまで apt 層の日付固定は確定扱いにしない。
+- **snapshot.ubuntu.com 4/10 到達の確認（2026-07-09・OMEN、上記 503 の後続）**: apt 固定日を 2026-04-10 へ移した（[D-018](decisions.md#d-018-apt-層の日付固定snapshotubuntucom-2026-04-10level-2)）際、`https://snapshot.ubuntu.com/ubuntu/20260410T000000Z` から HTTPS で `ca-certificates` ほか R ビルド依存一式の取得に成功（ca-certificates は Verify-Peer 一時無効化で初回導入、詳細は「ubuntu ベース転換と 4-1b 成果」）。4/09 で観測した 503 の恒常性は依然未判定だが、4/10 は少なくとも当日到達可を実測。
 - **Claude Science 評価（2026-07-07、現時点で不適）**: 自律実行エージェント設計が明示的承認の統制哲学と衝突、環境管理が凍結済み再現性アーキテクチャと衝突。文献レビュー・原稿ドラフト用途に限れば将来的な可能性はあるが、コアパイプラインとは分離。
 - **既に方針として確定した negative data（簡潔に）**: 旧系列（`834f7e5`）は pull 忘れの旧系列でありタグ退避で保全のうえ不使用。macOS で得た数値結果データは正規化の小数点差のため不使用（ただし正系列コードの出所が macOS であることとは別問題で、再現実行は WSL2〔amd64〕基準）。ORA は廃止し GSEA へ一本化。既存 amd64 スナップショットの掘り起こしはせず P71 でクリーン再構築。
 
@@ -95,7 +128,7 @@ worklog には課題見出しのみを置き、以下の乖離分析の詳細を
 ### 5-2. contamDE（`contamde_purity_functions.R`）
 
 - **(1) MUREN 正規化への置換**: オリジナルの `limma_voom` 内部 size factor を MUREN 係数に差し替え（`voom(normalize.method="none")`）。パイプライン全体で MUREN を正規化標準とする方針との一貫性から、適切な改変として論文中に明示する方針。ただし妥当性は 5-1 の帰趨に依存。
-- **(2) qvalue の残置（BH 是正が正当）**: 純度推定の p 値調整に `qvalue(pi0.method="bootstrap")` を使用。オリジナル `contamDE.lm` はここで `p.adjust(method="fdr")`＝BH を使用しており、かつプロジェクト全体の方針も qvalue から BH へ戻した経緯がある。BH 是正はオリジナル忠実性・プロジェクト方針の二重に正当（[D-019](decisions.md#d-019-contamde-の-p-値調整を-qvaluebh-是正)）。この箇所は top1000 遺伝子ゲートの発動条件（有意遺伝子数）に効き、純度推定 w_hat に伝播するため優先度が高い。
+- **(2) qvalue の残置（BH 是正が正当）**: 純度推定の p 値調整に `qvalue(pi0.method="bootstrap")` を使用。オリジナル `contamDE.lm` はここで `p.adjust(method="fdr")`＝BH を使用しており、かつプロジェクト全体の方針も qvalue から BH へ戻した経緯がある。BH 是正はオリジナル忠実性・プロジェクト方針の二重に正当（[D-017](decisions.md#d-017-contamde-の-p-値調整を-qvaluebh-是正)）。この箇所は top1000 遺伝子ゲートの発動条件（有意遺伝子数）に効き、純度推定 w_hat に伝播するため優先度が高い。
 
 ### 5-3. gls.cpp（`contamde_gls.cpp`）
 
@@ -106,6 +139,6 @@ worklog には課題見出しのみを置き、以下の乖離分析の詳細を
 
 ### 5-4. BLAS / RcppArmadillo
 
-- **BLAS スレッド1固定**（[D-018](decisions.md#d-018-blas-スレッド1固定)）: `norm_improved.R`・05・06・07 で `blas_set_num_threads(1L)`／`OPENBLAS_NUM_THREADS=1` を設定。オリジナル MUREN は BLAS 無指定（環境委任＝R 標準作法）。スレッド1固定は、マルチスレッド BLAS の非決定的丸め順序を排除する再現性のための正当な措置（オリジナルが規定しない層の明示的固定）。実装済み。
+- **BLAS スレッド1固定**（[D-016](decisions.md#d-016-blas-スレッド1固定)）: `norm_improved.R`・05・06・07 で `blas_set_num_threads(1L)`／`OPENBLAS_NUM_THREADS=1` を設定。オリジナル MUREN は BLAS 無指定（環境委任＝R 標準作法）。スレッド1固定は、マルチスレッド BLAS の非決定的丸め順序を排除する再現性のための正当な措置（オリジナルが規定しない層の明示的固定）。実装済み。
 - **BLAS 実装差**: OpenBLAS 化により結果は元実装と異なり結論にも影響が及ぶ（AMD64/ARM で結果が変わるのと同種の浮動小数点差。アルゴリズム改変ではない）。最終結論への影響は軽微との記憶（ユーザー）、見直しに前向き。
 - **RcppArmadillo/OpenBLAS 廃止（未決）**: 廃止は数値結果に影響する独立した重い設計課題。廃止は問題を別 BLAS 実装へ移すだけになり得るため、廃止でなく「本番環境固定（イメージ凍結）＋結論の頑健性提示」が筋との整理。使用箇所は、RcppArmadillo が 05 の CDM に限定（sourceCpp 1 箇所、呼び出し 1 箇所）、OpenBLAS はパイプライン全体の数値基盤（05/06/07/norm_improved に散在）。廃止するか否かは未決（考えた末に廃止しない可能性も残す）。

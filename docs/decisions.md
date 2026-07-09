@@ -40,13 +40,13 @@ operational decision（方針として運用者の裁量で決めた、supersede
 
 ### D-004  apt 層の日付固定＝snapshot.ubuntu.com 2026-04-09・Level 2
 
-- 状態: Accepted
+- 状態: Superseded by D-018
 - 決定: 新規 apt install の取得元を `snapshot.ubuntu.com` 2026-04-09 に固定する（Level 2＝新規 install のみ固定、`apt upgrade` はしない。取得可能であることを前提とする）。
 - 論拠: R パッケージ層（P3M 2026-04-09）と apt 層の再現性水準を揃えるため。
 
 ### D-005  ベースイメージ＝rocker/rstudio:4.5.3
 
-- 状態: Accepted
+- 状態: Superseded by D-019
 - 決定: 器のベースを `rocker/rstudio:4.5.3`（noble, R 4.5.3）とする。当初は `bioconductor/bioconductor_docker:RELEASE_3_22` を想定していたが、同イメージの実 R は 4.5.2 で production 定石と不一致、かつ本プロジェクトは CRAN＋野良改変を含み純 Bioconductor でないため、これを置換した。
 - 論拠: R 版を主軸に据える。検証結果・パッケージ版の詳細は records 参照。
 - 参照: [records](records.md) 「rocker/rstudio:4.5.3 採用の検証詳細」
@@ -124,3 +124,24 @@ operational decision（方針として運用者の裁量で決めた、supersede
 - 決定: 純度推定の p 値調整を qvalue から BH（`p.adjust(method="fdr")`）へ戻す。
 - 論拠: オリジナル `contamDE.lm` 忠実性とプロジェクト方針の二重に正当。top1000 ゲートへの伝播の詳細は records 参照。
 - 参照: [records](records.md) 「5-2 contamDE」
+
+### D-018  apt 層の日付固定＝snapshot.ubuntu.com 2026-04-10・Level 2
+
+- 状態: Accepted
+- 決定: 新規 apt install の取得元を `snapshot.ubuntu.com` 2026-04-10 に固定する（Level 2＝新規 install のみ固定、`apt upgrade` はしない）。ベースイメージ `ubuntu:noble-20260410`（[D-019](decisions.md#d-019-ベースイメージubuntunoble-20260410-r-453-自前ソースビルドrstudio-廃止)）の apt 層ビルド日と一致させる。[D-004](decisions.md#d-004-apt-層の日付固定snapshotubuntucom-2026-04-09level-2) を supersede。
+- 論拠: ベースの apt 層（4/10 ビルド）と snapshot 固定日を一致させ版ずれを排す。P3M（4/09）と1日ずれるが OS が1日新しい＝安全側。
+- 参照: [records](records.md) 「ubuntu ベース転換と 4-1b 成果」
+
+### D-019  ベースイメージ＝ubuntu:noble-20260410 ＋ R 4.5.3 自前ソースビルド（RStudio 廃止）
+
+- 状態: Accepted
+- 決定: 器のベースを `rocker/rstudio:4.5.3` から `ubuntu:noble-20260410`（日付タグ＝不変。究極の固定は digest 指定）＋ R 4.5.3 の CRAN ソースからの自前ビルドへ転換し、RStudio Server を廃止する。[D-005](decisions.md#d-005-ベースイメージrockerrstudio453) を supersede。
+- 論拠: `ubuntu:24.04`（ローリングタグ）は再ビルドで apt 層が動き再現性が崩れる。日付タグ `noble-YYYYMMDD` は特定日ビルドで不変。プロダクトは対話環境を前提としないため RStudio は不要。OMEN で R 4.5.3 ビルド・明示49パッケージ導入・主要版一致を実証。
+- 参照: [records](records.md) 「ubuntu ベース転換と 4-1b 成果」
+
+### D-020  開発環境の BLAS 構成＝OpenBLAS pthread（update-alternatives 方式）
+
+- 状態: Accepted（本番の参照 BLAS 移行は別途・未決）
+- 決定: 開発環境（OMEN）の BLAS/LAPACK を外部 OpenBLAS pthread に置く（`update-alternatives` で `libblas.so.3`/`liblapack.so.3` を OpenBLAS pthread、priority 100・auto）。R は `--with-blas --with-lapack` でこれを参照。旧 rocker 環境と同一構成。本番で参照 BLAS に揃えるかは別途判断する。
+- 論拠: 現行スクリプトが OpenBLAS 前提（旧 Dockerfile で `libopenblas0-pthread` 使用を確認、[D-016](decisions.md#d-016-blas-スレッド1固定) のスレッド1固定もこの層に効く）。開発の便法を本番判断に混ぜない。
+- 参照: [records](records.md) 「5-4. BLAS / RcppArmadillo」「ubuntu ベース転換と 4-1b 成果」
