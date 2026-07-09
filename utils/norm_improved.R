@@ -21,7 +21,7 @@ muren_norm <- function(reads,
                        trim = 10,
                        maxiter = 70,
                        workers = 2,               # numeric, "auto", or existing cluster
-                       include_self = FALSE,
+                       include_self = TRUE,
                        ...) {
   
   # Pass pairwise_method to reg_sp via options

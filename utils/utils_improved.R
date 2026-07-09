@@ -28,14 +28,8 @@ ep <- function(x) {
 }
 
 # ---- Enhanced Gene Filtering ----
-# Keep genes with max count >= trim AND present (>0) in at least 2 samples
-# This prevents zero-variance genes from entering the normalization
 filter_gene_l <- function(reads, trim) {
-  max_counts <- matrixStats::rowMaxs(reads)
-  min_samples <- rowSums(reads > 0)
-  
-  # Return logical vector for genes passing both criteria
-  (max_counts >= trim) & (min_samples >= 2)
+  matrixStats::rowMaxs(reads) >= trim
 }
 
 # ---- Robust Regression Backend ----
