@@ -2,6 +2,8 @@
 
 operational decision（方針として運用者の裁量で決めた、supersede で覆り得る設計選択）の単一情報源。
 
+> 各エントリの `参照: [records](records.md) 「…」` は詳細の**所在標識**であり、AI はその内容を保持しない。AI は records を自発参照せず、詳細が必要な場合は当該区間の提示を運用者に要請する（取得手順の本体は [rules](rules.md) B-4）。
+
 ## 運用規約
 
 - 本ファイルは **operational decision**（方針として裁量で決めた設計選択）の単一情報源である。**research knowledge**（外部の証拠＝文献・データ・統計理論が決める研究知見）は本ファイルに置かず、[profile](profile.md) 区画2 に置く。
@@ -11,9 +13,9 @@ operational decision（方針として運用者の裁量で決めた、supersede
     - `Accepted`（確定）
     - `Pending-verification`（方針は決定済み、実行検証・確認で確定する。昇格条件を明記）
     - `Superseded by D-0XX`（後続決定に置換）
-- **論拠は一行に留め、詳細は [records](records.md) を参照する**（decisions を肥大させない）。
+- **論拠は簡潔に（原則一行）。decisions を肥大させない。** records 側に置くべき詳細（検証記録・negative data・経緯）を持つ決定に限り、その詳細は [records](records.md) に置き、当該エントリから参照する。一行で自足する決定に records 詳細や参照を用意する必要はない。
 - 履歴は Git と supersede 連鎖が担う。**本ファイルに changelog を設けない。**
-- 一方向フロー：[worklog](worklog.md) の課題が解決 → decisions を発行（または Pending-verification を Accepted へ昇格）。実施が完了 → worklog の手順を一行化し、詳細を [records](records.md) へ移す。
+- 一方向フロー：[worklog](worklog.md) の課題が解決 → decisions を発行（または Pending-verification を Accepted へ昇格）。実施が完了 → worklog の手順を一行化し、記録すべき詳細があれば [records](records.md) へ移す。
 
 ---
 
@@ -28,7 +30,7 @@ operational decision（方針として運用者の裁量で決めた、supersede
 
 - 状態: Accepted
 - 決定: Bioconductor 3.22 を採用し、`version="3.22"`（実装形 `R_BIOC_VERSION="3.22"`）を明示する。当初は現結果の再現を優先し 3.21 としていたが、現結果保持の圧力を外し production 定石を一貫適用する立場へ移行して 3.22 に改めた。
-- 論拠: R 4.5.3 期に current だった世代で、4.5.3 期の修正を取り込んだ枯れた状態にある。詳細は records 参照。
+- 論拠: R 4.5.3 期に current だった世代で、4.5.3 期の修正を取り込んだ枯れた状態にある。
 - 参照: [records](records.md) 「Bioconductor 3.22 の詳細論拠」
 
 ### D-003  パッケージ版固定＝P3M 日付スナップショット 2026-04-09
@@ -115,14 +117,14 @@ operational decision（方針として運用者の裁量で決めた、supersede
 
 - 状態: Pending-verification（昇格条件: worklog 4-2 で結果への影響の最終評価。実装済みだが評価待ち）
 - 決定: norm_improved.R・05・06・07 で BLAS スレッドを1に固定する（`blas_set_num_threads(1L)` / `OPENBLAS_NUM_THREADS=1`）。
-- 論拠: マルチスレッド BLAS の非決定的丸め順序を排除する再現性措置。詳細は records 参照。
+- 論拠: マルチスレッド BLAS の非決定的丸め順序を排除する再現性措置。
 - 参照: [records](records.md) 「5-4 BLAS/RcppArmadillo」
 
 ### D-017  contamDE の p 値調整を qvalue→BH 是正
 
 - 状態: Pending-verification（昇格条件: worklog 4-2 で該当スクリプト是正・結果影響評価）
 - 決定: 純度推定の p 値調整を qvalue から BH（`p.adjust(method="fdr")`）へ戻す。
-- 論拠: オリジナル `contamDE.lm` 忠実性とプロジェクト方針の二重に正当。top1000 ゲートへの伝播の詳細は records 参照。
+- 論拠: オリジナル `contamDE.lm` 忠実性とプロジェクト方針の二重に正当。
 - 参照: [records](records.md) 「5-2 contamDE」
 
 ### D-018  apt 層の日付固定＝snapshot.ubuntu.com 2026-04-10・Level 2
@@ -145,3 +147,10 @@ operational decision（方針として運用者の裁量で決めた、supersede
 - 決定: 開発環境（OMEN）の BLAS/LAPACK を外部 OpenBLAS pthread に置く（`update-alternatives` で `libblas.so.3`/`liblapack.so.3` を OpenBLAS pthread、priority 100・auto）。R は `--with-blas --with-lapack` でこれを参照。旧 rocker 環境と同一構成。本番で参照 BLAS に揃えるかは別途判断する。
 - 論拠: 現行スクリプトが OpenBLAS 前提（旧 Dockerfile で `libopenblas0-pthread` 使用を確認、[D-016](decisions.md#d-016-blas-スレッド1固定) のスレッド1固定もこの層に効く）。開発の便法を本番判断に混ぜない。
 - 参照: [records](records.md) 「5-4. BLAS / RcppArmadillo」「ubuntu ベース転換と 4-1b 成果」
+
+### D-021  MUREN improved の参照選択・遺伝子フィルタを論文準拠へ是正
+
+- 状態: Accepted
+- 決定: `utils/norm_improved.R` の `include_self` 既定を FALSE から TRUE にし、`refs="saturated"` を自己を含む全サンプル参照（`seq_len(n_exp)`）へ戻す。あわせて `utils/utils_improved.R` の `filter_gene_l` を複合条件（`rowMaxs>=trim` かつ `rowSums(reads>0)>=2`）から `rowMaxs(reads)>=trim` 単独へ戻す。
+- 論拠: 論文を一次・オリジナル `norm.R`/`utils.R` を補助として照合した結果、是正前の自己除外・複合フィルタが論文・オリジナル双方から逸脱していたため回復。
+- 参照: [records](records.md) 「5-1 MUREN 参照選択」（決着詳細は材料B で同節に追記予定）
