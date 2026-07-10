@@ -1,6 +1,6 @@
 # records
 
-追記のみ・write-once。[decisions](decisions.md) の各エントリが参照する詳細論拠、実施記録、negative data、スクリプト乖離分析の詳細を収める。確定後は書き換えない。
+追記のみ・原則としてwrite-once。[decisions](decisions.md) の各エントリが参照する詳細論拠、実施記録、negative data、スクリプト乖離分析の詳細を収める。確定後は書き換えない。
 
 ---
 
@@ -122,7 +122,7 @@ worklog には課題見出しのみを置き、以下の乖離分析の詳細を
 ### 5-1. MUREN 参照選択（`norm_improved.R`）
 
 - オリジナル MUREN の `saturated`（既定＝全サンプルを参照、自己を含む `1:n_exp`）に対し、`norm_improved.R` は既定で自己参照を除外（`include_self=FALSE` → `setdiff(seq_len(n_exp), k)`）し、さらに中央値近傍へ参照を絞る `refs_cap`（既定 Inf）を新設。これは丸め差でなく、正規化係数推定に入る参照集合の定義変更。
-- オリジナルのドキュメントは「all samples as references」と明記し、コードに自己除外案のコメントアウト痕があるため、自己除外はオリジナルの設計選択に反する可能性が高い。ただし MUREN 論文（NAR）の参照選択定義に照らして「違反」か「許容される別実装」かは未判定。オリジナルは非登録の野良スクリプトのため、スクリプト準拠と論文準拠のどちらを基準とするかにも議論の余地。
+- オリジナルのドキュメントは「all samples as references」と明記し、コードに自己除外案のコメントアウト痕があるため、自己除外はオリジナルの設計選択に反する可能性が高い。ただし MUREN 論文（BMC Bioinformatics）の参照選択定義に照らして「違反」か「許容される別実装」かは未判定。オリジナルは非登録の野良スクリプトのため、スクリプト準拠と論文準拠のどちらを基準とするかにも議論の余地。
 - 未決: MUREN 論文の参照選択・自己参照の定義確認。是正方針（オリジナル準拠に戻すか、変更を論文的に正当化するか）。BLAS 系統（5-4）とは別系統。contamDE の MUREN 置換（5-2(1)）の妥当性にも波及する上流課題。
 
 ### 5-2. contamDE（`contamde_purity_functions.R`）
@@ -142,3 +142,28 @@ worklog には課題見出しのみを置き、以下の乖離分析の詳細を
 - **BLAS スレッド1固定**（[D-016](decisions.md#d-016-blas-スレッド1固定)）: `norm_improved.R`・05・06・07 で `blas_set_num_threads(1L)`／`OPENBLAS_NUM_THREADS=1` を設定。オリジナル MUREN は BLAS 無指定（環境委任＝R 標準作法）。スレッド1固定は、マルチスレッド BLAS の非決定的丸め順序を排除する再現性のための正当な措置（オリジナルが規定しない層の明示的固定）。実装済み。
 - **BLAS 実装差**: OpenBLAS 化により結果は元実装と異なり結論にも影響が及ぶ（AMD64/ARM で結果が変わるのと同種の浮動小数点差。アルゴリズム改変ではない）。最終結論への影響は軽微との記憶（ユーザー）、見直しに前向き。
 - **RcppArmadillo/OpenBLAS 廃止（未決）**: 廃止は数値結果に影響する独立した重い設計課題。廃止は問題を別 BLAS 実装へ移すだけになり得るため、廃止でなく「本番環境固定（イメージ凍結）＋結論の頑健性提示」が筋との整理。使用箇所は、RcppArmadillo が 05 の CDM に限定（sourceCpp 1 箇所、呼び出し 1 箇所）、OpenBLAS はパイプライン全体の数値基盤（05/06/07/norm_improved に散在）。廃止するか否かは未決（考えた末に廃止しない可能性も残す）。
+
+### 5-1（決着）参照選択・自己参照・median polish 収束の論文照合
+
+（本ブロックは write-once 規約に従い既存 5-1 本文を書き換えず追記する。5-1 の未決のうち
+saturated/自己参照および遺伝子フィルタは [D-021](decisions.md#d-021-muren-improved-の参照選択遺伝子フィルタを論文準拠へ是正) で是正決着。
+`refs_cap`（中央値近傍への参照絞り込み、既定 Inf）は本決着の対象外で、別課題として存置する。）
+
+**参照選択・自己参照の決着（5-1 未決の解消）**
+論文（Wang et al., BMC Bioinformatics 2021, DOI 10.1186/s12859-021-04288-0）の全文照合により確認。論文の saturated は全サンプルを参照とする定義で、single-parameter の統合（Proposition 3）は全 i,j（自己ペア i=j を含む）の総和で定式化される。オリジナル norm.R の saturated も 1:n_exp（自己含む）で、自己除外案はコメントアウト痕として無効化されていた。よって improved の是正前（include_self=FALSE）が論文・オリジナル双方からの逸脱であり、TRUE への是正で回復する。5-1 の未決（是正方針）は「オリジナル準拠かつ論文準拠の、自己を含む saturated に戻す」で決着。
+
+**LTS 実装（robustbase 置換）の論文準拠性**
+MASS::ltsreg（オリジナル）から robustbase::ltsReg（improved）への置換は数値結果を変えるが、論文が定義する LTS 推定量（最大 breakdown を与える trimming、FAST-LTS）には両者とも到達する。robustbase::ltsReg の既定 alpha=1/2 は本番経路（single_param=TRUE, p=1, 切片のみ）で論文の h=(n+p+1)%/%2 と一致。robustbase ソース確認により、切片のみ（location model）の場合は内部で .fastmcd(..., nsamp=0)（悉皆探索）に帰着し、ユーザー指定 nsamp に依らず厳密解を返すことを確認。よって nsamp の値は本番経路の結果に影響せず、論文の LTS 推定量への到達が保証される。robustbase は seed 固定で再現性が高い点も置換の利点。
+
+**scaling 変換の論文整合**
+single-parameter・scaling_coeff の返り値は 1/(2^(overall+col))。論文の scaling coefficient 定義（library size の counterpart、raw counts を割って正規化 counts を得る）と符号・向きが一致することを、コードと論文記述の照合で確認。
+
+**統合ステップ（median polish）の収束検証**
+論文の統合は median polish による LAD 推定（Proposition 3、maxiter 前提で収束）。是正版の polish_coeff は medpolish(rs_mx, na.rm=TRUE, maxiter=70) を呼び overall + col を返す。この maxiter=70 が論文の LAD 推定に到達するか（収束するか）を実データ相当で検証。
+
+- 方法: 無選別サンプル（GDC 生カウント 906 file_id、条件フィルタ前）から N をランダム抽出、unstranded 列で行列を構成、群非依存フィルタ（CPM>1 を過半数サンプル）を適用。是正版と同一ロジックで rs_mx を構成し medpolish の反復回数と、maxiter=70 対 500 の係数一致を確認。N=20/60/150 × シード3の9条件。本番データ構造への追従（データドリブン）を避けるため、無選別からのランダム抽出・本番非使用の unstranded 列を使用。
+- 結果: 全9条件で medpolish は2反復で収束、maxiter=70 と 500 で係数が厳密一致（差 0）。検証スクリプトの rs_mx 構成は本体 muren_norm の scaling_coeff 出力と厳密一致（差 0）することも初回確認で裏取り。結論として maxiter=70 は全水準で論文の LAD 推定に到達しており、median polish 実装は論文準拠。論文が第一に挙げる LP-LAD への置換は不要と判断。
+- なお、検証で得た遺伝子数（条件により約17,000〜18,000）は、ランダム抽出＋CPM フィルタ下の検証用の値であり、本番解析の入力遺伝子数や本番の Results ではない。収束の頑健性を示すための一時条件下の数値。
+
+**未使用メソッドの位置づけ（削除対象、論文準拠には無関係）**
+コード上に残存する非推奨・非論文メソッドは本番経路から発動しない。内訳は、double-parameter（reg_dp、polish_one_gene、single_param=FALSE 分岐）——論文・オリジナル由来の正規機能だが、オリジナル norm.R ドキュメントが single を "default and recommended"、double を "slower" と明記する非推奨オプション。mode（mode_sp）——オリジナルの選択肢だが既定でない。median/trim10/huber、set_muren_method・check_muren_config・initialize_muren——オリジナル・論文にない改変（特に set_muren_method はデータサイズで手法を自動切替する機構で、データドリブン回避方針に反する）。末尾の cat 副作用。これらは本番の single_param=TRUE・pairwise_method="lts" 明示により不発動で、論文準拠を損なわない。今後のスクリプト全体見直しフェーズでの削除対象。
