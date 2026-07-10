@@ -97,7 +97,7 @@ operational decision（方針として運用者の裁量で決めた、supersede
 
 ### D-013  全文書を docs/ 配下で Git 管理・GitHub 越しにプロジェクト同期
 
-- 状態: Accepted
+- 状態: Superseded by D-022
 - 決定: プロセス文書を docs/ 配下で Git 管理し、GitHub 越しにプロジェクトへ同期する（同期一系統）。旧方針「プロセス文書は Git 追跡外・手動でプロジェクトナレッジ更新」を supersede する。
 - 論拠: Git（スクリプト）とプロジェクトナレッジ（文書）で同期機構が二系統だった状態自体が二重管理の温床だった。
 
@@ -154,3 +154,9 @@ operational decision（方針として運用者の裁量で決めた、supersede
 - 決定: `utils/norm_improved.R` の `include_self` 既定を FALSE から TRUE にし、`refs="saturated"` を自己を含む全サンプル参照（`seq_len(n_exp)`）へ戻す。あわせて `utils/utils_improved.R` の `filter_gene_l` を複合条件（`rowMaxs>=trim` かつ `rowSums(reads>0)>=2`）から `rowMaxs(reads)>=trim` 単独へ戻す。
 - 論拠: 論文を一次・オリジナル `norm.R`/`utils.R` を補助として照合した結果、是正前の自己除外・複合フィルタが論文・オリジナル双方から逸脱していたため回復。
 - 参照: [records](records.md) 「5-1 MUREN 参照選択」（決着詳細は材料B で同節に追記予定）
+
+### D-022  同期対象を records 除外へ改訂（AI は records を自発参照しない）
+
+- 状態: Accepted
+- 決定: docs/ 配下を Git 管理し GitHub 越しにプロジェクトへ同期する方針は維持しつつ、同期対象から `records.md` を除外する。AI は records を常時参照文書として保持せず、詳細が必要な場合は当該区間の提示を運用者に要請する（取得手順は [rules](rules.md) B-4、各エントリ参照欄の位置づけは本ファイル冒頭の所在標識注記による）。[D-013](decisions.md#d-013-全文書を-docs-配下で-git-管理github-越しにプロジェクト同期) を supersede。
+- 論拠: records は decisions からの参照先・オンデマンド文書であり常時参照を要さない。ナレッジから外すことで検索空間のノイズを減らし、常時参照すべき文書（decisions 等）のヒット精度を上げる。records の一次情報源は Git 側に不変で存置する（同期停止であって廃止ではない）。
