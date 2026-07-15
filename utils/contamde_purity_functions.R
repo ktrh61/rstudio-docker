@@ -103,7 +103,6 @@ contamde_purity <- function(counts,
                             contaminated = TRUE,
                             pairwise_method = "lts",
                             workers = "auto",
-                            prior.count = 1.0,
                             verbose = TRUE) {
   
   if (verbose) cat("Starting tumor purity estimation...\n")
@@ -133,33 +132,17 @@ contamde_purity <- function(counts,
   # Normalize counts by MUREN size factors
   count_norm <- t(t(counts) / size)
   
-  # Handle zero counts (use raw counts for determination)
-  if (prior.count > 0) {
-    valid_genes <- rep(TRUE, nrow(counts))
-    count_norm_valid <- count_norm
-  } else {
-    valid_genes <- apply(counts, 1L, function(x) all(x > 0))
-    count_norm_valid <- count_norm[valid_genes, , drop = FALSE]
-  }
-  counts_valid <- counts[valid_genes, , drop = FALSE]
-  
-  if (verbose) {
-    n_exc <- sum(!valid_genes)
-    cat(sprintf("  Excluded %d genes with zero counts (%.1f%%)\n", 
-                n_exc, 100 * n_exc / nrow(counts)))
-  }
+  # Pseudocount (+1) fixed as in the original contamDE.lm; all genes retained.
+  count_norm_valid <- count_norm
+  counts_valid <- counts
   
   # Split normal/tumor and calculate log2 ratios
   idx_n <- seq_len(ncol_counts)
   idx_t <- setdiff(seq_len(ncol(count_norm_valid)), idx_n)
   
-  if (prior.count > 0) {
-    y <- log2((count_norm_valid[, idx_t, drop=FALSE] + prior.count) /
-                (count_norm_valid[, idx_n, drop=FALSE] + prior.count))
-  } else {
-    y <- log2(count_norm_valid[, idx_t, drop=FALSE]) -
-      log2(count_norm_valid[, idx_n, drop=FALSE])
-  }
+  # Pseudocount (+1) fixed; matches original contamDE.lm (count + 1).
+  y <- log2((count_norm_valid[, idx_t, drop = FALSE] + 1) /
+              (count_norm_valid[, idx_n, drop = FALSE] + 1))
   
   # Design matrix (safe construction via data.frame)
   if (is.null(subtype) || length(unique(subtype)) == 1) {
@@ -188,10 +171,7 @@ contamde_purity <- function(counts,
   
   if (contaminated) {
     if (verbose) cat("  Estimating tumor purity proportions...\n")
-    
-    p_limma <- p_limma[valid_genes]
-    log2_fc_limma <- log2_fc_limma[valid_genes]
-    
+
     # Calculate adjusted p-values using BH method (deterministic)
     p_adj <- stats::p.adjust(p_limma, method = "BH")
     
