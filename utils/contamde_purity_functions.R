@@ -65,18 +65,23 @@ limma_voom_purity <- function(counts, pairwise_method = "lts",
   d$samples$norm.factors <- as.numeric(nf)
   
   # voom transformation (normalize.method fixed to "none")
-  condition <- factor(c(rep("Normal", ncol_counts), rep("Tumor", ncol_counts)))
-  design <- stats::model.matrix(~ 0 + condition)
-  colnames(design) <- levels(condition)
+  # Paired design: block on patient pair to characterize the tumor-normal
+  # within-pair correlation (corresponds to the fixed effect alpha_ij in the
+  # matched-sample model of contamDE; Shen et al. 2016, Bioinformatics).
+  condition <- factor(c(rep("Normal", ncol_counts), rep("Tumor", ncol_counts)),
+                      levels = c("Normal", "Tumor"))
+  pair <- factor(rep(seq_len(ncol_counts), 2))
+  design <- stats::model.matrix(~ 0 + condition + pair)
   v <- limma::voom(d, design, normalize.method = "none")
   
   # Effective library sizes
   size <- d$samples$lib.size * d$samples$norm.factors
   size <- size / mean(size)
   
-  # limma fit (no duplicateCorrelation / no blocking)
+  # limma fit (patient pair blocked via fixed effect in the design above;
+  # duplicateCorrelation is intentionally not used)
   fit <- limma::lmFit(v, design)
-  contrs <- limma::makeContrasts(contrasts = "Tumor - Normal",
+  contrs <- limma::makeContrasts(contrasts = "conditionTumor - conditionNormal",
                                  levels = design)
   fit2 <- limma::contrasts.fit(fit, contrs)
   fit2 <- limma::eBayes(fit2, trend = TRUE, robust = TRUE)
