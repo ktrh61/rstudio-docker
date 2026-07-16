@@ -1,0 +1,47 @@
+Enhanced MUREN utils loaded successfully.
+Use initialize_muren(n_genes, n_samples) to optimize configuration.
+無選別サンプル(tsv)総数: 906
+
+================ ③ medpolish 収束検証 ================
+水準 N = 20,60,150 / シード = 101,202,303
+フィルタ: CPM>1 を過半数(50%)サンプル / worker=16
+
+N= 20 seed=101 | genes=17402 | iter@70= 2 iter@500=  2 | conv@70=TRUE  | |Δ|max=0.00e+00 | match=TRUE
+N= 20 seed=202 | genes=17682 | iter@70= 2 iter@500=  2 | conv@70=TRUE  | |Δ|max=0.00e+00 | match=TRUE
+N= 20 seed=303 | genes=18112 | iter@70= 2 iter@500=  2 | conv@70=TRUE  | |Δ|max=0.00e+00 | match=TRUE
+N= 60 seed=101 | genes=17533 | iter@70= 2 iter@500=  2 | conv@70=TRUE  | |Δ|max=0.00e+00 | match=TRUE
+N= 60 seed=202 | genes=17465 | iter@70= 2 iter@500=  2 | conv@70=TRUE  | |Δ|max=0.00e+00 | match=TRUE
+N= 60 seed=303 | genes=17544 | iter@70= 2 iter@500=  2 | conv@70=TRUE  | |Δ|max=0.00e+00 | match=TRUE
+N=150 seed=101 | genes=17196 | iter@70= 2 iter@500=  2 | conv@70=TRUE  | |Δ|max=0.00e+00 | match=TRUE
+N=150 seed=202 | genes=17253 | iter@70= 2 iter@500=  2 | conv@70=TRUE  | |Δ|max=0.00e+00 | match=TRUE
+N=150 seed=303 | genes=17342 | iter@70= 2 iter@500=  2 | conv@70=TRUE  | |Δ|max=0.00e+00 | match=TRUE
+
+================ 要約 ================
+   N seed n_gene_kept iter_70 iter_500 converged_70 max_abs_diff_70_500
+  20  101       17402       2        2         TRUE                   0
+  20  202       17682       2        2         TRUE                   0
+  20  303       18112       2        2         TRUE                   0
+  60  101       17533       2        2         TRUE                   0
+  60  202       17465       2        2         TRUE                   0
+  60  303       17544       2        2         TRUE                   0
+ 150  101       17196       2        2         TRUE                   0
+ 150  202       17253       2        2         TRUE                   0
+ 150  303       17342       2        2         TRUE                   0
+ coef_match
+       TRUE
+       TRUE
+       TRUE
+       TRUE
+       TRUE
+       TRUE
+       TRUE
+       TRUE
+       TRUE
+
+全ケース 70未満収束: TRUE
+全ケース 70/500係数一致: TRUE
+=> maxiter=70 は全水準・全シードで論文のLAD推定に到達(収束済み)。
+======================================
+----------------------------------------
+exit status: 0
+elapsed: 257 sec (00:04:17)
