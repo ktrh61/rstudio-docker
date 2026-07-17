@@ -1,19 +1,29 @@
 # 021_build_se.R
-# Load STAR-Counts TSV files into a SummarizedExperiment with all six assays.
+# Load STAR-Counts TSV files into a SummarizedExperiment holding the single
+# count assay selected by library strandedness.
 # Input : processed/file_sample_mapping.rds       (from 020)
 #         raw/expression/<file_id>/<file>.tsv      (from 010)
 # Output: processed/thyr_se_raw.rds                (consumed by 030)
+#         meta/strand_selection_<timestamp>.tsv    (per-sample strand metrics)
 #         meta/loading_metadata_<timestamp>.rds    (run provenance)
 #
-# Columns are labelled by sample_submitter_id. All six assays (three strand
-# counts plus TPM / FPKM / FPKM-UQ) are stored; assay selection is left to 030.
-# TSV reading is parallelised; the large per-file result list is released after
-# the matrices are populated to cap the memory peak before the SE is built.
+# Strandedness is decided per sample from the STAR gene-count totals of the two
+# stranded columns (Dobin's general rule, ratio form): if the smaller total is
+# at most half the larger (ratio <= 0.5) the library is stranded and the larger
+# column is used; otherwise it is unstranded and the unstranded column is used.
+# N_noFeature and N_ambiguous are recorded for audit but not used to decide.
+# Columns are labelled by sample_submitter_id. Only the selected count assay is
+# stored; TPM and FPKM are dropped. TSV reading is parallelised; the large
+# per-file result list is released before the SE is built to cap the memory peak.
 
 source("setup.R")
 
 library(SummarizedExperiment)
 library(parallel)
+
+# Ratio threshold for the stranded/unstranded decision (smaller/larger of the
+# two stranded gene-count totals). At or below this the library is stranded.
+strand_ratio_threshold <- 0.5
 
 # --- Load mapping ----------------------------------------------------------
 mapping_file <- file.path(paths$processed, "file_sample_mapping.rds")
@@ -81,12 +91,14 @@ rm(first_data)
 message("Genes: ", n_genes, " ; samples: ", n_samples)
 
 # --- Read all count files in parallel --------------------------------------
-# Lightweight vector arguments keep the fork footprint small. Columns are
-# extracted by position (four count/expression triplets in columns 4-9).
+# Each worker returns the three strand count vectors (for later selection), the
+# two meta rows used for audit, and the stranded gene-count totals used to
+# decide strandedness. Lightweight vector arguments keep the fork footprint
+# small. Column positions: 4 unstranded, 5 stranded_first, 6 stranded_second.
 sample_ids <- tsv_map$sample_submitter_id
 paths_vec <- tsv_map$path
 
-read_star_counts <- function(i, paths_vec, ids_vec) {
+read_star_counts <- function(i, paths_vec) {
   data.table::setDTthreads(1L)
   path <- paths_vec[i]
 
@@ -98,15 +110,26 @@ read_star_counts <- function(i, paths_vec, ids_vec) {
         showProgress = FALSE,
         nThread = 1L
       )
-      dt <- dt[5:nrow(dt), ]
+      key <- dt[[1]]
+      nf <- as.numeric(unlist(dt[key == "N_noFeature", 4:6]))
+      am <- as.numeric(unlist(dt[key == "N_ambiguous", 4:6]))
+
+      # Gene rows only (drop the four leading meta rows).
+      genes <- dt[5:nrow(dt), ]
+      unstranded <- as.numeric(genes[[4]])
+      stranded_first <- as.numeric(genes[[5]])
+      stranded_second <- as.numeric(genes[[6]])
+
       list(
         idx = i,
-        unstranded = as.numeric(dt[[4]]),
-        stranded_first = as.numeric(dt[[5]]),
-        stranded_second = as.numeric(dt[[6]]),
-        tpm_unstranded = as.numeric(dt[[7]]),
-        fpkm_unstranded = as.numeric(dt[[8]]),
-        fpkm_uq_unstranded = as.numeric(dt[[9]]),
+        unstranded = unstranded,
+        stranded_first = stranded_first,
+        stranded_second = stranded_second,
+        sum_unstranded = sum(unstranded),
+        sum_first = sum(stranded_first),
+        sum_second = sum(stranded_second),
+        nf_unstranded = nf[1], nf_first = nf[2], nf_second = nf[3],
+        am_unstranded = am[1], am_first = am[2], am_second = am[3],
         success = TRUE
       )
     },
@@ -124,47 +147,103 @@ results <- mclapply(
   seq_len(n_samples),
   read_star_counts,
   paths_vec = paths_vec,
-  ids_vec = sample_ids,
   mc.cores = n_cores,
   mc.preschedule = FALSE
 )
 
 failed <- !vapply(results, function(x) isTRUE(x$success), logical(1))
 if (any(failed)) {
-  warning("Files that failed to read: ", sum(failed))
+  stop("Files that failed to read: ", sum(failed))
 }
 
-# --- Assemble assay matrices -----------------------------------------------
-message("Assembling assay matrices ...")
-
-assay_names <- c(
-  "unstranded", "stranded_first", "stranded_second",
-  "tpm_unstranded", "fpkm_unstranded", "fpkm_uq_unstranded"
+# --- Decide strandedness per sample ----------------------------------------
+# Ratio = smaller / larger of the two stranded gene-count totals. ratio <=
+# threshold => stranded (take the larger stranded column); otherwise unstranded
+# (take the unstranded column).
+message(
+  "Deciding strandedness (ratio threshold ", strand_ratio_threshold,
+  ") ..."
 )
 
-make_matrix <- function() {
-  m <- matrix(0, nrow = n_genes, ncol = n_samples)
-  rownames(m) <- gene_info$gene_id
-  colnames(m) <- sample_ids
-  m
+decide_strand <- function(r) {
+  larger <- max(r$sum_first, r$sum_second)
+  smaller <- min(r$sum_first, r$sum_second)
+  ratio <- smaller / larger
+  if (ratio <= strand_ratio_threshold) {
+    selected <- if (r$sum_first > r$sum_second) {
+      "stranded_first"
+    } else {
+      "stranded_second"
+    }
+  } else {
+    selected <- "unstranded"
+  }
+  list(ratio = ratio, selected = selected)
 }
-assay_list <- setNames(
-  lapply(assay_names, function(x) make_matrix()),
-  assay_names
+
+decisions <- lapply(results, decide_strand)
+selected_per_sample <- vapply(decisions, function(d) d$selected, character(1))
+selected_levels <- unique(selected_per_sample)
+
+message(
+  "Selected column(s): ",
+  paste(
+    sprintf(
+      "%s=%d", names(table(selected_per_sample)),
+      as.integer(table(selected_per_sample))
+    ),
+    collapse = " ; "
+  )
 )
+
+# A single count assay requires one consistent column across all samples. If
+# samples disagree, stop rather than mix columns of different strandedness.
+if (length(selected_levels) > 1) {
+  stop(
+    "Samples disagree on strand selection: ",
+    paste(selected_levels, collapse = ", "),
+    " (see strand_selection metrics)"
+  )
+}
+selected_column <- selected_levels
+
+# --- Strand selection record (meta) ----------------------------------------
+strand_selection <- data.frame(
+  sample_submitter_id = sample_ids,
+  selected = selected_per_sample,
+  ratio = vapply(decisions, function(d) d$ratio, numeric(1)),
+  sum_unstranded = vapply(results, function(r) r$sum_unstranded, numeric(1)),
+  sum_first = vapply(results, function(r) r$sum_first, numeric(1)),
+  sum_second = vapply(results, function(r) r$sum_second, numeric(1)),
+  nf_unstranded = vapply(results, function(r) r$nf_unstranded, numeric(1)),
+  nf_first = vapply(results, function(r) r$nf_first, numeric(1)),
+  nf_second = vapply(results, function(r) r$nf_second, numeric(1)),
+  am_unstranded = vapply(results, function(r) r$am_unstranded, numeric(1)),
+  am_first = vapply(results, function(r) r$am_first, numeric(1)),
+  am_second = vapply(results, function(r) r$am_second, numeric(1)),
+  stringsAsFactors = FALSE
+)
+
+timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
+strand_file <- file.path(
+  paths$meta, paste0("strand_selection_", timestamp, ".tsv")
+)
+data.table::fwrite(strand_selection, strand_file, sep = "\t")
+message("Saved strand selection: ", strand_file)
+
+# --- Assemble the selected count matrix ------------------------------------
+message("Assembling count matrix for '", selected_column, "' ...")
+
+count_matrix <- matrix(0, nrow = n_genes, ncol = n_samples)
+rownames(count_matrix) <- gene_info$gene_id
+colnames(count_matrix) <- sample_ids
 
 for (r in results) {
-  if (!isTRUE(r$success)) {
-    next
-  }
-  col_idx <- r$idx
-  for (a in assay_names) {
-    assay_list[[a]][, col_idx] <- r[[a]]
-  }
+  count_matrix[, r$idx] <- r[[selected_column]]
 }
 
 # Release the large per-file result list before building the SE to cap the
-# memory peak (results holds every file's six numeric vectors).
+# memory peak (results holds every file's three strand count vectors).
 rm(results)
 gc()
 
@@ -186,15 +265,14 @@ row_data <- data.frame(
 )
 
 thyr_se <- SummarizedExperiment(
-  assays = assay_list,
+  assays = setNames(list(count_matrix), selected_column),
   colData = col_data,
   rowData = row_data
 )
 
 message(
   "SummarizedExperiment: ", nrow(thyr_se), " genes x ",
-  ncol(thyr_se), " samples ; assays: ",
-  paste(assayNames(thyr_se), collapse = ", ")
+  ncol(thyr_se), " samples ; assay: ", assayNames(thyr_se)
 )
 
 # --- Save ------------------------------------------------------------------
@@ -202,7 +280,6 @@ se_out <- file.path(paths$processed, "thyr_se_raw.rds")
 saveRDS(thyr_se, se_out)
 message("Saved SE: ", se_out)
 
-timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
 metadata_out <- file.path(
   paths$meta, paste0("loading_metadata_", timestamp, ".rds")
 )
@@ -211,6 +288,8 @@ saveRDS(
     loading_date = Sys.Date(),
     n_files_loaded = n_samples,
     n_genes = n_genes,
+    selected_column = selected_column,
+    strand_ratio_threshold = strand_ratio_threshold,
     parallel_cores = n_cores
   ),
   metadata_out
