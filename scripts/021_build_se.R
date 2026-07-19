@@ -15,6 +15,10 @@
 # Columns are labelled by sample_submitter_id. Only the selected count assay is
 # stored; TPM and FPKM are dropped. TSV reading is parallelised; the large
 # per-file result list is released before the SE is built to cap the memory peak.
+#
+# Genes with a zero total across all samples carry no information for any
+# downstream step and only inflate the stored object; they are dropped once the
+# count matrix is assembled, before the SE is built.
 
 source("setup.R")
 
@@ -246,6 +250,20 @@ for (r in results) {
 # memory peak (results holds every file's three strand count vectors).
 rm(results)
 gc()
+
+# --- Drop all-zero genes ---------------------------------------------------
+# Genes with a zero total across all samples are uninformative for every
+# downstream step (they are subsumed by later low-expression filtering) and
+# only enlarge the stored SE. Remove them here, keeping gene_info aligned so
+# row_data below stays consistent.
+nonzero_genes <- rowSums(count_matrix) > 0
+n_dropped <- sum(!nonzero_genes)
+count_matrix <- count_matrix[nonzero_genes, , drop = FALSE]
+gene_info <- gene_info[nonzero_genes, ]
+message(
+  "Dropped all-zero genes: ", n_dropped,
+  " ; genes retained: ", nrow(count_matrix)
+)
 
 # --- Build SummarizedExperiment --------------------------------------------
 col_data <- data.frame(
