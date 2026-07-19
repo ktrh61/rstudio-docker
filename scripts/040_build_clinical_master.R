@@ -191,6 +191,7 @@ se_map <- data.table(
 setkey(se_map, case_id)
 
 master[, in_se := case_id %in% se_cases_norm]
+master[, se_case_id := NA_character_]
 master[se_map, se_case_id := i.se_case_id, on = "case_id"]
 
 message(
@@ -232,10 +233,10 @@ message(
   nrow(master), " cases x ", ncol(master), " columns)"
 )
 
-fwrite(master, file.path(paths$output, "thyr_clinical_master.csv"))
+fwrite(master, file.path(paths$output, "thyr_clinical_master.csv"), na = "NA")
 message("Saved readable master: output/thyr_clinical_master.csv")
 
-fwrite(driver_summary, file.path(paths$output, "driver_summary.csv"))
+fwrite(driver_summary, file.path(paths$output, "driver_summary.csv"), na = "NA")
 message("Saved driver summary: output/driver_summary.csv")
 
 message(
