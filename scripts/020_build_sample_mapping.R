@@ -15,7 +15,6 @@ library(GenomicDataCommons)
 library(parallel)
 
 # --- Load manifest ---------------------------------------------------------
-# 010 writes manifests to meta/. Use the most recent one.
 manifest_files <- list.files(
   paths$meta,
   pattern = "^manifest_gene_counts_.*\\.tsv$",
@@ -33,8 +32,7 @@ message("Using manifest: ", basename(manifest_file))
 message("Files in manifest: ", nrow(manifest))
 
 # --- Query GDC for case and sample metadata --------------------------------
-# Sequential batched queries respect API rate limits. Each batch expands the
-# case and sample records attached to a set of file_ids.
+# Each batch expands the case and sample records attached to a set of file_ids.
 file_ids <- manifest$id
 n_files <- length(file_ids)
 batch_size <- 50L

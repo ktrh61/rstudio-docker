@@ -99,7 +99,7 @@ apply_gene_fixes <- function(elems) {
 # Turn a candidate string into a sorted, de-duplicated element set: strip
 # parenthetical aliases, split on commas, trim, drop empties, normalize symbols.
 to_set <- function(s) {
-  s <- gsub("\\([^)]*\\)", "", s) # remove "(RET-PTC1)" style aliases
+  s <- gsub("\\([^)]*\\)", "", s)
   el <- unlist(strsplit(s, ","))
   el <- trimws(el)
   el <- el[el != ""]

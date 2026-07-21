@@ -1,11 +1,11 @@
 # 042_summarize_driver_as.R
 # Summarize case counts by driver classification crossed with Assigned Share
 # (AS) band and sample-pair status. This is a summarization layer only: it does
-# NOT select analysis targets or define analysis groups. No BRAF V600E
-# restriction, no co-mutation exclusion, no RET grepl selection is applied here;
-# driver classification is taken verbatim from the Designated_* columns. Target
-# selection is deferred entirely to downstream, which specifies cases
-# statistically from the clinical master, the AS table, and the SE.
+# NOT select analysis targets or define analysis groups (no BRAF V600E
+# restriction, no co-mutation exclusion, no RET grepl selection); driver
+# classification is taken verbatim from the Designated_* columns, and target
+# selection is deferred to downstream, which specifies cases statistically from
+# the clinical master, the AS table, and the SE.
 #
 # Input : processed/thyr_clinical_master.rds       (from 040; master key case_id)
 #         processed/thyr_case_assigned_share.rds    (from 041; AS per case)
@@ -24,7 +24,7 @@
 # (REBC-YQ-<id>) are normalized to the master key form (REBC-<id>) on the SE
 # side only, in memory, matching 040. Cases absent from the SE are unpaired.
 #
-# Classification axes: two levels, taken verbatim (na kept as its own category).
+# Classification axes: two levels (na kept as its own category).
 #   Group  = Designated_DriverGroup
 #   Driver = Designated_Driver
 # Driver resolves specific fusions (e.g. ETV6-NTRK3) that Group collapses;
@@ -118,8 +118,8 @@ message(
 )
 
 # --- Build the long-format summary -------------------------------------------
-# For a given classification column and a subset of cases, count non-empty
-# (category x band) cells. na category is kept explicitly.
+# For a given classification column and a subset of cases, count (category x
+# band) cells.
 count_level <- function(data, col, level_name) {
   v <- as.character(data[[col]])
   v[is.na(v) | v == ""] <- "na"

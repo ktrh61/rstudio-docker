@@ -3,7 +3,7 @@
 # count assay selected by library strandedness.
 # Input : processed/file_sample_mapping.rds       (from 020)
 #         raw/expression/<file_id>/<file>.tsv      (from 010)
-# Output: processed/thyr_se_raw.rds                (consumed by 030)
+# Output: processed/thyr_se_raw.rds                (consumed by 040, 042)
 #         meta/strand_selection_<timestamp>.tsv    (per-sample strand metrics)
 #         meta/loading_metadata_<timestamp>.rds    (run provenance)
 #
@@ -16,9 +16,8 @@
 # stored; TPM and FPKM are dropped. TSV reading is parallelised; the large
 # per-file result list is released before the SE is built to cap the memory peak.
 #
-# Genes with a zero total across all samples carry no information for any
-# downstream step and only inflate the stored object; they are dropped once the
-# count matrix is assembled, before the SE is built.
+# All-zero genes are dropped once the count matrix is assembled; the rationale
+# and the gene_info alignment are documented at that step below.
 
 source("setup.R")
 
@@ -26,7 +25,7 @@ library(SummarizedExperiment)
 library(parallel)
 
 # Ratio threshold for the stranded/unstranded decision (smaller/larger of the
-# two stranded gene-count totals). At or below this the library is stranded.
+# two stranded gene-count totals).
 strand_ratio_threshold <- 0.5
 
 # --- Load mapping ----------------------------------------------------------
@@ -161,9 +160,7 @@ if (any(failed)) {
 }
 
 # --- Decide strandedness per sample ----------------------------------------
-# Ratio = smaller / larger of the two stranded gene-count totals. ratio <=
-# threshold => stranded (take the larger stranded column); otherwise unstranded
-# (take the unstranded column).
+# Apply the ratio rule (see header) per sample; decide_strand() implements it.
 message(
   "Deciding strandedness (ratio threshold ", strand_ratio_threshold,
   ") ..."
