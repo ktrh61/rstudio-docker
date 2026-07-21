@@ -33,9 +33,7 @@ suppressPackageStartupMessages({
   library(data.table)
 })
 
-# ---------------------------------------------------------------------------
-# Column selection
-# ---------------------------------------------------------------------------
+# --- Column selection -------------------------------------------------------
 # Driver columns retained from S1. Designated_DriverType is kept as the raw
 # column; a Mut/Fusion split is also derived below (redundant with Pathway, but
 # cheap and losslessly recoverable). WGS-derived bulk columns (SSV/SV/SCNA/
@@ -63,9 +61,7 @@ clinical_cols <- c(
 
 id_col <- "REBC_ID"
 
-# ---------------------------------------------------------------------------
-# Load Science Data S1
-# ---------------------------------------------------------------------------
+# --- Load Science Data S1 ---------------------------------------------------
 s1_path <- file.path(paths$raw, "clinical", "abg2538-data-s1.txt")
 if (!file.exists(s1_path)) {
   stop("Clinical S1 not found: ", s1_path)
@@ -82,9 +78,7 @@ if (length(missing_cols) > 0) {
 master <- s1[, c(id_col, clinical_cols, driver_cols), with = FALSE]
 setnames(master, id_col, "case_id")
 
-# ---------------------------------------------------------------------------
-# Driver aggregation helpers
-# ---------------------------------------------------------------------------
+# --- Driver aggregation helpers ----------------------------------------------
 norm_chr <- function(x) {
   x <- as.character(x)
   x[is.na(x)] <- ""
@@ -139,9 +133,7 @@ aggregate_pair <- function(rna_vec, wgs_vec) {
   list(union = union_str, flag = flag)
 }
 
-# ---------------------------------------------------------------------------
-# Build aggregated driver columns (raw columns preserved above)
-# ---------------------------------------------------------------------------
+# --- Build aggregated driver columns (raw columns preserved above) ----------
 fus <- aggregate_pair(
   norm_chr(master$RNA_CandidateDriverFusion),
   norm_chr(master$WGS_CandidateDriverFusion)
@@ -169,9 +161,7 @@ message(
   sum(mut$flag != ""), " / ", nrow(master)
 )
 
-# ---------------------------------------------------------------------------
-# Pair with SE for case presence (YQ normalization on the SE side, in memory)
-# ---------------------------------------------------------------------------
+# --- Pair with SE for case presence (YQ normalization on the SE side, in memory) ---
 se_path <- file.path(paths$processed, "thyr_se_raw.rds")
 if (!file.exists(se_path)) {
   stop("SE not found: ", se_path, " (run 021 first)")
@@ -202,9 +192,7 @@ n_yq <- sum(!is.na(master$se_case_id) &
   master$se_case_id != master$case_id)
 message("SE cases carrying the YQ form: ", n_yq)
 
-# ---------------------------------------------------------------------------
-# Coarse summary: case counts by driver classification
-# ---------------------------------------------------------------------------
+# --- Coarse summary: case counts by driver classification -------------------
 # Three nested granularities, all covering the 440-case total with na shown as
 # its own category: Group (16, primary), Driver (32, finest), Pathway (9,
 # auxiliary). Counts are over all cases, before any analysis-target selection.
@@ -224,9 +212,7 @@ driver_summary <- rbindlist(list(
   summarize_col("Designated_DriverPathway", "Pathway")
 ))
 
-# ---------------------------------------------------------------------------
-# Save outputs
-# ---------------------------------------------------------------------------
+# --- Save outputs ------------------------------------------------------------
 saveRDS(master, file.path(paths$processed, "thyr_clinical_master.rds"))
 message(
   "Saved master: processed/thyr_clinical_master.rds (",

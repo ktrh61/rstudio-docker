@@ -44,9 +44,7 @@ suppressPackageStartupMessages({
   library(data.table)
 })
 
-# ---------------------------------------------------------------------------
-# Load inputs
-# ---------------------------------------------------------------------------
+# --- Load inputs -------------------------------------------------------------
 master_path <- file.path(paths$processed, "thyr_clinical_master.rds")
 as_path <- file.path(paths$processed, "thyr_case_assigned_share.rds")
 se_path <- file.path(paths$processed, "thyr_se_raw.rds")
@@ -63,9 +61,7 @@ setDT(as_dt)
 
 message("Master: ", nrow(master), " cases ; AS table: ", nrow(as_dt), " cases")
 
-# ---------------------------------------------------------------------------
-# Join AS onto the master and assign the AS band
-# ---------------------------------------------------------------------------
+# --- Join AS onto the master and assign the AS band --------------------------
 dt <- merge(
   master[, .(case_id, Designated_DriverGroup, Designated_Driver)],
   as_dt[, .(case_id, assigned_share_approx, assigned_share_approx_status)],
@@ -100,9 +96,7 @@ message(
   )
 )
 
-# ---------------------------------------------------------------------------
-# Derive pair status from SE (on the fly; YQ normalized on the SE side)
-# ---------------------------------------------------------------------------
+# --- Derive pair status from SE (on the fly; YQ normalized on the SE side) --
 cd <- as.data.frame(colData(se))
 normalize_case_id <- function(x) sub("^REBC-YQ-", "REBC-", as.character(x))
 cd$case_norm <- normalize_case_id(cd$case_submitter_id)
@@ -123,9 +117,7 @@ message(
   " / unpaired: ", sum(dt$pair_class == "unpaired")
 )
 
-# ---------------------------------------------------------------------------
-# Build the long-format summary
-# ---------------------------------------------------------------------------
+# --- Build the long-format summary -------------------------------------------
 # For a given classification column and a subset of cases, count non-empty
 # (category x band) cells. na category is kept explicitly.
 count_level <- function(data, col, level_name) {
@@ -161,9 +153,7 @@ setcolorder(summary_long, c("level", "category", "pair_class", "band", "n"))
 setorder(summary_long, level, -cat_n, category, pair_class, band)
 summary_long[, cat_n := NULL]
 
-# ---------------------------------------------------------------------------
-# Integrity checks
-# ---------------------------------------------------------------------------
+# --- Integrity checks ---------------------------------------------------------
 # all == paired + unpaired for every (level, category, band) cell.
 wide <- dcast(summary_long, level + category + band ~ pair_class,
   value.var = "n", fill = 0
@@ -188,9 +178,7 @@ message(
   nrow(master), ")"
 )
 
-# ---------------------------------------------------------------------------
-# Save
-# ---------------------------------------------------------------------------
+# --- Save ---------------------------------------------------------------------
 out_path <- file.path(paths$output, "driver_as_summary.csv")
 fwrite(summary_long, out_path, na = "NA")
 message("Saved: output/driver_as_summary.csv (", nrow(summary_long), " rows)")
