@@ -1,20 +1,20 @@
 # 041_compute_assigned_share.R
-# Attach a per-case approximate Assigned Share to the clinical master. The
-# quantity is the "Assigned Share associated with the expected value of ERR",
+# Attach a per-case approximate Assigned Share to the prepared clinical table.
+# The quantity is the "Assigned Share associated with the expected value of ERR",
 # computed by compute_thyroid_as() as a Monte Carlo approximation of IREP; it is
 # a hand estimate, not an IREP-produced value. Attached to all 440 cases; no
-# target selection or grouping here (deferred to 042).
+# target selection or grouping here.
 #
-# Input : processed/thyr_clinical_master.rds   (from 040; master key case_id)
+# Input : processed/thyr_clinical.rds          (from 001; key REBC_ID)
 #         utils/thyroid_as_functions.R         (compute_thyroid_as)
-# Output: processed/thyr_case_assigned_share.rds  (case_id-keyed, 440 rows)
+# Output: processed/thyr_case_assigned_share.rds  (REBC_ID-keyed, 440 rows)
 #         output/thyr_case_assigned_share.csv     (human-readable)
 #
 # Output columns:
-#   case_id                       master key (S1 form, no YQ)
+#   REBC_ID                       case key (S1 form, no YQ)
 #   assigned_share_approx         approximate AS (percent, 0-100), or NA
 #   assigned_share_approx_status  "computed", or a reason string when NA
-#   dose_mgy, age_exposure,       inputs copied from the master
+#   dose_mgy, age_exposure,       inputs copied from the clinical table
 #     age_surgery
 #
 # A case is computed only when DOSE, AGE_EXPOSURE and AGE_SURGERY are all finite
@@ -23,35 +23,35 @@
 
 source("setup.R")
 
-suppressPackageStartupMessages({
-  library(data.table)
-})
+library(data.table)
 
-# --- Load estimator and master ---------------------------------------------
+# --- Load estimator and clinical table -------------------------------------
 as_fun_path <- file.path(paths$root, "utils", "thyroid_as_functions.R")
 if (!file.exists(as_fun_path)) {
   stop("Assigned Share functions not found: ", as_fun_path)
 }
 source(as_fun_path)
 
-master_path <- file.path(paths$processed, "thyr_clinical_master.rds")
-if (!file.exists(master_path)) {
-  stop("Clinical master not found: ", master_path, " (run 040 first)")
+clinical_path <- file.path(paths$processed, "thyr_clinical.rds")
+if (!file.exists(clinical_path)) {
+  stop("Clinical table not found: ", clinical_path, " (run 001 first)")
 }
-master <- readRDS(master_path)
-message("Master loaded: ", nrow(master), " cases")
+clinical <- readRDS(clinical_path)
+message("Clinical loaded: ", nrow(clinical), " cases")
 
-needed <- c("case_id", "DOSE", "AGE_EXPOSURE", "AGE_SURGERY")
-missing_cols <- setdiff(needed, names(master))
+needed <- c("REBC_ID", "DOSE", "AGE_EXPOSURE", "AGE_SURGERY")
+missing_cols <- setdiff(needed, names(clinical))
 if (length(missing_cols) > 0) {
-  stop("Master missing expected columns: ", paste(missing_cols, collapse = ", "))
+  stop(
+    "Clinical missing expected columns: ", paste(missing_cols, collapse = ", ")
+  )
 }
 
 res <- data.table(
-  case_id      = as.character(master$case_id),
-  dose_mgy     = as.numeric(master$DOSE),
-  age_exposure = as.numeric(master$AGE_EXPOSURE),
-  age_surgery  = as.numeric(master$AGE_SURGERY)
+  REBC_ID      = as.character(clinical$REBC_ID),
+  dose_mgy     = as.numeric(clinical$DOSE),
+  age_exposure = as.numeric(clinical$AGE_EXPOSURE),
+  age_surgery  = as.numeric(clinical$AGE_SURGERY)
 )
 
 # --- Computability check ---------------------------------------------------
@@ -81,12 +81,12 @@ res[, assigned_share_approx := approx]
 res[, assigned_share_approx_status := status]
 
 setcolorder(res, c(
-  "case_id",
+  "REBC_ID",
   "assigned_share_approx",
   "assigned_share_approx_status",
   "dose_mgy", "age_exposure", "age_surgery"
 ))
-setkey(res, case_id)
+setkey(res, REBC_ID)
 
 message(
   "Assigned Share (approx) computed: ", sum(status == "computed"),
