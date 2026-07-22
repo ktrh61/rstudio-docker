@@ -2,7 +2,6 @@
 # Prepare gene lengths (exon union length per gene) from the GDC GENCODE v36 GTF.
 # Input : GDC reference GTF (downloaded; md5-verified)
 # Output: processed/gene_lengths.rds  (named numeric vector: ENSG id -> length in bp)
-#         processed/gene_lengths.csv  (same content, flat table)
 
 source("setup.R")
 
@@ -17,7 +16,6 @@ gtf_gz <- file.path(paths$raw, "reference", "gencode.v36.annotation.gtf.gz")
 gtf_file <- file.path(paths$raw, "reference", "gencode.v36.annotation.gtf")
 
 out_rds <- file.path(paths$processed, "gene_lengths.rds")
-out_csv <- file.path(paths$processed, "gene_lengths.csv")
 
 dir.create(dirname(gtf_gz), recursive = TRUE, showWarnings = FALSE)
 
@@ -63,14 +61,7 @@ if (n_zero > 0) {
 
 # --- Save ------------------------------------------------------------------
 saveRDS(gene_lengths, out_rds)
-write.csv(
-  data.frame(
-    gene_id = names(gene_lengths), length = gene_lengths, row.names = NULL
-  ),
-  out_csv,
-  row.names = FALSE
-)
 
 message("Genes with length: ", length(gene_lengths))
 message("Zero-length genes dropped: ", n_zero)
-message("Saved: ", out_rds, " and ", out_csv)
+message("Saved: ", out_rds)
