@@ -8,6 +8,11 @@
 # script resolves the owning case and biospecimen sample via the GDC API and
 # records the identifiers 021 needs to label SummarizedExperiment columns. API
 # queries are sequential (rate limits); result parsing is parallelised.
+#
+# case_submitter_id is normalized here to the S1 form: the TSS-augmented prefix
+# REBC-YQ- is reduced to REBC- so that the mapping (and the SE built from it)
+# carries the same case key as the clinical table. This is the single point of
+# YQ normalization.
 
 source("setup.R")
 
@@ -38,7 +43,9 @@ n_files <- length(file_ids)
 batch_size <- 50L
 n_batches <- ceiling(n_files / batch_size)
 
-message("Querying GDC API for ", n_files, " files in ", n_batches, " batches ...")
+message(
+  "Querying GDC API for ", n_files, " files in ", n_batches, " batches ..."
+)
 
 batch_results <- vector("list", n_batches)
 
@@ -86,10 +93,14 @@ parse_batch <- function(batch_result) {
     }
     sample_data <- case_data$samples[[1]]
 
-    if (length(sample_data$sample_type) > 0) {
+    if (
+      length(sample_data$sample_type) > 0
+    ) {
       sample_type_value <- as.character(sample_data$sample_type)[1]
-    } else if (length(sample_data$tumor_descriptor) > 0 &&
-      length(sample_data$specimen_type) > 0) {
+    } else if (
+      length(sample_data$tumor_descriptor) > 0 &&
+        length(sample_data$specimen_type) > 0
+    ) {
       sample_type_value <- paste(
         sample_data$tumor_descriptor[1],
         sample_data$specimen_type[1],
@@ -128,6 +139,29 @@ mapping_rows <- mapping_rows[!vapply(mapping_rows, is.null, logical(1))]
 file_sample_mapping <- data.table::rbindlist(mapping_rows, fill = TRUE)
 
 message("Mapped files: ", nrow(file_sample_mapping))
+
+# --- Normalize case ids (YQ -> REBC), collision-free by construction --------
+# Normalization maps REBC-YQ-<id> -> REBC-<id>. A collision would occur only if
+# some REBC-YQ-<id> and its REBC-<id> both existed as distinct individuals
+# before normalization. Verify the two id sets are disjoint under normalization
+# first; if so, normalization is injective and needs no post-hoc collision
+# check. Only then apply it.
+raw_ids <- unique(file_sample_mapping$case_submitter_id)
+yq_ids <- raw_ids[grepl("^REBC-YQ-", raw_ids)]
+plain_ids <- raw_ids[!grepl("^REBC-YQ-", raw_ids)]
+yq_normalized <- sub("^REBC-YQ-", "REBC-", yq_ids)
+collision <- intersect(yq_normalized, plain_ids)
+if (length(collision) > 0) {
+  stop(
+    "YQ normalization would collide (REBC-YQ- and REBC- forms coexist as ",
+    "distinct case ids): ", paste(collision, collapse = ", ")
+  )
+}
+file_sample_mapping$case_submitter_id <-
+  sub("^REBC-YQ-", "REBC-", file_sample_mapping$case_submitter_id)
+message(
+  "Case ids normalized (YQ -> REBC); ", length(yq_ids), " YQ id(s) folded"
+)
 
 # --- Completeness check ----------------------------------------------------
 # Every manifest file_id must resolve to a mapping row.
