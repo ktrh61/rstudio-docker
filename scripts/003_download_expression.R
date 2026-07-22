@@ -1,4 +1,4 @@
-# 010_download_expression.R
+# 003_download_expression.R
 # Download REBC-THYR Gene Expression Quantification files (STAR - Counts) from GDC.
 # Input : GDC files query (REBC-THYR, RNA-Seq, STAR - Counts, open access)
 # Output: raw/expression/<file_id>/<file>.rna_seq.augmented_star_gene_counts.tsv
@@ -6,10 +6,10 @@
 #         meta/manifest_retry_<timestamp>.tsv             (only if files remain missing)
 #
 # Each file is verified against the manifest md5sum after download. Partial
-# failures are allowed and collected into a retry manifest; re-running the
-# script downloads only what is still missing (md5-matching files are skipped).
-# The script completes successfully only when every manifest file_id is present
-# and md5-verified; otherwise it writes a retry manifest and exits non-zero.
+# failures are allowed: re-running the script downloads only what is still
+# missing (md5-matching files are skipped). The script completes successfully
+# only when every manifest file_id is present and md5-verified; otherwise it
+# writes a retry manifest and exits non-zero.
 
 source("setup.R")
 
@@ -61,10 +61,10 @@ is_valid <- function(file_id, file_name, md5_expected) {
 }
 
 # --- Download loop ---------------------------------------------------------
+# Missing files are downloaded, copied into the expected layout, and md5-checked;
+# a file failing md5 is removed so the completeness check below re-flags it.
 file_ids <- manifest$id
 n_total <- length(file_ids)
-
-failed <- character()
 
 message("Downloading up to ", n_total, " files to ", expr_dir, " ...")
 
@@ -82,21 +82,17 @@ for (i in seq_len(n_total)) {
     silent = TRUE
   )
 
-  if (inherits(result, "try-error")) {
-    failed <- c(failed, file_id)
-  } else {
+  if (!inherits(result, "try-error")) {
     cached_path <- as.character(result)[1]
     target_dir <- file.path(expr_dir, file_id)
     dir.create(target_dir, recursive = TRUE, showWarnings = FALSE)
     target_file <- file.path(target_dir, basename(cached_path))
     copied <- file.copy(cached_path, target_file, overwrite = TRUE)
 
-    if (!copied ||
-      tools::md5sum(target_file)[[1]] != md5_expected) {
-      if (file.exists(target_file)) {
-        file.remove(target_file)
-      }
-      failed <- c(failed, file_id)
+    if ((!copied ||
+      tools::md5sum(target_file)[[1]] != md5_expected) &&
+      file.exists(target_file)) {
+      file.remove(target_file)
     }
   }
 
@@ -106,8 +102,8 @@ for (i in seq_len(n_total)) {
 }
 
 # --- Completeness check ----------------------------------------------------
-# Re-verify every manifest file_id against md5, independent of this run's
-# success/failure bookkeeping, so a prior partial run is also accounted for.
+# Re-verify every manifest file_id against md5, independent of this run, so a
+# prior partial run is also accounted for.
 valid <- vapply(
   seq_len(n_total),
   function(i) {
