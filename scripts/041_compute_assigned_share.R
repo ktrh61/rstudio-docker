@@ -42,9 +42,7 @@ message("Clinical loaded: ", nrow(clinical), " cases")
 needed <- c("REBC_ID", "DOSE", "AGE_EXPOSURE", "AGE_SURGERY")
 missing_cols <- setdiff(needed, names(clinical))
 if (length(missing_cols) > 0) {
-  stop(
-    "Clinical missing expected columns: ", paste(missing_cols, collapse = ", ")
-  )
+  stop("Clinical missing expected columns: ", paste(missing_cols, collapse = ", "))
 }
 
 res <- data.table(
