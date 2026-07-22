@@ -8,7 +8,6 @@
 # Input : processed/thyr_clinical.rds          (from 001; key REBC_ID)
 #         utils/thyroid_as_functions.R         (compute_thyroid_as)
 # Output: processed/thyr_case_assigned_share.rds  (REBC_ID-keyed, 440 rows)
-#         output/thyr_case_assigned_share.csv     (human-readable)
 #
 # Output columns:
 #   REBC_ID                       case key (S1 form, no YQ)
@@ -99,6 +98,3 @@ message(
   "Saved: processed/thyr_case_assigned_share.rds (",
   nrow(res), " cases x ", ncol(res), " columns)"
 )
-
-fwrite(res, file.path(paths$output, "thyr_case_assigned_share.csv"), na = "NA")
-message("Saved readable: output/thyr_case_assigned_share.csv")
