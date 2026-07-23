@@ -67,6 +67,11 @@ analysis_v7/data/raw/manifest_*.tsv
 # 作業ディレクトリの中身は追跡しないが、器(.gitkeep)は残す
 raw/*
 !raw/.gitkeep
+# サブディレクトリ(expression/clinical/reference)の器も残す。
+# 一旦ディレクトリを再包含し、中身は再度無視、.gitkeepだけ通す。
+!raw/*/
+raw/*/*
+!raw/*/.gitkeep
 processed/*
 !processed/.gitkeep
 output/*
