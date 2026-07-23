@@ -1,203 +1,82 @@
 # ==============================================================================
-# utils.R - Improved helpers for MUREN normalization
-# Version: Enhanced performance and robustness
+# MUREN helpers
+# Statistical model follows the original MUREN implementation. The LTS engine
+# is MASS::ltsreg; no automatic estimator selection or fallback is provided.
 # ==============================================================================
 
-# ---- Dependencies Check ----
-if (!requireNamespace("matrixStats", quietly = TRUE))
+if (!requireNamespace("matrixStats", quietly = TRUE)) {
   stop("Package 'matrixStats' is required for filter_gene_l().")
-if (!requireNamespace("robustbase", quietly = TRUE))
-  stop("Package 'robustbase' is required for LTS regression. MASS fallback is not supported due to inconsistent results.")
-if (!requireNamespace("MASS", quietly = TRUE))
-  stop("Package 'MASS' is required for Huber regression.")
+}
+if (!requireNamespace("MASS", quietly = TRUE)) {
+  stop("Package 'MASS' is required for LTS regression.")
+}
 
-# ---- Constants ----
-TOL <- .Machine$double.eps ^ 0.5
+TOL <- .Machine$double.eps^0.5
 
-# ---- Small Helper Functions ----
 is.wholenumber <- function(x, tol = TOL) {
   abs(x - round(x)) < tol
 }
 
 lg <- function(x) {
-  log2(1 + x)  # log-space transformation used inside MUREN
+  log2(1 + x)
 }
 
 ep <- function(x) {
-  2^x - 1      # inverse of lg transformation
+  2^x - 1
 }
 
-# ---- Enhanced Gene Filtering ----
 filter_gene_l <- function(reads, trim) {
   matrixStats::rowMaxs(reads) >= trim
 }
 
-# ---- Robust Regression Backend ----
-# Uses robustbase::ltsReg (fast C implementation)
-# MASS fallback removed - robustbase is required
-.reg_backend <- function(formula, ...) {
-  # robustbase::ltsReg: fast C implementation
-  # Formula handling: ~1 for intercept-only, ~x for slope+intercept
-  robustbase::ltsReg(formula, ...)
-}
-
-# ---- Single-Parameter Regression (Location Shift) ----
-# Returns a scalar coefficient per (sample, ref) pair
-# Method can be controlled via options("muren_pair_method")
+# Single-parameter MUREN: robust location shift between a target and reference.
 reg_sp <- function(s_k, s_r, ...) {
-  y <- s_r - s_k
-  method <- getOption("muren_pair_method", "lts")
-  
-  # Fast median-based location shift
-  if (method == "median") {
-    return(stats::median(y, na.rm = TRUE))
-  }
-  
-  # Trimmed mean (removes 10% extreme values)
-  if (method == "trim10") {
-    return(mean(y, trim = 0.10, na.rm = TRUE))
-  }
-  
-  # Huber robust regression (M-estimator)
-  if (method == "huber") {
-    # MASS is required for Huber (checked at startup)
-    fit <- MASS::rlm(y ~ 1, psi = MASS::psi.huber, maxit = 20)
-    return(unname(coef(fit)[1]))
-  }
-  
-  # Default: LTS regression (robustbase required, checked at startup)
-  .reg_backend(y ~ 1, ...)$coefficients[1]
+  MASS::ltsreg(s_r - s_k ~ 1, ...)$coefficients[[1L]]
 }
 
-# ---- Mode-Based Shift (Alternative Robust Location) ----
-# Returns the mode of the difference distribution
+# Original mode-based alternative for the single-parameter form.
 mode_sp <- function(s_k, s_r, ...) {
   d <- stats::density(s_r - s_k, ...)
   d$x[which.max(d$y)]
 }
 
-# ---- Double-Parameter Regression (Non-linear Correction) ----
-# Returns fitted values (vector of length = n_genes)
+# Double-parameter MUREN: fitted reference log-counts for each gene.
 reg_dp <- function(s_k, s_r, ...) {
-  .reg_backend(s_r ~ s_k, ...)$fitted.values
+  MASS::ltsreg(s_r ~ s_k, ...)$fitted.values
 }
 
-# ---- Legacy Task Builder (Backward Compatibility) ----
-# Not used by the revised muren_norm(), but kept for compatibility
-get_tasks <- function(k, reg_wapper, refs) {
-  parse(text = paste(
-    reg_wapper,
-    "(log_raw_reads_mx[, ", k, "],",
-    "log_raw_reads_mx[, ", refs, "], ...)",
-    collapse = "\n", sep = ""
-  ))
-}
-
-# ---- Median Polish: Sample Effects from Pairwise Results ----
-# For single-parameter regression results
-# fitted_n: numeric vector of pairwise regression results
-# locations: indices mapping vector back to (ref x sample) matrix
 polish_coeff <- function(fitted_n, n_exp, locations, unused_refs, maxiter) {
-  # Initialize matrix for pairwise results
   rs_mx <- matrix(NA_real_, nrow = n_exp, ncol = n_exp)
   rs_mx[locations] <- fitted_n
-  
-  # Remove unused references (rows) if any
-  if (length(unused_refs) > 0) {
+
+  if (length(unused_refs) > 0L) {
     rs_mx <- rs_mx[-unused_refs, , drop = FALSE]
   }
-  
-  # Apply median polish to extract sample effects
-  m <- stats::medpolish(rs_mx, 
-                        na.rm = TRUE, 
-                        trace.iter = FALSE, 
-                        maxiter = maxiter)
-  
-  # Return column effects + overall (sample effects in log2 space)
-  m$overall + m$col
+
+  fit <- stats::medpolish(
+    rs_mx,
+    na.rm = TRUE,
+    trace.iter = FALSE,
+    maxiter = maxiter
+  )
+
+  fit$overall + fit$col
 }
 
-# ---- Median Polish Per Gene (Double-Parameter Path) ----
-# For gene-specific normalization in double-parameter regression
 polish_one_gene <- function(fitted_n, n_exp, locations, unused_refs, maxiter) {
-  # Initialize matrix for this gene's pairwise results
   rs_mx <- matrix(NA_real_, nrow = n_exp, ncol = n_exp)
   rs_mx[locations] <- fitted_n
-  
-  # Remove unused references (rows) if any
-  if (length(unused_refs) > 0) {
+
+  if (length(unused_refs) > 0L) {
     rs_mx <- rs_mx[-unused_refs, , drop = FALSE]
   }
-  
-  # Apply median polish for this gene
-  m <- stats::medpolish(rs_mx, 
-                        na.rm = TRUE, 
-                        trace.iter = FALSE, 
-                        maxiter = maxiter)
-  
-  # Return column effects + overall (sample effects for this gene)
-  m$overall + m$col
+
+  fit <- stats::medpolish(
+    rs_mx,
+    na.rm = TRUE,
+    trace.iter = FALSE,
+    maxiter = maxiter
+  )
+
+  fit$overall + fit$col
 }
-
-# ---- Performance Enhancement Functions ----
-
-# Set optimal MUREN method based on data size and requirements
-set_muren_method <- function(n_genes, n_samples, priority = "balanced") {
-  total_comparisons <- n_genes * n_samples * (n_samples - 1)
-  
-  if (priority == "speed") {
-    if (total_comparisons > 1e6) {
-      options(muren_pair_method = "median")
-      message("Large dataset detected: Using median method for maximum speed")
-    } else {
-      options(muren_pair_method = "trim10")
-      message("Using trimmed mean method for good speed/robustness balance")
-    }
-  } else if (priority == "robustness") {
-    options(muren_pair_method = "lts")
-    message("Using LTS method for maximum robustness")
-  } else {  # balanced
-    if (total_comparisons > 5e5) {
-      options(muren_pair_method = "trim10")
-      message("Using trimmed mean method for balanced performance")
-    } else {
-      options(muren_pair_method = "lts")
-      message("Using LTS method for optimal robustness")
-    }
-  }
-}
-
-# Check and report MUREN configuration
-check_muren_config <- function() {
-  method <- getOption("muren_pair_method", "lts")
-  has_robustbase <- requireNamespace("robustbase", quietly = TRUE)
-  has_mass <- requireNamespace("MASS", quietly = TRUE)
-  
-  cat("MUREN Configuration:\n")
-  cat(sprintf("  Method: %s\n", method))
-  cat(sprintf("  robustbase available: %s (required for LTS)\n", has_robustbase))
-  cat(sprintf("  MASS available: %s (required for Huber)\n", has_mass))
-  
-  if (method == "lts" && !has_robustbase) {
-    stop("robustbase is required for LTS method. Please install it with: install.packages('robustbase')")
-  }
-  if (method == "huber" && !has_mass) {
-    stop("MASS is required for Huber method.")
-  }
-  
-  invisible(list(method = method, robustbase = has_robustbase, mass = has_mass))
-}
-
-# ---- Initialization Function ----
-# Call this to set up optimal MUREN configuration
-initialize_muren <- function(n_genes = NULL, n_samples = NULL, priority = "balanced") {
-  if (!is.null(n_genes) && !is.null(n_samples)) {
-    set_muren_method(n_genes, n_samples, priority)
-  }
-  check_muren_config()
-  invisible(TRUE)
-}
-
-# ---- End of utils.R ----
-cat("Enhanced MUREN utils loaded successfully.\n")
-cat("Use initialize_muren(n_genes, n_samples) to optimize configuration.\n")

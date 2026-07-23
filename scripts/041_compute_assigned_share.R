@@ -16,9 +16,9 @@
 #   dose_mgy, age_exposure,       inputs copied from the clinical table
 #     age_surgery
 #
-# A case is computed only when DOSE, AGE_EXPOSURE and AGE_SURGERY are all finite
-# and DOSE is non-negative; otherwise assigned_share_approx is NA with the
-# reason recorded. n_iter and seed use the compute_thyroid_as() defaults.
+# A case is computed only when DOSE, AGE_EXPOSURE and AGE_SURGERY are all
+# finite; otherwise assigned_share_approx is NA with the reason recorded.
+# n_iter and seed use the compute_thyroid_as() defaults.
 
 source("setup.R")
 
@@ -55,11 +55,9 @@ res <- data.table(
 finite_all <- is.finite(res$dose_mgy) &
   is.finite(res$age_exposure) &
   is.finite(res$age_surgery)
-dose_ok <- is.finite(res$dose_mgy) & res$dose_mgy >= 0
 
 status <- rep("computed", nrow(res))
 status[!finite_all] <- "missing_input"
-status[finite_all & !dose_ok] <- "negative_dose"
 computable <- status == "computed"
 
 # --- Compute ---------------------------------------------------------------
@@ -90,7 +88,6 @@ message(
   " / ", nrow(res)
 )
 message("  NA (missing_input): ", sum(status == "missing_input"))
-message("  NA (negative_dose): ", sum(status == "negative_dose"))
 
 # --- Save ------------------------------------------------------------------
 saveRDS(res, file.path(paths$processed, "thyr_case_assigned_share.rds"))
