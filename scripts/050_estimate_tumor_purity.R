@@ -37,8 +37,9 @@ source(file.path(paths$root, "utils", "utils_improved.R"))
 source(file.path(paths$root, "utils", "norm_improved.R"))
 source(file.path(paths$root, "utils", "contamde_purity_functions.R"))
 
-# ContamDE / MUREN group-internal parallel workers.
-workers <- 3L
+# Canonical MUREN worker count used to generate the published analysis.
+workers <- 4L
+message("MUREN workers: ", workers, " (canonical setting)")
 
 # AS threshold (percent) separating High from Low/Mid among exposed cases.
 as_high_threshold <- 66.6

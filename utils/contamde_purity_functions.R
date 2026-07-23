@@ -76,7 +76,11 @@ for (pkg in c("edgeR", "limma", "statmod")) {
 # ==============================================================================
 # limma + voom with MUREN scaling factors
 # ==============================================================================
-limma_voom_purity <- function(counts, workers = 2L) {
+limma_voom_purity <- function(counts, workers) {
+  if (missing(workers)) {
+    stop("'workers' must be explicitly specified.")
+  }
+
   validated <- .validate_paired_counts(counts)
   counts <- validated$counts
   n_pairs <- validated$n_pairs
@@ -165,8 +169,12 @@ contamde_purity <- function(counts,
                             covariate = NULL,
                             contaminated = TRUE,
                             pairwise_method = "lts",
-                            workers = 2L,
+                            workers,
                             verbose = TRUE) {
+  if (missing(workers)) {
+    stop("'workers' must be explicitly specified.")
+  }
+
   # These arguments are retained temporarily for existing call sites. This
   # purity-only estimator has one fixed model and does not implement subtype,
   # covariate, uncontaminated, or alternative MUREN-method branches.

@@ -31,8 +31,12 @@ muren_norm <- function(reads,
                        filter_gene = TRUE,
                        trim = 10,
                        maxiter = 70,
-                       workers = 2,
+                       workers,
                        ...) {
+  if (missing(workers)) {
+    stop("'workers' must be explicitly specified.")
+  }
+
   is_flag <- function(x) {
     is.logical(x) && length(x) == 1L && !is.na(x)
   }
