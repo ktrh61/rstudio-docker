@@ -62,3 +62,14 @@ gdc-client*
 # Remove manifest inclusion (too many files)
 # Manifests should be documented in README instead
 analysis_v7/data/raw/manifest_*.tsv
+
+# === new top-level work dirs (raw/processed/output/meta) ===
+# 作業ディレクトリの中身は追跡しないが、器(.gitkeep)は残す
+raw/*
+!raw/.gitkeep
+processed/*
+!processed/.gitkeep
+output/*
+!output/.gitkeep
+meta/*
+!meta/.gitkeep
