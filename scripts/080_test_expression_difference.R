@@ -19,9 +19,13 @@
 # higher in the exposed arm. p_exact enumerates every C(n, nx) allocation and
 # needs no seed. fdr_perm is a permutation-calibrated FDR on the statistic:
 # the null comes from N_PERM whole-column shuffles, which preserve inter-gene
-# correlation, and pi0 is held at 1. The omnibus "count" rows ask whether the
-# number of genes past a null quantile exceeds what those same shuffles
-# produce; the "max" row asks the same of the single most extreme gene.
+# correlation, and pi0 is held at 1.
+#
+# The omnibus rows share that null. "count" asks whether the number of genes
+# past a fixed null quantile exceeds what the shuffles produce, "max" asks the
+# same of the single most extreme gene, and "hc" is Higher Criticism, which
+# scans the threshold instead of fixing one. PRIMARY_OMNIBUS names the row
+# that carries the inferential claim; the others are descriptive.
 
 source("setup.R")
 
@@ -35,6 +39,8 @@ source(file.path(paths$root, "utils", "brunnermunzel_mc.R"))
 N_PERM <- 999L # label shuffles for the empirical null
 PERM_SEED <- 19860426L # fixed seed (Chernobyl accident date 1986-04-26)
 OMNIBUS_ALPHA <- c(1e-2, 1e-3, 1e-4) # per-gene null quantiles for the omnibus
+HC_ALPHA0 <- 0.1 # fraction of the p-value range Higher Criticism scans
+PRIMARY_OMNIBUS <- "hc" # the pre-specified inferential row
 EXACT_MAX <- 1e8 # largest C(n, nx) still enumerated exactly
 EXACT_THREADS <- 16L # threads for the enumeration
 
@@ -71,6 +77,26 @@ permutation_fdr <- function(statistic, null_statistic, n_perm) {
   out
 }
 
+# --- Higher Criticism ------------------------------------------------------
+# Scanning the threshold instead of fixing one, so no per-gene cut-off has to
+# be chosen. The p-values are empirical against the pooled shuffle null, which
+# both keeps real and shuffled genes on one scale and makes the statistic
+# usable under inter-gene correlation; Higher Criticism's asymptotic null
+# assumes independence and must not be used here.
+higher_criticism <- function(statistic, pooled_null, n_null, alpha0) {
+  n <- length(statistic)
+  p <- sort(
+    (n_null - findInterval(statistic, pooled_null, left.open = TRUE) + 1) /
+      (n_null + 1)
+  )
+  index <- seq_len(n)
+  usable <- index <= max(1L, floor(alpha0 * n)) & p > 1 / n
+  if (!any(usable)) {
+    return(NA_real_)
+  }
+  max((sqrt(n) * (index / n - p) / sqrt(p * (1 - p)))[usable])
+}
+
 # --- Omnibus test ----------------------------------------------------------
 omnibus_table <- function(statistic, null_statistic, alpha, n_perm) {
   pooled <- sort(as.numeric(null_statistic))
@@ -95,6 +121,20 @@ omnibus_table <- function(statistic, null_statistic, alpha, n_perm) {
     null_lo = unname(stats::quantile(null_max, 0.025)),
     null_hi = unname(stats::quantile(null_max, 0.975)),
     p = (sum(null_max >= observed_max) + 1) / (n_perm + 1),
+    stringsAsFactors = FALSE
+  )
+
+  n_null <- length(pooled)
+  observed_hc <- higher_criticism(statistic, pooled, n_null, HC_ALPHA0)
+  null_hc <- apply(null_statistic, 2L, function(s) {
+    higher_criticism(s, pooled, n_null, HC_ALPHA0)
+  })
+  counted[[length(counted) + 1L]] <- data.frame(
+    test = "hc", alpha = HC_ALPHA0, cut = NA_real_, observed = observed_hc,
+    null_median = stats::median(null_hc),
+    null_lo = unname(stats::quantile(null_hc, 0.025)),
+    null_hi = unname(stats::quantile(null_hc, 0.975)),
+    p = (sum(null_hc >= observed_hc) + 1) / (n_perm + 1),
     stringsAsFactors = FALSE
   )
   do.call(rbind, counted)
@@ -147,8 +187,9 @@ test_unit <- function(dgelist, unit) {
 
   omnibus <- omnibus_table(statistic, null_statistic, OMNIBUS_ALPHA, N_PERM)
   message(sprintf(
-    "  %-9s %d vs %d ; min p_exact %.3e ; fdr_perm<0.10 %d ; omnibus p %s",
+    "  %-9s %d vs %d ; min p_exact %.3e ; fdr_perm<0.10 %d ; %s p %.3f ; all %s",
     unit, nx, n - nx, min(p_exact), sum(genes$fdr_perm < 0.10),
+    PRIMARY_OMNIBUS, omnibus$p[omnibus$test == PRIMARY_OMNIBUS],
     paste(sprintf("%.3f", omnibus$p), collapse = "/")
   ))
 
@@ -167,7 +208,7 @@ test_unit <- function(dgelist, unit) {
 }
 
 # --- Run every unit --------------------------------------------------------
-message("Testing units (omnibus p reported as 1e-2/1e-3/1e-4/max):")
+message("Testing units (all = count 1e-2/1e-3/1e-4, max, hc):")
 units <- lapply(names(normalized$units), function(unit) {
   test_unit(normalized$units[[unit]]$dgelist, unit)
 })
@@ -182,6 +223,8 @@ thyr_expression_test <- list(
     n_perm = N_PERM,
     perm_seed = PERM_SEED,
     omnibus_alpha = OMNIBUS_ALPHA,
+    hc_alpha0 = HC_ALPHA0,
+    primary_omnibus = PRIMARY_OMNIBUS,
     exact_max = EXACT_MAX,
     fdr = "permutation-calibrated, pi0 = 1",
     reference_group = "Sporadic"
