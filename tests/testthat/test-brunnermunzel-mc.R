@@ -945,3 +945,48 @@ testthat::test_that("tie patterns group genes without changing answers", {
   invisible(brunnermunzel_pvalues(data, nx, B = 99L, seed = 3L, method = "mc"))
   testthat::expect_equal(.brunnermunzel_mc_state$null_generation_count, 2)
 })
+
+testthat::test_that("row statistics and effects match the single-pair calls", {
+  set.seed(77L)
+  nx <- 4L
+  ny <- 5L
+  data <- rbind(
+    c(1, 2, 3, 4, 5, 6, 7, 8, 9),
+    c(9, 8, 7, 6, 5, 4, 3, 2, 1),
+    c(1, 1, 2, 2, 1, 2, 2, 3, 3),
+    rep(4, nx + ny),
+    round(rnorm(nx + ny), 3)
+  )
+  rownames(data) <- paste0("g", seq_len(nrow(data)))
+
+  statistics <- brunnermunzel_statistics(data, nx)
+  effects <- brunnermunzel_effects(data, nx)
+  testthat::expect_identical(names(statistics), rownames(data))
+  testthat::expect_identical(names(effects), rownames(data))
+
+  for (i in seq_len(nrow(data))) {
+    x <- data[i, seq_len(nx)]
+    y <- data[i, nx + seq_len(ny)]
+    reference <- .reference_bm(x, y)
+    testthat::expect_equal(
+      unname(statistics[i]), reference$statistic,
+      tolerance = 1e-14
+    )
+    testthat::expect_equal(
+      unname(effects[i]), reference$effect,
+      tolerance = 1e-14
+    )
+  }
+})
+
+testthat::test_that("row statistics and effects validate their inputs", {
+  data <- rbind(c(1, 2, 3, 4, 5, 6), c(2, 3, 4, 5, 6, 7))
+  for (f in list(brunnermunzel_statistics, brunnermunzel_effects)) {
+    testthat::expect_error(f(as.vector(data), 3L))
+    testthat::expect_error(f(data, 1L))
+    testthat::expect_error(f(data, 5L))
+    testthat::expect_error(f(rbind(c(1, NA, 3, 4, 5, 6)), 3L))
+    testthat::expect_error(f(matrix(letters[1:12], nrow = 2), 3L))
+    testthat::expect_length(f(data[0, , drop = FALSE], 3L), 0)
+  }
+})

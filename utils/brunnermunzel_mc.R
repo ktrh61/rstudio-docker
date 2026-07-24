@@ -489,19 +489,7 @@ brunnermunzel_mc_test <- function(
   result
 }
 
-# Two-group p-values for every row of `data` at once. Columns 1..nx are group
-# x and the remainder are group y. Rows sharing a tie pattern share a single
-# enumeration (or a single Monte Carlo null), which is what makes this far
-# cheaper than looping brunnermunzel_mc_test() over the rows.
-brunnermunzel_pvalues <- function(
-    data,
-    nx,
-    alternative = c("two.sided", "greater", "less"),
-    B = 999999L,
-    seed = NULL,
-    method = c("auto", "exact", "mc")) {
-  alternative <- match.arg(alternative)
-  method <- match.arg(method)
+.bm_validate_matrix <- function(data, nx) {
   if (
     !is.matrix(data) ||
       !is.numeric(data) ||
@@ -517,11 +505,59 @@ brunnermunzel_pvalues <- function(
     )
   }
   nx <- .bm_validate_integer(nx, "nx", positive = TRUE)
-  n <- ncol(data)
-  ny <- n - nx
-  if (nx < 2L || ny < 2L) {
+  if (nx < 2L || ncol(data) - nx < 2L) {
     stop("each group must contain at least two observations", call. = FALSE)
   }
+  nx
+}
+
+# Standard Brunner-Munzel statistic for every row of `data`. Columns 1..nx are
+# group x. Cheap relative to brunnermunzel_pvalues() because no permutation
+# null is built, which is what makes label-shuffling loops affordable.
+brunnermunzel_statistics <- function(data, nx) {
+  nx <- .bm_validate_matrix(data, nx)
+  if (nrow(data) == 0L) {
+    return(stats::setNames(numeric(0), rownames(data)))
+  }
+  statistics <- .brunnermunzel_mc_state$bm_observed_matrix_cpp(
+    matrix(as.double(data), nrow = nrow(data)),
+    as.integer(nx)
+  )$statistic
+  names(statistics) <- rownames(data)
+  statistics
+}
+
+# The Brunner-Munzel effect P(X<Y) + 0.5 P(X=Y) for every row of `data`, on the
+# same column convention as brunnermunzel_statistics().
+brunnermunzel_effects <- function(data, nx) {
+  nx <- .bm_validate_matrix(data, nx)
+  if (nrow(data) == 0L) {
+    return(stats::setNames(numeric(0), rownames(data)))
+  }
+  ny <- ncol(data) - nx
+  pooled <- apply(data, 1L, rank)
+  effects <- (colMeans(pooled[nx + seq_len(ny), , drop = FALSE]) -
+                (ny + 1) / 2) / nx
+  names(effects) <- rownames(data)
+  effects
+}
+
+# Two-group p-values for every row of `data` at once. Columns 1..nx are group
+# x and the remainder are group y. Rows sharing a tie pattern share a single
+# enumeration (or a single Monte Carlo null), which is what makes this far
+# cheaper than looping brunnermunzel_mc_test() over the rows.
+brunnermunzel_pvalues <- function(
+    data,
+    nx,
+    alternative = c("two.sided", "greater", "less"),
+    B = 999999L,
+    seed = NULL,
+    method = c("auto", "exact", "mc")) {
+  alternative <- match.arg(alternative)
+  method <- match.arg(method)
+  nx <- .bm_validate_matrix(data, nx)
+  n <- ncol(data)
+  ny <- n - nx
   B <- .bm_validate_integer(B, "B", positive = TRUE)
   if (!is.null(seed)) {
     seed <- .bm_validate_integer(seed, "seed")
