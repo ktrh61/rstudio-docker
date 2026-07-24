@@ -192,8 +192,19 @@ process_unit <- function(samples1, samples2, group_labels) {
   dge_final$samples$norm.factors <- nf_final
   dge_final$samples$scaling_coeff <-
     deges$scaling_coeff[colnames(dge_final)]
+  # The saved norm.factors are the audit trail for the MUREN coefficients, so
+  # they must stay exactly what those coefficients imply. Setting one without
+  # the other would otherwise be silent.
+  stopifnot(isTRUE(all.equal(
+    nf_final,
+    muren_to_norm_factors(
+      dge_final$samples$scaling_coeff, dge_final$samples$lib.size
+    )
+  )))
   message(sprintf(
-    "    norm.factors range: [%.4f, %.4f]", min(nf_final), max(nf_final)
+    "    norm.factors range: [%.4f, %.4f] ; scaling_coeff range: [%.4f, %.4f]",
+    min(nf_final), max(nf_final),
+    min(dge_final$samples$scaling_coeff), max(dge_final$samples$scaling_coeff)
   ))
 
   list(
