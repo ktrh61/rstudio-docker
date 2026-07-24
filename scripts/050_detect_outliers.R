@@ -1,54 +1,40 @@
-# 050_estimate_tumor_purity.R
-# Estimate relative tumor purity per case with ContamDE (MUREN normalization),
-# for the four analysis groups R_Sporadic / R_High / B_Sporadic / B_High.
-# Input : processed/thyr_se_raw.rds              (from 021; single count assay)
-#         processed/thyr_clinical.rds            (from 001; driver columns)
-#         processed/thyr_case_assigned_share.rds (from 041; dose_mgy, AS)
-#         utils/utils_improved.R, utils/norm_improved.R,
-#         utils/contamde_purity_functions.R
-# Output: processed/thyr_case_purity.rds
-#           columns: case_submitter_id, group, tumor_purity
-#
-# ContamDE outputs a relative purity score normalized within the set of pairs
-# passed together (the highest-purity pair is scaled to ~1), so estimation is
-# run per group and the score is comparable only within a group.
+# 050_detect_outliers.R
+# Assemble the analysis target cases (driver + exposure + paired) and flag
+# sample outliers with PC-OD, BEFORE tumor-purity estimation. Detecting
+# outliers first keeps the downstream ContamDE purity estimate (060) from being
+# contaminated by an anomalous sample.
+# Input : processed/thyr_clinical.rds             (from 001; driver columns)
+#         processed/thyr_case_assigned_share.rds  (from 041; dose_mgy, AS)
+#         processed/thyr_se_raw.rds                (from 021; single count assay)
+#         utils/PC-OD_improved.R                   (PC_OD)
+# Output: processed/thyr_case_outliers.rds
+#           columns: case_submitter_id, group, driver, exposure,
+#                    tumor_id, normal_id, has_outlier_tumor, has_outlier_normal
 #
 # Group definition (this dataset):
 #   driver  : BRAF  = Designated_Driver "BRAF.MutV600E" with no co-mutation
-#                     (WGS/RNA CandidateDriverMutation is BRAF-only or empty/NA)
 #             RET   = Designated_Driver in {CCDC6-RET, NCOA4-RET, RET-OTHER}
-#   exposure: from 041 dose_mgy. dose_mgy == 0 -> Sporadic ;
-#             dose_mgy > 0 with assigned_share_approx >= 66.6 -> High.
-#             Exposed cases with AS < 66.6 (Low/Mid) are out of scope here.
-#   group   = {R,B}_{Sporadic,High}
+#   exposure: dose_mgy == 0 -> Sporadic ; dose_mgy > 0 with AS >= 66.6 -> High.
+#   group   = {R,B}_{Sporadic,High} ; R = RET driver, B = BRAF driver.
 #
-# Pairs are the _merged Primary Tumor / Solid Tissue Normal sample of each case
-# (one of each; verified unique for this SE).
+# PC-OD runs on eight group x tissue sub-matrices over ALL target cases (no
+# purity filter). Each sub-matrix is filterByExpr-reduced and turned into
+# log-CPM without normalization (normalized.lib.sizes = FALSE, prior.count = 2,
+# the edgeR default), the natural pre-normalization scale for sample outlier
+# detection: raw library sizes preserve composition outliers that normalization
+# would mask, and the log scale keeps high-count genes from dominating.
 
 source("setup.R")
 
 suppressPackageStartupMessages({
   library(SummarizedExperiment)
   library(edgeR)
-  library(limma)
 })
 
-source(file.path(paths$root, "utils", "utils_improved.R"))
-source(file.path(paths$root, "utils", "norm_improved.R"))
-source(file.path(paths$root, "utils", "contamde_purity_functions.R"))
-
-# Canonical MUREN worker count used to generate the published analysis.
-workers <- 4L
-message("MUREN workers: ", workers, " (canonical setting)")
+source(file.path(paths$root, "utils", "PC-OD_improved.R"))
 
 # AS threshold (percent) separating High from Low/Mid among exposed cases.
 as_high_threshold <- 66.6
-
-# BLAS/OMP single-threaded (MUREN parallelizes the outer loop).
-if (requireNamespace("RhpcBLASctl", quietly = TRUE)) {
-  RhpcBLASctl::blas_set_num_threads(1L)
-  RhpcBLASctl::omp_set_num_threads(1L)
-}
 
 # --- Load inputs -----------------------------------------------------------
 se_path <- file.path(paths$processed, "thyr_se_raw.rds")
@@ -100,8 +86,7 @@ driver_tbl <- driver_tbl[!is.na(driver_tbl$driver), , drop = FALSE]
 
 # --- Exposure classification (041) -----------------------------------------
 # dose_mgy == 0 -> Sporadic ; dose_mgy > 0 with AS >= threshold -> High.
-# Other cases (dose_mgy NA, or exposed with AS < threshold) are not assigned an
-# exposure band and drop out of scope.
+# Other cases (dose_mgy NA, or exposed with AS < threshold) drop out of scope.
 as_tbl <- data.frame(
   case_submitter_id = as.character(assigned_share$REBC_ID),
   dose_mgy = as.numeric(assigned_share$dose_mgy),
@@ -122,7 +107,6 @@ as_tbl$exposure <- exposure
 cd <- as.data.frame(colData(se))
 is_merged <- grepl("_merged", cd$sample_submitter_id)
 m <- cd[is_merged, , drop = FALSE]
-
 t_rows <- m[m$sample_type == "Primary Tumor", , drop = FALSE]
 n_rows <- m[m$sample_type == "Solid Tissue Normal", , drop = FALSE]
 
@@ -157,102 +141,68 @@ targets <- merge(targets, pair_tbl, by = "case_submitter_id")
 
 prefix <- ifelse(targets$driver == "RET", "R", "B")
 targets$group <- paste0(prefix, "_", targets$exposure)
-
 message("Target cases by group:")
 print(table(targets$group))
 
-# --- Gene filter (protein_coding + filterByExpr) ---------------------------
-gene_info <- as.data.frame(rowData(se))
-is_protein_coding <- gene_info$gene_type == "protein_coding"
+# --- PC-OD per (group x tissue) --------------------------------------------
 counts_all <- assay(se)
 
-filter_genes <- function(normal_ids, tumor_ids) {
-  cg <- counts_all[, c(normal_ids, tumor_ids), drop = FALSE]
-  grp <- factor(c(
-    rep("Normal", length(normal_ids)),
-    rep("Tumor", length(tumor_ids))
-  ))
-  keep_expr <- edgeR::filterByExpr(cg, group = grp)
-  is_protein_coding & keep_expr
+run_pcod <- function(sample_ids) {
+  cts <- counts_all[, sample_ids, drop = FALSE]
+  y <- edgeR::DGEList(counts = cts)
+  keep <- edgeR::filterByExpr(y)
+  y <- y[keep, , keep.lib.sizes = TRUE]
+  logCPM <- edgeR::cpm(
+    y,
+    log = TRUE,
+    normalized.lib.sizes = FALSE,
+    prior.count = 2
+  )
+  PC_OD(logCPM)
 }
 
-# --- Per-group purity estimation -------------------------------------------
+targets$has_outlier_tumor <- 0L
+targets$has_outlier_normal <- 0L
+
 groups <- c("R_Sporadic", "R_High", "B_Sporadic", "B_High")
-purity_by_case <- list()
-
 for (g in groups) {
-  gi <- targets[targets$group == g, , drop = FALSE]
-  if (nrow(gi) == 0) {
-    message("Group ", g, ": no target pairs; skipped")
+  gi_idx <- which(targets$group == g)
+  if (length(gi_idx) == 0) {
+    message("Group ", g, ": no cases; skipped")
     next
   }
-  message("Group ", g, ": ", nrow(gi), " pairs")
+  gi <- targets[gi_idx, , drop = FALSE]
+  message("Group ", g, ": ", nrow(gi), " cases")
 
-  keep <- filter_genes(gi$normal_id, gi$tumor_id)
-  counts <- cbind(
-    counts_all[keep, gi$normal_id, drop = FALSE],
-    counts_all[keep, gi$tumor_id, drop = FALSE]
-  )
-  np <- nrow(gi)
-  colnames(counts) <- c(
-    paste0("Normal_", seq_len(np)),
-    paste0("Tumor_", seq_len(np))
-  )
+  out_t <- run_pcod(gi$tumor_id)
+  targets$has_outlier_tumor[gi_idx[out_t]] <- 1L
   message(
-    "  genes after filter: ", sum(keep), " ; matrix ",
-    nrow(counts), " x ", ncol(counts)
+    "  Tumor : ", length(out_t), " outlier(s)",
+    if (length(out_t)) paste0(" (", paste(gi$case_submitter_id[out_t], collapse = ", "), ")") else ""
   )
 
-  res <- tryCatch(
-    contamde_purity(
-      counts = counts,
-      subtype = NULL,
-      covariate = NULL,
-      contaminated = TRUE,
-      pairwise_method = "lts",
-      workers = workers,
-      verbose = FALSE
-    ),
-    error = function(e) {
-      warning("Group ", g, " purity estimation failed: ", conditionMessage(e))
-      NULL
-    }
+  out_n <- run_pcod(gi$normal_id)
+  targets$has_outlier_normal[gi_idx[out_n]] <- 1L
+  message(
+    "  Normal: ", length(out_n), " outlier(s)",
+    if (length(out_n)) paste0(" (", paste(gi$case_submitter_id[out_n], collapse = ", "), ")") else ""
   )
-
-  if (is.null(res)) {
-    purity_by_case[[g]] <- data.frame(
-      case_submitter_id = gi$case_submitter_id,
-      group = g,
-      tumor_purity = NA_real_,
-      stringsAsFactors = FALSE
-    )
-    next
-  }
-
-  purity_by_case[[g]] <- data.frame(
-    case_submitter_id = gi$case_submitter_id,
-    group = g,
-    tumor_purity = as.numeric(res$proportion),
-    stringsAsFactors = FALSE
-  )
-  message(sprintf(
-    "  purity: mean=%.3f sd=%.3f range=[%.3f, %.3f]",
-    mean(res$proportion), sd(res$proportion),
-    min(res$proportion), max(res$proportion)
-  ))
 }
 
 # --- Assemble and save -----------------------------------------------------
-thyr_case_purity <- do.call(rbind, purity_by_case)
-rownames(thyr_case_purity) <- NULL
-thyr_case_purity <- thyr_case_purity[
-  order(thyr_case_purity$group, thyr_case_purity$case_submitter_id), ,
-  drop = FALSE
-]
+out_tbl <- targets[, c(
+  "case_submitter_id", "group", "driver", "exposure",
+  "tumor_id", "normal_id", "has_outlier_tumor", "has_outlier_normal"
+), drop = FALSE]
+out_tbl <- out_tbl[order(out_tbl$group, out_tbl$case_submitter_id), , drop = FALSE]
+rownames(out_tbl) <- NULL
 
-out <- file.path(paths$processed, "thyr_case_purity.rds")
-saveRDS(thyr_case_purity, out)
+message("Cases with a tumor outlier : ", sum(out_tbl$has_outlier_tumor))
+message("Cases with a normal outlier: ", sum(out_tbl$has_outlier_normal))
+
+out <- file.path(paths$processed, "thyr_case_outliers.rds")
+saveRDS(out_tbl, out)
 message(
-  "Saved: ", out, " (", nrow(thyr_case_purity), " cases x ",
-  ncol(thyr_case_purity), " columns)"
+  "Saved: ", out, " (", nrow(out_tbl), " cases x ",
+  ncol(out_tbl), " columns)"
 )

@@ -1,9 +1,10 @@
 # 070_normalize_counts.R
-# DEGES normalization of the clean paired samples from 060, per two-group
-# comparison and tissue. The DEGES core (MUREN normalization + permutation
-# Brunner-Munzel screening, TCC X-Y-X) lives in utils/deges_muren_bm.R; this
-# script prepares each unit's count matrix and runs it.
-# Input : processed/thyr_case_outliers.rds  (from 060)
+# DEGES normalization of the high-purity paired samples, per two-group
+# comparison and tissue. Cases are the outlier-removed (050), pooled-purity
+# (060) cases whose relative purity clears PURITY_THRESHOLD. The DEGES core
+# (MUREN normalization + permutation Brunner-Munzel screening, TCC X-Y-X) lives
+# in utils/deges_muren_bm.R; this script prepares each unit's count matrix.
+# Input : processed/thyr_case_purity.rds    (from 060; case, group, tumor_purity)
 #         processed/thyr_se_raw.rds         (from 021; single count assay)
 #         utils/utils_improved.R, utils/norm_improved.R   (muren_norm)
 #         utils/brunnermunzel_mc.R          (brunnermunzel_mc_test)
@@ -30,6 +31,7 @@ source(file.path(paths$root, "utils", "brunnermunzel_mc.R"))
 source(file.path(paths$root, "utils", "deges_muren_bm.R"))
 
 # --- Configuration ---------------------------------------------------------
+PURITY_THRESHOLD <- 0.6 # min pooled (common-scale) relative purity to include
 ITERATION <- 3L # DEGES iterations (exact count; iDEGES)
 FDR <- 0.10 # BH adjusted-p cutoff for potential DEGs
 FLOOR_PDEG <- 0.05 # floorPDEG fraction forced as potential DEGs (TCC)
@@ -62,12 +64,12 @@ if (requireNamespace("RhpcBLASctl", quietly = TRUE)) {
 }
 
 # --- Load inputs -----------------------------------------------------------
-outliers_path <- file.path(paths$processed, "thyr_case_outliers.rds")
-if (!file.exists(outliers_path)) {
-  stop("thyr_case_outliers.rds not found (run 060 first)")
+purity_path <- file.path(paths$processed, "thyr_case_purity.rds")
+if (!file.exists(purity_path)) {
+  stop("thyr_case_purity.rds not found (run 060 first)")
 }
-outliers <- readRDS(outliers_path)
-message("Outlier table: ", nrow(outliers), " cases")
+purity <- readRDS(purity_path)
+message("Purity table: ", nrow(purity), " cases (outlier-removed by 050)")
 
 se_path <- file.path(paths$processed, "thyr_se_raw.rds")
 if (!file.exists(se_path)) stop("thyr_se_raw.rds not found (run 021 first)")
@@ -77,14 +79,16 @@ message(
   assayNames(se)
 )
 
-# --- Select clean cases ----------------------------------------------------
-# A clean case has neither a tumor nor a normal outlier flag from 060.
-clean <- outliers[
-  outliers$has_outlier_tumor == 0 & outliers$has_outlier_normal == 0, ,
-  drop = FALSE
-]
-message("Clean cases: ", nrow(clean), " / ", nrow(outliers))
-message("Clean cases by group:")
+# --- Select high-purity cases ----------------------------------------------
+# Outliers were already removed by 050 before purity estimation; here we keep
+# cases whose pooled (common-scale) relative purity clears the threshold. The
+# threshold lives here so a sensitivity check re-runs only 070, not the 060
+# ContamDE step.
+clean <- purity[purity$tumor_purity >= PURITY_THRESHOLD, , drop = FALSE]
+message(sprintf(
+  "High-purity cases (>= %.2f): %d / %d", PURITY_THRESHOLD, nrow(clean), nrow(purity)
+))
+message("Selected cases by group:")
 print(table(clean$group))
 
 # --- Resolve _merged Tumor / Normal sample per case ------------------------
