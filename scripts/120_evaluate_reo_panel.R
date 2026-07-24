@@ -25,6 +25,7 @@ suppressPackageStartupMessages({
 })
 
 source(file.path(paths$root, "utils", "reo_tpm.R"))
+source(file.path(paths$root, "utils", "brunnermunzel_mc.R"))
 
 # AS bands (percent). High (>= 66.6) is the training arm; these are below it.
 AS_LOW_MAX <- 33.3
@@ -91,17 +92,30 @@ reversal_score <- function(l2tpm, samples, panel, dead_zone) {
 }
 as_tbl$score <- reversal_score(log2_tpm, as_tbl$tumor_id, panel, dead_zone)
 
-classify <- function(score, b) {
-  ifelse(score <= b$negative_max & (b$has_gap | score < b$positive_min), "negative",
-    ifelse(score >= b$positive_min & (b$has_gap | score > b$negative_max), "positive",
-      "undetermined"))
-}
+# --- Read A: classification vs the R0-based threshold -----------------------
+classify <- function(score, b) ifelse(score > b$negative_max, "positive", "negative")
 as_tbl$class <- classify(as_tbl$score, boundary)
+
+# --- Read B: graded increase Low -> Mid (out-of-sample, permutation BM) -----
+# Two ordered bands, so the ordered-alternative (Jonckheere-Terpstra) test is a
+# one-sided Brunner-Munzel: is the R_Mid reversal score stochastically greater
+# than R_Low? BM is used (not Wilcoxon) for the same reason as the main
+# analysis: the mixture makes the arms unequally dispersed. Training arms
+# (Sporadic/High) are NOT in this test -- they are shown only for the figure.
+low_score <- as_tbl$score[as_tbl$band == "R_Low"]
+mid_score <- as_tbl$score[as_tbl$band == "R_Mid"]
+bm_low_mid <- brunnermunzel_mc_test(
+  low_score, mid_score, alternative = "less", method = "auto", seed = 19860426L
+)
+message(sprintf(
+  "\nRead B (out-of-sample): Mid > Low reversal score, one-sided BM p = %.4f (%s), effect P(Low<Mid)=%.3f",
+  bm_low_mid$p.value, attr(bm_low_mid, "mc")$method, unname(bm_low_mid$estimate)
+))
 
 # --- Report: graded validation ---------------------------------------------
 n_pairs <- nrow(panel)
-message(sprintf("\nPanel size %d ; boundary negative<=%d positive>=%d",
-  n_pairs, boundary$negative_max, boundary$positive_min))
+message(sprintf("\nPanel size %d ; R0-based positive threshold: score > %d",
+  n_pairs, boundary$negative_max))
 message("Reversal score by exposure band (training arms shown for reference):")
 tr <- reo$training
 ref <- data.frame(
@@ -128,7 +142,17 @@ thyr_reo_evaluation <- list(
     panel_size = n_pairs, note = "R_Low/R_Mid unfiltered for purity/outliers"),
   samples = as_tbl[, c("case_submitter_id", "band", "assigned_share",
     "dose_mgy", "tumor_id", "score", "class")],
-  summary = summary_tbl
+  summary = summary_tbl,
+  # Read A: R0-based threshold classification. Read B: out-of-sample ordered
+  # test on Low vs Mid only (training arms excluded). Sporadic/High are for the
+  # graded figure, not the inference.
+  read_A_threshold = boundary$negative_max,
+  read_B = list(
+    test = "one-sided Brunner-Munzel, Mid > Low reversal score",
+    method = attr(bm_low_mid, "mc")$method,
+    p_value = bm_low_mid$p.value,
+    effect_P_low_lt_mid = unname(bm_low_mid$estimate)
+  )
 )
 out_rds <- file.path(paths$processed, "thyr_reo_evaluation.rds")
 saveRDS(thyr_reo_evaluation, out_rds)

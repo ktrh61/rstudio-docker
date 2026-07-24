@@ -97,32 +97,19 @@ r1_score <- reversal_score(log2_tpm, r1_samples, panel)
 message(sprintf("R0 score range [%d, %d] ; R1 score range [%d, %d]",
   min(r0_score), max(r0_score), min(r1_score), max(r1_score)))
 
-# --- Data-driven boundary zone ---------------------------------------------
+# --- Boundary: threshold from the Sporadic (R0) arm only -------------------
+# The training High arm (R1) is a mixture and contains Sporadic-like cases with
+# zero reversals, so a min(R1)-based positive threshold collapses. Instead a
+# sample scores positive when it shows MORE pair reversals than any Sporadic
+# case: threshold = max(R0 score). This is mixture-robust and interpretable, and
+# is the classification-based read (A) of the panel; the graded permutation read
+# (B) is done out-of-sample in 120.
 max_r0 <- max(r0_score)
-min_r1 <- min(r1_score)
-has_gap <- max_r0 < min_r1
-boundary <- list(
-  negative_max = max_r0,
-  positive_min = min_r1,
-  has_gap = has_gap,
-  undetermined = if (has_gap) {
-    if (min_r1 - max_r0 > 1) (max_r0 + 1):(min_r1 - 1) else integer(0)
-  } else {
-    min_r1:max_r0
-  }
-)
-message(sprintf(
-  "Boundary: negative <= %d, positive >= %d, %s",
-  max_r0, min_r1,
-  if (has_gap) sprintf("gap of %d (clean separation)", min_r1 - max_r0 - 1)
-  else sprintf("overlap of %d", max_r0 - min_r1 + 1)
-))
-
+boundary <- list(negative_max = max_r0, positive_min = max_r0 + 1L)
 classify <- function(score, b) {
-  ifelse(score <= b$negative_max & (b$has_gap | score < b$positive_min), "negative",
-    ifelse(score >= b$positive_min & (b$has_gap | score > b$negative_max), "positive",
-      "undetermined"))
+  ifelse(score > b$negative_max, "positive", "negative")
 }
+message(sprintf("Boundary (R0-based): positive if score > %d", max_r0))
 message("Training classification (R0 Sporadic / R1 High):")
 print(table(arm = c(rep("R0", length(r0_score)), rep("R1", length(r1_score))),
   class = c(classify(r0_score, boundary), classify(r1_score, boundary))))
