@@ -14,16 +14,14 @@
 #           DGEList with DEGES-MUREN norm.factors and a diagnostics list.
 #
 # Units: R_Sporadic vs R_High and B_Sporadic vs B_High, each x {Tumor, Normal}.
-# Per unit: protein_coding -> filterByExpr -> Cook's transient removal -> the
-# DEGES core. The returned scaling coefficients are applied to the filterByExpr
-# DGEList (before Cook's removal).
+# Per unit: protein_coding -> filterByExpr -> the DEGES core. The returned
+# scaling coefficients are applied to the filterByExpr DGEList.
 
 source("setup.R")
 
 suppressPackageStartupMessages({
   library(SummarizedExperiment)
   library(edgeR)
-  library(DESeq2)
 })
 
 source(file.path(paths$root, "utils", "utils_improved.R"))
@@ -35,7 +33,6 @@ source(file.path(paths$root, "utils", "deges_muren_bm.R"))
 ITERATION <- 3L # DEGES iterations (exact count; iDEGES)
 FDR <- 0.10 # BH adjusted-p cutoff for potential DEGs
 FLOOR_PDEG <- 0.05 # floorPDEG fraction forced as potential DEGs (TCC)
-COOKS_QUANTILE <- 0.99 # Cook's distance F-quantile cutoff
 MUREN_METHOD <- "lts" # MUREN pairwise regression
 WORKERS <- 16L # MUREN parallel workers
 
@@ -112,32 +109,6 @@ gene_info <- as.data.frame(rowData(se))
 is_protein_coding <- gene_info$gene_type == "protein_coding"
 counts_all <- assay(se)
 
-# --- Cook's distance outlier genes (DESeq2) --------------------------------
-# Transient removal for normalization only; the reported gene set is unchanged.
-detect_cook_outliers <- function(count_matrix, sample_groups, quantile_cutoff) {
-  coldata <- data.frame(
-    group = factor(sample_groups),
-    row.names = colnames(count_matrix)
-  )
-  dds <- DESeqDataSetFromMatrix(
-    countData = count_matrix, colData = coldata, design = ~group
-  )
-  dds <- estimateSizeFactors(dds)
-  dds <- estimateDispersions(dds)
-  dds <- nbinomWaldTest(dds)
-  cooks <- assays(dds)[["cooks"]]
-
-  n_samples <- ncol(count_matrix)
-  n_params <- ncol(model.matrix(~ factor(sample_groups)))
-  f_cutoff <- qf(quantile_cutoff, df1 = n_params, df2 = n_samples - n_params)
-
-  max_cooks <- apply(cooks, 1, function(x) {
-    if (all(is.na(x))) NA_real_ else max(x, na.rm = TRUE)
-  })
-  outliers <- !is.na(max_cooks) & max_cooks > f_cutoff
-  list(outliers = outliers, threshold = f_cutoff, outlier_count = sum(outliers))
-}
-
 # --- Normalize one unit (comparison x tissue) ------------------------------
 process_unit <- function(samples1, samples2, group_labels) {
   sample_groups <- c(
@@ -158,20 +129,9 @@ process_unit <- function(samples1, samples2, group_labels) {
     " ; after filterByExpr: ", nrow(count_matrix_filtered)
   )
 
-  # Cook's distance transient removal (normalization only)
-  cook <- detect_cook_outliers(
-    count_matrix_filtered, sample_groups, COOKS_QUANTILE
-  )
-  count_for_norm <- if (cook$outlier_count > 0) {
-    count_matrix_filtered[!cook$outliers, , drop = FALSE]
-  } else {
-    count_matrix_filtered
-  }
-  message("    Cook's outlier genes: ", cook$outlier_count)
-
-  # TCC-faithful DEGES core (MUREN + MC Brunner-Munzel) on the Cook-removed set.
+  # TCC-faithful DEGES core (MUREN + Brunner-Munzel) on the filterByExpr set.
   deges <- deges_muren_bm(
-    counts = count_for_norm, group = sample_groups,
+    counts = count_matrix_filtered, group = sample_groups,
     iteration = ITERATION, fdr = FDR, floor_pdeg = FLOOR_PDEG,
     n_perm = BM_MC_B, seed = BM_MC_SEED,
     alternative = BM_MC_ALTERNATIVE, est = BM_MC_EST,
@@ -179,8 +139,8 @@ process_unit <- function(samples1, samples2, group_labels) {
     muren_method = MUREN_METHOD, workers = WORKERS
   )
 
-  # Apply the final scaling coefficients to the filterByExpr DGEList (before
-  # Cook's removal); carry norm.factors and the MUREN coefficients on samples.
+  # Apply the final scaling coefficients to the filterByExpr DGEList; carry
+  # norm.factors and the MUREN coefficients on samples.
   dge_final <- DGEList(
     counts = count_matrix_filtered,
     group = factor(sample_groups),
@@ -214,8 +174,6 @@ process_unit <- function(samples1, samples2, group_labels) {
       n_samples = c(length(samples1), length(samples2)),
       n_protein_coding = nrow(count_matrix),
       n_after_filter = nrow(count_matrix_filtered),
-      cook_outliers = cook$outlier_count,
-      cook_threshold = cook$threshold,
       n_iterations = deges$iterations$n,
       iter_n_genes = deges$iterations$n_non_deg,
       iter_deg_count = deges$iterations$deg_count,
@@ -260,7 +218,6 @@ thyr_normalized_counts <- list(
     iteration = ITERATION,
     fdr = FDR,
     floor_pdeg = FLOOR_PDEG,
-    cooks_quantile = COOKS_QUANTILE,
     muren_method = MUREN_METHOD,
     workers = WORKERS,
     bm_test = "permutation_brunnermunzel",
