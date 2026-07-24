@@ -1,6 +1,6 @@
 # 070_normalize_counts.R
 # DEGES normalization of the clean paired samples from 060, per two-group
-# comparison and tissue. The DEGES core (MUREN normalization + Monte Carlo
+# comparison and tissue. The DEGES core (MUREN normalization + permutation
 # Brunner-Munzel screening, TCC X-Y-X) lives in utils/deges_muren_bm.R; this
 # script prepares each unit's count matrix and runs it.
 # Input : processed/thyr_case_outliers.rds  (from 060)
@@ -39,11 +39,24 @@ COOKS_QUANTILE <- 0.99 # Cook's distance F-quantile cutoff
 MUREN_METHOD <- "lts" # MUREN pairwise regression
 WORKERS <- 16L # MUREN parallel workers
 
-# Monte Carlo Brunner-Munzel screening (utils/brunnermunzel_mc.R).
-BM_MC_B <- 999999L # Monte Carlo permutations
+# Brunner-Munzel screening (utils/brunnermunzel_mc.R).
+# "auto" enumerates all C(n, nx) allocations exactly when that is affordable
+# and samples otherwise. Both units here are well inside the budget
+# (C(28,12) = 3.0e7 and C(36,9) = 9.4e7), so the screen's p-values are exact:
+# no 1/(B + 1) floor, no sampling error, and no dependence on BM_MC_SEED.
+# BM_MC_B / BM_MC_SEED apply only if a unit ever falls back to sampling.
+BM_METHOD <- "auto"
+BM_EXACT_MAX <- 1e8 # largest C(n, nx) still enumerated exactly
+BM_EXACT_THREADS <- 16L # threads for the enumeration
+BM_MC_B <- 999999L # Monte Carlo permutations (fallback only)
 BM_MC_SEED <- 19860426L # fixed seed (Chernobyl accident date 1986-04-26)
 BM_MC_ALTERNATIVE <- "two.sided"
 BM_MC_EST <- "original"
+
+options(
+  brunnermunzel.exact.max.allocations = BM_EXACT_MAX,
+  brunnermunzel.exact.threads = BM_EXACT_THREADS
+)
 
 # BLAS/OMP single-threaded (MUREN parallelizes the outer loop).
 if (requireNamespace("RhpcBLASctl", quietly = TRUE)) {
@@ -162,6 +175,7 @@ process_unit <- function(samples1, samples2, group_labels) {
     iteration = ITERATION, fdr = FDR, floor_pdeg = FLOOR_PDEG,
     n_perm = BM_MC_B, seed = BM_MC_SEED,
     alternative = BM_MC_ALTERNATIVE, est = BM_MC_EST,
+    bm_method = BM_METHOD,
     muren_method = MUREN_METHOD, workers = WORKERS
   )
 
@@ -238,7 +252,9 @@ thyr_normalized_counts <- list(
     cooks_quantile = COOKS_QUANTILE,
     muren_method = MUREN_METHOD,
     workers = WORKERS,
-    bm_test = "monte_carlo_brunnermunzel",
+    bm_test = "permutation_brunnermunzel",
+    bm_method = BM_METHOD,
+    bm_exact_max = BM_EXACT_MAX,
     bm_B = BM_MC_B,
     bm_seed = BM_MC_SEED,
     bm_alternative = BM_MC_ALTERNATIVE,

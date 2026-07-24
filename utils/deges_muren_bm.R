@@ -1,14 +1,20 @@
 # deges_muren_bm.R
 # TCC-faithful DEGES normalization (the X-Y-X / iDEGES protocol of TCC; Kadota
-# et al.) with MUREN as the normalizer and a Monte Carlo studentized
-# Brunner-Munzel permutation test as the DEG screen. MUREN replaces TMM and the
-# Monte Carlo Brunner-Munzel test replaces edgeR's exact test; the iteration,
-# floorPDEG screen, and degenerate guard follow TCC::calcNormFactors.
+# et al.) with MUREN as the normalizer and a studentized Brunner-Munzel
+# permutation test as the DEG screen. MUREN replaces TMM and the Brunner-Munzel
+# test replaces edgeR's exact test; the iteration, floorPDEG screen, and
+# degenerate guard follow TCC::calcNormFactors.
 #
 # Requires (sourced by the caller before use):
 #   utils/norm_improved.R      (muren_norm)
-#   utils/brunnermunzel_mc.R   (brunnermunzel_mc_test)
+#   utils/brunnermunzel_mc.R   (brunnermunzel_pvalues)
 #   package edgeR
+#
+# `bm_method` selects how the screen's permutation p-values are obtained:
+# "auto" (default) enumerates all C(n, nx) allocations exactly when that is
+# affordable and samples otherwise, "exact" and "mc" force the choice. `est`
+# is accepted for call compatibility only -- it selects the effect-size
+# parameterization, which the DEG screen never reads.
 #
 # deges_muren_bm(counts, group, iteration, fdr, floor_pdeg, ...) runs, on a
 # fixed gene x sample count matrix:
@@ -57,35 +63,40 @@ muren_to_norm_factors <- function(scaling_coeff, lib_size) {
   sc
 }
 
-# --- Per-gene Monte Carlo Brunner-Munzel p-values --------------------------
-# The same n_perm/seed/alternative/est go to every gene; a fixed seed
-# makes the result reproducible and enables the null-distribution cache.
+# --- Per-gene permutation Brunner-Munzel p-values --------------------------
+# All genes go through one call: those sharing a tie pattern share a single
+# exact enumeration (or a single Monte Carlo null). With bm_method = "auto"
+# the p-values are exact whenever C(n, nx) is small enough to enumerate, so
+# the screen carries no sampling error, no 1/(n_perm + 1) floor, and no seed
+# dependence. That sharpens the floorPDEG ranking; it does not by itself make
+# the BH cutoff fire, which is limited by the heavy tail of the permutation
+# null at these group sizes rather than by p-value resolution.
 .deges_bm_pvalues <- function(cpm_matrix, group, group_levels,
-                              n_perm, seed, alternative, est) {
+                              n_perm, seed, alternative, bm_method) {
   g1 <- which(group == group_levels[1])
   g2 <- which(group == group_levels[2])
-  n_genes <- nrow(cpm_matrix)
-  pvalues <- numeric(n_genes)
-  for (i in seq_len(n_genes)) {
-    pvalues[i] <- brunnermunzel_mc_test(
-      cpm_matrix[i, g1], cpm_matrix[i, g2],
-      alternative = alternative, est = est, B = n_perm, seed = seed
-    )$p.value
-  }
-  pvalues
+  as.numeric(brunnermunzel_pvalues(
+    cpm_matrix[, c(g1, g2), drop = FALSE],
+    nx = length(g1),
+    alternative = alternative,
+    B = n_perm,
+    seed = seed,
+    method = bm_method
+  ))
 }
 
-# --- DEGES normalization (MUREN + MC Brunner-Munzel) -----------------------
+# --- DEGES normalization (MUREN + permutation Brunner-Munzel) --------------
 deges_muren_bm <- function(counts, group, iteration = 1L,
                            fdr, floor_pdeg,
                            n_perm, seed, alternative = "two.sided",
                            est = "original",
+                           bm_method = "auto",
                            muren_method = "lts", workers = 3L) {
   if (!exists("muren_norm", mode = "function", inherits = TRUE)) {
     stop("muren_norm() must be loaded (source utils/norm_improved.R).")
   }
-  if (!exists("brunnermunzel_mc_test", mode = "function", inherits = TRUE)) {
-    stop("brunnermunzel_mc_test() must be loaded (utils/brunnermunzel_mc.R).")
+  if (!exists("brunnermunzel_pvalues", mode = "function", inherits = TRUE)) {
+    stop("brunnermunzel_pvalues() must be loaded (utils/brunnermunzel_mc.R).")
   }
   group <- factor(group)
   group_levels <- levels(group)
@@ -114,7 +125,7 @@ deges_muren_bm <- function(counts, group, iteration = 1L,
       full_dge, normalized.lib.sizes = TRUE, prior.count = 0, log = FALSE
     )
     pvalues <- .deges_bm_pvalues(
-      cpm_matrix, group, group_levels, n_perm, seed, alternative, est
+      cpm_matrix, group, group_levels, n_perm, seed, alternative, bm_method
     )
     p_adj <- p.adjust(pvalues, method = "BH")
 
