@@ -5,9 +5,8 @@
 # attributable signal, reversal scores should grade with assigned share:
 # Sporadic (train R0) < R_Low < R_Mid < High (train R1). This is exploratory and
 # descriptive; it does not alter the panel or its boundary.
-# Input : processed/thyr_reo_panel.rds             (from 110; panel + boundary)
-#         processed/thyr_clinical.rds              (from 030; driver)
-#         processed/thyr_case_assigned_share.rds   (from 130; dose, AS)
+# Input : processed/thyr_reo_panel.rds             (from 520; panel + boundary)
+#         processed/thyr_analysis_cohorts.rds      (from 230; include_reo_evaluation)
 #         processed/thyr_se_raw.rds                (from 120; stranded_second)
 #         processed/gene_lengths.rds               (from 020)
 #         lib/reo.R
@@ -28,54 +27,35 @@ source(file.path(paths$root, "lib", "reo.R"))
 source(file.path(paths$root, "lib", "stat_brunnermunzel.R"))
 
 # AS bands (percent). High (>= 66.6) is the training arm; these are below it.
-AS_LOW_MAX <- 33.3
-AS_MID_MAX <- 66.6
+# AS band boundaries come from config.R (AS_LOW_MAX / AS_HIGH_MIN); the band
+# assignment itself is fixed upstream in 140/230.
 
 # --- Load inputs -----------------------------------------------------------
 panel_path <- file.path(paths$processed, "thyr_reo_panel.rds")
-clin_path <- file.path(paths$processed, "thyr_clinical.rds")
-as_path <- file.path(paths$processed, "thyr_case_assigned_share.rds")
+cohorts_path <- file.path(paths$processed, "thyr_analysis_cohorts.rds")
 se_path <- file.path(paths$processed, "thyr_se_raw.rds")
 len_path <- file.path(paths$processed, "gene_lengths.rds")
-for (p in c(panel_path, clin_path, as_path, se_path, len_path)) {
+for (p in c(panel_path, cohorts_path, se_path, len_path)) {
   if (!file.exists(p)) stop("missing input: ", p)
 }
 reo <- readRDS(panel_path)
 panel <- reo$panel
 boundary <- reo$boundary
 dead_zone <- reo$config$dead_zone
-clinical <- readRDS(clin_path)
-assigned_share <- as.data.frame(readRDS(as_path))
+cohorts <- readRDS(cohorts_path)
 se <- readRDS(se_path)
 gene_lengths <- readRDS(len_path)
 
-# --- Identify R_Low / R_Mid RET tumours ------------------------------------
-ret_values <- c("CCDC6-RET", "NCOA4-RET", "RET-OTHER")
-ret_cases <- as.character(clinical$REBC_ID)[clinical$Designated_Driver %in% ret_values]
-
+# --- R_Low / R_Mid RET tumours (adoption fixed in 230) ---------------------
+eval_cases <- cohorts[cohorts$include_reo_evaluation, , drop = FALSE]
 as_tbl <- data.frame(
-  case_submitter_id = as.character(assigned_share$REBC_ID),
-  dose_mgy = as.numeric(assigned_share$dose_mgy),
-  assigned_share = as.numeric(assigned_share$assigned_share_approx),
+  case_submitter_id = eval_cases$case_submitter_id,
+  dose_mgy = eval_cases$dose_mgy,
+  assigned_share = eval_cases$assigned_share_approx,
+  band = paste0("R_", eval_cases$band),
+  tumor_id = eval_cases$tumor_id,
   stringsAsFactors = FALSE
 )
-as_tbl <- as_tbl[as_tbl$case_submitter_id %in% ret_cases &
-  is.finite(as_tbl$dose_mgy) & as_tbl$dose_mgy > 0 &
-  is.finite(as_tbl$assigned_share), , drop = FALSE]
-band <- ifelse(as_tbl$assigned_share <= AS_LOW_MAX, "R_Low",
-  ifelse(as_tbl$assigned_share <= AS_MID_MAX, "R_Mid", NA_character_))
-as_tbl$band <- band
-as_tbl <- as_tbl[!is.na(as_tbl$band), , drop = FALSE]
-
-# Paired _merged Primary Tumor sample per case.
-cd <- as.data.frame(colData(se))
-m <- cd[grepl("_merged", cd$sample_submitter_id), , drop = FALSE]
-tumor_of <- setNames(
-  m$sample_submitter_id[m$sample_type == "Primary Tumor"],
-  m$case_submitter_id[m$sample_type == "Primary Tumor"]
-)
-as_tbl$tumor_id <- unname(tumor_of[as_tbl$case_submitter_id])
-as_tbl <- as_tbl[!is.na(as_tbl$tumor_id), , drop = FALSE]
 message("Intermediate RET tumours: ",
   paste(names(table(as_tbl$band)), table(as_tbl$band), sep = "=", collapse = " "))
 
@@ -138,7 +118,7 @@ print(table(band = as_tbl$band, class = as_tbl$class))
 # --- Assemble and save -----------------------------------------------------
 thyr_reo_evaluation <- list(
   date = Sys.Date(),
-  config = list(as_low_max = AS_LOW_MAX, as_mid_max = AS_MID_MAX,
+  config = list(as_low_max = AS_LOW_MAX, as_mid_max = AS_HIGH_MIN,
     panel_size = n_pairs, note = "R_Low/R_Mid unfiltered for purity/outliers"),
   samples = as_tbl[, c("case_submitter_id", "band", "assigned_share",
     "dose_mgy", "tumor_id", "score", "class")],

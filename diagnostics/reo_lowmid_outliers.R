@@ -4,9 +4,9 @@
 # whether the graded reversal-score relationship and the Mid > Low test survive
 # removing any flagged sample. Provisional: not wired into the pipeline; mirrors
 # 210_detect_outliers.R's PC-OD but on the intermediate-exposure bands.
-# Input : processed/thyr_clinical.rds, thyr_case_assigned_share.rds,
+# Input : processed/thyr_case_design.rds (from 140),
 #         thyr_se_raw.rds, thyr_reo_evaluation.rds
-#         lib/qc_pc_od.R, lib/reo_lowmid_cases.R, lib/stat_brunnermunzel.R
+#         lib/qc_pc_od.R, lib/stat_brunnermunzel.R
 # Output: processed/thyr_reo_lowmid_outliers_provisional.rds
 
 source("setup.R")
@@ -15,16 +15,23 @@ suppressPackageStartupMessages({
   library(edgeR)
 })
 source(file.path(paths$root, "lib", "qc_pc_od.R"))
-source(file.path(paths$root, "lib", "reo_lowmid_cases.R"))
 source(file.path(paths$root, "lib", "stat_brunnermunzel.R"))
 
-# --- Load and resolve R_Low / R_Mid tumours --------------------------------
-clinical <- readRDS(file.path(paths$processed, "thyr_clinical.rds"))
-assigned_share <- as.data.frame(readRDS(file.path(paths$processed, "thyr_case_assigned_share.rds")))
+# --- Load and resolve R_Low / R_Mid tumours (from the design table) --------
+design <- readRDS(file.path(paths$processed, "thyr_case_design.rds"))
 se <- readRDS(file.path(paths$processed, "thyr_se_raw.rds"))
 eval <- readRDS(file.path(paths$processed, "thyr_reo_evaluation.rds"))
 
-cases <- resolve_ret_exposure_cases(clinical, assigned_share, se)
+ret <- design[design$driver %in% "RET" & !is.na(design$band), , drop = FALSE]
+cases <- data.frame(
+  case_submitter_id = ret$case_submitter_id,
+  dose_mgy = ret$dose_mgy,
+  assigned_share = ret$assigned_share_approx,
+  band = paste0("R_", ret$band),
+  tumor_id = ret$tumor_id,
+  normal_id = ret$normal_id,
+  stringsAsFactors = FALSE
+)
 cases <- cases[cases$band %in% c("R_Low", "R_Mid") & !is.na(cases$tumor_id), , drop = FALSE]
 message("R_Low/Mid tumours: ",
   paste(names(table(cases$band)), table(cases$band), sep = "=", collapse = " "))

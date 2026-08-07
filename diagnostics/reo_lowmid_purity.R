@@ -6,10 +6,10 @@
 # independent of purity, purity filtering the validation set would not change the
 # conclusion; if correlated, a full re-filter (deferred layer 2) is warranted.
 # Provisional: not wired into the pipeline; mirrors 220 pooled ContamDE.
-# Input : processed/thyr_clinical.rds, thyr_case_assigned_share.rds,
+# Input : processed/thyr_case_design.rds (from 140),
 #         thyr_se_raw.rds, thyr_reo_evaluation.rds
 #         lib/norm_muren_helpers.R, lib/norm_muren.R,
-#         lib/purity_contamde.R, lib/reo_lowmid_cases.R
+#         lib/purity_contamde.R
 # Output: processed/thyr_reo_lowmid_purity_provisional.rds
 
 source("setup.R")
@@ -21,18 +21,25 @@ suppressPackageStartupMessages({
 source(file.path(paths$root, "lib", "norm_muren_helpers.R"))
 source(file.path(paths$root, "lib", "norm_muren.R"))
 source(file.path(paths$root, "lib", "purity_contamde.R"))
-source(file.path(paths$root, "lib", "reo_lowmid_cases.R"))
 
 # WORKERS comes from config.R via setup.R (development 16L; canonical is 4L).
 pin_blas_threads()
 
-# --- Resolve the whole RET cohort (all four bands) with normal pairs --------
-clinical <- readRDS(file.path(paths$processed, "thyr_clinical.rds"))
-assigned_share <- as.data.frame(readRDS(file.path(paths$processed, "thyr_case_assigned_share.rds")))
+# --- Resolve the whole RET cohort (all four bands) from the design table ----
+design <- readRDS(file.path(paths$processed, "thyr_case_design.rds"))
 se <- readRDS(file.path(paths$processed, "thyr_se_raw.rds"))
 eval <- readRDS(file.path(paths$processed, "thyr_reo_evaluation.rds"))
 
-cases <- resolve_ret_exposure_cases(clinical, assigned_share, se)
+ret <- design[design$driver %in% "RET" & !is.na(design$band), , drop = FALSE]
+cases <- data.frame(
+  case_submitter_id = ret$case_submitter_id,
+  dose_mgy = ret$dose_mgy,
+  assigned_share = ret$assigned_share_approx,
+  band = paste0("R_", ret$band),
+  tumor_id = ret$tumor_id,
+  normal_id = ret$normal_id,
+  stringsAsFactors = FALSE
+)
 cases <- cases[!is.na(cases$tumor_id) & !is.na(cases$normal_id), , drop = FALSE]
 message("RET cohort with pairs: ",
   paste(names(table(cases$band)), table(cases$band), sep = "=", collapse = " "))

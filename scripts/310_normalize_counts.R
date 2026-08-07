@@ -1,10 +1,10 @@
 # 310_normalize_counts.R
 # DEGES normalization of the high-purity paired samples, per two-group
-# comparison and tissue. Cases are the outlier-removed (210), pooled-purity
-# (220) cases whose relative purity clears PURITY_THRESHOLD. The DEGES core
+# comparison and tissue. Case adoption (outlier-removed, purity-passing) is
+# fixed upstream in 230 (include_main_bm). The DEGES core
 # (MUREN normalization + permutation Brunner-Munzel screening, TCC X-Y-X) lives
 # in lib/norm_deges.R; this script prepares each unit's count matrix.
-# Input : processed/thyr_case_purity.rds    (from 220; case, group, tumor_purity)
+# Input : processed/thyr_analysis_cohorts.rds (from 230; include_main_bm)
 #         processed/thyr_se_raw.rds         (from 120; single count assay)
 #         lib/norm_muren_helpers.R, lib/norm_muren.R   (muren_norm)
 #         lib/stat_brunnermunzel.R          (brunnermunzel_mc_test)
@@ -57,12 +57,11 @@ options(
 pin_blas_threads()
 
 # --- Load inputs -----------------------------------------------------------
-purity_path <- file.path(paths$processed, "thyr_case_purity.rds")
-if (!file.exists(purity_path)) {
-  stop("thyr_case_purity.rds not found (run 220 first)")
+cohorts_path <- file.path(paths$processed, "thyr_analysis_cohorts.rds")
+if (!file.exists(cohorts_path)) {
+  stop("thyr_analysis_cohorts.rds not found (run 230 first)")
 }
-purity <- readRDS(purity_path)
-message("Purity table: ", nrow(purity), " cases (outlier-removed by 210)")
+cohorts <- readRDS(cohorts_path)
 
 se_path <- file.path(paths$processed, "thyr_se_raw.rds")
 if (!file.exists(se_path)) stop("thyr_se_raw.rds not found (run 120 first)")
@@ -72,26 +71,27 @@ message(
   assayNames(se)
 )
 
-# --- Select high-purity cases ----------------------------------------------
-# Outliers were already removed by 210 before purity estimation; here we keep
-# cases whose pooled (common-scale) relative purity clears the threshold. The
-# threshold lives here so a sensitivity check re-runs only 310, not the 220
-# ContamDE step.
-clean <- purity[purity$tumor_purity >= PURITY_THRESHOLD, , drop = FALSE]
-message(sprintf(
-  "High-purity cases (>= %.2f): %d / %d", PURITY_THRESHOLD, nrow(clean), nrow(purity)
-))
+# --- Select the main BM cohort (adoption fixed in 230) ----------------------
+# Purity-threshold application, PC-OD flags and pairing all live in 230; a
+# purity-threshold sensitivity check re-runs 230 + 310.
+included <- cohorts[cohorts$include_main_bm, , drop = FALSE]
+clean <- data.frame(
+  case_submitter_id = included$case_submitter_id,
+  group = paste0(
+    ifelse(included$driver == "RET", "R", "B"), "_", included$band
+  ),
+  cohort = ifelse(included$driver == "RET", "R", "B"),
+  tumor_purity = included$tumor_purity,
+  stringsAsFactors = FALSE
+)
+clean <- clean[order(clean$group, clean$case_submitter_id), , drop = FALSE]
+rownames(clean) <- NULL
+message("Main BM cohort (include_main_bm): ", nrow(clean), " cases")
 message("Selected cases by group:")
 print(table(clean$group))
 
-# --- Resolve _merged Tumor / Normal sample per case ------------------------
-cd <- as.data.frame(colData(se))
-is_merged <- grepl("_merged", cd$sample_submitter_id)
-m <- cd[is_merged, , drop = FALSE]
-t_rows <- m[m$sample_type == "Primary Tumor", , drop = FALSE]
-n_rows <- m[m$sample_type == "Solid Tissue Normal", , drop = FALSE]
-tumor_of <- setNames(t_rows$sample_submitter_id, t_rows$case_submitter_id)
-normal_of <- setNames(n_rows$sample_submitter_id, n_rows$case_submitter_id)
+tumor_of <- setNames(included$tumor_id, included$case_submitter_id)
+normal_of <- setNames(included$normal_id, included$case_submitter_id)
 
 sample_ids_for <- function(cases, tissue) {
   ids <- if (tissue == "Tumor") tumor_of[cases] else normal_of[cases]
