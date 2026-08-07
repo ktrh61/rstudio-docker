@@ -10,8 +10,7 @@
 #           list(date, config, units)
 #           units = { R_Tumor, R_Normal, B_Tumor, B_Normal }; each holds
 #             n_samples : Sporadic and High column counts
-#             genes     : gene_id, effect, statistic, p_exact, q_storey,
-#                         fdr_perm, rank
+#             genes     : gene_id, effect, statistic, p_exact, q_storey, rank
 #             pi0       : estimate, and the shuffle-null pi0 distribution
 #                         (vector + quantiles) that calibrates it
 #             q_curve   : rejections R(alpha) over a q-threshold grid
@@ -37,11 +36,11 @@
 # shuffles) and the plug-in estimator is applied per shuffle, giving the
 # distribution the estimate would have under the global null.
 #
-# fdr_perm stays as a sensitivity column (not inference): a permutation
-# -calibrated FDR on the statistic whose null comes from the whole-column
-# shuffles, with pi0 held at 1.
+# The historical permutation-calibrated FDR column (fdr_perm, pi0 = 1) was
+# retired with the other sensitivity columns (reorg plan v2 appendix B.2);
+# its record lives in the baseline and the amendment record.
 #
-# The omnibus rows share that null. "count" asks whether the number of genes
+# The omnibus rows share the shuffle null. "count" asks whether the number of genes
 # past a fixed null quantile exceeds what the shuffles produce, "max" asks the
 # same of the single most extreme gene, and "hc" is Higher Criticism, which
 # scans the threshold instead of fixing one. PRIMARY_OMNIBUS names the row
@@ -101,21 +100,6 @@ storey_pi0_null <- function(null_statistic) {
     (n_perm - rank(s, ties.method = "min") + 1) / n_perm
   }) # n_perm x genes
   apply(null_p, 1L, function(p) min(1, mean(p > 0.5) / 0.5))
-}
-
-# --- Permutation-calibrated FDR (sensitivity column) ------------------------
-# Step-up on the statistic itself rather than on p_exact: the two are
-# equivalent within a tie pattern, and the shuffled null already carries the
-# mixture of tie patterns that the gene set actually has.
-permutation_fdr <- function(statistic, null_statistic, n_perm) {
-  ordering <- order(statistic, decreasing = TRUE)
-  sorted_null <- sort(null_statistic)
-  expected <- (length(sorted_null) -
-    findInterval(statistic[ordering], sorted_null, left.open = TRUE)) / n_perm
-  fdr <- pmin(1, expected / seq_along(ordering))
-  out <- numeric(length(statistic))
-  out[ordering] <- rev(cummin(rev(fdr)))
-  out
 }
 
 # --- Higher Criticism ------------------------------------------------------
@@ -223,7 +207,6 @@ test_unit <- function(dgelist, unit) {
     statistic = statistic,
     p_exact = p_exact,
     q_storey = storey$q,
-    fdr_perm = permutation_fdr(statistic, null_statistic, N_PERM),
     rank = rank(-statistic, ties.method = "min"),
     stringsAsFactors = FALSE
   )
@@ -240,10 +223,9 @@ test_unit <- function(dgelist, unit) {
 
   omnibus <- omnibus_table(statistic, null_statistic, OMNIBUS_ALPHA, N_PERM)
   message(sprintf(
-    "  %-9s %d vs %d ; pi0_hat %.3f (null med %.3f) ; q<%.2f %d ; fdr_perm<%.2f %d ; %s p %.3f ; all %s",
+    "  %-9s %d vs %d ; pi0_hat %.3f (null med %.3f) ; q<%.2f %d ; %s p %.3f ; all %s",
     unit, nx, n - nx, storey$pi0, stats::median(pi0_null),
     FDR_CUT, sum(storey$q < FDR_CUT),
-    FDR_CUT, sum(genes$fdr_perm < FDR_CUT),
     PRIMARY_OMNIBUS, omnibus$p[omnibus$test == PRIMARY_OMNIBUS],
     paste(sprintf("%.3f", omnibus$p), collapse = "/")
   ))
@@ -295,7 +277,6 @@ thyr_expression_test <- list(
     inference = "Storey q < 0.10 on exact p (plug-in pi0, lambda = 0.5)",
     pi0_lambda = 0.5,
     q_threshold = FDR_CUT,
-    fdr_perm = "sensitivity column: permutation-calibrated, pi0 = 1",
     perm_sharing = "per-unit perm_index consumed by 420; hash per unit",
     perm_index_hash = vapply(
       units, function(u) u$perm_index_hash, character(1)

@@ -11,8 +11,8 @@
 # Output: processed/thyr_enrichment_test.rds
 #           list(date, config, collections, units)
 #           units = { R_Tumor, R_Normal, B_Tumor, B_Normal }; each a data frame
-#             sets : collection, pathway, size, ES, NES, pval, q_tail,
-#                    fwer_wy, redundant_with, leading_edge
+#             sets : collection, pathway, size, ES, NES, pval, q_bh,
+#                    redundant_with, leading_edge
 #
 # GSEA consumes the whole ranking. That choice is not a fallback: it is
 # threshold-free (no DEG-list cut whose membership sits on the q cliff decides
@@ -26,25 +26,29 @@
 # input it is exactly the standard GSEA statistic (verified in
 # tests/testthat/test-gsea-block-es.R).
 #
-# Inference: the collection-internal Subramanian tail-ratio FDR, q_tail
-# < FDR_CUT (0.10), within each of the four families. NES standardization
-# treats the sets of a family as exchangeable under the null -- the
-# pre-committed stance of a hypothesis that carries no set-level prediction --
-# and the pooled null gives m x B resolution. No cross-family claim is made.
-# fwer_wy (Westfall-Young) is retained as a sensitivity column only; q < 0.25
-# is not used, not even as an exploratory bar.
+# Inference: per-set permutation p (each set against its own null row,
+# sign-conditional) with BH inside each of the four families, q_bh < FDR_CUT
+# (0.10). BH is the Storey q machinery with pi0 held at its conservative
+# bound 1: at this level the pi0 plug-in is variance-dominated (dependent
+# p-values riding one collective-drift mode) and errs anti-conservative in
+# exactly the realizations where the procedure is most fragile, so it is not
+# estimated. This is the procedure the held-out null calibration passed
+# (global-null P(>=1) 0.045 pooled against nominal 0.10); the pooled
+# tail-ratio FDR and a restandardized variant were measured miscalibrated
+# (0.14 / 0.22) and are not used -- measurements in diagnostics/output/,
+# decision record in reorg plan v2 appendix B. No cross-family claim is
+# made; q < 0.25 is not used, not even as an exploratory bar.
 #
 # Families: H, C2:CP, C5:GO:BP, and C2:CGP:radiation -- an exploratory family
 # whose curation regex was fixed before this inference touched real data
 # (lib/gsea_collections.R, with the construct caveat recorded there). C6/C7
-# stay excluded on relevance grounds. Adding a family cannot dilute another
-# family's q-values (everything is computed within collection).
+# stay excluded on relevance grounds. Everything is computed within
+# collection, so adding a family cannot affect another family's q-values.
 #
-# The change from the previous spec (gseaParam = 0, FWER as primary inference)
-# is a protocol amendment, not a bug fix; the amendment record keeps the
-# before/after specs and what had been seen when. The spike-in positive
-# control is re-run under this inference after the D6 held-out null
-# calibration passes (reorg plan v2, phase 4 step 15).
+# The change from the previous spec (gseaParam = 0, Westfall-Young FWER as
+# primary inference) is a protocol amendment, not a bug fix; appendix B keeps
+# the before/after specs and what had been seen when. The spike-in positive
+# control is re-run under this inference (diagnostics/gsea_spikein_control.R).
 #
 # The size window drops both noise-prone tiny sets and the vague giant ones;
 # redundant_with flags a set whose leading edge is largely contained in a
@@ -153,23 +157,23 @@ test_unit <- function(dgelist, unit) {
   per_collection <- lapply(names(index), function(collection) {
     keep <- collection_of == collection
     standardized <- gsea_nes(observed[keep], null[keep, , drop = FALSE])
+    pval <- gsea_pathway_pvalues(standardized$nes, standardized$nes_null)
     result <- data.frame(
       collection = collection,
       pathway = names(observed)[keep],
       size = lengths(flat[keep]),
       ES = unname(observed[keep]),
       NES = unname(standardized$nes),
-      pval = gsea_pathway_pvalues(standardized$nes, standardized$nes_null),
-      q_tail = gsea_tail_ratio_q(standardized$nes, standardized$nes_null),
-      fwer_wy = gsea_westfall_young(standardized$nes, standardized$nes_null),
+      pval = pval,
+      q_bh = p.adjust(pval, method = "BH"),
       stringsAsFactors = FALSE
     )
     result$redundant_with <- gsea_redundancy(
       result, leading_edge, REDUNDANT_JACCARD,
-      candidate = !is.na(result$q_tail) & result$q_tail < FDR_CUT
+      candidate = !is.na(result$q_bh) & result$q_bh < FDR_CUT
     )
     result$leading_edge <- I(unname(leading_edge[result$pathway]))
-    result[order(result$q_tail, result$pval, -abs(result$NES)), , drop = FALSE]
+    result[order(result$q_bh, result$pval, -abs(result$NES)), , drop = FALSE]
   })
 
   sets <- do.call(rbind, per_collection)
@@ -179,8 +183,8 @@ test_unit <- function(dgelist, unit) {
     rows <- sets[sets$collection == collection, , drop = FALSE]
     sprintf(
       "%s q<%.2f %d (min %.3f)", collection, FDR_CUT,
-      sum(rows$q_tail < FDR_CUT, na.rm = TRUE),
-      min(rows$q_tail, na.rm = TRUE)
+      sum(rows$q_bh < FDR_CUT, na.rm = TRUE),
+      min(rows$q_bh, na.rm = TRUE)
     )
   }, character(1))
   message(sprintf(
@@ -209,8 +213,9 @@ thyr_enrichment_test <- list(
       expression_test$units, function(u) u$perm_index_hash, character(1)
     ),
     inference = paste(
-      "collection-internal Subramanian tail-ratio FDR, q_tail <",
-      FDR_CUT, "; fwer_wy is a sensitivity column"
+      "per-set permutation p + BH within collection, q_bh <", FDR_CUT,
+      "(Storey q with pi0 at its conservative bound 1;",
+      "reorg plan v2 appendix B)"
     ),
     q_threshold = FDR_CUT,
     excluded_collections = c("C2:CGP (except radiation subset)", "C6", "C7"),

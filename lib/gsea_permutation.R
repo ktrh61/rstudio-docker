@@ -23,25 +23,21 @@
 # weights sum to zero scores 0. Leading edges are reported at block
 # granularity (whole tie-blocks, never a fraction of one).
 #
-# Inference (gsea_tail_ratio_q): the Subramanian tail-ratio FDR computed
-# within one collection -- the ratio of the pooled-null tail fraction to the
-# observed tail fraction at each set's NES, by sign. The pooled null
-# (collection sets x shuffles) is what gives the estimate its m x B
-# resolution; NES standardization makes the sets exchangeable under the null,
-# which matches a hypothesis that carries no set-level prediction. Fixed
-# conventions: signs are handled separately against sign-restricted
-# references; the null tail fraction is plus-one smoothed like a permutation
-# p-value (so q > 0 always); the observed tail fraction is exact (never zero
-# at a set's own NES); an empty null side yields the smoothed ceiling rather
-# than NA; q is capped at 1; no monotonization is applied -- the raw ratio is
-# reported.
-#
-# The Westfall-Young FWER (gsea_westfall_young) is retained as a sensitivity
-# column only: its null is the largest |NES| anywhere in the collection per
-# shuffle, so inter-pathway correlation is carried exactly, but it answers a
-# sparse-signal question the protocol no longer poses at this level.
-# Callers evaluate one collection at a time so that each collection's pooled
-# null and NES normalization are built from that collection alone.
+# Inference: per-set permutation p (gsea_pathway_pvalues -- each set against
+# its own null row, sign-conditional) with BH within the collection, applied
+# by the caller. BH is the Storey q-value machinery with pi0 held at its
+# conservative bound 1; the protocol-wide q framework is unchanged, only the
+# pi0 plug-in is not estimated at this level (24-3,900 dependent p-values
+# moving on one collective-drift mode leave the estimator variance-dominated,
+# and its errors point anti-conservative exactly in the drift realizations).
+# This choice is the one the held-out null calibration passed: the pooled
+# tail-ratio FDR (Subramanian 2005) and a per-realization restandardized
+# variant were both measured miscalibrated under this dependence structure
+# (global-null P(>=1 discovery) 0.14 and 0.22 against nominal 0.10; per-set
+# p + BH measured 0.045). Measurements and the mechanism are recorded in
+# diagnostics/output/ and reorg plan v2 appendix B.
+# Callers evaluate one collection at a time so that each collection's NES
+# normalization is built from that collection alone.
 
 # --- Ranking metric ---------------------------------------------------------
 # Tie-averaged normal scores: monotone in the metric, tied metrics share one
@@ -156,9 +152,9 @@ gsea_nes <- function(observed, null) {
   )
 }
 
-# --- Per-set permutation p (descriptive; ordering only) ---------------------
-# Each pathway against its own null. The collection-wide drift that inter-
-# pathway correlation produces sits in both terms, so it cancels here.
+# --- Per-set permutation p (the inference carrier; BH is applied on top) ----
+# Each pathway against its own null row, conditional on the observed sign.
+# The plus-one counting keeps p > 0 at permutation resolution.
 gsea_pathway_pvalues <- function(nes, nes_null) {
   vapply(seq_along(nes), function(i) {
     if (!is.finite(nes[i])) {
@@ -171,59 +167,6 @@ gsea_pathway_pvalues <- function(nes, nes_null) {
     } else {
       (sum(z <= nes[i]) + 1) / (sum(z <= 0) + 1)
     }
-  }, numeric(1))
-}
-
-# --- Collection-internal tail-ratio FDR (inference) -------------------------
-# Subramanian et al. (2005) within one collection; conventions fixed in the
-# file header. Sorted sign-restricted references turn each tail count into a
-# binary search.
-gsea_tail_ratio_q <- function(nes, nes_null) {
-  pooled <- nes_null[is.finite(nes_null)]
-  finite <- nes[is.finite(nes)]
-  pooled_positive <- sort(pooled[pooled >= 0])
-  pooled_negative <- sort(pooled[pooled < 0])
-  observed_positive <- sort(finite[finite >= 0])
-  observed_negative <- sort(finite[finite < 0])
-  count_at_least <- function(x, reference) {
-    length(reference) - findInterval(x, reference, left.open = TRUE)
-  }
-  count_at_most <- function(x, reference) {
-    findInterval(x, reference)
-  }
-
-  q <- rep(NA_real_, length(nes))
-  positive <- which(is.finite(nes) & nes >= 0)
-  negative <- which(is.finite(nes) & nes < 0)
-  if (length(positive)) {
-    null_tail <- (count_at_least(nes[positive], pooled_positive) + 1) /
-      (length(pooled_positive) + 1)
-    observed_tail <- count_at_least(nes[positive], observed_positive) /
-      length(observed_positive)
-    q[positive] <- pmin(1, null_tail / observed_tail)
-  }
-  if (length(negative)) {
-    null_tail <- (count_at_most(nes[negative], pooled_negative) + 1) /
-      (length(pooled_negative) + 1)
-    observed_tail <- count_at_most(nes[negative], observed_negative) /
-      length(observed_negative)
-    q[negative] <- pmin(1, null_tail / observed_tail)
-  }
-  q
-}
-
-# --- Westfall-Young FWER (sensitivity column) -------------------------------
-# Single-step: the null is the largest |NES| anywhere in the collection per
-# shuffle, so the correlation among pathways is carried exactly rather than
-# assumed away.
-gsea_westfall_young <- function(nes, nes_null) {
-  null_max <- apply(abs(nes_null), 2L, max, na.rm = TRUE)
-  n_perm <- length(null_max)
-  vapply(seq_along(nes), function(i) {
-    if (!is.finite(nes[i])) {
-      return(NA_real_)
-    }
-    (sum(null_max >= abs(nes[i])) + 1) / (n_perm + 1)
   }, numeric(1))
 }
 

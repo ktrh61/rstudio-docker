@@ -112,28 +112,18 @@ test_that("normal scores are tie-shared, monotone, and bound infinities", {
   expect_equal(scores, qnorm((c(1, 2, 3, 4, 5.5, 5.5) - 0.5) / 6))
 })
 
-# --- Tail-ratio q (hand-computed) -------------------------------------------
+# --- Per-set permutation p (hand-computed) ----------------------------------
 
-test_that("tail-ratio q matches the hand-computed reference", {
-  nes <- c(2, 1, -1)
-  nes_null <- rbind(c(1.5, 0.5), c(0.5, -0.5), c(-1.5, 0.5))
-  # Pooled positive null {1.5, 0.5, 0.5, 0.5}, negative {-1.5, -0.5};
-  # observed positive {2, 1}, negative {-1}.
-  #   q(2)  = [(0+1)/(4+1)] / (1/2) = 0.4
-  #   q(1)  = [(1+1)/(4+1)] / (2/2) = 0.4
-  #   q(-1) = [(1+1)/(2+1)] / (1/1) = 2/3
+test_that("per-set p matches the hand-computed sign-conditional reference", {
+  nes <- c(2, -1)
+  nes_null <- rbind(c(1.5, 0.5, -0.5), c(0.5, -0.5, -2))
+  # Set 1 (NES 2 >= 0): null row {1.5, 0.5, -0.5}, positives {1.5, 0.5};
+  #   p = (#{z >= 2} + 1) / (#{z >= 0} + 1) = 1/3.
+  # Set 2 (NES -1 < 0): null row {0.5, -0.5, -2}, negatives {-0.5, -2};
+  #   p = (#{z <= -1} + 1) / (#{z <= 0} + 1)... z <= 0 counts {-0.5, -2}.
+  #   p = (1 + 1) / (2 + 1) = 2/3.
   expect_equal(
-    gsea_tail_ratio_q(nes, nes_null), c(0.4, 0.4, 2 / 3),
+    gsea_pathway_pvalues(nes, nes_null), c(1 / 3, 2 / 3),
     tolerance = 1e-12
   )
-})
-
-test_that("tail-ratio q is plus-one smoothed and capped at 1", {
-  nes <- c(3, 0.1)
-  nes_null <- rbind(c(0.5, 0.4), c(0.3, 0.2))
-  q <- gsea_tail_ratio_q(nes, nes_null)
-  expect_true(all(q > 0)) # never exactly zero
-  expect_true(all(q <= 1))
-  # NES = 3 above every null value: q = (0+1)/(4+1) / (1/2) = 0.4
-  expect_equal(q[1], 0.4, tolerance = 1e-12)
 })

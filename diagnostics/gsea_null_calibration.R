@@ -10,12 +10,18 @@
 # seed, draw B + R label shuffles per unit and compute the block ES for all of
 # them once. Shuffles 1..B form one shared null pool; each of the R later
 # shuffles is treated as a pseudo-observation against that pool and pushed
-# through the exact inference 420 applies (NES against the pool, collection-
-# internal tail-ratio q, q < FDR_CUT). Under the global null every shuffle is
-# exchangeable, so the extra cost over one analysis is ~(B + R)/B. Because the
-# replicates share the null pool, their discovery indicators are weakly
-# positively correlated; the binomial CI understates that, which is recorded
-# here rather than corrected.
+# through the exact inference 420 applies (NES against the pool, per-set
+# permutation p, BH within collection, q < FDR_CUT). Under the global null
+# every shuffle is exchangeable, so the extra cost over one analysis is
+# ~(B + R)/B. Because the replicates share the null pool, their discovery
+# indicators are weakly positively correlated; the binomial CI understates
+# that, which is recorded here rather than corrected.
+#
+# History (reorg plan v2 appendix B): this measurement is what replaced the
+# pooled tail-ratio FDR of the original D2 -- measured miscalibrated here
+# (P(>=1) 0.14 pooled, 0.24 worst cell; a restandardized variant 0.22/0.44)
+# before any real-data run; per-set p + BH measured 0.045 and was adopted.
+# The superseded measurement logs stay in diagnostics/output/.
 #
 # Under the complete null FDR = P(at least one discovery), so the measurement
 # per unit x collection is: the share of replicates with >= 1 discovery
@@ -106,8 +112,8 @@ calibrate_unit <- function(dgelist, unit) {
     keep <- collection_of == collection
     vapply(seq_len(R_REPLICATES), function(r) {
       standardized <- gsea_nes(pseudo[keep, r], pool[keep, , drop = FALSE])
-      q <- gsea_tail_ratio_q(standardized$nes, standardized$nes_null)
-      sum(q < FDR_CUT, na.rm = TRUE)
+      pval <- gsea_pathway_pvalues(standardized$nes, standardized$nes_null)
+      sum(p.adjust(pval, method = "BH") < FDR_CUT, na.rm = TRUE)
     }, integer(1))
   })
   names(counts_by_collection) <- names(index)

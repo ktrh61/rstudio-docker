@@ -3,8 +3,9 @@
 # phase 4 step 15). The historical control (a 15% shift over one Hallmark set
 # planted in a unit with no gene-level signal, caught at Westfall-Young fwer
 # 0.003 under the old spec) was an ad-hoc measurement; this script makes it a
-# recorded diagnostic and re-runs it under the new inference (tie-averaged
-# normal scores, tie-block ES, collection-internal tail-ratio q).
+# recorded diagnostic and re-runs it under the adopted inference (tie-averaged
+# normal scores, tie-block ES, per-set permutation p + BH within collection;
+# reorg plan v2 appendix B).
 #
 # The point of the control is that an empty result on real data is a property
 # of the data, not of a dead pipeline: a planted signal of modest, biologically
@@ -103,15 +104,15 @@ null <- matrix(
 sets <- do.call(rbind, lapply(names(index), function(collection) {
   keep <- collection_of == collection
   standardized <- gsea_nes(observed[keep], null[keep, , drop = FALSE])
+  pval <- gsea_pathway_pvalues(standardized$nes, standardized$nes_null)
   data.frame(
     collection = collection,
     pathway = names(observed)[keep],
     size = lengths(flat[keep]),
     ES = unname(observed[keep]),
     NES = unname(standardized$nes),
-    pval = gsea_pathway_pvalues(standardized$nes, standardized$nes_null),
-    q_tail = gsea_tail_ratio_q(standardized$nes, standardized$nes_null),
-    fwer_wy = gsea_westfall_young(standardized$nes, standardized$nes_null),
+    pval = pval,
+    q_bh = p.adjust(pval, method = "BH"),
     stringsAsFactors = FALSE
   )
 }))
@@ -119,16 +120,16 @@ rownames(sets) <- NULL
 
 spiked_row <- sets[sets$pathway == SPIKE_SET, , drop = FALSE]
 hallmark <- sets[sets$collection == "H", , drop = FALSE]
-hallmark_rank <- match(SPIKE_SET, hallmark$pathway[order(hallmark$q_tail)])
+hallmark_rank <- match(SPIKE_SET, hallmark$pathway[order(hallmark$q_bh)])
 message(sprintf(
-  "Spiked set: NES %.2f ; q_tail %.4f (rank %d/%d in H) ; fwer_wy %.4f ; recovered at q<%.2f: %s",
-  spiked_row$NES, spiked_row$q_tail, hallmark_rank, nrow(hallmark),
-  spiked_row$fwer_wy, FDR_CUT, spiked_row$q_tail < FDR_CUT
+  "Spiked set: NES %.2f ; pval %.4f ; q_bh %.4f (rank %d/%d in H) ; recovered at q<%.2f: %s",
+  spiked_row$NES, spiked_row$pval, spiked_row$q_bh, hallmark_rank,
+  nrow(hallmark), FDR_CUT, spiked_row$q_bh < FDR_CUT
 ))
 message(sprintf(
   "Hallmark sets besides the spike at q<%.2f: %d",
-  FDR_CUT, sum(hallmark$q_tail < FDR_CUT, na.rm = TRUE) -
-    as.integer(spiked_row$q_tail < FDR_CUT)
+  FDR_CUT, sum(hallmark$q_bh < FDR_CUT, na.rm = TRUE) -
+    as.integer(spiked_row$q_bh < FDR_CUT)
 ))
 
 # --- Save ------------------------------------------------------------------
