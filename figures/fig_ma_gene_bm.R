@@ -1,14 +1,14 @@
-# 075_plot_ma_provisional.R  (PROVISIONAL / 仮置き)
-# MA plots companion to the 085 volcano, one facet per analysis unit. The A axis
+# fig_ma_gene_bm.R  (PROVISIONAL / 仮置き)
+# MA plots companion to fig_gene_bm_evidence.R, one facet per analysis unit. The A axis
 # is average abundance (mean log2 CPM across all samples in the unit) and the M
-# axis is the log2 fold change High - Sporadic, computed from the 070 DEGES-
+# axis is the log2 fold change High - Sporadic, computed from the 310 DEGES-
 # normalized CPM for display only (the DE call is the rank-based Brunner-Munzel
-# of 080, which has no fold change). Points are coloured by the 080 permutation
+# of 410, which has no fold change). Points are coloured by the 410 permutation
 # FDR (fdr_perm < FDR_CUT). An MA plot also checks that the fold change does not
 # trend with abundance -- a normalization sanity view. Provisional: not wired
-# into the pipeline (it reads 080's output despite the lower number).
-# Input : processed/thyr_normalized_counts.rds  (from 070; per-unit DGEList)
-#         processed/thyr_expression_test.rds      (from 080; fdr_perm, effect)
+# into the pipeline (it reads 410's output).
+# Input : processed/thyr_normalized_counts.rds  (from 310; per-unit DGEList)
+#         processed/thyr_expression_test.rds      (from 410; fdr_perm, effect)
 #         processed/thyr_se_raw.rds               (gene_id -> gene_name)
 # Output: output/ma_expression.png
 
@@ -68,7 +68,7 @@ p <- ggplot(df, aes(x = A, y = M)) +
   labs(
     x = expression("A:  average abundance  " * (log[2] * " CPM)")),
     y = expression("M:  " * log[2] * " fold change  (High - Sporadic)"),
-    title = "Gene-level MA plot (070 CPM, 080 Brunner-Munzel FDR), per unit",
+    title = "Gene-level MA plot (310 CPM, 410 Brunner-Munzel FDR), per unit",
     subtitle = paste0("Fold change for display only (DE call is rank-based BM); ",
       "coloured by permutation FDR < ", FDR_CUT, ". R_Normal/B_Tumor negative controls.")
   ) +

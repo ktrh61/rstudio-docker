@@ -1,16 +1,16 @@
-# 120_evaluate_reo_panel.R
-# Apply the finalized REO panel (110) to the intermediate-exposure RET tumours
+# 530_evaluate_reo_panel.R
+# Apply the finalized REO panel (520) to the intermediate-exposure RET tumours
 # it was never trained on -- R_Low (assigned share 0-33.3%) and R_Mid (33.3-
 # 66.6%) -- as a graded, out-of-sample check. If the panel captures a radiation-
 # attributable signal, reversal scores should grade with assigned share:
 # Sporadic (train R0) < R_Low < R_Mid < High (train R1). This is exploratory and
 # descriptive; it does not alter the panel or its boundary.
 # Input : processed/thyr_reo_panel.rds             (from 110; panel + boundary)
-#         processed/thyr_clinical.rds              (from 001; driver)
-#         processed/thyr_case_assigned_share.rds   (from 041; dose, AS)
-#         processed/thyr_se_raw.rds                (from 021; stranded_second)
-#         processed/gene_lengths.rds               (from 005)
-#         utils/reo_tpm.R
+#         processed/thyr_clinical.rds              (from 030; driver)
+#         processed/thyr_case_assigned_share.rds   (from 130; dose, AS)
+#         processed/thyr_se_raw.rds                (from 120; stranded_second)
+#         processed/gene_lengths.rds               (from 020)
+#         lib/reo.R
 # Output: processed/thyr_reo_evaluation.rds, output/reo_evaluation_samples.csv
 #
 # DESIGN NOTES (deferred, revisit): the R_Low/R_Mid tumours here are NOT filtered
@@ -24,8 +24,8 @@ suppressPackageStartupMessages({
   library(SummarizedExperiment)
 })
 
-source(file.path(paths$root, "utils", "reo_tpm.R"))
-source(file.path(paths$root, "utils", "brunnermunzel_mc.R"))
+source(file.path(paths$root, "lib", "reo.R"))
+source(file.path(paths$root, "lib", "stat_brunnermunzel.R"))
 
 # AS bands (percent). High (>= 66.6) is the training arm; these are below it.
 AS_LOW_MAX <- 33.3

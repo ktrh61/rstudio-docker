@@ -1,12 +1,12 @@
-# 041_compute_assigned_share.R
+# 130_compute_assigned_share.R
 # Attach a per-case approximate Assigned Share to the prepared clinical table.
 # The quantity is the "Assigned Share associated with the expected value of ERR",
 # computed by compute_thyroid_as() as a Monte Carlo approximation of IREP; it is
 # a hand estimate, not an IREP-produced value. Attached to all 440 cases; no
 # target selection or grouping here.
 #
-# Input : processed/thyr_clinical.rds          (from 001; key REBC_ID)
-#         utils/thyroid_as_functions.R         (compute_thyroid_as)
+# Input : processed/thyr_clinical.rds          (from 030; key REBC_ID)
+#         lib/dose_thyroid_as.R         (compute_thyroid_as)
 # Output: processed/thyr_case_assigned_share.rds  (REBC_ID-keyed, 440 rows)
 #
 # Output columns:
@@ -25,7 +25,7 @@ source("setup.R")
 library(data.table)
 
 # --- Load estimator and clinical table -------------------------------------
-as_fun_path <- file.path(paths$root, "utils", "thyroid_as_functions.R")
+as_fun_path <- file.path(paths$root, "lib", "dose_thyroid_as.R")
 if (!file.exists(as_fun_path)) {
   stop("Assigned Share functions not found: ", as_fun_path)
 }
@@ -33,7 +33,7 @@ source(as_fun_path)
 
 clinical_path <- file.path(paths$processed, "thyr_clinical.rds")
 if (!file.exists(clinical_path)) {
-  stop("Clinical table not found: ", clinical_path, " (run 001 first)")
+  stop("Clinical table not found: ", clinical_path, " (run 030 first)")
 }
 clinical <- readRDS(clinical_path)
 message("Clinical loaded: ", nrow(clinical), " cases")

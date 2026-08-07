@@ -1,14 +1,14 @@
-# 100_select_reo_pairs.R
+# 510_select_reo_pairs.R
 # REO (relative expression ordering) candidate-pair generation and selection,
 # for the R cohort (RET/PTC) tumour comparison High vs Sporadic.
-# Input : processed/thyr_expression_test.rds     (from 080; per-gene BM effect)
-#         processed/thyr_normalized_counts.rds   (from 070; R_Tumor sample set)
-#         processed/thyr_se_raw.rds              (from 021; stranded_second counts)
-#         processed/gene_lengths.rds             (from 005; unversioned lengths)
+# Input : processed/thyr_expression_test.rds     (from 410; per-gene BM effect)
+#         processed/thyr_normalized_counts.rds   (from 310; R_Tumor sample set)
+#         processed/thyr_se_raw.rds              (from 120; stranded_second counts)
+#         processed/gene_lengths.rds             (from 020; unversioned lengths)
 # Output: processed/thyr_reo_candidate_pairs.rds, output/reo_candidate_pairs.csv
 #
 # A REO pair (up-gene, down-gene) has a stable within-sample order in Sporadic
-# (R0) and flips in High (R1). Because 080's exact permutation BM leaves no
+# (R0) and flips in High (R1). Because 410's exact permutation BM leaves no
 # thresholded DEG list, the candidate gene pool is the top N genes by BM effect
 # magnitude |effect - 0.5| (not a DEG cut), split into up (effect > 0.5, higher
 # in High) and down (effect < 0.5). The pool only feeds pair generation; the
@@ -17,7 +17,7 @@
 # Expression is TPM (length-normalized), required because REO compares gene i vs
 # gene j WITHIN a sample and raw/CPM counts confound that with gene length. TPM
 # is computed here from the stranded_second counts (the strand chosen upstream
-# in 020-021); the unstranded TPM in the raw SE must not be used. REO is
+# in 110-120); the unstranded TPM in the raw SE must not be used. REO is
 # normalization-free (within-sample ranks), so DEGES normalization is irrelevant.
 #
 # Selection (following the v7 policy):
@@ -27,7 +27,7 @@
 #   R1 (High)   : > 50% of samples reverse the R0 reference sign, but not 100%
 #     (a full reversal is banned as overfitting).
 #   Rank by |median(r_R0) - median(r_R1)| descending.
-# Redundancy removal (gene reuse, correlated pairs) is deferred to 110.
+# Redundancy removal (gene reuse, correlated pairs) is deferred to 520.
 
 source("setup.R")
 
@@ -35,7 +35,7 @@ suppressPackageStartupMessages({
   library(SummarizedExperiment)
 })
 
-source(file.path(paths$root, "utils", "reo_tpm.R"))
+source(file.path(paths$root, "lib", "reo.R"))
 
 # --- Configuration ---------------------------------------------------------
 N_CANDIDATES <- 500L # top genes by |effect - 0.5| (~half up, half down)
@@ -174,7 +174,7 @@ thyr_reo_candidate_pairs <- list(
     n_candidates = N_CANDIDATES,
     params = PARAMS,
     n_r0 = n_r0, n_r1 = n_r1,
-    ranking_metric = "abs(effect - 0.5) from 080 BM",
+    ranking_metric = "abs(effect - 0.5) from 410 BM",
     expression = "TPM from stranded_second counts"
   ),
   pairs = pairs

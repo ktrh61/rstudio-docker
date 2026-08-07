@@ -15,8 +15,8 @@
 # ==============================================================================
 
 # Note: Requires prior loading of:
-# source("./utils/utils_improved.R")
-# source("./utils/norm_improved.R")
+# source("./lib/norm_muren_helpers.R")
+# source("./lib/norm_muren.R")
 
 # Required packages
 for (pkg in c("edgeR", "limma", "statmod")) {

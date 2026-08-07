@@ -1,12 +1,12 @@
-# 250_detect_outliers_provisional.R  (PROVISIONAL / 仮置き)
+# reo_lowmid_outliers.R  (PROVISIONAL / 仮置き)
 # Layer-1 QC for the REO out-of-sample validation: run PC-OD outlier detection
-# on the R_Low / R_Mid tumours (which 120 currently uses unfiltered), then check
+# on the R_Low / R_Mid tumours (which 530 currently uses unfiltered), then check
 # whether the graded reversal-score relationship and the Mid > Low test survive
 # removing any flagged sample. Provisional: not wired into the pipeline; mirrors
-# 050_detect_outliers.R's PC-OD but on the intermediate-exposure bands.
+# 210_detect_outliers.R's PC-OD but on the intermediate-exposure bands.
 # Input : processed/thyr_clinical.rds, thyr_case_assigned_share.rds,
 #         thyr_se_raw.rds, thyr_reo_evaluation.rds
-#         utils/PC-OD_improved.R, utils/reo_lowmid_cases.R, utils/brunnermunzel_mc.R
+#         lib/qc_pc_od.R, lib/reo_lowmid_cases.R, lib/stat_brunnermunzel.R
 # Output: processed/thyr_reo_lowmid_outliers_provisional.rds
 
 source("setup.R")
@@ -14,9 +14,9 @@ suppressPackageStartupMessages({
   library(SummarizedExperiment)
   library(edgeR)
 })
-source(file.path(paths$root, "utils", "PC-OD_improved.R"))
-source(file.path(paths$root, "utils", "reo_lowmid_cases.R"))
-source(file.path(paths$root, "utils", "brunnermunzel_mc.R"))
+source(file.path(paths$root, "lib", "qc_pc_od.R"))
+source(file.path(paths$root, "lib", "reo_lowmid_cases.R"))
+source(file.path(paths$root, "lib", "stat_brunnermunzel.R"))
 
 # --- Load and resolve R_Low / R_Mid tumours --------------------------------
 clinical <- readRDS(file.path(paths$processed, "thyr_clinical.rds"))
@@ -29,7 +29,7 @@ cases <- cases[cases$band %in% c("R_Low", "R_Mid") & !is.na(cases$tumor_id), , d
 message("R_Low/Mid tumours: ",
   paste(names(table(cases$band)), table(cases$band), sep = "=", collapse = " "))
 
-# --- PC-OD per band on tumour log-CPM (same scale as 050) ------------------
+# --- PC-OD per band on tumour log-CPM (same scale as 210) ------------------
 counts_all <- assay(se, "stranded_second")
 run_pcod <- function(ids) {
   y <- edgeR::DGEList(counts_all[, ids, drop = FALSE])

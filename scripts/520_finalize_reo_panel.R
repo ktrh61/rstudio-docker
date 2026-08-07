@@ -1,11 +1,11 @@
-# 110_finalize_reo_panel.R
-# Build the final REO panel from the candidate pairs (100) by greedy, non-
+# 520_finalize_reo_panel.R
+# Build the final REO panel from the candidate pairs (510) by greedy, non-
 # redundant selection, then set a data-driven boundary zone and classification.
 # Input : processed/thyr_reo_candidate_pairs.rds  (from 100)
-#         processed/thyr_normalized_counts.rds     (from 070; R_Tumor sample set)
-#         processed/thyr_se_raw.rds                (from 021; stranded_second)
-#         processed/gene_lengths.rds               (from 005)
-#         utils/reo_tpm.R
+#         processed/thyr_normalized_counts.rds     (from 310; R_Tumor sample set)
+#         processed/thyr_se_raw.rds                (from 120; stranded_second)
+#         processed/gene_lengths.rds               (from 020)
+#         lib/reo.R
 # Output: processed/thyr_reo_panel.rds, output/reo_panel.csv
 #
 # Greedy selection walks candidate pairs in descending median_diff and keeps a
@@ -15,7 +15,7 @@
 # that reverse (|r| >= dead zone and opposite sign to the R0 reference). The
 # boundary zone is data-driven from the training arms: negative <= max(R0
 # scores), positive >= min(R1 scores), the interior undetermined. Classification
-# thresholds are set on R0/R1 only; 120 applies them to R_Low/R_Mid untouched.
+# thresholds are set on R0/R1 only; 530 applies them to R_Low/R_Mid untouched.
 
 source("setup.R")
 
@@ -23,12 +23,12 @@ suppressPackageStartupMessages({
   library(SummarizedExperiment)
 })
 
-source(file.path(paths$root, "utils", "reo_tpm.R"))
+source(file.path(paths$root, "lib", "reo.R"))
 
 # --- Configuration ---------------------------------------------------------
 TARGET_PANEL_SIZE <- 10L
 CORRELATION_THRESHOLD <- 0.75 # Spearman; drop a pair correlated above this
-DEAD_ZONE <- log2(1.2) # must match 100
+DEAD_ZONE <- log2(1.2) # must match 510
 
 # --- Load inputs -----------------------------------------------------------
 cand_path <- file.path(paths$processed, "thyr_reo_candidate_pairs.rds")
@@ -103,7 +103,7 @@ message(sprintf("R0 score range [%d, %d] ; R1 score range [%d, %d]",
 # sample scores positive when it shows MORE pair reversals than any Sporadic
 # case: threshold = max(R0 score). This is mixture-robust and interpretable, and
 # is the classification-based read (A) of the panel; the graded permutation read
-# (B) is done out-of-sample in 120.
+# (B) is done out-of-sample in 530.
 max_r0 <- max(r0_score)
 boundary <- list(negative_max = max_r0, positive_min = max_r0 + 1L)
 classify <- function(score, b) {

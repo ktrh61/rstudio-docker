@@ -1,4 +1,4 @@
-# 021_build_se.R
+# 120_build_se.R
 # Load STAR-Counts TSV files into a SummarizedExperiment holding the single
 # count assay selected by library strandedness.
 # Input : processed/file_sample_mapping.rds       (from 020)

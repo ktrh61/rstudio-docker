@@ -1,13 +1,13 @@
-# driver_as_summary.R
+# tab_cohort_composition.R
 # Summarize case counts by driver classification crossed with Assigned Share
 # (AS) band and sample-pair status. This is a summary only: it does not select
 # analysis targets or define analysis groups; driver classification is taken
 # verbatim from the Designated_* columns. Not part of the analysis pipeline; no
 # files are written (results are printed).
 #
-# Input : processed/thyr_clinical.rds               (from 001; key REBC_ID)
-#         processed/thyr_case_assigned_share.rds     (from 041; AS per case)
-#         processed/thyr_se_raw.rds                  (from 021; for pair status)
+# Input : processed/thyr_clinical.rds               (from 030; key REBC_ID)
+#         processed/thyr_case_assigned_share.rds     (from 130; AS per case)
+#         processed/thyr_se_raw.rds                  (from 120; for pair status)
 #
 # AS band (4 categories, covering all cases):
 #   non_exposed  status == "missing_input"; AS not computed.
@@ -18,7 +18,7 @@
 # Pair status: derived on the fly from SE colData. A case is "paired" when it
 # carries both a Primary Tumor and a Solid Tissue Normal sample (sample_type
 # exact match). SE case ids are already YQ-normalized to the REBC form (done in
-# 020), so they match the REBC_ID key directly. Cases absent from the SE are
+# 110), so they match the REBC_ID key directly. Cases absent from the SE are
 # unpaired.
 #
 # Classification axes: two levels (na kept as its own category).

@@ -30,7 +30,7 @@
   )
   if (length(candidates) == 0L) {
     stop(
-      "Cannot determine the location of utils/brunnermunzel_mc.R; ",
+      "Cannot determine the location of lib/stat_brunnermunzel.R; ",
       "load it with source().",
       call. = FALSE
     )
@@ -40,13 +40,13 @@
 
 if (!requireNamespace("Rcpp", quietly = TRUE)) {
   stop(
-    "Package 'Rcpp' is required to source utils/brunnermunzel_mc.R.",
+    "Package 'Rcpp' is required to source lib/stat_brunnermunzel.R.",
     call. = FALSE
   )
 }
 
 .bm_source_file <- .bm_find_source_file()
-.bm_cpp_file <- file.path(dirname(.bm_source_file), "brunnermunzel_mc.cpp")
+.bm_cpp_file <- file.path(dirname(.bm_source_file), "stat_brunnermunzel.cpp")
 if (!file.exists(.bm_cpp_file)) {
   stop("Companion C++ file not found: ", .bm_cpp_file, call. = FALSE)
 }

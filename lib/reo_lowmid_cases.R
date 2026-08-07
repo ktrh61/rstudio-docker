@@ -1,6 +1,6 @@
 # Resolve RET-cohort cases by radiation exposure band, with paired _merged
 # tumour / normal sample IDs. Shared by the provisional REO QC scripts
-# (250/260) so their R_Low / R_Mid definitions match the committed pipeline:
+# (diagnostics/reo_lowmid_outliers.R, reo_lowmid_purity.R) so their R_Low / R_Mid definitions match the committed pipeline:
 # Sporadic dose 0; among exposed (dose > 0) High assigned share >= 66.6, Mid
 # (33.3, 66.6), Low (0, 33.3]. Only RET (R cohort) is returned.
 resolve_ret_exposure_cases <- function(clinical, assigned_share, se) {

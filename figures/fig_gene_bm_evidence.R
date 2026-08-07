@@ -1,11 +1,11 @@
-# 085_plot_volcano_provisional.R  (PROVISIONAL / 仮置き)
-# Volcano plots of the 080 gene-level Brunner-Munzel results, one facet per
+# fig_gene_bm_evidence.R  (PROVISIONAL / 仮置き)
+# Volcano plots of the 410 gene-level Brunner-Munzel results, one facet per
 # analysis unit. The x axis is the signed BM effect 2*effect - 1 = P(X<Y) -
 # P(X>Y) (Cliff's delta; > 0 = higher in the High arm), since a rank test has no
 # fold change. The y axis is -log10(exact permutation p). Points are coloured by
 # the permutation-calibrated FDR (fdr_perm < FDR_CUT), and the strongest genes
 # per unit are labelled. Provisional: not wired into the pipeline.
-# Input : processed/thyr_expression_test.rds  (from 080)
+# Input : processed/thyr_expression_test.rds  (from 410)
 #         processed/thyr_se_raw.rds            (gene_id -> gene_name)
 # Output: output/volcano_expression.png
 
@@ -63,7 +63,7 @@ p <- ggplot(df, aes(x = x, y = y)) +
     x = expression("signed Brunner-Munzel effect  " * (P(X < Y) - P(X > Y))
       * "   " %->% "  higher in High"),
     y = expression(-log[10] * "(exact permutation p)"),
-    title = "Gene-level Brunner-Munzel volcano (080), per analysis unit",
+    title = "Gene-level Brunner-Munzel volcano (410), per analysis unit",
     subtitle = paste0("Rank-based effect (no fold change); coloured by permutation FDR < ",
       FDR_CUT, ". R_Normal/B_Tumor are negative controls.")
   ) +

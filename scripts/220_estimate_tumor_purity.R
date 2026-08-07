@@ -1,6 +1,6 @@
-# 060_estimate_tumor_purity.R
+# 220_estimate_tumor_purity.R
 # Estimate relative tumor purity per case with ContamDE (MUREN normalization),
-# AFTER outlier detection (050) and with the two exposure arms of each cohort
+# AFTER outlier detection (210) and with the two exposure arms of each cohort
 # POOLED. Pooling puts High and Sporadic on one common relative scale (ContamDE
 # is comparable only within the set of pairs passed together) and adds pairs for
 # a steadier reference profile. It is licensed here because the two arms share
@@ -10,18 +10,18 @@
 # profile correlation 0.99). The purity axis (tumour vs normal contamination) is
 # orthogonal to the exposure sample-mixture axis, so pooling does not dilute the
 # exposure signal.
-# Input : processed/thyr_case_outliers.rds  (from 050; targets + outlier flags)
-#         processed/thyr_se_raw.rds          (from 021; single count assay)
-#         utils/utils_improved.R, utils/norm_improved.R,
-#         utils/contamde_purity_functions.R
+# Input : processed/thyr_case_outliers.rds  (from 210; targets + outlier flags)
+#         processed/thyr_se_raw.rds          (from 120; single count assay)
+#         lib/norm_muren_helpers.R, lib/norm_muren.R,
+#         lib/purity_contamde.R
 # Output: processed/thyr_case_purity.rds
 #           columns: case_submitter_id, group, cohort, tumor_purity
 #
-# Outlier cases (either tissue flagged by 050) are dropped before estimation and
+# Outlier cases (either tissue flagged by 210) are dropped before estimation and
 # do not appear in the output. The relative-purity score (max-one within a
 # cohort) is emitted for every retained case at every purity; the >= threshold
-# selection is applied downstream in 070, so a threshold sensitivity check needs
-# only 070 re-run, not this ContamDE step.
+# selection is applied downstream in 310, so a threshold sensitivity check needs
+# only 310 re-run, not this ContamDE step.
 
 source("setup.R")
 
@@ -31,9 +31,9 @@ suppressPackageStartupMessages({
   library(limma)
 })
 
-source(file.path(paths$root, "utils", "utils_improved.R"))
-source(file.path(paths$root, "utils", "norm_improved.R"))
-source(file.path(paths$root, "utils", "contamde_purity_functions.R"))
+source(file.path(paths$root, "lib", "norm_muren_helpers.R"))
+source(file.path(paths$root, "lib", "norm_muren.R"))
+source(file.path(paths$root, "lib", "purity_contamde.R"))
 
 # MUREN worker count. The published/reproduction run on the Xeon host uses 4L
 # (canonical); raised here only to speed up development iterations. Worker count
@@ -49,12 +49,12 @@ if (requireNamespace("RhpcBLASctl", quietly = TRUE)) {
 
 # --- Load inputs -----------------------------------------------------------
 outliers_path <- file.path(paths$processed, "thyr_case_outliers.rds")
-if (!file.exists(outliers_path)) stop("thyr_case_outliers.rds not found (run 050 first)")
+if (!file.exists(outliers_path)) stop("thyr_case_outliers.rds not found (run 210 first)")
 targets <- readRDS(outliers_path)
 message("Target cases: ", nrow(targets))
 
 se_path <- file.path(paths$processed, "thyr_se_raw.rds")
-if (!file.exists(se_path)) stop("thyr_se_raw.rds not found (run 021 first)")
+if (!file.exists(se_path)) stop("thyr_se_raw.rds not found (run 120 first)")
 se <- readRDS(se_path)
 
 # --- Drop outlier cases (order correction: clean before purity) ------------

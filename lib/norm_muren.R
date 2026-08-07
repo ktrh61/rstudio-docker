@@ -2,7 +2,7 @@
 # MUREN core
 # Statistical model follows the original MUREN implementation. Pairwise work is
 # evaluated directly in deterministic chunks to reduce parallel overhead.
-# Requires utils/utils_improved.R to be sourced first.
+# Requires lib/norm_muren_helpers.R to be sourced first.
 # ==============================================================================
 
 if (!requireNamespace("foreach", quietly = TRUE)) {

@@ -1,5 +1,5 @@
-# 270_evaluate_reo_confound_provisional.R  (PROVISIONAL / 仮置き)
-# Layer-2 QC for the REO out-of-sample validation: 260 showed the reversal score
+# reo_lowmid_confound.R  (PROVISIONAL / 仮置き)
+# Layer-2 QC for the REO out-of-sample validation: reo_lowmid_purity.R showed the reversal score
 # correlates with tumour purity within R_Low/Mid, and purity itself grades with
 # assigned share (AS). So the graded Low<Mid score increase could be AS-driven
 # (radiation) OR purity-driven. This script separates them:
@@ -8,13 +8,13 @@
 #   (A) Purity-stratified ordered test: within each purity stratum, is Mid > Low
 #       score (one-sided BM)? Purity does not vary within a stratum, so a
 #       surviving Mid>Low is AS-attributable.
-# Provisional: not wired into the pipeline; reads 260's provisional purity.
+# Provisional: not wired into the pipeline; reads reo_lowmid_purity.R's provisional purity.
 # Input : processed/thyr_reo_lowmid_purity_provisional.rds (from 260)
-#         utils/brunnermunzel_mc.R
+#         lib/stat_brunnermunzel.R
 # Output: processed/thyr_reo_confound_provisional.rds
 
 source("setup.R")
-source(file.path(paths$root, "utils", "brunnermunzel_mc.R"))
+source(file.path(paths$root, "lib", "stat_brunnermunzel.R"))
 
 d <- readRDS(file.path(paths$processed, "thyr_reo_lowmid_purity_provisional.rds"))
 d <- d[d$band %in% c("R_Low", "R_Mid") & !is.na(d$score) & !is.na(d$tumor_purity), , drop = FALSE]

@@ -1,14 +1,14 @@
-# 070_normalize_counts.R
+# 310_normalize_counts.R
 # DEGES normalization of the high-purity paired samples, per two-group
-# comparison and tissue. Cases are the outlier-removed (050), pooled-purity
-# (060) cases whose relative purity clears PURITY_THRESHOLD. The DEGES core
+# comparison and tissue. Cases are the outlier-removed (210), pooled-purity
+# (220) cases whose relative purity clears PURITY_THRESHOLD. The DEGES core
 # (MUREN normalization + permutation Brunner-Munzel screening, TCC X-Y-X) lives
-# in utils/deges_muren_bm.R; this script prepares each unit's count matrix.
-# Input : processed/thyr_case_purity.rds    (from 060; case, group, tumor_purity)
-#         processed/thyr_se_raw.rds         (from 021; single count assay)
-#         utils/utils_improved.R, utils/norm_improved.R   (muren_norm)
-#         utils/brunnermunzel_mc.R          (brunnermunzel_mc_test)
-#         utils/deges_muren_bm.R  (deges_muren_bm, muren_to_norm_factors)
+# in lib/norm_deges.R; this script prepares each unit's count matrix.
+# Input : processed/thyr_case_purity.rds    (from 220; case, group, tumor_purity)
+#         processed/thyr_se_raw.rds         (from 120; single count assay)
+#         lib/norm_muren_helpers.R, lib/norm_muren.R   (muren_norm)
+#         lib/stat_brunnermunzel.R          (brunnermunzel_mc_test)
+#         lib/norm_deges.R  (deges_muren_bm, muren_to_norm_factors)
 # Output: processed/thyr_normalized_counts.rds
 #           list(date, config, comparisons, clean_cases, units)
 #           units = { R_Tumor, R_Normal, B_Tumor, B_Normal }; each holds a
@@ -25,10 +25,10 @@ suppressPackageStartupMessages({
   library(edgeR)
 })
 
-source(file.path(paths$root, "utils", "utils_improved.R"))
-source(file.path(paths$root, "utils", "norm_improved.R"))
-source(file.path(paths$root, "utils", "brunnermunzel_mc.R"))
-source(file.path(paths$root, "utils", "deges_muren_bm.R"))
+source(file.path(paths$root, "lib", "norm_muren_helpers.R"))
+source(file.path(paths$root, "lib", "norm_muren.R"))
+source(file.path(paths$root, "lib", "stat_brunnermunzel.R"))
+source(file.path(paths$root, "lib", "norm_deges.R"))
 
 # --- Configuration ---------------------------------------------------------
 PURITY_THRESHOLD <- 0.6 # min pooled (common-scale) relative purity to include
@@ -38,7 +38,7 @@ FLOOR_PDEG <- 0.05 # floorPDEG fraction forced as potential DEGs (TCC)
 MUREN_METHOD <- "lts" # MUREN pairwise regression
 WORKERS <- 16L # MUREN parallel workers
 
-# Brunner-Munzel screening (utils/brunnermunzel_mc.R).
+# Brunner-Munzel screening (lib/stat_brunnermunzel.R).
 # "auto" enumerates all C(n, nx) allocations exactly when that is affordable
 # and samples otherwise. Both units here are well inside the budget
 # (C(28,12) = 3.0e7 and C(36,9) = 9.4e7), so the screen's p-values are exact:
@@ -66,13 +66,13 @@ if (requireNamespace("RhpcBLASctl", quietly = TRUE)) {
 # --- Load inputs -----------------------------------------------------------
 purity_path <- file.path(paths$processed, "thyr_case_purity.rds")
 if (!file.exists(purity_path)) {
-  stop("thyr_case_purity.rds not found (run 060 first)")
+  stop("thyr_case_purity.rds not found (run 220 first)")
 }
 purity <- readRDS(purity_path)
-message("Purity table: ", nrow(purity), " cases (outlier-removed by 050)")
+message("Purity table: ", nrow(purity), " cases (outlier-removed by 210)")
 
 se_path <- file.path(paths$processed, "thyr_se_raw.rds")
-if (!file.exists(se_path)) stop("thyr_se_raw.rds not found (run 021 first)")
+if (!file.exists(se_path)) stop("thyr_se_raw.rds not found (run 120 first)")
 se <- readRDS(se_path)
 message(
   "SE: ", nrow(se), " genes x ", ncol(se), " samples ; assay: ",
@@ -80,9 +80,9 @@ message(
 )
 
 # --- Select high-purity cases ----------------------------------------------
-# Outliers were already removed by 050 before purity estimation; here we keep
+# Outliers were already removed by 210 before purity estimation; here we keep
 # cases whose pooled (common-scale) relative purity clears the threshold. The
-# threshold lives here so a sensitivity check re-runs only 070, not the 060
+# threshold lives here so a sensitivity check re-runs only 310, not the 220
 # ContamDE step.
 clean <- purity[purity$tumor_purity >= PURITY_THRESHOLD, , drop = FALSE]
 message(sprintf(

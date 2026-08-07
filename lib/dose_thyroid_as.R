@@ -1,5 +1,5 @@
 # =============================================================================
-# thyroid_as_functions.R
+# dose_thyroid_as.R
 #
 # Standalone Monte Carlo estimator of the thyroid Assigned Share (AS) associated
 # with the expected value of the excess relative risk (ERR), approximating the

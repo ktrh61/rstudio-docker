@@ -2,7 +2,7 @@
   file.path(testthat::test_path(), "..", ".."),
   mustWork = TRUE
 )
-.implementation_file <- file.path(.repo_root, "utils", "brunnermunzel_mc.R")
+.implementation_file <- file.path(.repo_root, "lib", "stat_brunnermunzel.R")
 source(.implementation_file)
 
 .reset_null_cache <- function() {

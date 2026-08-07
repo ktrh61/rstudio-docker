@@ -8,7 +8,7 @@
 # kept here (harmless, matches the original panel) over the stranded_second
 # assay chosen upstream; the unstranded TPM must not be used.
 #
-# All three REO scripts (100/110/120) call this so a panel built on one sample
+# All three REO scripts (510/520/530) call this so a panel built on one sample
 # set is applied to another with an identical expression definition.
 reo_log2_tpm <- function(se, gene_lengths, samples) {
   counts <- SummarizedExperiment::assay(se, "stranded_second")[, samples, drop = FALSE]

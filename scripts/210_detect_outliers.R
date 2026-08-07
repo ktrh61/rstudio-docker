@@ -1,12 +1,12 @@
-# 050_detect_outliers.R
+# 210_detect_outliers.R
 # Assemble the analysis target cases (driver + exposure + paired) and flag
 # sample outliers with PC-OD, BEFORE tumor-purity estimation. Detecting
-# outliers first keeps the downstream ContamDE purity estimate (060) from being
+# outliers first keeps the downstream ContamDE purity estimate (220) from being
 # contaminated by an anomalous sample.
-# Input : processed/thyr_clinical.rds             (from 001; driver columns)
-#         processed/thyr_case_assigned_share.rds  (from 041; dose_mgy, AS)
-#         processed/thyr_se_raw.rds                (from 021; single count assay)
-#         utils/PC-OD_improved.R                   (PC_OD)
+# Input : processed/thyr_clinical.rds             (from 030; driver columns)
+#         processed/thyr_case_assigned_share.rds  (from 130; dose_mgy, AS)
+#         processed/thyr_se_raw.rds                (from 120; single count assay)
+#         lib/qc_pc_od.R                   (PC_OD)
 # Output: processed/thyr_case_outliers.rds
 #           columns: case_submitter_id, group, driver, exposure,
 #                    tumor_id, normal_id, has_outlier_tumor, has_outlier_normal
@@ -31,14 +31,14 @@ suppressPackageStartupMessages({
   library(edgeR)
 })
 
-source(file.path(paths$root, "utils", "PC-OD_improved.R"))
+source(file.path(paths$root, "lib", "qc_pc_od.R"))
 
 # AS threshold (percent) separating High from Low/Mid among exposed cases.
 as_high_threshold <- 66.6
 
 # --- Load inputs -----------------------------------------------------------
 se_path <- file.path(paths$processed, "thyr_se_raw.rds")
-if (!file.exists(se_path)) stop("thyr_se_raw.rds not found (run 021 first)")
+if (!file.exists(se_path)) stop("thyr_se_raw.rds not found (run 120 first)")
 se <- readRDS(se_path)
 message(
   "SE: ", nrow(se), " genes x ", ncol(se), " samples ; assay: ",
@@ -46,16 +46,16 @@ message(
 )
 
 clinical_path <- file.path(paths$processed, "thyr_clinical.rds")
-if (!file.exists(clinical_path)) stop("thyr_clinical.rds not found (run 001 first)")
+if (!file.exists(clinical_path)) stop("thyr_clinical.rds not found (run 030 first)")
 clinical <- readRDS(clinical_path)
 message("Clinical: ", nrow(clinical), " cases")
 
 as_path <- file.path(paths$processed, "thyr_case_assigned_share.rds")
-if (!file.exists(as_path)) stop("thyr_case_assigned_share.rds not found (run 041 first)")
+if (!file.exists(as_path)) stop("thyr_case_assigned_share.rds not found (run 130 first)")
 assigned_share <- as.data.frame(readRDS(as_path))
 message("Assigned Share: ", nrow(assigned_share), " cases")
 
-# --- Driver classification (001) -------------------------------------------
+# --- Driver classification (030) -------------------------------------------
 # RET: exact match on the three RET fusion values of Designated_Driver.
 # BRAF: BRAF.MutV600E with no co-mutation (CandidateDriverMutation BRAF-only or
 # empty/NA in both WGS and RNA). The two masks are exclusive for this dataset.
@@ -84,7 +84,7 @@ driver_tbl <- data.frame(
 )
 driver_tbl <- driver_tbl[!is.na(driver_tbl$driver), , drop = FALSE]
 
-# --- Exposure classification (041) -----------------------------------------
+# --- Exposure classification (130) -----------------------------------------
 # dose_mgy == 0 -> Sporadic ; dose_mgy > 0 with AS >= threshold -> High.
 # Other cases (dose_mgy NA, or exposed with AS < threshold) drop out of scope.
 as_tbl <- data.frame(
@@ -102,7 +102,7 @@ exposure[is_sporadic] <- "Sporadic"
 exposure[is_high] <- "High"
 as_tbl$exposure <- exposure
 
-# --- Pair resolution (021 colData) -----------------------------------------
+# --- Pair resolution (120 colData) -----------------------------------------
 # One _merged Primary Tumor and one _merged Solid Tissue Normal per case.
 cd <- as.data.frame(colData(se))
 is_merged <- grepl("_merged", cd$sample_submitter_id)

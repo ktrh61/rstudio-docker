@@ -1,11 +1,11 @@
-# 080_test_expression_difference.R
+# 410_test_expression_difference.R
 # Test each analysis unit for a High-vs-Sporadic expression difference on the
-# DEGES-normalized counts from 070, with the exact permutation Brunner-Munzel
+# DEGES-normalized counts from 310, with the exact permutation Brunner-Munzel
 # test. No differential-expression call is made: the products are a complete
 # ranked gene table and a unit-level omnibus permutation test, which is what
 # the downstream gene-set analysis consumes.
-# Input : processed/thyr_normalized_counts.rds  (from 070; per-unit DGEList)
-#         utils/brunnermunzel_mc.R
+# Input : processed/thyr_normalized_counts.rds  (from 310; per-unit DGEList)
+#         lib/stat_brunnermunzel.R
 # Output: processed/thyr_expression_test.rds
 #           list(date, config, units)
 #           units = { R_Tumor, R_Normal, B_Tumor, B_Normal }; each holds
@@ -33,7 +33,7 @@ suppressPackageStartupMessages({
   library(edgeR)
 })
 
-source(file.path(paths$root, "utils", "brunnermunzel_mc.R"))
+source(file.path(paths$root, "lib", "stat_brunnermunzel.R"))
 
 # --- Configuration ---------------------------------------------------------
 N_PERM <- 999L # label shuffles for the empirical null
@@ -57,7 +57,7 @@ if (requireNamespace("RhpcBLASctl", quietly = TRUE)) {
 # --- Load inputs -----------------------------------------------------------
 norm_path <- file.path(paths$processed, "thyr_normalized_counts.rds")
 if (!file.exists(norm_path)) {
-  stop("thyr_normalized_counts.rds not found (run 070 first)")
+  stop("thyr_normalized_counts.rds not found (run 310 first)")
 }
 normalized <- readRDS(norm_path)
 message("Units: ", paste(names(normalized$units), collapse = ", "))

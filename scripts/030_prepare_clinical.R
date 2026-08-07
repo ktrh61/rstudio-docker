@@ -1,4 +1,4 @@
-# 001_prepare_clinical.R
+# 030_prepare_clinical.R
 # Prepare the clinical table from Science Data S1 (a TSV named .txt) for
 # downstream use: read all columns, coerce missing markers to NA, and type each
 # column (numeric where the column parses as numeric, character otherwise). No
@@ -63,4 +63,4 @@ message(
   nrow(clinical), " cases x ", ncol(clinical), " columns)"
 )
 
-message("001 complete. Clinical table prepared; all columns kept verbatim.")
+message("030 complete. Clinical table prepared; all columns kept verbatim.")

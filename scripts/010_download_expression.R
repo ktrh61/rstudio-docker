@@ -1,4 +1,4 @@
-# 003_download_expression.R
+# 010_download_expression.R
 # Download REBC-THYR Gene Expression Quantification files (STAR - Counts) from GDC.
 # Input : GDC files query (REBC-THYR, RNA-Seq, STAR - Counts, open access)
 # Output: raw/expression/<file_id>/<file>.rna_seq.augmented_star_gene_counts.tsv

@@ -1,12 +1,12 @@
-# 020_build_sample_mapping.R
+# 110_build_sample_mapping.R
 # Build a file-sample mapping for REBC-THYR STAR-Counts files by querying the
 # GDC API for case- and sample-level metadata.
 # Input : meta/manifest_gene_counts_<timestamp>.tsv   (from 010, latest is used)
-# Output: processed/file_sample_mapping.rds           (consumed by 021)
+# Output: processed/file_sample_mapping.rds           (consumed by 120)
 #
 # The manifest lists one row per expression file (file_id). For each file this
 # script resolves the owning case and biospecimen sample via the GDC API and
-# records the identifiers 021 needs to label SummarizedExperiment columns. API
+# records the identifiers 120 needs to label SummarizedExperiment columns. API
 # queries are sequential (rate limits); result parsing is parallelised.
 #
 # case_submitter_id is normalized here to the S1 form: the TSS-augmented prefix

@@ -1,4 +1,4 @@
-# 005_prepare_gene_lengths.R
+# 020_prepare_gene_lengths.R
 # Prepare gene lengths (exon union length per gene) from the GDC GENCODE v36 GTF.
 # Input : GDC reference GTF (downloaded; md5-verified)
 # Output: processed/gene_lengths.rds  (named numeric vector: ENSG id -> length in bp)

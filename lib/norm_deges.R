@@ -1,4 +1,4 @@
-# deges_muren_bm.R
+# norm_deges.R
 # TCC-faithful DEGES normalization (the X-Y-X / iDEGES protocol of TCC; Kadota
 # et al.) with MUREN as the normalizer and a studentized Brunner-Munzel
 # permutation test as the DEG screen. MUREN replaces TMM and the Brunner-Munzel
@@ -6,8 +6,8 @@
 # degenerate guard follow TCC::calcNormFactors.
 #
 # Requires (sourced by the caller before use):
-#   utils/norm_improved.R      (muren_norm)
-#   utils/brunnermunzel_mc.R   (brunnermunzel_pvalues)
+#   lib/norm_muren.R      (muren_norm)
+#   lib/stat_brunnermunzel.R   (brunnermunzel_pvalues)
 #   package edgeR
 #
 # `bm_method` selects how the screen's permutation p-values are obtained:
@@ -32,7 +32,7 @@
 # scaling_coeff is the per-sample size by which raw counts must be divided.
 # Divide by the target DGEList's lib.size and centre geometrically, so
 # lib.size * norm.factors stays proportional to scaling_coeff. Follows
-# utils/contamde_purity_functions.R. scaling_coeff and lib_size share order.
+# lib/purity_contamde.R. scaling_coeff and lib_size share order.
 muren_to_norm_factors <- function(scaling_coeff, lib_size) {
   if (any(!is.finite(scaling_coeff)) || any(scaling_coeff <= 0)) {
     stop("MUREN scaling coefficients must be finite and positive.")
@@ -93,10 +93,10 @@ deges_muren_bm <- function(counts, group, iteration = 1L,
                            bm_method = "auto",
                            muren_method = "lts", workers = 3L) {
   if (!exists("muren_norm", mode = "function", inherits = TRUE)) {
-    stop("muren_norm() must be loaded (source utils/norm_improved.R).")
+    stop("muren_norm() must be loaded (source lib/norm_muren.R).")
   }
   if (!exists("brunnermunzel_pvalues", mode = "function", inherits = TRUE)) {
-    stop("brunnermunzel_pvalues() must be loaded (utils/brunnermunzel_mc.R).")
+    stop("brunnermunzel_pvalues() must be loaded (lib/stat_brunnermunzel.R).")
   }
   group <- factor(group)
   group_levels <- levels(group)

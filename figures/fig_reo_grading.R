@@ -1,4 +1,4 @@
-# 280_plot_reo_evaluation_provisional.R  (PROVISIONAL / 仮置き)
+# fig_reo_grading.R  (PROVISIONAL / 仮置き)
 # Figure for the REO out-of-sample validation, same concept as the v7
 # 13_reo_evaluation_poc plot: REO reversal score (x) against assigned share
 # (radiation attribution %, y), coloured by exposure band, training arms open /

@@ -2,7 +2,7 @@
 
 # Treat the current working directory as the repository root.
 .root <- getwd()
-.markers <- c("Dockerfile", "setup.R")
+.markers <- c("setup.R", "scripts")
 .missing <- .markers[!file.exists(file.path(.root, .markers))]
 if (length(.missing) > 0) {
   stop(

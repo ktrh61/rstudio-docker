@@ -1,11 +1,11 @@
-# 090_test_enrichment.R
-# Gene-set enrichment for each analysis unit, on the ranking produced by 080.
+# 420_test_gene_sets.R
+# Gene-set enrichment for each analysis unit, on the ranking produced by 410.
 # Genes are ranked by the signed Brunner-Munzel statistic and the null comes
-# from the same label shuffles 080 used, so the gene-level and set-level
+# from the same label shuffles 410 used, so the gene-level and set-level
 # results rest on one permutation null.
-# Input : processed/thyr_normalized_counts.rds  (from 070; per-unit DGEList)
-#         processed/thyr_expression_test.rds    (from 080; n_perm and seed)
-#         utils/brunnermunzel_mc.R, utils/gsea_permutation.R
+# Input : processed/thyr_normalized_counts.rds  (from 310; per-unit DGEList)
+#         processed/thyr_expression_test.rds    (from 410; n_perm and seed)
+#         lib/stat_brunnermunzel.R, lib/gsea_permutation.R
 # Output: processed/thyr_enrichment_test.rds
 #           list(date, config, collections, units)
 #           units = { R_Tumor, R_Normal, B_Tumor, B_Normal }; each a data frame
@@ -26,7 +26,7 @@
 # else: its null is the largest |NES| anywhere in the collection per shuffle, so
 # inter-pathway correlation is carried exactly. The choice matches the level's
 # sparsity -- a collection carries signal in one or two sets, so the maximum is
-# the right statistic, just as the diffuse gene level in 080 called for a count.
+# the right statistic, just as the diffuse gene level in 410 called for a count.
 # A spike-in positive control (a 15% shift over one Hallmark set, planted in a
 # unit with no signal) is caught at fwer 0.003, so an empty result is a property
 # of the data. The claim is only that no set survives fwer correction; no test
@@ -50,8 +50,8 @@ suppressPackageStartupMessages({
   library(msigdbr)
 })
 
-source(file.path(paths$root, "utils", "brunnermunzel_mc.R"))
-source(file.path(paths$root, "utils", "gsea_permutation.R"))
+source(file.path(paths$root, "lib", "stat_brunnermunzel.R"))
+source(file.path(paths$root, "lib", "gsea_permutation.R"))
 
 # --- Configuration ---------------------------------------------------------
 SPECIES <- "Homo sapiens"
@@ -92,14 +92,14 @@ if (requireNamespace("RhpcBLASctl", quietly = TRUE)) {
 # --- Load inputs -----------------------------------------------------------
 norm_path <- file.path(paths$processed, "thyr_normalized_counts.rds")
 test_path <- file.path(paths$processed, "thyr_expression_test.rds")
-if (!file.exists(norm_path)) stop("thyr_normalized_counts.rds not found (070)")
-if (!file.exists(test_path)) stop("thyr_expression_test.rds not found (080)")
+if (!file.exists(norm_path)) stop("thyr_normalized_counts.rds not found (310)")
+if (!file.exists(test_path)) stop("thyr_expression_test.rds not found (410)")
 normalized <- readRDS(norm_path)
 expression_test <- readRDS(test_path)
 
 N_PERM <- expression_test$config$n_perm
 PERM_SEED <- expression_test$config$perm_seed
-message("Reusing 080's permutation null: ", N_PERM, " shuffles, seed ", PERM_SEED)
+message("Reusing 410's permutation null: ", N_PERM, " shuffles, seed ", PERM_SEED)
 
 # --- Gene sets -------------------------------------------------------------
 collect_sets <- function(spec) {
@@ -212,7 +212,7 @@ thyr_enrichment_test <- list(
   date = Sys.Date(),
   config = list(
     ranking = "signed Brunner-Munzel statistic",
-    permutation = "sample labels, shared with 080",
+    permutation = "sample labels, shared with 410",
     n_perm = N_PERM,
     perm_seed = PERM_SEED,
     primary_collection = PRIMARY_COLLECTION,

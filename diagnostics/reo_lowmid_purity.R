@@ -1,15 +1,15 @@
-# 260_estimate_tumor_purity_provisional.R  (PROVISIONAL / 仮置き)
+# reo_lowmid_purity.R  (PROVISIONAL / 仮置き)
 # Layer-1 QC for the REO out-of-sample validation: estimate R_Low / R_Mid tumour
 # purity on the SAME common scale as the training arms by pooling the whole RET
 # cohort (Sporadic + Low + Mid + High) in one ContamDE run, then check whether
 # the REO reversal score is driven by purity within a band. If score is
 # independent of purity, purity filtering the validation set would not change the
 # conclusion; if correlated, a full re-filter (deferred layer 2) is warranted.
-# Provisional: not wired into the pipeline; mirrors 060 pooled ContamDE.
+# Provisional: not wired into the pipeline; mirrors 220 pooled ContamDE.
 # Input : processed/thyr_clinical.rds, thyr_case_assigned_share.rds,
 #         thyr_se_raw.rds, thyr_reo_evaluation.rds
-#         utils/utils_improved.R, utils/norm_improved.R,
-#         utils/contamde_purity_functions.R, utils/reo_lowmid_cases.R
+#         lib/norm_muren_helpers.R, lib/norm_muren.R,
+#         lib/purity_contamde.R, lib/reo_lowmid_cases.R
 # Output: processed/thyr_reo_lowmid_purity_provisional.rds
 
 source("setup.R")
@@ -18,10 +18,10 @@ suppressPackageStartupMessages({
   library(edgeR)
   library(limma)
 })
-source(file.path(paths$root, "utils", "utils_improved.R"))
-source(file.path(paths$root, "utils", "norm_improved.R"))
-source(file.path(paths$root, "utils", "contamde_purity_functions.R"))
-source(file.path(paths$root, "utils", "reo_lowmid_cases.R"))
+source(file.path(paths$root, "lib", "norm_muren_helpers.R"))
+source(file.path(paths$root, "lib", "norm_muren.R"))
+source(file.path(paths$root, "lib", "purity_contamde.R"))
+source(file.path(paths$root, "lib", "reo_lowmid_cases.R"))
 
 workers <- 16L # development; canonical is 4L
 if (requireNamespace("RhpcBLASctl", quietly = TRUE)) {

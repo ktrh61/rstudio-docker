@@ -19,7 +19,7 @@
 
 if (!requireNamespace("fgsea", quietly = TRUE)) {
   stop(
-    "Package 'fgsea' is required to source utils/gsea_permutation.R.",
+    "Package 'fgsea' is required to source lib/gsea_permutation.R.",
     call. = FALSE
   )
 }
