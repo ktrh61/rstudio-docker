@@ -175,6 +175,7 @@ process_unit <- function(samples1, samples2, group_labels) {
       iter_n_genes = deges$iterations$n_non_deg,
       iter_deg_count = deges$iterations$deg_count,
       iter_method = deges$iterations$exclusion_method,
+      iter_pi0 = deges$iterations$pi0,
       final_deg_count = deges$iterations$deg_count[deges$iterations$n]
     )
   )
@@ -214,6 +215,7 @@ thyr_normalized_counts <- list(
   config = list(
     iteration = ITERATION,
     fdr = DEGES_FDR,
+    fdr_method = "storey_plugin_lambda0.5",
     floor_pdeg = FLOOR_PDEG,
     muren_method = MUREN_METHOD,
     workers = WORKERS,

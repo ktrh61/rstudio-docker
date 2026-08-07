@@ -20,8 +20,9 @@
 # fixed gene x sample count matrix:
 #   STEP 1 : initial MUREN scaling coefficients on the full matrix.
 #   STEP 2 : repeat `iteration` times -- screen DEGs on the FULL matrix with the
-#            current coefficients (MC Brunner-Munzel -> BH; normal cutoff set vs
-#            a floorPDEG raw-p rank set, the larger adopted), then re-estimate
+#            current coefficients (permutation Brunner-Munzel -> Storey q with
+#            pi0 fixed at lambda = 0.5; normal cutoff set vs a floorPDEG raw-p
+#            rank set, the larger adopted), then re-estimate
 #            MUREN coefficients from the non-DEG genes. Runs exactly `iteration`
 #            times; stops early only when no non-DEG genes remain (TCC guard).
 # Returns the final per-sample scaling coefficients and per-iteration
@@ -68,9 +69,10 @@ muren_to_norm_factors <- function(scaling_coeff, lib_size) {
 # exact enumeration (or a single Monte Carlo null). With bm_method = "auto"
 # the p-values are exact whenever C(n, nx) is small enough to enumerate, so
 # the screen carries no sampling error, no 1/(n_perm + 1) floor, and no seed
-# dependence. That sharpens the floorPDEG ranking; it does not by itself make
-# the BH cutoff fire, which is limited by the heavy tail of the permutation
-# null at these group sizes rather than by p-value resolution.
+# dependence. Under the protocol-wide Storey correction (q = pi0_hat * BH with
+# pi0_hat fixed at lambda = 0.5; reorg plan v2 D1) the screen can fire on real
+# data, unlike the historical BH form whose cutoff was out of reach under the
+# heavy-tailed permutation null at these group sizes.
 .deges_bm_pvalues <- function(cpm_matrix, group, group_levels,
                               n_perm, seed, alternative, bm_method) {
   g1 <- which(group == group_levels[1])
@@ -113,6 +115,7 @@ deges_muren_bm <- function(counts, group, iteration = 1L,
   n_non_deg <- integer(iteration)
   deg_count <- integer(iteration)
   exclusion_method <- character(iteration)
+  pi0 <- numeric(iteration)
   n_done <- 0L
 
   for (i in seq_len(iteration)) {
@@ -127,7 +130,10 @@ deges_muren_bm <- function(counts, group, iteration = 1L,
     pvalues <- .deges_bm_pvalues(
       cpm_matrix, group, group_levels, n_perm, seed, alternative, bm_method
     )
-    p_adj <- p.adjust(pvalues, method = "BH")
+    # Storey q with pi0_hat at lambda = 0.5 (plug-in; reorg plan v2 D1):
+    # q = pi0_hat * (BH adjusted p). Monotone because BH is monotone.
+    pi0_hat <- min(1, mean(pvalues > 0.5) / 0.5)
+    p_adj <- pmin(1, pi0_hat * p.adjust(pvalues, method = "BH"))
 
     # Normal cutoff set vs floorPDEG raw-p rank set; adopt the larger.
     normal_deg <- which(p_adj < fdr)
@@ -147,9 +153,10 @@ deges_muren_bm <- function(counts, group, iteration = 1L,
     n_non_deg[i] <- length(non_deg)
     deg_count[i] <- length(normal_deg)
     exclusion_method[i] <- method_used
+    pi0[i] <- pi0_hat
     message(sprintf(
-      "      iteration %d: %d DEGs (%s), %d non-DEG genes retained",
-      i, length(normal_deg), method_used, length(non_deg)
+      "      iteration %d: pi0_hat %.3f, %d DEGs (%s), %d non-DEG genes retained",
+      i, pi0_hat, length(normal_deg), method_used, length(non_deg)
     ))
 
     # TCC degenerate guard: stop if removing DEGs leaves no non-DEG genes.
@@ -171,7 +178,8 @@ deges_muren_bm <- function(counts, group, iteration = 1L,
       n = n_done,
       n_non_deg = n_non_deg[keep],
       deg_count = deg_count[keep],
-      exclusion_method = exclusion_method[keep]
+      exclusion_method = exclusion_method[keep],
+      pi0 = pi0[keep]
     )
   )
 }
