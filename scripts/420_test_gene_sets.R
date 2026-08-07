@@ -1,90 +1,78 @@
 # 420_test_gene_sets.R
-# Gene-set enrichment for each analysis unit, on the ranking produced by 410.
-# Genes are ranked by the signed Brunner-Munzel statistic and the null comes
-# from the same label shuffles 410 used, so the gene-level and set-level
-# results rest on one permutation null.
+# Gene-set enrichment for each analysis unit, on the ranking produced by the
+# Brunner-Munzel contrast, under the spec-B protocol (reorg plan v2 D2/D3/D7,
+# decided 2026-08-07). The null comes from the same label shuffles 410 used
+# (its saved perm_index, consumed by reference), so the gene-level and
+# set-level results rest on one permutation null.
 # Input : processed/thyr_normalized_counts.rds  (from 310; per-unit DGEList)
-#         processed/thyr_expression_test.rds    (from 410; n_perm and seed)
-#         lib/stat_brunnermunzel.R, lib/gsea_permutation.R
+#         processed/thyr_expression_test.rds    (from 410; perm_index)
+#         lib/stat_brunnermunzel.R, lib/gsea_permutation.R,
+#         lib/gsea_collections.R
 # Output: processed/thyr_enrichment_test.rds
 #           list(date, config, collections, units)
 #           units = { R_Tumor, R_Normal, B_Tumor, B_Normal }; each a data frame
-#             sets : collection, pathway, size, ES, NES, pval, fwer,
-#                    fdr_subramanian, redundant_with, leading_edge
+#             sets : collection, pathway, size, ES, NES, pval, q_tail,
+#                    fwer_wy, redundant_with, leading_edge
 #
-# No differentially expressed gene list is used or produced: GSEA consumes the
-# whole ranking, which is what makes it the right test when the signal is
-# diffuse and no single gene survives correction.
+# GSEA consumes the whole ranking. That choice is not a fallback: it is
+# threshold-free (no DEG-list cut whose membership sits on the q cliff decides
+# what is tested) and the label-shuffle null carries the inter-gene dependence
+# exactly, which is what a diffuse-signal hypothesis requires.
 #
-# Only process-definition collections are used. Experiment-derived collections
-# (C2:CGP, C6, C7) are excluded because their sets are built from perturbation
-# experiments -- acute high-dose irradiation, oncogene activation -- whose
-# confounding this design exists to avoid. NES and fwer are computed within each
-# collection, so adding an exploratory collection cannot dilute the primary one.
+# Ranking metric: tie-averaged normal scores of the signed Brunner-Munzel
+# statistic (lib/gsea_permutation.R header). Enrichment score: weighted
+# running sum at gseaParam = 1, evaluated at tie-block boundaries only, so no
+# arbitrary tie-break injects order the data does not contain; on tie-free
+# input it is exactly the standard GSEA statistic (verified in
+# tests/testthat/test-gsea-block-es.R).
 #
-# Inference is the Westfall-Young family-wise error rate (fwer), and nothing
-# else: its null is the largest |NES| anywhere in the collection per shuffle, so
-# inter-pathway correlation is carried exactly. The choice matches the level's
-# sparsity -- a collection carries signal in one or two sets, so the maximum is
-# the right statistic, just as the diffuse gene level in 410 called for a count.
-# A spike-in positive control (a 15% shift over one Hallmark set, planted in a
-# unit with no signal) is caught at fwer 0.003, so an empty result is a property
-# of the data. The claim is only that no set survives fwer correction; no test
-# of a diffuse pathway excess is attempted, and none is claimed. pval and
-# fdr_subramanian are descriptive: pval is the uncorrected per-set value used
-# for ordering, and fdr_subramanian (Subramanian et al. 2005) is carried to
-# document why standard GSEA fails here -- it divides by the mean of the pooled
-# null, which under inter-pathway correlation follows whichever way the
-# collection drifts in one realization, and on this data calls 74% of Hallmark
-# in a unit with no gene-level signal.
+# Inference: the collection-internal Subramanian tail-ratio FDR, q_tail
+# < FDR_CUT (0.10), within each of the four families. NES standardization
+# treats the sets of a family as exchangeable under the null -- the
+# pre-committed stance of a hypothesis that carries no set-level prediction --
+# and the pooled null gives m x B resolution. No cross-family claim is made.
+# fwer_wy (Westfall-Young) is retained as a sensitivity column only; q < 0.25
+# is not used, not even as an exploratory bar.
+#
+# Families: H, C2:CP, C5:GO:BP, and C2:CGP:radiation -- an exploratory family
+# whose curation regex was fixed before this inference touched real data
+# (lib/gsea_collections.R, with the construct caveat recorded there). C6/C7
+# stay excluded on relevance grounds. Adding a family cannot dilute another
+# family's q-values (everything is computed within collection).
+#
+# The change from the previous spec (gseaParam = 0, FWER as primary inference)
+# is a protocol amendment, not a bug fix; the amendment record keeps the
+# before/after specs and what had been seen when. The spike-in positive
+# control is re-run under this inference after the D6 held-out null
+# calibration passes (reorg plan v2, phase 4 step 15).
 #
 # The size window drops both noise-prone tiny sets and the vague giant ones;
 # redundant_with flags a set whose leading edge is largely contained in a
-# better-ranked set, which is how an ontology's parent and child terms both
-# surface on a single signal.
+# better-ranked set (block-granular edges), gated at q_tail < FDR_CUT.
 
 source("setup.R")
 
 suppressPackageStartupMessages({
   library(edgeR)
   library(msigdbr)
+  library(parallel)
 })
 
 source(file.path(paths$root, "lib", "stat_brunnermunzel.R"))
 source(file.path(paths$root, "lib", "gsea_permutation.R"))
+source(file.path(paths$root, "lib", "gsea_collections.R"))
 source(file.path(paths$root, "lib", "units.R"))
 source(file.path(paths$root, "lib", "annotation.R"))
 
 # --- Configuration ---------------------------------------------------------
 SPECIES <- "Homo sapiens"
-COLLECTIONS <- list(
-  "H" = list(collection = "H", subcollection = NA_character_),
-  "C2:CP" = list(
-    collection = "C2",
-    subcollection = c(
-      "CP:REACTOME", "CP:WIKIPATHWAYS", "CP:KEGG_MEDICUS",
-      "CP:BIOCARTA", "CP:PID"
-    )
-  ),
-  "C5:GO:BP" = list(collection = "C5", subcollection = "GO:BP")
-)
-PRIMARY_COLLECTION <- "H" # the pre-specified inferential collection
-# Unweighted Kolmogorov-Smirnov enrichment score. The studentized Brunner-
-# Munzel statistic can reach +/-Inf (its denominator vanishes for some
-# allocations), so a magnitude weighting would let a single such gene dominate
-# a pathway's score and, in permutations, inflate whichever pathway's max-|NES|
-# null happens to contain it -- corrupting the Westfall-Young null. Rank-only
-# scoring is bounded and avoids this. The choice follows from the metric's tail,
-# known a priori, not from the results: at gseaParam = 1 the primary conclusion
-# is the same (R_Tumor Hallmark min fwer 0.64 vs 0.83 here, both null).
-GSEA_PARAM <- 0
-MIN_SET_SIZE <- 15L
-MAX_SET_SIZE <- 500L
+GSEA_PARAM <- 1 # weighted running sum on the normal scores
+MIN_SET_SIZE <- GSEA_MIN_SET_SIZE # lib/gsea_collections.R; shared with the
+MAX_SET_SIZE <- GSEA_MAX_SET_SIZE # null calibration diagnostic
 REDUNDANT_JACCARD <- 0.5
-REDUNDANT_MAX_PVAL <- 0.05 # sets below this get a redundancy annotation
-# EXACT_THREADS / BM_EXACT_MAX come from config.R via setup.R. 420 computes BM
-# statistics only (no p-value path), so exact.max.allocations is inert here;
-# it is set for uniformity with 310/410.
+# FDR_CUT / WORKERS / EXACT_THREADS / BM_EXACT_MAX come from config.R via
+# setup.R. 420 computes BM statistics only (no p-value path), so
+# exact.max.allocations is inert here; it is set for uniformity with 310/410.
 
 options(
   brunnermunzel.exact.max.allocations = BM_EXACT_MAX,
@@ -100,30 +88,21 @@ if (!file.exists(norm_path)) stop("thyr_normalized_counts.rds not found (310)")
 if (!file.exists(test_path)) stop("thyr_expression_test.rds not found (410)")
 normalized <- readRDS(norm_path)
 expression_test <- readRDS(test_path)
-
-N_PERM <- expression_test$config$n_perm
-PERM_SEED <- expression_test$config$perm_seed
-message("Reusing 410's permutation null: ", N_PERM, " shuffles, seed ", PERM_SEED)
+message(
+  "Reusing 410's permutation index: ",
+  expression_test$config$n_perm, " shuffles per unit"
+)
 
 # --- Gene sets -------------------------------------------------------------
-collect_sets <- function(spec) {
-  frames <- lapply(spec$subcollection, function(sub) {
-    if (is.na(sub)) {
-      msigdbr(species = SPECIES, collection = spec$collection)
-    } else {
-      msigdbr(
-        species = SPECIES, collection = spec$collection, subcollection = sub
-      )
-    }
-  })
-  frame <- do.call(rbind, frames)
-  split(frame$ensembl_gene, frame$gs_name)
-}
-
-gene_sets <- lapply(COLLECTIONS, collect_sets)
+collections <- load_gene_set_collections(SPECIES)
+gene_sets <- collections$gene_sets
 message("Gene sets before filtering: ", paste(
   names(gene_sets), lengths(gene_sets), sep = "=", collapse = " "
 ))
+message(
+  "C2:CGP:radiation curation: ",
+  length(collections$curation$radiation_sets), " sets"
+)
 
 # --- Per-unit enrichment ---------------------------------------------------
 test_unit <- function(dgelist, unit) {
@@ -140,7 +119,12 @@ test_unit <- function(dgelist, unit) {
   cpm_matrix <- cpm_matrix[!duplicated(ensembl), , drop = FALSE]
   rownames(cpm_matrix) <- ensembl[!duplicated(ensembl)]
   nx <- length(sporadic)
-  n <- ncol(cpm_matrix)
+
+  perm_index <- expression_test$units[[unit]]$perm_index
+  n_perm <- ncol(perm_index)
+  if (nrow(perm_index) != ncol(cpm_matrix)) {
+    stop(unit, ": perm_index rows do not match the unit's sample count.")
+  }
 
   index <- lapply(gene_sets, gsea_pathway_index,
     gene_ids = rownames(cpm_matrix),
@@ -149,58 +133,59 @@ test_unit <- function(dgelist, unit) {
   collection_of <- rep(names(index), lengths(index))
   flat <- unlist(unname(index), recursive = FALSE)
 
-  metric <- brunnermunzel_statistics(cpm_matrix, nx)
-  observed <- gsea_scores(metric, flat, GSEA_PARAM)
+  scores <- gsea_normal_scores(brunnermunzel_statistics(cpm_matrix, nx))
+  observed <- gsea_block_scores(scores, flat)
 
-  set.seed(PERM_SEED)
-  null <- vapply(
-    seq_len(N_PERM),
-    function(i) {
-      gsea_scores(
-        brunnermunzel_statistics(
-          cpm_matrix[, sample(n), drop = FALSE], nx
-        ),
-        flat, GSEA_PARAM
-      )
-    },
-    numeric(length(flat))
+  null_columns <- mclapply(seq_len(n_perm), function(i) {
+    gsea_block_scores(
+      gsea_normal_scores(brunnermunzel_statistics(
+        cpm_matrix[, perm_index[, i], drop = FALSE], nx
+      )),
+      flat
+    )
+  }, mc.cores = WORKERS)
+  null <- matrix(
+    unlist(null_columns), nrow = length(flat), ncol = n_perm,
+    dimnames = list(names(flat), NULL)
   )
 
-  leading_edge <- gsea_leading_edge(metric, flat, rownames(cpm_matrix), GSEA_PARAM)
+  leading_edge <- gsea_block_leading_edge(scores, flat, rownames(cpm_matrix))
   per_collection <- lapply(names(index), function(collection) {
     keep <- collection_of == collection
-    normalized <- gsea_nes(observed[keep], null[keep, , drop = FALSE])
+    standardized <- gsea_nes(observed[keep], null[keep, , drop = FALSE])
     result <- data.frame(
       collection = collection,
       pathway = names(observed)[keep],
       size = lengths(flat[keep]),
       ES = unname(observed[keep]),
-      NES = unname(normalized$nes),
-      pval = gsea_pathway_pvalues(normalized$nes, normalized$nes_null),
-      fwer = gsea_westfall_young(normalized$nes, normalized$nes_null),
-      fdr_subramanian = gsea_subramanian_fdr(
-        normalized$nes, normalized$nes_null
-      ),
+      NES = unname(standardized$nes),
+      pval = gsea_pathway_pvalues(standardized$nes, standardized$nes_null),
+      q_tail = gsea_tail_ratio_q(standardized$nes, standardized$nes_null),
+      fwer_wy = gsea_westfall_young(standardized$nes, standardized$nes_null),
       stringsAsFactors = FALSE
     )
     result$redundant_with <- gsea_redundancy(
       result, leading_edge, REDUNDANT_JACCARD,
-      candidate = !is.na(result$pval) & result$pval < REDUNDANT_MAX_PVAL
+      candidate = !is.na(result$q_tail) & result$q_tail < FDR_CUT
     )
     result$leading_edge <- I(unname(leading_edge[result$pathway]))
-    result[order(result$fwer, result$pval, -abs(result$NES)), , drop = FALSE]
+    result[order(result$q_tail, result$pval, -abs(result$NES)), , drop = FALSE]
   })
 
   sets <- do.call(rbind, per_collection)
   rownames(sets) <- NULL
 
-  primary <- sets[sets$collection == PRIMARY_COLLECTION, , drop = FALSE]
+  per_family <- vapply(names(index), function(collection) {
+    rows <- sets[sets$collection == collection, , drop = FALSE]
+    sprintf(
+      "%s q<%.2f %d (min %.3f)", collection, FDR_CUT,
+      sum(rows$q_tail < FDR_CUT, na.rm = TRUE),
+      min(rows$q_tail, na.rm = TRUE)
+    )
+  }, character(1))
   message(sprintf(
-    "  %-9s %d sets | %s min fwer %.3f (fwer<0.05 %d) | top: %s | [ref] fdr_subramanian<0.25 %d",
-    unit, nrow(sets), PRIMARY_COLLECTION,
-    min(primary$fwer, na.rm = TRUE), sum(primary$fwer < 0.05, na.rm = TRUE),
-    sub("^HALLMARK_", "", primary$pathway[1]),
-    sum(sets$fdr_subramanian < 0.25, na.rm = TRUE)
+    "  %-9s %d sets | %s", unit, nrow(sets),
+    paste(per_family, collapse = " | ")
   ))
   sets
 }
@@ -215,25 +200,28 @@ names(units) <- names(normalized$units)
 thyr_enrichment_test <- list(
   date = Sys.Date(),
   config = list(
-    ranking = "signed Brunner-Munzel statistic",
-    permutation = "sample labels, shared with 410",
-    n_perm = N_PERM,
-    perm_seed = PERM_SEED,
-    primary_collection = PRIMARY_COLLECTION,
-    excluded_collections = c("C2:CGP", "C6", "C7"),
+    ranking = "tie-averaged normal scores of the signed BM statistic",
+    es = "tie-block invariant weighted running sum, gseaParam = 1",
+    permutation = "sample labels; 410's saved perm_index, by reference",
+    n_perm = expression_test$config$n_perm,
+    perm_seed = expression_test$config$perm_seed,
+    perm_index_hash = vapply(
+      expression_test$units, function(u) u$perm_index_hash, character(1)
+    ),
+    inference = paste(
+      "collection-internal Subramanian tail-ratio FDR, q_tail <",
+      FDR_CUT, "; fwer_wy is a sensitivity column"
+    ),
+    q_threshold = FDR_CUT,
+    excluded_collections = c("C2:CGP (except radiation subset)", "C6", "C7"),
+    radiation_curation = collections$curation,
     min_set_size = MIN_SET_SIZE,
     max_set_size = MAX_SET_SIZE,
     redundant_jaccard = REDUNDANT_JACCARD,
-    redundant_max_pval = REDUNDANT_MAX_PVAL,
     gsea_param = GSEA_PARAM,
-    inference = paste(
-      "Westfall-Young fwer, within collection (primary and only);",
-      "pval and fdr_subramanian are descriptive"
-    ),
-    msigdbr_version = as.character(packageVersion("msigdbr")),
-    fgsea_version = as.character(packageVersion("fgsea"))
+    msigdbr_version = as.character(packageVersion("msigdbr"))
   ),
-  collections = names(COLLECTIONS),
+  collections = names(gene_sets),
   units = units
 )
 
