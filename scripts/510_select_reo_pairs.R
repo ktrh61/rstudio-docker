@@ -8,11 +8,12 @@
 # Output: processed/thyr_reo_candidate_pairs.rds, output/reo_candidate_pairs.csv
 #
 # A REO pair (up-gene, down-gene) has a stable within-sample order in Sporadic
-# (R0) and flips in High (R1). Because 410's exact permutation BM leaves no
-# thresholded DEG list, the candidate gene pool is the top N genes by BM effect
-# magnitude |effect - 0.5| (not a DEG cut), split into up (effect > 0.5, higher
-# in High) and down (effect < 0.5). The pool only feeds pair generation; the
-# reversal criteria below are the actual filter and are DE-independent.
+# (R0) and flips in High (R1). The candidate gene pool is the top N genes by BM
+# effect magnitude |effect - 0.5|, not a DEG cut: pool membership is threshold-
+# free by design, so it does not ride the q cliff (a Storey q < 0.10 DEG set
+# exists in 410 but is deliberately not used here). The pool only feeds pair
+# generation; the reversal criteria below are the actual filter and are
+# DE-independent.
 #
 # Expression is TPM (length-normalized), required because REO compares gene i vs
 # gene j WITHIN a sample and raw/CPM counts confound that with gene length. TPM
