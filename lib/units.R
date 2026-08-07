@@ -16,3 +16,14 @@ unit_arms <- function(group, unit = "") {
   }
   list(sporadic = sporadic, high = high)
 }
+
+# The SE's single count assay, verified. 120 stores exactly one assay named by
+# the data-driven strand selection ("stranded_second" on this dataset); callers
+# must not hardcode that name -- this accessor stops if the invariant breaks.
+se_single_assay <- function(se) {
+  an <- SummarizedExperiment::assayNames(se)
+  if (length(an) != 1L) {
+    stop("Expected a single assay in the SE, found: ", paste(an, collapse = ", "))
+  }
+  SummarizedExperiment::assay(se, 1L)
+}

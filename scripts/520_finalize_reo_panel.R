@@ -1,9 +1,9 @@
 # 520_finalize_reo_panel.R
 # Build the final REO panel from the candidate pairs (510) by greedy, non-
 # redundant selection, then set a data-driven boundary zone and classification.
-# Input : processed/thyr_reo_candidate_pairs.rds  (from 100)
+# Input : processed/thyr_reo_candidate_pairs.rds  (from 510)
 #         processed/thyr_normalized_counts.rds     (from 310; R_Tumor sample set)
-#         processed/thyr_se_raw.rds                (from 120; stranded_second)
+#         processed/thyr_se_raw.rds                (from 120; single count assay)
 #         processed/gene_lengths.rds               (from 020)
 #         lib/reo.R
 # Output: processed/thyr_reo_panel.rds, output/reo_panel.csv
@@ -23,8 +23,8 @@ suppressPackageStartupMessages({
   library(SummarizedExperiment)
 })
 
-source(file.path(paths$root, "lib", "reo.R"))
 source(file.path(paths$root, "lib", "units.R"))
+source(file.path(paths$root, "lib", "reo.R"))
 
 # --- Configuration ---------------------------------------------------------
 TARGET_PANEL_SIZE <- 10L

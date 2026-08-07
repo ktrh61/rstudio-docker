@@ -7,7 +7,7 @@
 # descriptive; it does not alter the panel or its boundary.
 # Input : processed/thyr_reo_panel.rds             (from 520; panel + boundary)
 #         processed/thyr_analysis_cohorts.rds      (from 230; include_reo_evaluation)
-#         processed/thyr_se_raw.rds                (from 120; stranded_second)
+#         processed/thyr_se_raw.rds                (from 120; single count assay)
 #         processed/gene_lengths.rds               (from 020)
 #         lib/reo.R
 # Output: processed/thyr_reo_evaluation.rds, output/reo_evaluation_samples.csv
@@ -23,10 +23,10 @@ suppressPackageStartupMessages({
   library(SummarizedExperiment)
 })
 
+source(file.path(paths$root, "lib", "units.R"))
 source(file.path(paths$root, "lib", "reo.R"))
 source(file.path(paths$root, "lib", "stat_brunnermunzel.R"))
 
-# AS bands (percent). High (>= 66.6) is the training arm; these are below it.
 # AS band boundaries come from config.R (AS_LOW_MAX / AS_HIGH_MIN); the band
 # assignment itself is fixed upstream in 140/230.
 

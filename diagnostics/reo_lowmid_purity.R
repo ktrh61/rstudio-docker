@@ -18,6 +18,7 @@ suppressPackageStartupMessages({
   library(edgeR)
   library(limma)
 })
+source(file.path(paths$root, "lib", "units.R"))
 source(file.path(paths$root, "lib", "norm_muren_helpers.R"))
 source(file.path(paths$root, "lib", "norm_muren.R"))
 source(file.path(paths$root, "lib", "purity_contamde.R"))
@@ -48,7 +49,7 @@ message("RET cohort with pairs: ",
 # --- Pooled ContamDE on the whole RET cohort (common scale) ----------------
 gene_info <- as.data.frame(rowData(se))
 is_pc <- gene_info$gene_type == "protein_coding"
-counts_all <- assay(se, "stranded_second")
+counts_all <- se_single_assay(se)
 keep <- filter_pc_expr_mask(counts_all, is_pc, cases$normal_id, cases$tumor_id)
 np <- nrow(cases)
 counts <- cbind(counts_all[keep, cases$normal_id, drop = FALSE],

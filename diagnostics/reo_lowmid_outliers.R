@@ -15,6 +15,7 @@ suppressPackageStartupMessages({
   library(edgeR)
 })
 source(file.path(paths$root, "lib", "qc_pc_od.R"))
+source(file.path(paths$root, "lib", "units.R"))
 source(file.path(paths$root, "lib", "gene_filter.R"))
 source(file.path(paths$root, "lib", "stat_brunnermunzel.R"))
 
@@ -38,7 +39,7 @@ message("R_Low/Mid tumours: ",
   paste(names(table(cases$band)), table(cases$band), sep = "=", collapse = " "))
 
 # --- PC-OD per band on tumour log-CPM (same scale as 210) ------------------
-counts_all <- assay(se, "stranded_second")
+counts_all <- se_single_assay(se)
 run_pcod <- function(ids) {
   # keep_lib_sizes = FALSE is this diagnostic's historical behaviour (210 uses
   # TRUE); the divergence is preserved, unification is a recorded open item.

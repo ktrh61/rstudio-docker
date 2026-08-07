@@ -6,7 +6,7 @@
 # classification threshold marked. Shows the graded trend (band medians rise
 # with assigned share). Provisional: not wired into the pipeline; regenerates
 # output/reo_poc_vs_reversal.png from the saved panel/evaluation objects.
-# Input : processed/thyr_reo_panel.rds        (from 110; panel + boundary + training)
+# Input : processed/thyr_reo_panel.rds        (from 520; panel + boundary + training)
 #         processed/thyr_reo_evaluation.rds   (from 120; R_Low/Mid scores)
 #         processed/thyr_se_raw.rds           (sample -> case for training AS)
 #         processed/thyr_case_assigned_share.rds (assigned share)

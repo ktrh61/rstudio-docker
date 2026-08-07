@@ -1,17 +1,16 @@
-# log2 TPM from a SummarizedExperiment's stranded_second counts, for REO.
+# log2 TPM from the SE's single count assay (the strand selected upstream in
+# 120), for REO. Requires lib/units.R (se_single_assay).
 #
 # REO compares gene i vs gene j WITHIN a sample, so expression must be length-
 # normalized (TPM); raw or CPM counts confound the within-sample order with gene
 # length. The per-sample TPM scaling (dividing by the sample total) cancels in a
 # pair ratio r = log2(TPM_i / TPM_j) = log2(rate_i / rate_j), so REO is free of
-# library-size / composition normalization -- only gene length matters. TPM is
-# kept here (harmless, matches the original panel) over the stranded_second
-# assay chosen upstream; the unstranded TPM must not be used.
+# library-size / composition normalization -- only gene length matters.
 #
 # All three REO scripts (510/520/530) call this so a panel built on one sample
 # set is applied to another with an identical expression definition.
 reo_log2_tpm <- function(se, gene_lengths, samples) {
-  counts <- SummarizedExperiment::assay(se, "stranded_second")[, samples, drop = FALSE]
+  counts <- se_single_assay(se)[, samples, drop = FALSE]
   ensembl <- sub("\\..*$", "", rownames(counts))
   has_len <- ensembl %in% names(gene_lengths)
   counts <- counts[has_len, , drop = FALSE]

@@ -3,7 +3,7 @@
 # for the R cohort (RET/PTC) tumour comparison High vs Sporadic.
 # Input : processed/thyr_expression_test.rds     (from 410; per-gene BM effect)
 #         processed/thyr_normalized_counts.rds   (from 310; R_Tumor sample set)
-#         processed/thyr_se_raw.rds              (from 120; stranded_second counts)
+#         processed/thyr_se_raw.rds              (from 120; single count assay)
 #         processed/gene_lengths.rds             (from 020; unversioned lengths)
 # Output: processed/thyr_reo_candidate_pairs.rds, output/reo_candidate_pairs.csv
 #
@@ -16,8 +16,8 @@
 #
 # Expression is TPM (length-normalized), required because REO compares gene i vs
 # gene j WITHIN a sample and raw/CPM counts confound that with gene length. TPM
-# is computed here from the stranded_second counts (the strand chosen upstream
-# in 110-120); the unstranded TPM in the raw SE must not be used. REO is
+# is computed here from the SE's single count assay (the strand chosen
+# upstream in 110-120; the SE stores no TPM). REO is
 # normalization-free (within-sample ranks), so DEGES normalization is irrelevant.
 #
 # Selection (following the v7 policy):
@@ -35,8 +35,8 @@ suppressPackageStartupMessages({
   library(SummarizedExperiment)
 })
 
-source(file.path(paths$root, "lib", "reo.R"))
 source(file.path(paths$root, "lib", "units.R"))
+source(file.path(paths$root, "lib", "reo.R"))
 source(file.path(paths$root, "lib", "annotation.R"))
 
 # --- Configuration ---------------------------------------------------------
@@ -68,7 +68,7 @@ r1_samples <- colnames(dge)[arms$high]
 message("R0 (Sporadic) tumour: ", length(r0_samples),
   " ; R1 (High) tumour: ", length(r1_samples))
 
-# --- log2 TPM from stranded_second counts (shared definition) --------------
+# --- log2 TPM from the single count assay (shared definition) ---------------
 log2_tpm <- reo_log2_tpm(se, gene_lengths, c(r0_samples, r1_samples))
 message("TPM matrix: ", nrow(log2_tpm), " length-annotated genes x ", ncol(log2_tpm), " samples")
 
@@ -177,7 +177,7 @@ thyr_reo_candidate_pairs <- list(
     params = PARAMS,
     n_r0 = n_r0, n_r1 = n_r1,
     ranking_metric = "abs(effect - 0.5) from 410 BM",
-    expression = "TPM from stranded_second counts"
+    expression = "TPM from the selected-strand count assay"
   ),
   pairs = pairs
 )
