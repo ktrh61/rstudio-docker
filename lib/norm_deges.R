@@ -116,6 +116,9 @@ deges_muren_bm <- function(counts, group, iteration = 1L,
   deg_count <- integer(iteration)
   exclusion_method <- character(iteration)
   pi0 <- numeric(iteration)
+  removed_frac <- numeric(iteration)
+  jaccard <- rep(NA_real_, iteration)
+  previous_deg <- NULL
   n_done <- 0L
 
   for (i in seq_len(iteration)) {
@@ -154,9 +157,19 @@ deges_muren_bm <- function(counts, group, iteration = 1L,
     deg_count[i] <- length(normal_deg)
     exclusion_method[i] <- method_used
     pi0[i] <- pi0_hat
+    removed_frac[i] <- length(potential_deg) / n_genes
+    # Set-level stability of the adopted exclusion set across iterations:
+    # counts alone can hide churn when the q cutoff sits on the cliff edge.
+    if (!is.null(previous_deg)) {
+      jaccard[i] <- length(intersect(previous_deg, potential_deg)) /
+        length(union(previous_deg, potential_deg))
+    }
+    previous_deg <- potential_deg
     message(sprintf(
-      "      iteration %d: pi0_hat %.3f, %d DEGs (%s), %d non-DEG genes retained",
-      i, pi0_hat, length(normal_deg), method_used, length(non_deg)
+      "      iteration %d: pi0_hat %.3f, %d DEGs (%s), %d non-DEG genes retained, removed %.1f%%%s",
+      i, pi0_hat, length(normal_deg), method_used, length(non_deg),
+      100 * removed_frac[i],
+      if (is.na(jaccard[i])) "" else sprintf(", Jaccard %.3f", jaccard[i])
     ))
 
     # TCC degenerate guard: stop if removing DEGs leaves no non-DEG genes.
@@ -179,7 +192,9 @@ deges_muren_bm <- function(counts, group, iteration = 1L,
       n_non_deg = n_non_deg[keep],
       deg_count = deg_count[keep],
       exclusion_method = exclusion_method[keep],
-      pi0 = pi0[keep]
+      pi0 = pi0[keep],
+      removed_frac = removed_frac[keep],
+      jaccard = jaccard[keep]
     )
   )
 }

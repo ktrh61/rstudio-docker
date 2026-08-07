@@ -176,6 +176,8 @@ process_unit <- function(samples1, samples2, group_labels) {
       iter_deg_count = deges$iterations$deg_count,
       iter_method = deges$iterations$exclusion_method,
       iter_pi0 = deges$iterations$pi0,
+      iter_removed_frac = deges$iterations$removed_frac,
+      iter_jaccard = deges$iterations$jaccard,
       final_deg_count = deges$iterations$deg_count[deges$iterations$n]
     )
   )
