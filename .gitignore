@@ -81,3 +81,6 @@ meta/*
 
 # ルート直下の旧生成物の退避先（拡張子問わず全体を除外）
 _archive_root/
+
+# Baseline reference CSVs are tracked (exception to the global *.csv ignore)
+!tests/reference/baseline_20260807/*.csv
