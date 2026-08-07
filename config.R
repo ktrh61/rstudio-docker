@@ -38,13 +38,16 @@ PURITY_THRESHOLD <- 0.6
 # REO dead zone: |log2 TPM difference| below this does not count as an order.
 DEAD_ZONE <- log2(1.2)
 
-# Display FDR cutoff for gene-level figures/messages (permutation FDR).
+# Protocol-wide inference threshold: Storey q < FDR_CUT at the gene level
+# (410) and the set level (420). Also the display cutoff for figures/messages.
 FDR_CUT <- 0.10
 
 # BH cutoff for the DEGES potential-DEG screen inside 310. Conceptually
 # distinct from FDR_CUT despite the shared value.
 DEGES_FDR <- 0.10
 
-# Label shuffles for the empirical null (410; 420 inherits the value from
-# 410's saved config so it always matches the artifact under analysis).
+# Label shuffles for the empirical null (410; 420 consumes 410's saved
+# per-unit perm_index so the shuffles always match the artifact under
+# analysis). Development value; the canonical publication run uses 9999L
+# (reorg plan v2 D4; switch at the final clean run, like WORKERS).
 N_PERM <- 999L
