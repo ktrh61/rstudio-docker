@@ -23,11 +23,8 @@ source(file.path(paths$root, "lib", "norm_muren.R"))
 source(file.path(paths$root, "lib", "purity_contamde.R"))
 source(file.path(paths$root, "lib", "reo_lowmid_cases.R"))
 
-workers <- 16L # development; canonical is 4L
-if (requireNamespace("RhpcBLASctl", quietly = TRUE)) {
-  RhpcBLASctl::blas_set_num_threads(1L)
-  RhpcBLASctl::omp_set_num_threads(1L)
-}
+# WORKERS comes from config.R via setup.R (development 16L; canonical is 4L).
+pin_blas_threads()
 
 # --- Resolve the whole RET cohort (all four bands) with normal pairs --------
 clinical <- readRDS(file.path(paths$processed, "thyr_clinical.rds"))
@@ -53,7 +50,7 @@ counts <- cbind(counts_all[keep, cases$normal_id, drop = FALSE],
   counts_all[keep, cases$tumor_id, drop = FALSE])
 colnames(counts) <- c(paste0("Normal_", seq_len(np)), paste0("Tumor_", seq_len(np)))
 res <- contamde_purity(counts = counts, subtype = NULL, covariate = NULL,
-  contaminated = TRUE, pairwise_method = "lts", workers = workers, verbose = FALSE)
+  contaminated = TRUE, pairwise_method = "lts", workers = WORKERS, verbose = FALSE)
 cases$tumor_purity <- as.numeric(res$proportion)
 
 message("Common-scale purity by band (median):")

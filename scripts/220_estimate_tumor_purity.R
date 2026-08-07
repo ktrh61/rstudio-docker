@@ -35,17 +35,12 @@ source(file.path(paths$root, "lib", "norm_muren_helpers.R"))
 source(file.path(paths$root, "lib", "norm_muren.R"))
 source(file.path(paths$root, "lib", "purity_contamde.R"))
 
-# MUREN worker count. The published/reproduction run on the Xeon host uses 4L
-# (canonical); raised here only to speed up development iterations. Worker count
+# MUREN worker count (WORKERS) comes from config.R via setup.R. Worker count
 # changes speed, not the MUREN result.
-workers <- 16L
-message("MUREN workers: ", workers, " (development; canonical is 4L)")
+message("MUREN workers: ", WORKERS, " (development; canonical is 4L)")
 
 # BLAS/OMP single-threaded (MUREN parallelizes the outer loop).
-if (requireNamespace("RhpcBLASctl", quietly = TRUE)) {
-  RhpcBLASctl::blas_set_num_threads(1L)
-  RhpcBLASctl::omp_set_num_threads(1L)
-}
+pin_blas_threads()
 
 # --- Load inputs -----------------------------------------------------------
 outliers_path <- file.path(paths$processed, "thyr_case_outliers.rds")
@@ -116,7 +111,7 @@ for (coh in c("R", "B")) {
     covariate = NULL,
     contaminated = TRUE,
     pairwise_method = "lts",
-    workers = workers,
+    workers = WORKERS,
     verbose = FALSE
   )
 

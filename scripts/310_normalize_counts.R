@@ -31,37 +31,30 @@ source(file.path(paths$root, "lib", "stat_brunnermunzel.R"))
 source(file.path(paths$root, "lib", "norm_deges.R"))
 
 # --- Configuration ---------------------------------------------------------
-PURITY_THRESHOLD <- 0.6 # min pooled (common-scale) relative purity to include
+# Shared constants (PURITY_THRESHOLD, DEGES_FDR, WORKERS, SEED, EXACT_THREADS,
+# BM_EXACT_MAX) come from config.R via setup.R.
 ITERATION <- 3L # DEGES iterations (exact count; iDEGES)
-FDR <- 0.10 # BH adjusted-p cutoff for potential DEGs
 FLOOR_PDEG <- 0.05 # floorPDEG fraction forced as potential DEGs (TCC)
 MUREN_METHOD <- "lts" # MUREN pairwise regression
-WORKERS <- 16L # MUREN parallel workers
 
 # Brunner-Munzel screening (lib/stat_brunnermunzel.R).
 # "auto" enumerates all C(n, nx) allocations exactly when that is affordable
 # and samples otherwise. Both units here are well inside the budget
 # (C(28,12) = 3.0e7 and C(36,9) = 9.4e7), so the screen's p-values are exact:
-# no 1/(B + 1) floor, no sampling error, and no dependence on BM_MC_SEED.
-# BM_MC_B / BM_MC_SEED apply only if a unit ever falls back to sampling.
+# no 1/(B + 1) floor, no sampling error, and no dependence on the seed.
+# BM_MC_B / SEED apply only if a unit ever falls back to sampling.
 BM_METHOD <- "auto"
-BM_EXACT_MAX <- 1e8 # largest C(n, nx) still enumerated exactly
-BM_EXACT_THREADS <- 16L # threads for the enumeration
 BM_MC_B <- 999999L # Monte Carlo permutations (fallback only)
-BM_MC_SEED <- 19860426L # fixed seed (Chernobyl accident date 1986-04-26)
 BM_MC_ALTERNATIVE <- "two.sided"
 BM_MC_EST <- "original"
 
 options(
   brunnermunzel.exact.max.allocations = BM_EXACT_MAX,
-  brunnermunzel.exact.threads = BM_EXACT_THREADS
+  brunnermunzel.exact.threads = EXACT_THREADS
 )
 
 # BLAS/OMP single-threaded (MUREN parallelizes the outer loop).
-if (requireNamespace("RhpcBLASctl", quietly = TRUE)) {
-  RhpcBLASctl::blas_set_num_threads(1L)
-  RhpcBLASctl::omp_set_num_threads(1L)
-}
+pin_blas_threads()
 
 # --- Load inputs -----------------------------------------------------------
 purity_path <- file.path(paths$processed, "thyr_case_purity.rds")
@@ -136,8 +129,8 @@ process_unit <- function(samples1, samples2, group_labels) {
   # TCC-faithful DEGES core (MUREN + Brunner-Munzel) on the filterByExpr set.
   deges <- deges_muren_bm(
     counts = count_matrix_filtered, group = sample_groups,
-    iteration = ITERATION, fdr = FDR, floor_pdeg = FLOOR_PDEG,
-    n_perm = BM_MC_B, seed = BM_MC_SEED,
+    iteration = ITERATION, fdr = DEGES_FDR, floor_pdeg = FLOOR_PDEG,
+    n_perm = BM_MC_B, seed = SEED,
     alternative = BM_MC_ALTERNATIVE, est = BM_MC_EST,
     bm_method = BM_METHOD,
     muren_method = MUREN_METHOD, workers = WORKERS
@@ -220,7 +213,7 @@ thyr_normalized_counts <- list(
   date = Sys.Date(),
   config = list(
     iteration = ITERATION,
-    fdr = FDR,
+    fdr = DEGES_FDR,
     floor_pdeg = FLOOR_PDEG,
     muren_method = MUREN_METHOD,
     workers = WORKERS,
@@ -228,7 +221,7 @@ thyr_normalized_counts <- list(
     bm_method = BM_METHOD,
     bm_exact_max = BM_EXACT_MAX,
     bm_B = BM_MC_B,
-    bm_seed = BM_MC_SEED,
+    bm_seed = SEED,
     bm_alternative = BM_MC_ALTERNATIVE,
     bm_est = BM_MC_EST
   ),

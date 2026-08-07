@@ -28,7 +28,7 @@ source(file.path(paths$root, "lib", "reo.R"))
 # --- Configuration ---------------------------------------------------------
 TARGET_PANEL_SIZE <- 10L
 CORRELATION_THRESHOLD <- 0.75 # Spearman; drop a pair correlated above this
-DEAD_ZONE <- log2(1.2) # must match 510
+# DEAD_ZONE comes from config.R via setup.R (shared with 510).
 
 # --- Load inputs -----------------------------------------------------------
 cand_path <- file.path(paths$processed, "thyr_reo_candidate_pairs.rds")

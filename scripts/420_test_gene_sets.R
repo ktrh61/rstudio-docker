@@ -80,14 +80,16 @@ MIN_SET_SIZE <- 15L
 MAX_SET_SIZE <- 500L
 REDUNDANT_JACCARD <- 0.5
 REDUNDANT_MAX_PVAL <- 0.05 # sets below this get a redundancy annotation
-EXACT_THREADS <- 16L
+# EXACT_THREADS / BM_EXACT_MAX come from config.R via setup.R. 420 computes BM
+# statistics only (no p-value path), so exact.max.allocations is inert here;
+# it is set for uniformity with 310/410.
 
-options(brunnermunzel.exact.threads = EXACT_THREADS)
+options(
+  brunnermunzel.exact.max.allocations = BM_EXACT_MAX,
+  brunnermunzel.exact.threads = EXACT_THREADS
+)
 
-if (requireNamespace("RhpcBLASctl", quietly = TRUE)) {
-  RhpcBLASctl::blas_set_num_threads(1L)
-  RhpcBLASctl::omp_set_num_threads(1L)
-}
+pin_blas_threads()
 
 # --- Load inputs -----------------------------------------------------------
 norm_path <- file.path(paths$processed, "thyr_normalized_counts.rds")

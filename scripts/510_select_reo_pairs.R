@@ -40,7 +40,7 @@ source(file.path(paths$root, "lib", "reo.R"))
 # --- Configuration ---------------------------------------------------------
 N_CANDIDATES <- 500L # top genes by |effect - 0.5| (~half up, half down)
 PARAMS <- list(
-  dead_zone = log2(1.2),        # |r| below this does not count as an order
+  dead_zone = DEAD_ZONE,        # from config.R
   r0_exception_max = 1L,        # max sign exceptions for R0 consistency
   r0_q10_threshold = log2(1.5), # R0 strength: 10th percentile of |r|
   chunk_size = 10000L

@@ -16,7 +16,7 @@ suppressPackageStartupMessages({
   library(ggrepel)
 })
 
-FDR_CUT <- 0.10
+# FDR_CUT comes from config.R via setup.R.
 N_LABEL <- 8L # strongest genes to label per unit
 
 test <- readRDS(file.path(paths$processed, "thyr_expression_test.rds"))
@@ -38,19 +38,19 @@ df <- do.call(rbind, lapply(unit_order, function(u) {
   )
 }))
 df$unit <- factor(df$unit, levels = unit_order)
+lab_up <- sprintf("up in High (FDR<%.2f)", FDR_CUT)
+lab_down <- sprintf("up in Sporadic (FDR<%.2f)", FDR_CUT)
 df$sig <- ifelse(df$fdr < FDR_CUT,
-  ifelse(df$x >= 0, "up in High (FDR<0.10)", "up in Sporadic (FDR<0.10)"),
+  ifelse(df$x >= 0, lab_up, lab_down),
   "n.s.")
-df$sig <- factor(df$sig,
-  levels = c("up in High (FDR<0.10)", "up in Sporadic (FDR<0.10)", "n.s."))
+df$sig <- factor(df$sig, levels = c(lab_up, lab_down, "n.s."))
 
 # strongest genes per unit (by p) to label
 lab <- do.call(rbind, lapply(split(df, df$unit), function(d) {
   head(d[order(d$p_exact), ], N_LABEL)
 }))
 
-pal <- c("up in High (FDR<0.10)" = "#eb6834",
-  "up in Sporadic (FDR<0.10)" = "#2a78d6", "n.s." = "grey75")
+pal <- setNames(c("#eb6834", "#2a78d6", "grey75"), c(lab_up, lab_down, "n.s."))
 
 p <- ggplot(df, aes(x = x, y = y)) +
   geom_vline(xintercept = 0, colour = "grey85") +

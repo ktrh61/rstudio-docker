@@ -105,7 +105,7 @@ as_tbl$class <- classify(as_tbl$score, boundary)
 low_score <- as_tbl$score[as_tbl$band == "R_Low"]
 mid_score <- as_tbl$score[as_tbl$band == "R_Mid"]
 bm_low_mid <- brunnermunzel_mc_test(
-  low_score, mid_score, alternative = "less", method = "auto", seed = 19860426L
+  low_score, mid_score, alternative = "less", method = "auto", seed = SEED
 )
 message(sprintf(
   "\nRead B (out-of-sample): Mid > Low reversal score, one-sided BM p = %.4f (%s), effect P(Low<Mid)=%.3f",

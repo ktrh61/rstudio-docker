@@ -36,23 +36,18 @@ suppressPackageStartupMessages({
 source(file.path(paths$root, "lib", "stat_brunnermunzel.R"))
 
 # --- Configuration ---------------------------------------------------------
-N_PERM <- 999L # label shuffles for the empirical null
-PERM_SEED <- 19860426L # fixed seed (Chernobyl accident date 1986-04-26)
+# Shared constants (N_PERM, SEED, EXACT_THREADS, BM_EXACT_MAX, FDR_CUT) come
+# from config.R via setup.R.
 OMNIBUS_ALPHA <- c(1e-2, 1e-3, 1e-4) # per-gene null quantiles for the omnibus
 HC_ALPHA0 <- 0.1 # fraction of the p-value range Higher Criticism scans
 PRIMARY_OMNIBUS <- "hc" # the pre-specified inferential row
-EXACT_MAX <- 1e8 # largest C(n, nx) still enumerated exactly
-EXACT_THREADS <- 16L # threads for the enumeration
 
 options(
-  brunnermunzel.exact.max.allocations = EXACT_MAX,
+  brunnermunzel.exact.max.allocations = BM_EXACT_MAX,
   brunnermunzel.exact.threads = EXACT_THREADS
 )
 
-if (requireNamespace("RhpcBLASctl", quietly = TRUE)) {
-  RhpcBLASctl::blas_set_num_threads(1L)
-  RhpcBLASctl::omp_set_num_threads(1L)
-}
+pin_blas_threads()
 
 # --- Load inputs -----------------------------------------------------------
 norm_path <- file.path(paths$processed, "thyr_normalized_counts.rds")
@@ -162,7 +157,7 @@ test_unit <- function(dgelist, unit) {
     brunnermunzel_pvalues(cpm_matrix, nx, method = "exact")
   )
 
-  set.seed(PERM_SEED)
+  set.seed(SEED)
   null_statistic <- vapply(
     seq_len(N_PERM),
     function(i) {
@@ -187,8 +182,8 @@ test_unit <- function(dgelist, unit) {
 
   omnibus <- omnibus_table(statistic, null_statistic, OMNIBUS_ALPHA, N_PERM)
   message(sprintf(
-    "  %-9s %d vs %d ; min p_exact %.3e ; fdr_perm<0.10 %d ; %s p %.3f ; all %s",
-    unit, nx, n - nx, min(p_exact), sum(genes$fdr_perm < 0.10),
+    "  %-9s %d vs %d ; min p_exact %.3e ; fdr_perm<%.2f %d ; %s p %.3f ; all %s",
+    unit, nx, n - nx, min(p_exact), FDR_CUT, sum(genes$fdr_perm < FDR_CUT),
     PRIMARY_OMNIBUS, omnibus$p[omnibus$test == PRIMARY_OMNIBUS],
     paste(sprintf("%.3f", omnibus$p), collapse = "/")
   ))
@@ -221,11 +216,11 @@ thyr_expression_test <- list(
     bm_method = "exact",
     alternative = "two.sided",
     n_perm = N_PERM,
-    perm_seed = PERM_SEED,
+    perm_seed = SEED,
     omnibus_alpha = OMNIBUS_ALPHA,
     hc_alpha0 = HC_ALPHA0,
     primary_omnibus = PRIMARY_OMNIBUS,
-    exact_max = EXACT_MAX,
+    exact_max = BM_EXACT_MAX,
     fdr = "permutation-calibrated, pi0 = 1",
     reference_group = "Sporadic"
   ),

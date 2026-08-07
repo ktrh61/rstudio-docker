@@ -38,7 +38,7 @@ par_bs <- partial_spearman(d$band_num, d$score, d$tumor_purity)
 
 # Permutation p for the partial correlation: permute band labels, keep score &
 # purity paired, so the null is "band unrelated to score given purity".
-set.seed(19860426L)
+set.seed(SEED)
 perm <- replicate(9999, {
   b <- sample(d$band_num)
   partial_spearman(b, d$score, d$tumor_purity)
@@ -63,7 +63,7 @@ strata <- lapply(c("lo_purity", "hi_purity"), function(s) {
     message(sprintf("  %-9s n(Low=%d,Mid=%d): too few for a test", s, length(lo), length(mi)))
     return(NULL)
   }
-  bm <- brunnermunzel_mc_test(lo, mi, alternative = "less", method = "auto", seed = 19860426L)
+  bm <- brunnermunzel_mc_test(lo, mi, alternative = "less", method = "auto", seed = SEED)
   message(sprintf(
     "  %-9s Low median %.1f (n=%d) | Mid median %.1f (n=%d) | Mid>Low p=%.4f, P(Low<Mid)=%.3f",
     s, stats::median(lo), length(lo), stats::median(mi), length(mi),

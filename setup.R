@@ -24,3 +24,6 @@ for (.p in paths[c("raw", "processed", "output", "meta")]) {
 }
 
 rm(.root, .markers, .missing, .p)
+
+# Shared cross-script constants (see config.R header).
+source(file.path(paths$root, "config.R"))
