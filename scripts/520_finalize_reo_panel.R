@@ -24,6 +24,7 @@ suppressPackageStartupMessages({
 })
 
 source(file.path(paths$root, "lib", "reo.R"))
+source(file.path(paths$root, "lib", "units.R"))
 
 # --- Configuration ---------------------------------------------------------
 TARGET_PANEL_SIZE <- 10L
@@ -43,9 +44,9 @@ dge <- readRDS(norm_path)$units$R_Tumor$dgelist
 se <- readRDS(se_path)
 gene_lengths <- readRDS(len_path)
 
-grp <- as.character(dge$samples$group)
-r0_samples <- colnames(dge)[grepl("Sporadic", grp, fixed = TRUE)]
-r1_samples <- colnames(dge)[grepl("High", grp, fixed = TRUE)]
+arms <- unit_arms(dge$samples$group, "R_Tumor")
+r0_samples <- colnames(dge)[arms$sporadic]
+r1_samples <- colnames(dge)[arms$high]
 all_samples <- c(r0_samples, r1_samples)
 log2_tpm <- reo_log2_tpm(se, gene_lengths, all_samples)
 message("Candidates: ", nrow(candidates), " ; R0 ", length(r0_samples), " R1 ", length(r1_samples))
@@ -82,18 +83,9 @@ rownames(panel) <- NULL
 message("Selected panel pairs: ", nrow(panel),
   if (nrow(panel) < TARGET_PANEL_SIZE) paste0(" (below target ", TARGET_PANEL_SIZE, ")") else "")
 
-# --- Per-sample reversal score on the training arms ------------------------
-reversal_score <- function(l2tpm, samples, panel) {
-  sc <- integer(length(samples))
-  names(sc) <- samples
-  for (k in seq_len(nrow(panel))) {
-    r <- l2tpm[panel$up[k], samples] - l2tpm[panel$down[k], samples]
-    sc <- sc + as.integer(abs(r) >= DEAD_ZONE & sign(r) != panel$r0_sign[k])
-  }
-  sc
-}
-r0_score <- reversal_score(log2_tpm, r0_samples, panel)
-r1_score <- reversal_score(log2_tpm, r1_samples, panel)
+# --- Per-sample reversal score on the training arms (lib/reo.R) ------------
+r0_score <- reversal_score(log2_tpm, r0_samples, panel, DEAD_ZONE)
+r1_score <- reversal_score(log2_tpm, r1_samples, panel, DEAD_ZONE)
 message(sprintf("R0 score range [%d, %d] ; R1 score range [%d, %d]",
   min(r0_score), max(r0_score), min(r1_score), max(r1_score)))
 
@@ -106,13 +98,10 @@ message(sprintf("R0 score range [%d, %d] ; R1 score range [%d, %d]",
 # (B) is done out-of-sample in 530.
 max_r0 <- max(r0_score)
 boundary <- list(negative_max = max_r0, positive_min = max_r0 + 1L)
-classify <- function(score, b) {
-  ifelse(score > b$negative_max, "positive", "negative")
-}
 message(sprintf("Boundary (R0-based): positive if score > %d", max_r0))
 message("Training classification (R0 Sporadic / R1 High):")
 print(table(arm = c(rep("R0", length(r0_score)), rep("R1", length(r1_score))),
-  class = c(classify(r0_score, boundary), classify(r1_score, boundary))))
+  class = c(classify_reversal(r0_score, boundary), classify_reversal(r1_score, boundary))))
 
 # --- Assemble and save -----------------------------------------------------
 thyr_reo_panel <- list(

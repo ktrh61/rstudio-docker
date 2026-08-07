@@ -20,20 +20,24 @@ suppressPackageStartupMessages({
   library(ggrepel)
 })
 
+source(file.path(paths$root, "lib", "units.R"))
+source(file.path(paths$root, "lib", "annotation.R"))
+source(file.path(paths$root, "lib", "plot_theme.R"))
+
 # FDR_CUT comes from config.R via setup.R.
 N_LABEL <- 8L # strongest genes to label per unit
 
 norm <- readRDS(file.path(paths$processed, "thyr_normalized_counts.rds"))
 test <- readRDS(file.path(paths$processed, "thyr_expression_test.rds"))
 se <- readRDS(file.path(paths$processed, "thyr_se_raw.rds"))
-name_of <- setNames(as.data.frame(rowData(se))$gene_name, rownames(se))
+name_of <- gene_name_map(se)
 
-unit_order <- c("R_Tumor", "R_Normal", "B_Tumor", "B_Normal")
+unit_order <- UNIT_ORDER
 df <- do.call(rbind, lapply(unit_order, function(u) {
   dge <- norm$units[[u]]$dgelist
-  grp <- as.character(dge$samples$group)
-  hi <- grepl("High", grp, fixed = TRUE)
-  sp <- grepl("Sporadic", grp, fixed = TRUE)
+  arms <- unit_arms(dge$samples$group, u)
+  hi <- arms$high
+  sp <- arms$sporadic
   lcpm <- edgeR::cpm(dge, normalized.lib.sizes = TRUE, log = TRUE, prior.count = 1)
   A <- rowMeans(lcpm)
   M <- rowMeans(lcpm[, hi, drop = FALSE]) - rowMeans(lcpm[, sp, drop = FALSE])
@@ -43,8 +47,7 @@ df <- do.call(rbind, lapply(unit_order, function(u) {
   p <- setNames(g$p_exact, g$gene_id)[rownames(dge)]
   data.frame(
     unit = u,
-    gene = ifelse(is.na(name_of[rownames(dge)]) | name_of[rownames(dge)] == "",
-      sub("\\..*$", "", rownames(dge)), unname(name_of[rownames(dge)])),
+    gene = gene_label(rownames(dge), name_of),
     A = A, M = M, fdr = unname(fdr), p_exact = unname(p),
     stringsAsFactors = FALSE
   )
@@ -57,7 +60,7 @@ df$sig <- factor(ifelse(df$fdr < FDR_CUT,
   levels = c(lab_up, lab_down, "n.s."))
 
 lab <- do.call(rbind, lapply(split(df, df$unit), function(d) head(d[order(d$p_exact), ], N_LABEL)))
-pal <- setNames(c("#eb6834", "#2a78d6", "grey75"), c(lab_up, lab_down, "n.s."))
+pal <- setNames(c(COL_UP, COL_DOWN, COL_NS), c(lab_up, lab_down, "n.s."))
 
 p <- ggplot(df, aes(x = A, y = M)) +
   geom_hline(yintercept = 0, colour = "grey85") +
@@ -73,19 +76,9 @@ p <- ggplot(df, aes(x = A, y = M)) +
     subtitle = paste0("Fold change for display only (DE call is rank-based BM); ",
       "coloured by permutation FDR < ", FDR_CUT, ". R_Normal/B_Tumor negative controls.")
   ) +
-  theme_bw(base_size = 11) +
-  theme(
-    plot.title = element_text(face = "bold", size = 12),
-    plot.subtitle = element_text(size = 9, colour = "grey30"),
-    panel.grid.minor = element_blank(),
-    strip.text = element_text(face = "bold"),
-    legend.position = "top"
-  )
+  theme_thyr()
 
-if (!dir.exists(paths$output)) dir.create(paths$output, recursive = TRUE)
-out_png <- file.path(paths$output, "ma_expression.png")
-ggsave(out_png, p, width = 9, height = 8, dpi = 160, type = "cairo")
-message("Saved: ", out_png)
+save_figure(p, "ma_expression.png", width = 9, height = 8)
 for (u in unit_order) {
   d <- df[df$unit == u, ]
   message(sprintf("  %-9s |M| median %.3f | M range [%.2f, %.2f] | fdr<%.2f %d",

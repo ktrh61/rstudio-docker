@@ -22,3 +22,22 @@ reo_log2_tpm <- function(se, gene_lengths, samples) {
   rownames(tpm) <- ensembl
   log2(tpm)
 }
+
+# Per-sample panel reversal score: the number of panel pairs whose within-
+# sample order (|r| >= dead_zone) is opposite to the R0 reference sign.
+# dead_zone is an explicit argument; callers pass the config value (520) or the
+# value recorded in the saved panel artifact (530).
+reversal_score <- function(l2tpm, samples, panel, dead_zone) {
+  sc <- integer(length(samples))
+  names(sc) <- samples
+  for (k in seq_len(nrow(panel))) {
+    r <- l2tpm[panel$up[k], samples] - l2tpm[panel$down[k], samples]
+    sc <- sc + as.integer(abs(r) >= dead_zone & sign(r) != panel$r0_sign[k])
+  }
+  sc
+}
+
+# Read-A classification against the R0-based boundary.
+classify_reversal <- function(score, boundary) {
+  ifelse(score > boundary$negative_max, "positive", "negative")
+}

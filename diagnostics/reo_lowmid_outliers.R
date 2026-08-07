@@ -15,6 +15,7 @@ suppressPackageStartupMessages({
   library(edgeR)
 })
 source(file.path(paths$root, "lib", "qc_pc_od.R"))
+source(file.path(paths$root, "lib", "gene_filter.R"))
 source(file.path(paths$root, "lib", "stat_brunnermunzel.R"))
 
 # --- Load and resolve R_Low / R_Mid tumours (from the design table) --------
@@ -39,10 +40,9 @@ message("R_Low/Mid tumours: ",
 # --- PC-OD per band on tumour log-CPM (same scale as 210) ------------------
 counts_all <- assay(se, "stranded_second")
 run_pcod <- function(ids) {
-  y <- edgeR::DGEList(counts_all[, ids, drop = FALSE])
-  keep <- edgeR::filterByExpr(y)
-  logCPM <- edgeR::cpm(y[keep, ], log = TRUE, normalized.lib.sizes = FALSE, prior.count = 2)
-  PC_OD(logCPM)
+  # keep_lib_sizes = FALSE is this diagnostic's historical behaviour (210 uses
+  # TRUE); the divergence is preserved, unification is a recorded open item.
+  PC_OD(logcpm_for_qc(counts_all, ids, keep_lib_sizes = FALSE))
 }
 cases$is_outlier <- 0L
 for (b in c("R_Low", "R_Mid")) {

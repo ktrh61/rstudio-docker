@@ -34,6 +34,7 @@ suppressPackageStartupMessages({
 source(file.path(paths$root, "lib", "norm_muren_helpers.R"))
 source(file.path(paths$root, "lib", "norm_muren.R"))
 source(file.path(paths$root, "lib", "purity_contamde.R"))
+source(file.path(paths$root, "lib", "gene_filter.R"))
 
 # MUREN worker count (WORKERS) comes from config.R via setup.R. Worker count
 # changes speed, not the MUREN result.
@@ -67,13 +68,7 @@ is_protein_coding <- gene_info$gene_type == "protein_coding"
 counts_all <- assay(se)
 
 filter_genes <- function(normal_ids, tumor_ids) {
-  cg <- counts_all[, c(normal_ids, tumor_ids), drop = FALSE]
-  grp <- factor(c(
-    rep("Normal", length(normal_ids)),
-    rep("Tumor", length(tumor_ids))
-  ))
-  keep_expr <- edgeR::filterByExpr(cg, group = grp)
-  is_protein_coding & keep_expr
+  filter_pc_expr_mask(counts_all, is_protein_coding, normal_ids, tumor_ids)
 }
 
 # --- Per-cohort pooled purity estimation -----------------------------------

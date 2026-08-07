@@ -34,6 +34,7 @@ suppressPackageStartupMessages({
 })
 
 source(file.path(paths$root, "lib", "stat_brunnermunzel.R"))
+source(file.path(paths$root, "lib", "units.R"))
 
 # --- Configuration ---------------------------------------------------------
 # Shared constants (N_PERM, SEED, EXACT_THREADS, BM_EXACT_MAX, FDR_CUT) come
@@ -137,12 +138,9 @@ omnibus_table <- function(statistic, null_statistic, alpha, n_perm) {
 
 # --- Per-unit test ---------------------------------------------------------
 test_unit <- function(dgelist, unit) {
-  group <- as.character(dgelist$samples$group)
-  sporadic <- which(grepl("Sporadic", group, fixed = TRUE))
-  high <- which(grepl("High", group, fixed = TRUE))
-  if (length(sporadic) + length(high) != ncol(dgelist)) {
-    stop("Unit ", unit, " has samples outside Sporadic / High.")
-  }
+  arms <- unit_arms(dgelist$samples$group, unit)
+  sporadic <- arms$sporadic
+  high <- arms$high
   cpm_matrix <- edgeR::cpm(
     dgelist,
     normalized.lib.sizes = TRUE, prior.count = 0, log = FALSE

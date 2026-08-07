@@ -13,6 +13,7 @@
 # Output: output/reo_poc_vs_reversal.png
 
 source("setup.R")
+source(file.path(paths$root, "lib", "plot_theme.R"))
 suppressPackageStartupMessages({
   library(SummarizedExperiment)
   library(ggplot2)
@@ -43,8 +44,7 @@ d$band <- factor(d$band, levels = c("R_Sporadic", "R_Low", "R_Mid", "R_High"))
 d$set <- ifelse(d$band %in% c("R_Sporadic", "R_High"), "training", "evaluation")
 
 thr <- reo$boundary$negative_max # A: positive if score > thr
-# colorblind-safe, ordered by assigned share (blue -> aqua -> yellow -> orange)
-pal <- c(R_Sporadic = "#2a78d6", R_Low = "#1baf7a", R_Mid = "#eda100", R_High = "#eb6834")
+pal <- PAL_BANDS # lib/plot_theme.R
 n_pairs <- nrow(reo$panel)
 
 set.seed(1L)
@@ -63,16 +63,9 @@ p <- ggplot(d, aes(x = score, y = as)) +
     y = "Assigned share  (radiation attribution, %)",
     title = "REO reversal grades with radiation attribution (RET/PTC tumours)",
     subtitle = "Out-of-sample R_Low / R_Mid (filled) vs training R_Sporadic / R_High (open); trend suggestive") +
-  theme_bw(base_size = 12) +
-  theme(plot.title = element_text(face = "bold", size = 12),
-    plot.subtitle = element_text(size = 9.5, colour = "grey30"),
-    panel.grid.minor = element_blank(),
-    legend.position = "right")
+  theme_thyr(base_size = 12, subtitle_size = 9.5, legend_position = "right")
 
-if (!dir.exists(paths$output)) dir.create(paths$output, recursive = TRUE)
-out_png <- file.path(paths$output, "reo_poc_vs_reversal.png")
-ggsave(out_png, p, width = 8.2, height = 5.6, dpi = 160, type = "cairo")
-message("Saved: ", out_png)
+save_figure(p, "reo_poc_vs_reversal.png", width = 8.2, height = 5.6)
 
 for (b in levels(d$band)) {
   s <- d$score[d$band == b]

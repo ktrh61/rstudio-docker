@@ -26,6 +26,7 @@ suppressPackageStartupMessages({
 })
 
 source(file.path(paths$root, "lib", "qc_pc_od.R"))
+source(file.path(paths$root, "lib", "gene_filter.R"))
 
 # --- Load inputs -----------------------------------------------------------
 se_path <- file.path(paths$processed, "thyr_se_raw.rds")

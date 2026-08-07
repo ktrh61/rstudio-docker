@@ -61,20 +61,10 @@ message("Intermediate RET tumours: ",
 
 # --- Apply the panel -------------------------------------------------------
 log2_tpm <- reo_log2_tpm(se, gene_lengths, as_tbl$tumor_id)
-reversal_score <- function(l2tpm, samples, panel, dead_zone) {
-  sc <- integer(length(samples))
-  names(sc) <- samples
-  for (k in seq_len(nrow(panel))) {
-    r <- l2tpm[panel$up[k], samples] - l2tpm[panel$down[k], samples]
-    sc <- sc + as.integer(abs(r) >= dead_zone & sign(r) != panel$r0_sign[k])
-  }
-  sc
-}
 as_tbl$score <- reversal_score(log2_tpm, as_tbl$tumor_id, panel, dead_zone)
 
 # --- Read A: classification vs the R0-based threshold -----------------------
-classify <- function(score, b) ifelse(score > b$negative_max, "positive", "negative")
-as_tbl$class <- classify(as_tbl$score, boundary)
+as_tbl$class <- classify_reversal(as_tbl$score, boundary)
 
 # --- Read B: graded increase Low -> Mid (out-of-sample, permutation BM) -----
 # Two ordered bands, so the ordered-alternative (Jonckheere-Terpstra) test is a

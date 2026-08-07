@@ -21,6 +21,7 @@ suppressPackageStartupMessages({
 source(file.path(paths$root, "lib", "norm_muren_helpers.R"))
 source(file.path(paths$root, "lib", "norm_muren.R"))
 source(file.path(paths$root, "lib", "purity_contamde.R"))
+source(file.path(paths$root, "lib", "gene_filter.R"))
 
 # WORKERS comes from config.R via setup.R (development 16L; canonical is 4L).
 pin_blas_threads()
@@ -48,10 +49,7 @@ message("RET cohort with pairs: ",
 gene_info <- as.data.frame(rowData(se))
 is_pc <- gene_info$gene_type == "protein_coding"
 counts_all <- assay(se, "stranded_second")
-grp <- factor(c(rep("Normal", nrow(cases)), rep("Tumor", nrow(cases))))
-keep <- is_pc & edgeR::filterByExpr(
-  counts_all[, c(cases$normal_id, cases$tumor_id), drop = FALSE], group = grp
-)
+keep <- filter_pc_expr_mask(counts_all, is_pc, cases$normal_id, cases$tumor_id)
 np <- nrow(cases)
 counts <- cbind(counts_all[keep, cases$normal_id, drop = FALSE],
   counts_all[keep, cases$tumor_id, drop = FALSE])

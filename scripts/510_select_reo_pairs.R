@@ -36,6 +36,8 @@ suppressPackageStartupMessages({
 })
 
 source(file.path(paths$root, "lib", "reo.R"))
+source(file.path(paths$root, "lib", "units.R"))
+source(file.path(paths$root, "lib", "annotation.R"))
 
 # --- Configuration ---------------------------------------------------------
 N_CANDIDATES <- 500L # top genes by |effect - 0.5| (~half up, half down)
@@ -60,9 +62,9 @@ se <- readRDS(se_path)
 gene_lengths <- readRDS(len_path)
 
 # R0 (Sporadic) and R1 (High) tumour sample IDs, from the analysed R_Tumor unit.
-grp <- as.character(dge$samples$group)
-r0_samples <- colnames(dge)[grepl("Sporadic", grp, fixed = TRUE)]
-r1_samples <- colnames(dge)[grepl("High", grp, fixed = TRUE)]
+arms <- unit_arms(dge$samples$group, "R_Tumor")
+r0_samples <- colnames(dge)[arms$sporadic]
+r1_samples <- colnames(dge)[arms$high]
 message("R0 (Sporadic) tumour: ", length(r0_samples),
   " ; R1 (High) tumour: ", length(r1_samples))
 
@@ -71,7 +73,7 @@ log2_tpm <- reo_log2_tpm(se, gene_lengths, c(r0_samples, r1_samples))
 message("TPM matrix: ", nrow(log2_tpm), " length-annotated genes x ", ncol(log2_tpm), " samples")
 
 # --- Candidate gene pool: top N by |effect - 0.5|, split up / down ---------
-genes$ensembl <- sub("\\..*$", "", genes$gene_id)
+genes$ensembl <- strip_ensembl_version(genes$gene_id)
 genes <- genes[genes$ensembl %in% rownames(log2_tpm), , drop = FALSE]
 genes <- genes[order(abs(genes$effect - 0.5), decreasing = TRUE), , drop = FALSE]
 pool <- head(genes, N_CANDIDATES)
@@ -164,7 +166,7 @@ message(sprintf(
 ))
 
 # --- Assemble and save -----------------------------------------------------
-name_of <- setNames(as.data.frame(rowData(se))$gene_name, sub("\\..*$", "", rownames(se)))
+name_of <- gene_name_map(se, strip_version = TRUE)
 pairs$up_name <- unname(name_of[pairs$up])
 pairs$down_name <- unname(name_of[pairs$down])
 

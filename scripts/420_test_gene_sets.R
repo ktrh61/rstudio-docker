@@ -52,6 +52,8 @@ suppressPackageStartupMessages({
 
 source(file.path(paths$root, "lib", "stat_brunnermunzel.R"))
 source(file.path(paths$root, "lib", "gsea_permutation.R"))
+source(file.path(paths$root, "lib", "units.R"))
+source(file.path(paths$root, "lib", "annotation.R"))
 
 # --- Configuration ---------------------------------------------------------
 SPECIES <- "Homo sapiens"
@@ -125,16 +127,16 @@ message("Gene sets before filtering: ", paste(
 
 # --- Per-unit enrichment ---------------------------------------------------
 test_unit <- function(dgelist, unit) {
-  group <- as.character(dgelist$samples$group)
-  sporadic <- which(grepl("Sporadic", group, fixed = TRUE))
-  high <- which(grepl("High", group, fixed = TRUE))
+  arms <- unit_arms(dgelist$samples$group, unit)
+  sporadic <- arms$sporadic
+  high <- arms$high
   cpm_matrix <- edgeR::cpm(
     dgelist,
     normalized.lib.sizes = TRUE, prior.count = 0, log = FALSE
   )[, c(sporadic, high), drop = FALSE]
   storage.mode(cpm_matrix) <- "double"
   # MSigDB carries unversioned Ensembl identifiers.
-  ensembl <- sub("\\..*$", "", rownames(cpm_matrix))
+  ensembl <- strip_ensembl_version(rownames(cpm_matrix))
   cpm_matrix <- cpm_matrix[!duplicated(ensembl), , drop = FALSE]
   rownames(cpm_matrix) <- ensembl[!duplicated(ensembl)]
   nx <- length(sporadic)

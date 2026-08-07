@@ -16,20 +16,23 @@ suppressPackageStartupMessages({
   library(ggrepel)
 })
 
+source(file.path(paths$root, "lib", "units.R"))
+source(file.path(paths$root, "lib", "annotation.R"))
+source(file.path(paths$root, "lib", "plot_theme.R"))
+
 # FDR_CUT comes from config.R via setup.R.
 N_LABEL <- 8L # strongest genes to label per unit
 
 test <- readRDS(file.path(paths$processed, "thyr_expression_test.rds"))
 se <- readRDS(file.path(paths$processed, "thyr_se_raw.rds"))
-name_of <- setNames(as.data.frame(rowData(se))$gene_name, rownames(se))
+name_of <- gene_name_map(se)
 
-unit_order <- c("R_Tumor", "R_Normal", "B_Tumor", "B_Normal")
+unit_order <- UNIT_ORDER
 df <- do.call(rbind, lapply(unit_order, function(u) {
   g <- test$units[[u]]$genes
   data.frame(
     unit = u,
-    gene = ifelse(is.na(name_of[g$gene_id]) | name_of[g$gene_id] == "",
-      sub("\\..*$", "", g$gene_id), unname(name_of[g$gene_id])),
+    gene = gene_label(g$gene_id, name_of),
     x = 2 * g$effect - 1,
     y = -log10(pmax(g$p_exact, .Machine$double.xmin)),
     fdr = g$fdr_perm,
@@ -50,7 +53,7 @@ lab <- do.call(rbind, lapply(split(df, df$unit), function(d) {
   head(d[order(d$p_exact), ], N_LABEL)
 }))
 
-pal <- setNames(c("#eb6834", "#2a78d6", "grey75"), c(lab_up, lab_down, "n.s."))
+pal <- setNames(c(COL_UP, COL_DOWN, COL_NS), c(lab_up, lab_down, "n.s."))
 
 p <- ggplot(df, aes(x = x, y = y)) +
   geom_vline(xintercept = 0, colour = "grey85") +
@@ -67,19 +70,9 @@ p <- ggplot(df, aes(x = x, y = y)) +
     subtitle = paste0("Rank-based effect (no fold change); coloured by permutation FDR < ",
       FDR_CUT, ". R_Normal/B_Tumor are negative controls.")
   ) +
-  theme_bw(base_size = 11) +
-  theme(
-    plot.title = element_text(face = "bold", size = 12),
-    plot.subtitle = element_text(size = 9, colour = "grey30"),
-    panel.grid.minor = element_blank(),
-    strip.text = element_text(face = "bold"),
-    legend.position = "top"
-  )
+  theme_thyr()
 
-if (!dir.exists(paths$output)) dir.create(paths$output, recursive = TRUE)
-out_png <- file.path(paths$output, "volcano_expression.png")
-ggsave(out_png, p, width = 9, height = 8, dpi = 160, type = "cairo")
-message("Saved: ", out_png)
+save_figure(p, "volcano_expression.png", width = 9, height = 8)
 for (u in unit_order) {
   g <- test$units[[u]]$genes
   message(sprintf("  %-9s genes %5d | min p_exact %.2e | fdr<%.2f %d",
