@@ -1,4 +1,4 @@
-# reo_lowmid_confound.R  (PROVISIONAL / 仮置き)
+# reo_lowmid_confound.R
 # Layer-2 QC for the REO out-of-sample validation: reo_lowmid_purity.R showed the reversal score
 # correlates with tumour purity within R_Low/Mid, and purity itself grades with
 # assigned share (AS). So the graded Low<Mid score increase could be AS-driven
@@ -8,15 +8,16 @@
 #   (A) Purity-stratified ordered test: within each purity stratum, is Mid > Low
 #       score (one-sided BM)? Purity does not vary within a stratum, so a
 #       surviving Mid>Low is AS-attributable.
-# Provisional: not wired into the pipeline; reads reo_lowmid_purity.R's provisional purity.
-# Input : processed/thyr_reo_lowmid_purity_provisional.rds (from 260)
+# A diagnostic outside the numbered stream (reorg plan v2 s2.6); reads the
+# purity diagnostic's output. Run after reo_lowmid_purity.R.
+# Input : diagnostics/output/reo_lowmid_purity.rds
 #         lib/stat_brunnermunzel.R
-# Output: processed/thyr_reo_confound_provisional.rds
+# Output: diagnostics/output/reo_confound.rds
 
 source("setup.R")
 source(file.path(paths$root, "lib", "stat_brunnermunzel.R"))
 
-d <- readRDS(file.path(paths$processed, "thyr_reo_lowmid_purity_provisional.rds"))
+d <- readRDS(file.path(paths$root, "diagnostics", "output", "reo_lowmid_purity.rds"))
 d <- d[d$band %in% c("R_Low", "R_Mid") & !is.na(d$score) & !is.na(d$tumor_purity), , drop = FALSE]
 d$band_num <- ifelse(d$band == "R_Mid", 1L, 0L) # ordered: Mid higher AS
 message("R_Low/Mid with score+purity: ",
@@ -80,6 +81,8 @@ out <- list(
   strata = strata_tbl,
   data = d[, c("case_submitter_id", "band", "assigned_share", "tumor_purity", "score", "stratum")]
 )
-out_rds <- file.path(paths$processed, "thyr_reo_confound_provisional.rds")
+out_dir <- file.path(paths$root, "diagnostics", "output")
+if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
+out_rds <- file.path(out_dir, "reo_confound.rds")
 saveRDS(out, out_rds)
 message("\nSaved: ", out_rds)

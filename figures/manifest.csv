@@ -1,0 +1,5 @@
+display_id,script,output,status,source_objects,manuscript_location
+unassigned,figures/fig_gene_bm_evidence.R,output/figures/fig_gene_bm_evidence.png,provisional,thyr_expression_test.rds;thyr_se_raw.rds,
+unassigned,figures/fig_ma_gene_bm.R,output/figures/fig_ma_gene_bm.png,provisional,thyr_normalized_counts.rds;thyr_expression_test.rds;thyr_se_raw.rds,
+unassigned,figures/fig_reo_grading.R,output/figures/fig_reo_grading.png,provisional,thyr_reo_panel.rds;thyr_reo_evaluation.rds;thyr_se_raw.rds;thyr_case_assigned_share.rds,
+unassigned,tables/tab_cohort_composition.R,,provisional,thyr_clinical.rds;thyr_case_assigned_share.rds;thyr_se_raw.rds,

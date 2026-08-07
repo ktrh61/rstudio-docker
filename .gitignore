@@ -84,3 +84,7 @@ _archive_root/
 
 # Baseline reference CSVs are tracked (exception to the global *.csv ignore)
 !tests/reference/baseline_20260807/*.csv
+
+# The figure/table manifest is a tracked management file (reorg plan v2 s2.6;
+# recorded as a narrow exception to the global *.csv ignore, like the baseline)
+!figures/manifest.csv

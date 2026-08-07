@@ -1,13 +1,13 @@
-# fig_gene_bm_evidence.R  (PROVISIONAL / 仮置き)
-# Volcano plots of the 410 gene-level Brunner-Munzel results, one facet per
-# analysis unit. The x axis is the signed BM effect 2*effect - 1 = P(X<Y) -
-# P(X>Y) (Cliff's delta; > 0 = higher in the High arm), since a rank test has no
-# fold change. The y axis is -log10(exact permutation p). Points are coloured by
-# the permutation-calibrated FDR (fdr_perm < FDR_CUT), and the strongest genes
-# per unit are labelled. Provisional: not wired into the pipeline.
+# fig_gene_bm_evidence.R
+# Gene-level Brunner-Munzel evidence plot, one facet per analysis unit (not a
+# volcano: a rank test has no fold change). The x axis is the signed BM effect
+# 2*effect - 1 = P(X<Y) - P(X>Y) (Cliff's delta; > 0 = higher in the High
+# arm) and the y axis is -log10(exact permutation p). Points are coloured by
+# the Storey q inference (q_storey < FDR_CUT) and the strongest genes per unit
+# are labelled. Status is tracked in figures/manifest.csv.
 # Input : processed/thyr_expression_test.rds  (from 410)
 #         processed/thyr_se_raw.rds            (gene_id -> gene_name)
-# Output: output/volcano_expression.png
+# Output: output/figures/fig_gene_bm_evidence.png
 
 source("setup.R")
 suppressPackageStartupMessages({
@@ -35,15 +35,15 @@ df <- do.call(rbind, lapply(unit_order, function(u) {
     gene = gene_label(g$gene_id, name_of),
     x = 2 * g$effect - 1,
     y = -log10(pmax(g$p_exact, .Machine$double.xmin)),
-    fdr = g$fdr_perm,
+    q = g$q_storey,
     p_exact = g$p_exact,
     stringsAsFactors = FALSE
   )
 }))
 df$unit <- factor(df$unit, levels = unit_order)
-lab_up <- sprintf("up in High (FDR<%.2f)", FDR_CUT)
-lab_down <- sprintf("up in Sporadic (FDR<%.2f)", FDR_CUT)
-df$sig <- ifelse(df$fdr < FDR_CUT,
+lab_up <- sprintf("up in High (q<%.2f)", FDR_CUT)
+lab_down <- sprintf("up in Sporadic (q<%.2f)", FDR_CUT)
+df$sig <- ifelse(df$q < FDR_CUT,
   ifelse(df$x >= 0, lab_up, lab_down),
   "n.s.")
 df$sig <- factor(df$sig, levels = c(lab_up, lab_down, "n.s."))
@@ -66,15 +66,15 @@ p <- ggplot(df, aes(x = x, y = y)) +
     x = expression("signed Brunner-Munzel effect  " * (P(X < Y) - P(X > Y))
       * "   " %->% "  higher in High"),
     y = expression(-log[10] * "(exact permutation p)"),
-    title = "Gene-level Brunner-Munzel volcano (410), per analysis unit",
-    subtitle = paste0("Rank-based effect (no fold change); coloured by permutation FDR < ",
-      FDR_CUT, ". R_Normal/B_Tumor are negative controls.")
+    title = "Gene-level Brunner-Munzel evidence (410), per analysis unit",
+    subtitle = paste0("Rank-based effect (no fold change); coloured by Storey q < ",
+      FDR_CUT, ". Unit readings follow the pre-registered prediction map.")
   ) +
   theme_thyr()
 
-save_figure(p, "volcano_expression.png", width = 9, height = 8)
+save_figure(p, "fig_gene_bm_evidence.png", width = 9, height = 8)
 for (u in unit_order) {
   g <- test$units[[u]]$genes
-  message(sprintf("  %-9s genes %5d | min p_exact %.2e | fdr<%.2f %d",
-    u, nrow(g), min(g$p_exact), FDR_CUT, sum(g$fdr_perm < FDR_CUT)))
+  message(sprintf("  %-9s genes %5d | min p_exact %.2e | q<%.2f %d",
+    u, nrow(g), min(g$p_exact), FDR_CUT, sum(g$q_storey < FDR_CUT)))
 }

@@ -1,16 +1,16 @@
-# fig_reo_grading.R  (PROVISIONAL / 仮置き)
-# Figure for the REO out-of-sample validation, same concept as the v7
+# fig_reo_grading.R
+# Figure for the REO out-of-sample evaluation, same concept as the v7
 # 13_reo_evaluation_poc plot: REO reversal score (x) against assigned share
 # (radiation attribution %, y), coloured by exposure band, training arms open /
 # evaluation arms filled, with the AS band boundaries (33.3/66.6) and the A
-# classification threshold marked. Shows the graded trend (band medians rise
-# with assigned share). Provisional: not wired into the pipeline; regenerates
-# output/reo_poc_vs_reversal.png from the saved panel/evaluation objects.
+# classification threshold marked. Shows the graded pattern (band medians rise
+# with assigned share) at the descriptive-observation level fixed in the plan
+# (v2 s0.5). Status is tracked in figures/manifest.csv.
 # Input : processed/thyr_reo_panel.rds        (from 520; panel + boundary + training)
-#         processed/thyr_reo_evaluation.rds   (from 120; R_Low/Mid scores)
+#         processed/thyr_reo_evaluation.rds   (from 530; R_Low/Mid scores)
 #         processed/thyr_se_raw.rds           (sample -> case for training AS)
 #         processed/thyr_case_assigned_share.rds (assigned share)
-# Output: output/reo_poc_vs_reversal.png
+# Output: output/figures/fig_reo_grading.png
 
 source("setup.R")
 source(file.path(paths$root, "lib", "plot_theme.R"))
@@ -62,10 +62,10 @@ p <- ggplot(d, aes(x = score, y = as)) +
   labs(x = paste0("REO reversal score (panel of ", n_pairs, " pairs)"),
     y = "Assigned share  (radiation attribution, %)",
     title = "REO reversal grades with radiation attribution (RET/PTC tumours)",
-    subtitle = "Out-of-sample R_Low / R_Mid (filled) vs training R_Sporadic / R_High (open); trend suggestive") +
+    subtitle = "Out-of-sample R_Low / R_Mid (filled) vs training R_Sporadic / R_High (open); descriptive grading") +
   theme_thyr(base_size = 12, subtitle_size = 9.5, legend_position = "right")
 
-save_figure(p, "reo_poc_vs_reversal.png", width = 8.2, height = 5.6)
+save_figure(p, "fig_reo_grading.png", width = 8.2, height = 5.6)
 
 for (b in levels(d$band)) {
   s <- d$score[d$band == b]

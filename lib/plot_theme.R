@@ -28,11 +28,14 @@ theme_thyr <- function(base_size = 11, subtitle_size = 9,
     )
 }
 
+# Figures land in output/figures/ (reorg plan v2 s2.6: figure scripts read
+# processed/ only and write output/figures/ only).
 save_figure <- function(plot, filename, width, height) {
-  if (!dir.exists(paths$output)) {
-    dir.create(paths$output, recursive = TRUE)
+  out_dir <- file.path(paths$output, "figures")
+  if (!dir.exists(out_dir)) {
+    dir.create(out_dir, recursive = TRUE)
   }
-  out_png <- file.path(paths$output, filename)
+  out_png <- file.path(out_dir, filename)
   ggplot2::ggsave(out_png, plot,
     width = width, height = height, dpi = 160, type = "cairo"
   )

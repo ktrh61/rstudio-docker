@@ -1,16 +1,17 @@
-# reo_lowmid_purity.R  (PROVISIONAL / 仮置き)
+# reo_lowmid_purity.R
 # Layer-1 QC for the REO out-of-sample validation: estimate R_Low / R_Mid tumour
 # purity on the SAME common scale as the training arms by pooling the whole RET
 # cohort (Sporadic + Low + Mid + High) in one ContamDE run, then check whether
 # the REO reversal score is driven by purity within a band. If score is
 # independent of purity, purity filtering the validation set would not change the
 # conclusion; if correlated, a full re-filter (deferred layer 2) is warranted.
-# Provisional: not wired into the pipeline; mirrors 220 pooled ContamDE.
+# A diagnostic outside the numbered stream (reorg plan v2 s2.6); mirrors 220
+# pooled ContamDE. Run after the main chain.
 # Input : processed/thyr_case_design.rds (from 140),
 #         thyr_se_raw.rds, thyr_reo_evaluation.rds
 #         lib/norm_muren_helpers.R, lib/norm_muren.R,
 #         lib/purity_contamde.R
-# Output: processed/thyr_reo_lowmid_purity_provisional.rds
+# Output: diagnostics/output/reo_lowmid_purity.rds
 
 source("setup.R")
 suppressPackageStartupMessages({
@@ -81,6 +82,8 @@ for (b in c("R_Low", "R_Mid")) {
 r_all <- suppressWarnings(cor(lm$tumor_purity, lm$score, method = "spearman"))
 message(sprintf("  pooled Low+Mid Spearman(purity, score) = %+.3f (n=%d)", r_all, nrow(lm)))
 
-out_rds <- file.path(paths$processed, "thyr_reo_lowmid_purity_provisional.rds")
+out_dir <- file.path(paths$root, "diagnostics", "output")
+if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
+out_rds <- file.path(out_dir, "reo_lowmid_purity.rds")
 saveRDS(cases[, c("case_submitter_id", "band", "assigned_share", "tumor_purity", "score")], out_rds)
 message("Saved: ", out_rds)

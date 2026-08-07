@@ -1,13 +1,14 @@
-# reo_lowmid_outliers.R  (PROVISIONAL / 仮置き)
+# reo_lowmid_outliers.R
 # Layer-1 QC for the REO out-of-sample validation: run PC-OD outlier detection
 # on the R_Low / R_Mid tumours (which 530 currently uses unfiltered), then check
 # whether the graded reversal-score relationship and the Mid > Low test survive
-# removing any flagged sample. Provisional: not wired into the pipeline; mirrors
-# 210_detect_outliers.R's PC-OD but on the intermediate-exposure bands.
+# removing any flagged sample. A diagnostic outside the numbered stream
+# (reorg plan v2 s2.6); mirrors 210_detect_outliers.R's PC-OD but on the
+# intermediate-exposure bands. Run after the main chain.
 # Input : processed/thyr_case_design.rds (from 140),
 #         thyr_se_raw.rds, thyr_reo_evaluation.rds
 #         lib/qc_pc_od.R, lib/stat_brunnermunzel.R
-# Output: processed/thyr_reo_lowmid_outliers_provisional.rds
+# Output: diagnostics/output/reo_lowmid_outliers.rds
 
 source("setup.R")
 suppressPackageStartupMessages({
@@ -71,6 +72,8 @@ report(rep(TRUE, nrow(cases)), "all samples")
 report(cases$is_outlier == 0, "outliers removed")
 
 # --- Save ------------------------------------------------------------------
-out_rds <- file.path(paths$processed, "thyr_reo_lowmid_outliers_provisional.rds")
+out_dir <- file.path(paths$root, "diagnostics", "output")
+if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
+out_rds <- file.path(out_dir, "reo_lowmid_outliers.rds")
 saveRDS(cases[, c("case_submitter_id", "band", "assigned_share", "tumor_id", "score", "is_outlier")], out_rds)
 message("Saved: ", out_rds, " (", sum(cases$is_outlier), " outlier(s) flagged)")
