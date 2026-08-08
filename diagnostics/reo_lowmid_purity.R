@@ -37,7 +37,7 @@ ret <- design[design$driver %in% "RET" & !is.na(design$band), , drop = FALSE]
 cases <- data.frame(
   case_submitter_id = ret$case_submitter_id,
   dose_mgy = ret$dose_mgy,
-  assigned_share = ret$assigned_share_approx,
+  assigned_share = ret$assigned_share,
   band = paste0("R_", ret$band),
   tumor_id = ret$tumor_id,
   normal_id = ret$normal_id,

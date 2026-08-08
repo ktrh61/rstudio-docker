@@ -51,7 +51,7 @@ eval_cases <- cohorts[cohorts$include_reo_evaluation, , drop = FALSE]
 as_tbl <- data.frame(
   case_submitter_id = eval_cases$case_submitter_id,
   dose_mgy = eval_cases$dose_mgy,
-  assigned_share = eval_cases$assigned_share_approx,
+  assigned_share = eval_cases$assigned_share,
   band = paste0("R_", eval_cases$band),
   tumor_id = eval_cases$tumor_id,
   stringsAsFactors = FALSE

@@ -10,9 +10,14 @@
 #         lib/cohort_design.R
 # Output: processed/thyr_case_design.rds
 #           columns: case_submitter_id, designated_driver_raw, driver,
-#             driver_status, dose_mgy, assigned_share_approx,
-#             assigned_share_approx_status, band, band_status,
+#             driver_status, dose_mgy, assigned_share,
+#             assigned_share_status, band, band_status,
 #             tumor_id, normal_id, has_tumor, has_normal, is_paired
+#
+# Guard: every driver-classified (RET/BRAF) exposed case must carry an IREP
+# assigned_share -- a silent gap here would silently shrink the analysis
+# cohorts, so it stops. (The guard lives here, not in 130, because driver
+# classification first exists in this script.)
 
 source("setup.R")
 
@@ -47,13 +52,22 @@ design <- classify_driver(clinical)
 as_tbl <- data.frame(
   case_submitter_id = as.character(assigned_share$REBC_ID),
   dose_mgy = as.numeric(assigned_share$dose_mgy),
-  assigned_share_approx = as.numeric(assigned_share$assigned_share_approx),
-  assigned_share_approx_status = as.character(assigned_share$assigned_share_approx_status),
+  assigned_share = as.numeric(assigned_share$assigned_share),
+  assigned_share_status = as.character(assigned_share$assigned_share_status),
   stringsAsFactors = FALSE
 )
 design <- merge(design, as_tbl, by = "case_submitter_id", all = TRUE, sort = TRUE)
 
-band_tbl <- assign_band(design$dose_mgy, design$assigned_share_approx)
+classified_gap <- design$driver %in% c("RET", "BRAF") &
+  design$dose_mgy > 0 & !is.finite(design$assigned_share)
+if (any(classified_gap)) {
+  stop(
+    "Driver-classified exposed case(s) lack an IREP assigned_share: ",
+    paste(design$case_submitter_id[classified_gap], collapse = ", ")
+  )
+}
+
+band_tbl <- assign_band(design$dose_mgy, design$assigned_share)
 design$band <- band_tbl$band
 design$band_status <- band_tbl$band_status
 

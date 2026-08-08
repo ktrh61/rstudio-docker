@@ -27,7 +27,7 @@ as_df <- as.data.frame(readRDS(file.path(paths$processed, "thyr_case_assigned_sh
 # sample_id -> case -> assigned share (for the training arms)
 cd <- as.data.frame(colData(se))
 samp2case <- setNames(as.character(cd$case_submitter_id), as.character(cd$sample_submitter_id))
-as_of <- setNames(as.numeric(as_df$assigned_share_approx), as.character(as_df$REBC_ID))
+as_of <- setNames(as.numeric(as_df$assigned_share), as.character(as_df$REBC_ID))
 as_for_sample <- function(sid) unname(as_of[samp2case[sid]])
 
 tr <- reo$training

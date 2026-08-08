@@ -89,5 +89,9 @@ _archive_root/
 # recorded as a narrow exception to the global *.csv ignore, like the baseline)
 !figures/manifest.csv
 
+# Canonical IREP Assigned Share values (researcher-computed input, not
+# re-downloadable; reorg plan v2 B.11 — narrow exception like the baseline)
+!raw/clinical/thyr_irep_assigned_share.csv
+
 # Diagnostics outputs are generated measurements (same handling as processed/)
 diagnostics/output/

@@ -1,6 +1,15 @@
 # =============================================================================
 # dose_thyroid_as.R
 #
+# RETIRED FROM THE PIPELINE (2026-08-09, reorg plan v2 B.11): the pipeline now
+# reads the researcher's actual IREP results (raw/clinical/
+# thyr_irep_assigned_share.csv); this approximation is archived so it can be
+# provided, with this annotation, should IREP itself ever become unavailable.
+# Against the verified IREP values it tracks the "AS associated with the
+# expected value of ERR" output at median |diff| ~0.1 and max ~3.5 AS points
+# over the analysis cohort (including age_exposure = 0). It remains an
+# approximation without regulatory standing, which is why it was replaced.
+#
 # Standalone Monte Carlo estimator of the thyroid Assigned Share (AS) associated
 # with the expected value of the excess relative risk (ERR), approximating the
 # NCI/NIH Interactive RadioEpidemiological Program (IREP) for a single case.

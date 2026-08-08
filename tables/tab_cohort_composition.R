@@ -9,11 +9,13 @@
 #         processed/thyr_case_assigned_share.rds     (from 130; AS per case)
 #         processed/thyr_se_raw.rds                  (from 120; for pair status)
 #
-# AS band (4 categories, covering all cases):
-#   non_exposed  status == "missing_input"; AS not computed.
-#   (0,33.3)     computed AS (percent).
-#   [33.3,66.6)  computed AS.
-#   [66.6,100]   computed AS.
+# AS band (5 categories, covering all cases):
+#   non_exposed  dose == 0 (status "not_required_sporadic"); AS undefined.
+#   no_reference exposed but outside the IREP reference (status
+#                "not_in_reference" -- driver-unclassified cases; v2 B.11).
+#   (0,33.3)     IREP AS (percent).
+#   [33.3,66.6)  IREP AS.
+#   [66.6,100]   IREP AS.
 #
 # Pair status: derived on the fly from SE colData. A case is "paired" when it
 # carries both a Primary Tumor and a Solid Tissue Normal sample (sample_type
@@ -56,7 +58,7 @@ message("Clinical: ", nrow(clinical), " cases ; AS table: ", nrow(as_dt), " case
 # --- Join AS onto the clinical table and assign the AS band ------------------
 dt <- merge(
   clinical[, .(REBC_ID, Designated_DriverGroup, Designated_Driver)],
-  as_dt[, .(REBC_ID, assigned_share_approx, assigned_share_approx_status)],
+  as_dt[, .(REBC_ID, assigned_share, assigned_share_status)],
   by = "REBC_ID", all.x = TRUE
 )
 if (nrow(dt) != nrow(clinical)) {
@@ -65,18 +67,21 @@ if (nrow(dt) != nrow(clinical)) {
 
 assign_band <- function(v, st) {
   b <- rep(NA_character_, length(v))
-  b[st == "missing_input"] <- "non_exposed"
-  ok <- st == "computed"
+  b[st == "not_required_sporadic"] <- "non_exposed"
+  b[st == "not_in_reference"] <- "no_reference"
+  ok <- st == "irep"
   b[ok & v > 0 & v < 33.3] <- "(0,33.3)"
   b[ok & v >= 33.3 & v < 66.6] <- "[33.3,66.6)"
   b[ok & v >= 66.6] <- "[66.6,100]"
   b
 }
-dt[, band := assign_band(assigned_share_approx, assigned_share_approx_status)]
+dt[, band := assign_band(assigned_share, assigned_share_status)]
 
-band_levels <- c("non_exposed", "(0,33.3)", "[33.3,66.6)", "[66.6,100]")
+band_levels <- c(
+  "non_exposed", "no_reference", "(0,33.3)", "[33.3,66.6)", "[66.6,100]"
+)
 if (any(is.na(dt$band))) {
-  bad <- dt[is.na(band), unique(assigned_share_approx_status)]
+  bad <- dt[is.na(band), unique(assigned_share_status)]
   stop("Unassigned AS band for status: ", paste(bad, collapse = ", "))
 }
 dt[, band := factor(band, levels = band_levels)]
