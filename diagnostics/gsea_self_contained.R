@@ -91,11 +91,14 @@ measure_unit <- function(dgelist, unit) {
   flat <- unlist(unname(index), recursive = FALSE)
 
   statistic <- abs(brunnermunzel_statistics(cpm_matrix, nx))
-  null_statistic <- do.call(cbind, mclapply(seq_len(n_perm), function(i) {
-    abs(brunnermunzel_statistics(
-      cpm_matrix[, perm_index[, i], drop = FALSE], nx
-    ))
-  }, mc.cores = WORKERS))
+  null_statistic <- gsea_bind_null_columns(
+    mclapply(seq_len(n_perm), function(i) {
+      abs(brunnermunzel_statistics(
+        cpm_matrix[, perm_index[, i], drop = FALSE], nx
+      ))
+    }, mc.cores = WORKERS),
+    nrow(cpm_matrix)
+  )
 
   # Sparse membership matrix: sets x genes.
   membership <- sparseMatrix(
@@ -105,9 +108,12 @@ measure_unit <- function(dgelist, unit) {
     dims = c(length(flat), n_genes)
   )
 
-  pooled <- as.numeric(null_statistic)
+  # Same cut convention as 410's omnibus (order-statistic pick on the sorted
+  # pooled null), so "the 410 count restricted to the set" is exact, not
+  # approximate-by-quantile-interpolation.
+  pooled <- sort(as.numeric(null_statistic))
   rows <- lapply(COUNT_QUANTILES, function(qq) {
-    cut <- stats::quantile(pooled, qq)
+    cut <- pooled[max(1L, round(length(pooled) * qq))]
     observed_counts <- as.numeric(membership %*% (statistic >= cut))
     null_counts <- as.matrix(membership %*% (null_statistic >= cut))
     p_set <- (rowSums(null_counts >= observed_counts) + 1) / (n_perm + 1)
