@@ -50,7 +50,7 @@ source(file.path(paths$root, "lib", "annotation.R"))
 
 # --- Configuration ---------------------------------------------------------
 SPECIES <- "Homo sapiens"
-CALIB_SEED <- 20260807L # decision date of D6; independent of SEED
+CALIB_SEED <- 19450809L # shared diagnostic base seed (v2 B.10); independent of SEED
 R_REPLICATES <- 100L
 # B (the shared null pool) matches the analysis N_PERM from config.R, so the
 # calibration measures the machinery at the resolution 420 actually uses.

@@ -52,9 +52,9 @@ PAIRS <- list(
   normal = c("R_Normal", "B_Normal"),
   tumor = c("R_Tumor", "B_Tumor")
 )
-# One distinct shuffle seed per unit (see header). Base = date this
-# independence requirement was fixed; offset = unit position.
-AGREEMENT_SEED_BASE <- 20260809L
+# One distinct shuffle seed per unit (see header). Base = the shared
+# diagnostic base seed (v2 B.10); offset = unit position.
+AGREEMENT_SEED_BASE <- 19450809L
 
 expression_test <- readRDS(
   file.path(paths$processed, "thyr_expression_test.rds")

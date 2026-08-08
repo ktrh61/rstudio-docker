@@ -35,10 +35,11 @@ SPECIES <- "Homo sapiens"
 SPIKE_UNIT <- "B_Tumor" # no gene-level signal against its own null
 SPIKE_SET <- "HALLMARK_ADIPOGENESIS" # one mid-size Hallmark set
 SPIKE_FACTOR <- 1.15 # 15% multiplicative shift on the High arm
-SPIKE_SEED <- 20260807L # shuffle seed; independent of the inference seed.
-# Coincides with the calibration's CALIB_SEED (both are the D6 decision
-# date), so for a given unit the two diagnostics share a shuffle stream.
-# Harmless: they are separate measurements, never combined.
+SPIKE_SEED <- 19450809L # shared diagnostic base seed (v2 B.10); independent
+# of the inference seed. Same literal as CALIB_SEED by design (one base value
+# for all non-inferential diagnostics), so for a given unit the two
+# diagnostics share a shuffle stream. Harmless: they are separate
+# measurements, never combined.
 
 pin_blas_threads()
 
