@@ -8,13 +8,12 @@
 # Requires (sourced by the caller before use):
 #   lib/norm_muren.R      (muren_norm)
 #   lib/stat_brunnermunzel.R   (brunnermunzel_pvalues)
+#   lib/stat_storey.R     (storey_q)
 #   package edgeR
 #
 # `bm_method` selects how the screen's permutation p-values are obtained:
 # "auto" (default) enumerates all C(n, nx) allocations exactly when that is
-# affordable and samples otherwise, "exact" and "mc" force the choice. `est`
-# is accepted for call compatibility only -- it selects the effect-size
-# parameterization, which the DEG screen never reads.
+# affordable and samples otherwise, "exact" and "mc" force the choice.
 #
 # deges_muren_bm(counts, group, iteration, fdr, floor_pdeg, ...) runs, on a
 # fixed gene x sample count matrix:
@@ -91,7 +90,6 @@ muren_to_norm_factors <- function(scaling_coeff, lib_size) {
 deges_muren_bm <- function(counts, group, iteration = 1L,
                            fdr, floor_pdeg,
                            n_perm, seed, alternative = "two.sided",
-                           est = "original",
                            bm_method = "auto",
                            muren_method = "lts", workers = 3L) {
   if (!exists("muren_norm", mode = "function", inherits = TRUE)) {
@@ -99,6 +97,9 @@ deges_muren_bm <- function(counts, group, iteration = 1L,
   }
   if (!exists("brunnermunzel_pvalues", mode = "function", inherits = TRUE)) {
     stop("brunnermunzel_pvalues() must be loaded (lib/stat_brunnermunzel.R).")
+  }
+  if (!exists("storey_q", mode = "function", inherits = TRUE)) {
+    stop("storey_q() must be loaded (source lib/stat_storey.R).")
   }
   group <- factor(group)
   group_levels <- levels(group)
@@ -133,10 +134,10 @@ deges_muren_bm <- function(counts, group, iteration = 1L,
     pvalues <- .deges_bm_pvalues(
       cpm_matrix, group, group_levels, n_perm, seed, alternative, bm_method
     )
-    # Storey q with pi0_hat at lambda = 0.5 (plug-in; reorg plan v2 D1):
-    # q = pi0_hat * (BH adjusted p). Monotone because BH is monotone.
-    pi0_hat <- min(1, mean(pvalues > 0.5) / 0.5)
-    p_adj <- pmin(1, pi0_hat * p.adjust(pvalues, method = "BH"))
+    # Protocol-wide Storey q (lib/stat_storey.R; reorg plan v2 D1).
+    screen <- storey_q(pvalues)
+    pi0_hat <- screen$pi0
+    p_adj <- screen$q
 
     # Normal cutoff set vs floorPDEG raw-p rank set; adopt the larger.
     normal_deg <- which(p_adj < fdr)

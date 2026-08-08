@@ -101,10 +101,8 @@ calibrate_unit <- function(dgelist, unit) {
       flat
     )
   }, mc.cores = WORKERS)
-  es <- matrix(
-    unlist(es_columns), nrow = length(flat), ncol = total,
-    dimnames = list(names(flat), NULL)
-  )
+  es <- gsea_bind_null_columns(es_columns, length(flat))
+  rownames(es) <- names(flat)
   pool <- es[, seq_len(N_PERM), drop = FALSE]
   pseudo <- es[, N_PERM + seq_len(R_REPLICATES), drop = FALSE]
 

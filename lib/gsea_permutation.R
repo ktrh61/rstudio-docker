@@ -39,6 +39,29 @@
 # Callers evaluate one collection at a time so that each collection's NES
 # normalization is built from that collection alone.
 
+# --- Parallel null assembly -------------------------------------------------
+# mclapply returns NULL for a killed worker and a condition object for an
+# errored one, with only a warning; matrix(unlist(...)) would then recycle
+# silently and misalign every downstream NES/p/q against the null. That is
+# the one failure class the assertion policy keeps guards for (a published
+# number silently falsified), so every permutation loop binds its columns
+# through this check.
+gsea_bind_null_columns <- function(columns, expected_length) {
+  ok <- vapply(
+    columns,
+    function(x) is.numeric(x) && length(x) == expected_length,
+    logical(1)
+  )
+  if (!all(ok)) {
+    stop(
+      sum(!ok), " of ", length(columns),
+      " parallel permutation workers returned no result; ",
+      "the null matrix would be silently misaligned."
+    )
+  }
+  matrix(unlist(columns), nrow = expected_length, ncol = length(columns))
+}
+
 # --- Ranking metric ---------------------------------------------------------
 # Tie-averaged normal scores: monotone in the metric, tied metrics share one
 # score, and +/-Inf map to finite extremes.

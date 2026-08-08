@@ -35,7 +35,10 @@ SPECIES <- "Homo sapiens"
 SPIKE_UNIT <- "B_Tumor" # no gene-level signal against its own null
 SPIKE_SET <- "HALLMARK_ADIPOGENESIS" # one mid-size Hallmark set
 SPIKE_FACTOR <- 1.15 # 15% multiplicative shift on the High arm
-SPIKE_SEED <- 20260807L # shuffle seed; independent of the inference seed
+SPIKE_SEED <- 20260807L # shuffle seed; independent of the inference seed.
+# Coincides with the calibration's CALIB_SEED (both are the D6 decision
+# date), so for a given unit the two diagnostics share a shuffle stream.
+# Harmless: they are separate measurements, never combined.
 
 pin_blas_threads()
 
@@ -96,10 +99,8 @@ null_columns <- mclapply(seq_len(N_PERM), function(i) {
     flat
   )
 }, mc.cores = WORKERS)
-null <- matrix(
-  unlist(null_columns), nrow = length(flat), ncol = N_PERM,
-  dimnames = list(names(flat), NULL)
-)
+null <- gsea_bind_null_columns(null_columns, length(flat))
+rownames(null) <- names(flat)
 
 sets <- do.call(rbind, lapply(names(index), function(collection) {
   keep <- collection_of == collection
@@ -119,6 +120,10 @@ sets <- do.call(rbind, lapply(names(index), function(collection) {
 rownames(sets) <- NULL
 
 spiked_row <- sets[sets$pathway == SPIKE_SET, , drop = FALSE]
+# A control that never entered the tested universe must not read as a pass.
+if (nrow(spiked_row) != 1L) {
+  stop("Spiked set ", SPIKE_SET, " is not in the tested universe.")
+}
 hallmark <- sets[sets$collection == "H", , drop = FALSE]
 hallmark_rank <- match(SPIKE_SET, hallmark$pathway[order(hallmark$q_bh)])
 message(sprintf(

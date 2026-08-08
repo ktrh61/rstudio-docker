@@ -52,7 +52,7 @@
 #
 # The size window drops both noise-prone tiny sets and the vague giant ones;
 # redundant_with flags a set whose leading edge is largely contained in a
-# better-ranked set (block-granular edges), gated at q_tail < FDR_CUT.
+# better-ranked set (block-granular edges), gated at q_bh < FDR_CUT.
 
 source("setup.R")
 
@@ -70,7 +70,9 @@ source(file.path(paths$root, "lib", "annotation.R"))
 
 # --- Configuration ---------------------------------------------------------
 SPECIES <- "Homo sapiens"
-GSEA_PARAM <- 1 # weighted running sum on the normal scores
+# The ES weight (gseaParam = 1, weight = |normal score|) is intrinsic to the
+# block ES in lib/gsea_permutation.R, not a parameter of this script; the
+# saved config records it as the literal it is.
 MIN_SET_SIZE <- GSEA_MIN_SET_SIZE # lib/gsea_collections.R; shared with the
 MAX_SET_SIZE <- GSEA_MAX_SET_SIZE # null calibration diagnostic
 REDUNDANT_JACCARD <- 0.5
@@ -148,10 +150,8 @@ test_unit <- function(dgelist, unit) {
       flat
     )
   }, mc.cores = WORKERS)
-  null <- matrix(
-    unlist(null_columns), nrow = length(flat), ncol = n_perm,
-    dimnames = list(names(flat), NULL)
-  )
+  null <- gsea_bind_null_columns(null_columns, length(flat))
+  rownames(null) <- names(flat)
 
   leading_edge <- gsea_block_leading_edge(scores, flat, rownames(cpm_matrix))
   per_collection <- lapply(names(index), function(collection) {
@@ -223,7 +223,7 @@ thyr_enrichment_test <- list(
     min_set_size = MIN_SET_SIZE,
     max_set_size = MAX_SET_SIZE,
     redundant_jaccard = REDUNDANT_JACCARD,
-    gsea_param = GSEA_PARAM,
+    gsea_param = 1, # hardcoded in the block ES (weight = |normal score|)
     msigdbr_version = as.character(packageVersion("msigdbr"))
   ),
   collections = names(gene_sets),

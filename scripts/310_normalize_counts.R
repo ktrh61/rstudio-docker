@@ -28,6 +28,7 @@ suppressPackageStartupMessages({
 source(file.path(paths$root, "lib", "norm_muren_helpers.R"))
 source(file.path(paths$root, "lib", "norm_muren.R"))
 source(file.path(paths$root, "lib", "stat_brunnermunzel.R"))
+source(file.path(paths$root, "lib", "stat_storey.R"))
 source(file.path(paths$root, "lib", "norm_deges.R"))
 
 # --- Configuration ---------------------------------------------------------
@@ -46,7 +47,6 @@ MUREN_METHOD <- "lts" # MUREN pairwise regression
 BM_METHOD <- "auto"
 BM_MC_B <- 999999L # Monte Carlo permutations (fallback only)
 BM_MC_ALTERNATIVE <- "two.sided"
-BM_MC_EST <- "original"
 
 options(
   brunnermunzel.exact.max.allocations = BM_EXACT_MAX,
@@ -131,7 +131,7 @@ process_unit <- function(samples1, samples2, group_labels) {
     counts = count_matrix_filtered, group = sample_groups,
     iteration = ITERATION, fdr = DEGES_FDR, floor_pdeg = FLOOR_PDEG,
     n_perm = BM_MC_B, seed = SEED,
-    alternative = BM_MC_ALTERNATIVE, est = BM_MC_EST,
+    alternative = BM_MC_ALTERNATIVE,
     bm_method = BM_METHOD,
     muren_method = MUREN_METHOD, workers = WORKERS
   )
@@ -226,8 +226,7 @@ thyr_normalized_counts <- list(
     bm_exact_max = BM_EXACT_MAX,
     bm_B = BM_MC_B,
     bm_seed = SEED,
-    bm_alternative = BM_MC_ALTERNATIVE,
-    bm_est = BM_MC_EST
+    bm_alternative = BM_MC_ALTERNATIVE
   ),
   comparisons = comparisons,
   clean_cases = clean,

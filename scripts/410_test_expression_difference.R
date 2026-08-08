@@ -56,6 +56,7 @@ suppressPackageStartupMessages({
 })
 
 source(file.path(paths$root, "lib", "stat_brunnermunzel.R"))
+source(file.path(paths$root, "lib", "stat_storey.R"))
 source(file.path(paths$root, "lib", "units.R"))
 
 # --- Configuration ---------------------------------------------------------
@@ -80,26 +81,21 @@ if (!file.exists(norm_path)) {
 normalized <- readRDS(norm_path)
 message("Units: ", paste(names(normalized$units), collapse = ", "))
 
-# --- Storey q (plug-in pi0, lambda = 0.5) ----------------------------------
-# Identical to the DEGES screen in lib/norm_deges.R (reorg plan v2 D1):
-# pi0_hat = min(1, mean(p > 0.5) / 0.5), q = min(1, pi0_hat * BH). Monotone
-# because BH is monotone.
-storey_q <- function(p) {
-  pi0_hat <- min(1, mean(p > 0.5) / 0.5)
-  list(pi0 = pi0_hat, q = pmin(1, pi0_hat * p.adjust(p, method = "BH")))
-}
-
-# The plug-in estimator applied to each shuffle, scored against its own
-# gene-wise null: within each gene's row of null statistics, the empirical
-# p of shuffle j is the fraction of shuffles at least as extreme. This keeps
-# per-gene null heterogeneity (tie patterns differ across genes) out of the
-# calibration, which pooling would mix in.
+# --- Storey q --------------------------------------------------------------
+# The protocol-wide correction lives in lib/stat_storey.R; the DEGES screen
+# in 310 applies the same functions, so the two cannot drift (v2 D1).
+#
+# storey_pi0_null: the plug-in estimator applied to each shuffle, scored
+# against its own gene-wise null: within each gene's row of null statistics,
+# the empirical p of shuffle j is the fraction of shuffles at least as
+# extreme. This keeps per-gene null heterogeneity (tie patterns differ across
+# genes) out of the calibration, which pooling would mix in.
 storey_pi0_null <- function(null_statistic) {
   n_perm <- ncol(null_statistic)
   null_p <- apply(null_statistic, 1L, function(s) {
     (n_perm - rank(s, ties.method = "min") + 1) / n_perm
   }) # n_perm x genes
-  apply(null_p, 1L, function(p) min(1, mean(p > 0.5) / 0.5))
+  apply(null_p, 1L, storey_pi0)
 }
 
 # --- Higher Criticism ------------------------------------------------------
@@ -186,6 +182,11 @@ test_unit <- function(dgelist, unit) {
 
   # The label shuffles as an explicit index object, so 420 can consume the
   # same permutations by reference rather than by seed coincidence (s3.2).
+  # Every unit seeds the same stream, so equal-n units hold bit-identical
+  # perm_index matrices (visible in the recorded hashes). That is harmless
+  # for per-unit inference and for 420's reuse, but cross-unit diagnostics
+  # must not pair these matrices as independent shuffles -- see
+  # diagnostics/signature_agreement.R, which draws its own.
   set.seed(SEED)
   perm_index <- vapply(seq_len(N_PERM), function(i) sample(n), integer(n))
   null_statistic <- vapply(

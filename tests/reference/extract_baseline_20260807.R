@@ -23,6 +23,19 @@ enrichment_test <- readRDS(file.path(paths$processed, "thyr_enrichment_test.rds"
 reo_panel <- readRDS(file.path(paths$processed, "thyr_reo_panel.rds"))
 reo_eval <- readRDS(file.path(paths$processed, "thyr_reo_evaluation.rds"))
 
+# This extractor documents the PRE-migration artifacts. The phase-4 rewrite
+# retired the columns it summarizes (fdr_perm; fwer/fdr_subramanian), so a
+# re-run against regenerated artifacts would silently overwrite the audit
+# CSVs with 0/Inf (missing data.frame columns index as NULL). Refuse instead:
+# the baseline is a frozen record, not a regenerable output.
+if (is.null(expression_test$units[[1]]$genes$fdr_perm) ||
+  is.null(enrichment_test$units[[1]]$fwer)) {
+  stop(
+    "processed/ artifacts are post-migration (phase 4); the ",
+    "baseline_20260807 record must not be regenerated from them."
+  )
+}
+
 PURITY_THRESHOLD <- 0.6 # convention fixed in the current pipeline (310)
 
 # --- Case-ID invariants ----------------------------------------------------

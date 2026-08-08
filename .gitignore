@@ -88,3 +88,6 @@ _archive_root/
 # The figure/table manifest is a tracked management file (reorg plan v2 s2.6;
 # recorded as a narrow exception to the global *.csv ignore, like the baseline)
 !figures/manifest.csv
+
+# Diagnostics outputs are generated measurements (same handling as processed/)
+diagnostics/output/
