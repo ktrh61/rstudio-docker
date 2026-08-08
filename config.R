@@ -7,11 +7,14 @@
 # own documented seeds.
 SEED <- 19860426L
 
-# MUREN parallel workers. Development value; the canonical publication run uses
-# 4L (worker count does not affect results; switch at the final clean run).
+# Parallelism: development values for the fast machine. The canonical
+# publication run executes on the adoption machine (Xeon, 4C/8T; ~6 threads
+# saturate it) and the published scripts declare 4L for BOTH knobs -- a
+# distributed verification script must not presuppose 16 threads. Thread
+# counts do not affect results; switch at the final clean run.
 WORKERS <- 16L
 
-# Brunner-Munzel exact-enumeration threads and allocation cap (310/410/420).
+# Brunner-Munzel exact-enumeration threads and allocation cap (310/410).
 EXACT_THREADS <- 16L
 BM_EXACT_MAX <- 1e8
 
