@@ -2,8 +2,9 @@
 # every script that sources setup.R sees these. Stage-specific parameters stay
 # in their own script and are recorded in that script's output config.
 
-# Canonical seed (Chernobyl accident date 1986-04-26). Used by 310 (DEGES MC
-# fallback), 410 (label shuffles), 530 (REO Low-vs-Mid BM), and diagnostics.
+# Canonical seed (Chernobyl accident date 1986-04-26). Used by 410 (label
+# shuffles) and 530 (REO Low-vs-Mid Monte Carlo BM); diagnostics draw their
+# own documented seeds.
 SEED <- 19860426L
 
 # MUREN parallel workers. Development value; the canonical publication run uses

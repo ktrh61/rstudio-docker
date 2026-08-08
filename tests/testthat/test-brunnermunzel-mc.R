@@ -910,7 +910,13 @@ testthat::test_that("the matrix interface validates its inputs", {
   testthat::expect_error(brunnermunzel_pvalues(as.vector(data), 3L))
   testthat::expect_error(brunnermunzel_pvalues(data, 1L))
   testthat::expect_error(brunnermunzel_pvalues(data, 5L))
-  testthat::expect_error(brunnermunzel_pvalues(data, 3L, B = 0))
+  # B parameterizes only the Monte Carlo null: invalid B must error on the
+  # mc path and must NOT be demanded on the exact path (310 declares exact
+  # and passes no usable B).
+  testthat::expect_error(brunnermunzel_pvalues(data, 3L, B = 0, method = "mc"))
+  testthat::expect_silent(
+    invisible(brunnermunzel_pvalues(data, 3L, B = 0, method = "exact"))
+  )
   testthat::expect_error(brunnermunzel_pvalues(data, 3L, seed = 1.5))
   testthat::expect_error(
     brunnermunzel_pvalues(rbind(c(1, NA, 3, 4, 5, 6)), 3L)

@@ -38,15 +38,14 @@ ITERATION <- 3L # DEGES iterations (exact count; iDEGES)
 FLOOR_PDEG <- 0.05 # floorPDEG fraction forced as potential DEGs (TCC)
 MUREN_METHOD <- "lts" # MUREN pairwise regression
 
-# Brunner-Munzel screening (lib/stat_brunnermunzel.R).
-# "auto" enumerates all C(n, nx) allocations exactly when that is affordable
-# and samples otherwise. Both units here are well inside the budget
-# (C(28,12) = 3.0e7 and C(36,9) = 9.4e7), so the screen's p-values are exact:
-# no 1/(B + 1) floor, no sampling error, and no dependence on the seed.
-# BM_MC_B / SEED apply only if a unit ever falls back to sampling.
-BM_METHOD <- "auto"
-BM_MC_B <- 999999L # Monte Carlo permutations (fallback only)
-BM_MC_ALTERNATIVE <- "two.sided"
+# Brunner-Munzel screening (lib/stat_brunnermunzel.R). Declared exact: both
+# units are well inside the enumeration budget (C(28,12) = 3.0e7 and
+# C(36,9) = 9.4e7), so the screen's p-values carry no 1/(B + 1) floor, no
+# sampling error, and no seed dependence. The declaration matches the path
+# actually taken (reorg plan v2 s3.2): if a future cohort ever made
+# enumeration impossible the run stops rather than silently sampling.
+BM_METHOD <- "exact"
+BM_ALTERNATIVE <- "two.sided"
 
 options(
   brunnermunzel.exact.max.allocations = BM_EXACT_MAX,
@@ -130,8 +129,8 @@ process_unit <- function(samples1, samples2, group_labels) {
   deges <- deges_muren_bm(
     counts = count_matrix_filtered, group = sample_groups,
     iteration = ITERATION, fdr = DEGES_FDR, floor_pdeg = FLOOR_PDEG,
-    n_perm = BM_MC_B, seed = SEED,
-    alternative = BM_MC_ALTERNATIVE,
+    n_perm = 0L, seed = SEED, # both unused on the exact path
+    alternative = BM_ALTERNATIVE,
     bm_method = BM_METHOD,
     muren_method = MUREN_METHOD, workers = WORKERS
   )
@@ -224,9 +223,7 @@ thyr_normalized_counts <- list(
     bm_test = "permutation_brunnermunzel",
     bm_method = BM_METHOD,
     bm_exact_max = BM_EXACT_MAX,
-    bm_B = BM_MC_B,
-    bm_seed = SEED,
-    bm_alternative = BM_MC_ALTERNATIVE
+    bm_alternative = BM_ALTERNATIVE
   ),
   comparisons = comparisons,
   clean_cases = clean,

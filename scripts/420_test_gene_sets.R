@@ -76,14 +76,9 @@ SPECIES <- "Homo sapiens"
 MIN_SET_SIZE <- GSEA_MIN_SET_SIZE # lib/gsea_collections.R; shared with the
 MAX_SET_SIZE <- GSEA_MAX_SET_SIZE # null calibration diagnostic
 REDUNDANT_JACCARD <- 0.5
-# FDR_CUT / WORKERS / EXACT_THREADS / BM_EXACT_MAX come from config.R via
-# setup.R. 420 computes BM statistics only (no p-value path), so
-# exact.max.allocations is inert here; it is set for uniformity with 310/410.
-
-options(
-  brunnermunzel.exact.max.allocations = BM_EXACT_MAX,
-  brunnermunzel.exact.threads = EXACT_THREADS
-)
+# FDR_CUT / WORKERS come from config.R via setup.R. 420 computes BM
+# statistics only (no p-value path), so the exact-enumeration options that
+# 310/410 set are not set here -- they would be inert knobs.
 
 pin_blas_threads()
 

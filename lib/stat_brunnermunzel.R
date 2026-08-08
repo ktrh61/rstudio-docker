@@ -558,7 +558,6 @@ brunnermunzel_pvalues <- function(
   nx <- .bm_validate_matrix(data, nx)
   n <- ncol(data)
   ny <- n - nx
-  B <- .bm_validate_integer(B, "B", positive = TRUE)
   if (!is.null(seed)) {
     seed <- .bm_validate_integer(seed, "seed")
   }
@@ -568,6 +567,11 @@ brunnermunzel_pvalues <- function(
 
   alternative_code <- .bm_alternative_code(alternative)
   resolved <- .bm_resolve_method(method, n, nx)
+  # B parameterizes only the Monte Carlo null; on the exact path it is unused
+  # and deliberately not validated, so callers on that path need no dummy.
+  if (resolved$method == "mc") {
+    B <- .bm_validate_integer(B, "B", positive = TRUE)
+  }
   observed <- .brunnermunzel_mc_state$bm_observed_matrix_cpp(
     matrix(as.double(data), nrow = nrow(data)),
     as.integer(nx)
