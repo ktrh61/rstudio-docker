@@ -156,19 +156,14 @@ omnibus_table <- function(statistic, null_statistic, alpha, n_perm) {
 
   n_null <- length(pooled)
   observed_hc <- higher_criticism(statistic, pooled, n_null, HC_ALPHA0)
-  # Column-independent and free of randomness, so distributing the shuffles
-  # cannot change a bit; the completeness-checked bind stops loudly if a
-  # worker dies (same guard as the permutation columns).
-  null_hc <- as.numeric(gsea_bind_null_columns(
-    parallel::mclapply(
-      seq_len(ncol(null_statistic)),
-      function(j) {
-        higher_criticism(null_statistic[, j], pooled, n_null, HC_ALPHA0)
-      },
-      mc.cores = WORKERS
-    ),
-    1L
-  ))
+  # Deliberately serial: forking here would clone a multi-GB heap (the null
+  # matrix and pooled vector are live), and the children's GC dirties the
+  # copy-on-write pages -- measured as an OOM kill on a 15 GB machine. The
+  # serial pass costs ~1 minute at the canonical N_PERM; the former rank()
+  # loop, not this one, was the scaling bottleneck.
+  null_hc <- apply(null_statistic, 2L, function(s) {
+    higher_criticism(s, pooled, n_null, HC_ALPHA0)
+  })
   counted[[length(counted) + 1L]] <- data.frame(
     test = "hc", alpha = HC_ALPHA0, cut = NA_real_, observed = observed_hc,
     null_median = stats::median(null_hc),
