@@ -53,11 +53,13 @@ source("setup.R")
 
 suppressPackageStartupMessages({
   library(edgeR)
+  library(parallel)
 })
 
 source(file.path(paths$root, "lib", "stat_brunnermunzel.R"))
 source(file.path(paths$root, "lib", "stat_storey.R"))
 source(file.path(paths$root, "lib", "units.R"))
+source(file.path(paths$root, "lib", "gsea_permutation.R")) # bind helper
 
 # --- Configuration ---------------------------------------------------------
 # Shared constants (N_PERM, SEED, EXACT_THREADS, BM_EXACT_MAX, FDR_CUT) come
@@ -189,15 +191,21 @@ test_unit <- function(dgelist, unit) {
   # diagnostics/signature_agreement.R, which draws its own.
   set.seed(SEED)
   perm_index <- vapply(seq_len(N_PERM), function(i) sample(n), integer(n))
-  null_statistic <- vapply(
+  # The shuffles are drawn above, so each column below is an independent
+  # deterministic computation: distributing them across workers cannot move a
+  # single bit (unlike MUREN, whose LTS draws per-worker random subsamples --
+  # see config.R). Completeness is checked when the columns are bound.
+  null_columns <- parallel::mclapply(
     seq_len(N_PERM),
     function(i) {
       abs(brunnermunzel_statistics(
         cpm_matrix[, perm_index[, i], drop = FALSE], nx
       ))
     },
-    numeric(nrow(cpm_matrix))
+    mc.cores = WORKERS
   )
+  null_statistic <- gsea_bind_null_columns(null_columns, nrow(cpm_matrix))
+  rm(null_columns)
 
   storey <- storey_q(p_exact)
   pi0_null <- storey_pi0_null(null_statistic)
