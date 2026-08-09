@@ -94,10 +94,17 @@ message("Units: ", paste(names(normalized$units), collapse = ", "))
 # genes) out of the calibration, which pooling would mix in.
 storey_pi0_null <- function(null_statistic) {
   n_perm <- ncol(null_statistic)
-  null_p <- apply(null_statistic, 1L, function(s) {
-    (n_perm - rank(s, ties.method = "min") + 1) / n_perm
-  }) # n_perm x genes
-  apply(null_p, 1L, storey_pi0)
+  # rowRanks(ties.method = "min") reproduces rank(ties.method = "min") per
+  # gene exactly (integer ranks, identical arithmetic); the per-shuffle
+  # pi0 values are unchanged -- this replaces 15k rank() calls that scale
+  # painfully at the canonical N_PERM.
+  r <- matrixStats::rowRanks(null_statistic, ties.method = "min")
+  null_p <- (n_perm - r + 1) / n_perm # genes x n_perm
+  vapply(
+    seq_len(n_perm),
+    function(j) storey_pi0(null_p[, j]),
+    numeric(1)
+  )
 }
 
 # --- Higher Criticism ------------------------------------------------------
@@ -136,7 +143,7 @@ omnibus_table <- function(statistic, null_statistic, alpha, n_perm) {
       stringsAsFactors = FALSE
     )
   })
-  null_max <- apply(null_statistic, 2L, max)
+  null_max <- matrixStats::colMaxs(null_statistic)
   observed_max <- max(statistic)
   counted[[length(counted) + 1L]] <- data.frame(
     test = "max", alpha = NA_real_, cut = NA_real_, observed = observed_max,
@@ -149,9 +156,19 @@ omnibus_table <- function(statistic, null_statistic, alpha, n_perm) {
 
   n_null <- length(pooled)
   observed_hc <- higher_criticism(statistic, pooled, n_null, HC_ALPHA0)
-  null_hc <- apply(null_statistic, 2L, function(s) {
-    higher_criticism(s, pooled, n_null, HC_ALPHA0)
-  })
+  # Column-independent and free of randomness, so distributing the shuffles
+  # cannot change a bit; the completeness-checked bind stops loudly if a
+  # worker dies (same guard as the permutation columns).
+  null_hc <- as.numeric(gsea_bind_null_columns(
+    parallel::mclapply(
+      seq_len(ncol(null_statistic)),
+      function(j) {
+        higher_criticism(null_statistic[, j], pooled, n_null, HC_ALPHA0)
+      },
+      mc.cores = WORKERS
+    ),
+    1L
+  ))
   counted[[length(counted) + 1L]] <- data.frame(
     test = "hc", alpha = HC_ALPHA0, cut = NA_real_, observed = observed_hc,
     null_median = stats::median(null_hc),
