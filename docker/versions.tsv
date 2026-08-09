@@ -1,0 +1,32 @@
+# Parity targets = versions proven in the 4-1b dev container, EXCEPT
+# Matrix 1.7-5: the dev container carried 1.7-4 from R's own recommended
+# mechanism; P3M 2026-04-09 (the single pinning mechanism) serves 1.7-5
+# (recorded deviation, reorg plan v2 phase-6 unit).
+package	version
+MASS	7.3-65
+Matrix	1.7-5
+lattice	0.22-9
+survival	3.8-6
+R.utils	2.13.0
+Rcpp	1.1.1
+RhpcBLASctl	0.23-42
+brunnermunzel	2.0
+data.table	1.18.2.1
+digest	0.6.39
+doSNOW	1.0.20
+foreach	1.5.2
+iterators	1.0.14
+ggplot2	4.0.2
+ggrepel	0.9.8
+matrixStats	1.5.0
+msigdbr	26.1.0
+testthat	3.3.2
+BiocManager	1.30.27
+edgeR	4.8.2
+limma	3.66.0
+fgsea	1.36.2
+TCC	1.50.0
+SummarizedExperiment	1.40.0
+GenomicRanges	1.62.1
+GenomicDataCommons	1.34.1
+rtracklayer	1.70.1

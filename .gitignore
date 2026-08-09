@@ -93,5 +93,9 @@ _archive_root/
 # re-downloadable; reorg plan v2 B.11 — narrow exception like the baseline)
 !raw/clinical/thyr_irep_assigned_share.csv
 
+# Build inputs for the canonical image are code, not data (exception to the
+# global *.tsv ignore; the Dockerfile COPYs this file)
+!docker/versions.tsv
+
 # Diagnostics outputs are generated measurements (same handling as processed/)
 diagnostics/output/

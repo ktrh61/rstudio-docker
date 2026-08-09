@@ -1,0 +1,4 @@
+# The repository is mounted at runtime, never copied into the image; only
+# docker/ enters the build context.
+*
+!docker/
