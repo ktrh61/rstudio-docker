@@ -11,6 +11,13 @@ SEED <- 19860426L
 # adoption machine (Xeon, 4C/8T), and a distributed verification script must
 # not presuppose more. No stage nests these knobs -- the peak concurrency is
 # 4 at every step, and the reference BLAS adds no threads of its own.
+#
+# WORKERS is part of the reproduction contract, not a free performance knob:
+# MUREN gives each worker its own RNG stream (norm_muren.R,
+# clusterSetRNGStream) and MASS::ltsreg draws random subsamples, so the worker
+# count decides which subsamples are drawn. A fixed count is fully
+# deterministic; changing it moves the last bits (measured 16 vs 4 workers:
+# purity 2e-14, scaling coefficients 2e-13, every cohort decision identical).
 WORKERS <- 4L
 
 # Brunner-Munzel exact-enumeration threads and allocation cap (310/410).
