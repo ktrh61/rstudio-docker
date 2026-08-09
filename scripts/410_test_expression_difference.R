@@ -175,8 +175,17 @@ omnibus_table <- function(statistic, null_statistic, alpha, n_perm) {
   do.call(rbind, counted)
 }
 
+# Permutation-fleet cap: each worker buffers its null columns twice over
+# (accumulation + serialization, ~160 MB at the canonical N_PERM), so an
+# uncapped fleet on a many-core machine can exceed 16 GB-class RAM together
+# with the previous unit's not-yet-collected heap. The published declaration
+# (WORKERS = 4) is below the cap; results are worker-count-invariant either
+# way (verified).
+PERM_WORKERS <- min(WORKERS, 8L)
+
 # --- Per-unit test ---------------------------------------------------------
 test_unit <- function(dgelist, unit) {
+  gc(verbose = FALSE) # release the previous unit's heap before forking
   arms <- unit_arms(dgelist$samples$group, unit)
   sporadic <- arms$sporadic
   high <- arms$high
@@ -214,7 +223,7 @@ test_unit <- function(dgelist, unit) {
         cpm_matrix[, perm_index[, i], drop = FALSE], nx
       ))
     },
-    mc.cores = WORKERS
+    mc.cores = PERM_WORKERS
   )
   null_statistic <- gsea_bind_null_columns(null_columns, nrow(cpm_matrix))
   rm(null_columns)
