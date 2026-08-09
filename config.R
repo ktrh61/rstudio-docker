@@ -7,15 +7,14 @@
 # own documented seeds.
 SEED <- 19860426L
 
-# Parallelism: development values for the fast machine. The canonical
-# publication run executes on the adoption machine (Xeon, 4C/8T; ~6 threads
-# saturate it) and the published scripts declare 4L for BOTH knobs -- a
-# distributed verification script must not presuppose 16 threads. Thread
-# counts do not affect results; switch at the final clean run.
-WORKERS <- 16L
+# Parallelism: the canonical declaration. The publication run executes on the
+# adoption machine (Xeon, 4C/8T), and a distributed verification script must
+# not presuppose more. No stage nests these knobs -- the peak concurrency is
+# 4 at every step, and the reference BLAS adds no threads of its own.
+WORKERS <- 4L
 
 # Brunner-Munzel exact-enumeration threads and allocation cap (310/410).
-EXACT_THREADS <- 16L
+EXACT_THREADS <- 4L
 BM_EXACT_MAX <- 1e8
 
 # Pin BLAS/OpenMP to one thread so explicit parallelism is the only parallelism.
@@ -52,6 +51,7 @@ DEGES_FDR <- 0.10
 
 # Label shuffles for the empirical null (410; 420 consumes 410's saved
 # per-unit perm_index so the shuffles always match the artifact under
-# analysis). Development value; the canonical publication run uses 9999L
-# (reorg plan v2 D4; switch at the final clean run, like WORKERS).
-N_PERM <- 999L
+# analysis). Canonical resolution per reorg plan v2 D4: simulation noise must
+# not decide claims, and the per-set p floor must clear the BH boundary of the
+# smallest family.
+N_PERM <- 9999L
