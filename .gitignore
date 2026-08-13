@@ -99,3 +99,8 @@ _archive_root/
 
 # Diagnostics outputs are generated measurements (same handling as processed/)
 diagnostics/output/
+
+# Curated external gene lists are a hand-made input with cited sources, not a
+# generated measurement: the anchor cross-reference is not reproducible
+# without it (narrow exception like the IREP input above)
+!diagnostics/external_gene_anchors.csv

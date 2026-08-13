@@ -1,0 +1,34 @@
+anchor_set,tissue,mapping,doi,symbol_published,symbol_current,note
+abend2013_normal,normal,direct,10.1038/bjc.2013.574,ABCC3,ABCC3,
+abend2013_normal,normal,direct,10.1038/bjc.2013.574,C1orf9,SUCO,renamed (HGNC:1240)
+abend2013_normal,normal,direct,10.1038/bjc.2013.574,C6orf62,C6orf62,
+abend2013_normal,normal,direct,10.1038/bjc.2013.574,FGFR1OP2,FGFR1OP2,
+abend2013_normal,normal,direct,10.1038/bjc.2013.574,HEY2,HEY2,
+abend2013_normal,normal,direct,10.1038/bjc.2013.574,NDOR1,NDOR1,also in abend2013_tumor
+abend2013_normal,normal,direct,10.1038/bjc.2013.574,STAT3,STAT3,
+abend2013_normal,normal,direct,10.1038/bjc.2013.574,UCP3,UCP3,
+abend2013_tumor,tumor,direct,10.1038/bjc.2013.574,ANKRD46,ANKRD46,
+abend2013_tumor,tumor,direct,10.1038/bjc.2013.574,CD47,CD47,
+abend2013_tumor,tumor,direct,10.1038/bjc.2013.574,HNRNPH1,HNRNPH1,
+abend2013_tumor,tumor,direct,10.1038/bjc.2013.574,NDOR1,NDOR1,also in abend2013_normal
+abend2013_tumor,tumor,direct,10.1038/bjc.2013.574,SCEL,SCEL,
+abend2013_tumor,tumor,direct,10.1038/bjc.2013.574,SERPINA1,SERPINA1,
+abend2012_pairdiff,pair_difference,indirect,10.1371/journal.pone.0039103,ACVR2A,ACVR2A,
+abend2012_pairdiff,pair_difference,indirect,10.1371/journal.pone.0039103,AJAP1,AJAP1,
+abend2012_pairdiff,pair_difference,indirect,10.1371/journal.pone.0039103,CA12,CA12,
+abend2012_pairdiff,pair_difference,indirect,10.1371/journal.pone.0039103,CDK12,CDK12,
+abend2012_pairdiff,pair_difference,indirect,10.1371/journal.pone.0039103,FAM38A,PIEZO1,renamed
+abend2012_pairdiff,pair_difference,indirect,10.1371/journal.pone.0039103,GALNT7,GALNT7,
+abend2012_pairdiff,pair_difference,indirect,10.1371/journal.pone.0039103,LMO3,LMO3,
+abend2012_pairdiff,pair_difference,indirect,10.1371/journal.pone.0039103,MTA1,MTA1,
+abend2012_pairdiff,pair_difference,indirect,10.1371/journal.pone.0039103,SLC19A1,SLC19A1,
+abend2012_pairdiff,pair_difference,indirect,10.1371/journal.pone.0039103,SLC43A3,SLC43A3,
+abend2012_pairdiff,pair_difference,indirect,10.1371/journal.pone.0039103,ZNF493,ZNF493,
+dom2012_normal,normal,direct,10.1038/bjc.2012.302,SERPINE1,SERPINE1,"clade E member number absent from PMC rendering; SERPINE1 presumed, verify against journal PDF before freezing"
+dom2012_normal,normal,direct,10.1038/bjc.2012.302,DUSP1,DUSP1,
+dom2012_normal,normal,direct,10.1038/bjc.2012.302,TRIB1,TRIB1,
+dom2012_normal,normal,direct,10.1038/bjc.2012.302,S100A10,S100A10,
+dom2012_normal,normal,direct,10.1038/bjc.2012.302,ANXA1,ANXA1,
+dom2012_normal,normal,direct,10.1038/bjc.2012.302,GNAL,GNAL,
+dom2012_normal,normal,direct,10.1038/bjc.2012.302,RDH12,RDH12,
+clip2,tumor,direct,10.1073/pnas.1017137108,CLIP2,CLIP2,validation: 10.1038/onc.2014.311
