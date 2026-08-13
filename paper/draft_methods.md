@@ -130,6 +130,15 @@ primary omnibus statistic, with count- and max-type rows reported
 descriptively <!-- N-05 -->. The full rejection curve R(α) is retained so
 that results do not depend on displaying a single threshold count.
 
+<!-- C-16 -->
+No unit-level binary significance label is assigned: unit-level evidence is
+reported continuously — the per-gene q-values, the pre-specified omnibus p
+and the rejection curve — following the methodological guidance against
+dichotomizing evidence near a threshold (Wasserstein & Lazar 2016; Greenland
+et al. 2016; Amrhein et al. 2019), with the interpretation of each outcome
+pattern pre-assigned by the analysis plan's interpretation map rather than
+left to post-hoc labeling.
+
 ## Gene-set level inference
 
 <!-- 写像元: 420, 430(ORA 注釈), lib/gsea_permutation.R, lib/gsea_collections.R -->
@@ -299,6 +308,10 @@ the paper.
   N-76 行(不使用)にのみ保存。
 - 手術年齢の共変量非投入の理由文(C-10 段落)は Q-03 の要旨の圧縮。年齢層別診断を
   しない理由の詳細は Discussion/limitation 側(判断点4の残り)に置く想定。
+- 非2値化の一文(C-16)を 410 節末尾に追加(2026-08-14、判断点1決着)。引用は
+  ASA 声明系3本(DOI は claim_map C-16 の根拠列)。unit の陽性/非陽性ラベルは全 unit で
+  不使用 — C-01 は両水準結合(DEG かつ HC)、C-03/C-04 は「検出されなかった」の記述形。
+  文言検査時に positive/negative 型のラベル語が紛れていないか確認する。
 - IREP の入力規約は 130 ヘッダの写し(N-68)。データ提供側の線量そのものの来歴は
   REBC-THYR 原論文への引用で受ける(引用は Intro/Methods 冒頭、書誌は研究者)。
 - Table/Supplementary 番号は全て(仮)。図表構成の確定(判断点5)後に振り直す。

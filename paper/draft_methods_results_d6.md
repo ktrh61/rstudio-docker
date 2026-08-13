@@ -93,6 +93,8 @@ account wherever set-level results for that cell are read.
 - 「0.045」は**採用時測定**(2026-08-08、開発 B=999、実データ前)で、本番凍結値は
   16セル表+pooled 0.064(N-56)。前者は選定の時系列防御、後者が論文の較正値。
 - WY-FWER 0.112 は N-57 に参考として台帳化したが本文・サプリとも不使用(B.2)。
-- Supplementary Results 最終文の受け先は B_Normal の扱い(判断点1)の決定後に確定。
+- Supplementary Results 最終文の受け先: **確定(2026-08-14、判断点1決着)** — Discussion の
+  B_Normal 段落(C-16 の規則5条件適用段落)の一文で受ける。B_Normal の扱いは2値ラベルなしの
+  連続量記述+規則5条件適用(claim_map C-16、Q-16)。
 - リント自己検査: unit 横断 FDR 主張なし / A/B 文言なし / 線量依存なし / q<0.25 不使用 /
   全数値 N タグ済み / C-06 タグ済み / WY 本文不使用。
