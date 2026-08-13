@@ -62,11 +62,16 @@ outliers were screened with principal-component outlier detection on
 unnormalized log-CPM within each group × tissue sub-matrix, before purity
 estimation so that an anomalous sample cannot contaminate the purity fit.
 Relative tumor purity was then estimated per case with ContamDE on
-MUREN-normalized paired counts, pooling the two exposure arms of each driver
-cohort so that High and Sporadic sit on one common relative scale; pooling
-was verified on these data (within-group purity ranks preserved at 0.93–0.99
-versus per-arm estimation; High-vs-Sporadic tumour profile correlation 0.99
-<!-- N-76 -->).
+MUREN-normalized paired counts, in one run per driver cohort with both
+exposure arms together: ContamDE purities are relative within the set of
+pairs estimated jointly, so a pooled run is what gives both arms one common
+scale on which a single threshold has a single meaning. The common tumour
+reference this assumes rests on the same premise as the driver
+stratification itself — tumour expression in both arms is dominated by the
+driver's biology — and the tumour-versus-normal contamination axis that
+purity measures is a different axis from the exposure contrast under test;
+the estimate serves only as a within-cohort relative filter and a
+diagnostic covariate.
 
 The main analysis cohort comprises driver-classified (RET or BRAF) cases in
 the Sporadic or High band with a paired tumor/normal sample, both tissues
@@ -286,9 +291,12 @@ the paper.
 - 530 の記述は「graded, descriptive, no dose–response form assumed」で§0.5 第1回の
   水準制約に合わせた。「if the panel captures a radiation-attributable signal…」型の
   予測文(530 ヘッダにある)は Methods に載せず、載せるなら Intro の予告側。
-- 純度プーリングの妥当性実測(0.93–0.99 / 0.99)は 220 ヘッダ記載の来歴値。
-  N-76 の出典はヘッダ行参照 — 一次ログではない点に注意(証拠階層は「設計選択の来歴」)。
-  本文に残すかは研究者判断(削っても流れは壊れない)。
+- 純度プーリング(研究者決定 2026-08-13、同日改訂): script ヘッダ・Methods とも
+  **理論構造で記述** — 相対尺度の共通化(腕別 run は単一閾値の意味を壊す。腕別で
+  先に回して観察された事実)、共通参照仮定は driver 層別設計の前提に乗る、純度軸は
+  曝露対比と別軸、役割は相対フィルタ+診断共変量のみ。設計時実測(0.93–0.99 / 0.99)は
+  **二重統計のためライセンスに使わない** — run コミット(8eed384)の凍結ヘッダと
+  N-76 行(不使用)にのみ保存。
 - 手術年齢の共変量非投入の理由文(C-10 段落)は Q-03 の要旨の圧縮。年齢層別診断を
   しない理由の詳細は Discussion/limitation 側(判断点4の残り)に置く想定。
 - IREP の入力規約は 130 ヘッダの写し(N-68)。データ提供側の線量そのものの来歴は

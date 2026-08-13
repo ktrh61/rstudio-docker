@@ -1,15 +1,17 @@
 # 220_estimate_tumor_purity.R
 # Estimate relative tumor purity per case with ContamDE (MUREN normalization),
 # AFTER outlier detection (210) and with the two exposure arms of each cohort
-# POOLED. Pooling puts High and Sporadic on one common relative scale (ContamDE
-# is comparable only within the set of pairs passed together) and adds pairs for
-# a steadier reference profile. It is licensed here because the two arms share
-# the driver's tumour transcriptome (RET/PTC or BRAF) and the exposure effect is
-# weak, so a common tumour reference holds; verified on this data (within-group
-# purity rank preserved 0.93-0.99 vs per-arm estimation; High vs Sporadic tumour
-# profile correlation 0.99). The purity axis (tumour vs normal contamination) is
-# orthogonal to the exposure sample-mixture axis, so pooling does not dilute the
-# exposure signal.
+# POOLED. ContamDE purities are relative within the set of pairs estimated
+# together, so per-arm runs place the two arms on incomparable scales and a
+# single downstream threshold would mean different things in each arm
+# (observed when per-arm estimation was tried first); one pooled run per
+# cohort gives all its purities one common scale, and adds pairs for a
+# steadier reference profile. The common tumour reference this assumes rests
+# on the design's own premise: tumour expression in both arms is dominated by
+# the driver's biology (RET/PTC or BRAF), and the purity axis (tumour vs
+# normal contamination) is a different axis from the exposure contrast under
+# test. The estimate serves only as a within-cohort relative filter and a
+# diagnostic covariate, never as a quantity of interest.
 # Input : processed/thyr_case_outliers.rds  (from 210; targets + outlier flags)
 #         processed/thyr_se_raw.rds          (from 120; single count assay)
 #         lib/norm_muren_helpers.R, lib/norm_muren.R,
