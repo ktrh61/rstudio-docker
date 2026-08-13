@@ -38,9 +38,13 @@ content. Second, the calibrated set-level test ranked the same Hallmark sets
 first without crossing its threshold <!-- N-28 -->, so the annotation and
 the calibrated inference disagree about evidence, not about ordering. Third,
 whether this attenuation reflects exposure-associated biology or differences
-in age structure and latency between the arms cannot be decided here
-[年齢の受け — 判断点4の決定後に確定]. No claim of the primary analyses
-rests on this annotation.
+in age structure and latency between the arms cannot be decided here; the
+arms' age difference is, however, disclosed with interval estimates
+(Hodges–Lehmann +2.5 years [−1.0, 6.0] in this stratum <!-- N-64 -->), and a
+published age contrast an order of magnitude larger produced no genome-wide
+differential expression and no set-level findings in papillary thyroid
+carcinoma (Vriens et al. 2011). No claim of the primary analyses rests on
+this annotation.
 
 ---
 
@@ -69,8 +73,10 @@ rests on this annotation.
   (SPERMATOGENESIS p 0.0036 q 0.179、KRAS_SIGNALING_UP・E2F_TARGETS・
   G2M_CHECKPOINT が NES 負の上位 — thyr_enrichment_test.rds; min q は N-28)。
   本文で個別 NES を引く場合は N 行の追加が必要(現状は N-28 の min q のみ台帳化)。
-- 年齢・潜伏期の受け(第2回・Q-03・判断点4): 年齢層別診断を追補計算で実施するか、
-  記述+limitation で受けるかの決定待ち。決定後に Discussion の [ ] を埋める。
+- 年齢・潜伏期の受け: **判断点4決着により確定(2026-08-14 反映)** — 年齢層別診断は
+  実施せず(Q-03・撤回済み3案は復活させない)、開示された推定(C-15、N-64)+文献側
+  (Vriens 2011、Q-13 (i))で受ける。Discussion の [ ] は埋め済み(N-64 タグ)。
+  潜伏期は年齢と不可分のため候補説明としての名指しのまま。
 - Supp Table SY = Supp.Tab.2(仮)(図表台帳)。D6 の Supp Table SX と番号整合は
   図表構成確定時に振り直し。
 - リント自己検査: 仮説生成の水準明示あり / A/B 中立(機構主張なし)/ 線量依存なし /

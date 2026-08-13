@@ -9,11 +9,15 @@
 # correlation over shared genes -- threshold-free, no dose assumption.
 #
 # The normal-tissue pair is the hypothesis-bearing comparison (shared
-# glandular exposure memory; Abend/Ory). The tumor pair is a descriptive
-# symmetric completion only: the design's premise is that tumor expression is
+# glandular exposure memory; Abend/Ory). The tumor pair was computed as the
+# symmetric completion: the design's premise is that tumor expression is
 # dominated by driver biology, so no similarity between the two
 # driver-conditioned contrasts is predicted, and no outcome tests the core
-# hypothesis (appendix B.7).
+# hypothesis (appendix B.7). The observed tumor-pair correlation is carried
+# in the paper at hypothesis-generating grade (claim map C-17, 2026-08-14):
+# consistent with an exposure-associated component visible across driver
+# backgrounds, and not separable in this design from shared covariate
+# structure (purity foremost; age).
 #
 # Each point estimate travels with a permutation-calibrated reference (same
 # convention as the pi0 reporting, v2 D1): labels are shuffled independently

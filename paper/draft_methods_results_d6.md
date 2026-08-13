@@ -66,9 +66,7 @@ miscalibrated on these data (pooled P(≥1) 0.140, and 0.221 for a
 restandardized variant, against the nominal 0.10; worst cell 0.44
 <!-- N-58 -->), and was replaced by the per-set permutation p with
 within-collection Benjamini–Hochberg adjustment, which measured 0.045 in the
-same pre-real-data setting <!-- N-57 -->. The replacement is recorded as a
-protocol amendment with the state of knowledge at the time of the change; the
-superseded measurement logs are retained with the analysis code.
+same pre-real-data setting <!-- N-57 -->.
 
 ## Supplementary Results — 較正表の読み(Supp Table SX に併記する注記)
 

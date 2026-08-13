@@ -121,12 +121,31 @@ Each gene was tested for a High-vs-Sporadic difference with the exact
 permutation Brunner–Munzel test (two-sided; exact enumeration of all
 C(n, nx) allocations, so the gene-level p-values need no seed; the saved
 label-shuffle index for unit-level nulls uses 9,999 shuffles at seed
-19860426 <!-- N-04, N-05 -->). Gene-level inference is the Storey q-value on
+19860426 <!-- N-04, N-05 -->). The Brunner–Munzel contrast is the
+protocol-wide two-sample statistic by design: the analysis takes the order
+relation as its primitive — the same commitment that selects the rank-based
+REO panel and the tie-invariant enrichment statistic below — its effect
+P(X<Y) reads directly as an exceedance probability, and at these arm sizes
+the permutation distribution is exactly enumerable, so gene-level inference
+carries neither a count-model assumption nor Monte Carlo error.
+Gene-level inference is the Storey q-value on
 the exact p-values with the plug-in pi0 estimate at λ = 0.5, thresholded at
-q < 0.10 protocol-wide <!-- N-05 -->; pi0 is reported with
+q < 0.10 protocol-wide <!-- N-05 -->. The estimator was fixed a priori from
+the working hypothesis and the design rather than tuned: the hypothesis is a
+weak signal spread across many genes — small per-gene effects attenuated by
+within-arm case mixture — so holding π0 at 1 would build the absence of
+exactly that signal into the correction; the conservativeness of the fixed-λ
+plug-in requires only marginal uniformity of the null p-values, which the
+exact test guarantees regardless of the dependence between genes, whereas
+adaptive choices of λ carry guarantees that assume independent or weakly
+dependent tests and do not apply to co-expressed genes sharing one label
+vector; and under a weak spread signal the alternative p-density is nearly
+flat, so raising λ buys little bias reduction at first-order variance cost —
+λ = 0.5 is the untuned Storey (2002) default. pi0 is reported with
 permutation-calibrated uncertainty. A unit-level omnibus permutation test
 accompanies the gene table; Higher Criticism (α0 = 0.1) is the pre-specified
-primary omnibus statistic, with count- and max-type rows reported
+primary omnibus statistic — chosen a priori for its sensitivity to many weak
+effects (Donoho & Jin 2004) — with count- and max-type rows reported
 descriptively <!-- N-05 -->. The full rejection curve R(α) is retained so
 that results do not depend on displaying a single threshold count.
 
@@ -136,8 +155,8 @@ reported continuously — the per-gene q-values, the pre-specified omnibus p
 and the rejection curve — following the methodological guidance against
 dichotomizing evidence near a threshold (Wasserstein & Lazar 2016; Greenland
 et al. 2016; Amrhein et al. 2019), with the interpretation of each outcome
-pattern pre-assigned by the analysis plan's interpretation map rather than
-left to post-hoc labeling.
+pattern pre-assigned before the results were seen rather than left to
+post-hoc labeling (interpretation map, Methods).
 
 ## Gene-set level inference
 
@@ -146,13 +165,18 @@ left to post-hoc labeling.
 Set-level enrichment consumes the whole per-gene ranking (threshold-free; no
 DEG-list cut decides what is tested), ranked by tie-averaged normal scores of
 the signed Brunner–Munzel statistic. The enrichment score is the weighted
-running sum (gseaParam = 1) evaluated at tie-block boundaries only, which on
-tie-free input equals the standard GSEA statistic <!-- N-72 -->. The null
+running sum (gseaParam = 1) evaluated at tie-block boundaries only, so that
+no arbitrary tie-break injects an order the data do not contain; on tie-free
+input it equals the standard GSEA statistic <!-- N-72 -->. The null
 reuses the identical label shuffles saved by the gene-level test (9,999 per
 unit <!-- N-07 -->), so gene- and set-level results rest on one permutation
 null. Inference is the per-set, sign-conditional permutation p-value with
 Benjamini–Hochberg adjustment within each collection, q_bh < 0.10
-<!-- N-72 -->; no cross-family claim is made.
+<!-- N-72 -->; no cross-family claim is made. Unlike the gene level, π0 is
+held at its conservative bound of 1 here: tens to thousands of dependent
+p-values riding one collective drift mode leave the plug-in estimate
+variance-dominated, with errors pointing anticonservative exactly in the
+realizations where the procedure is most fragile.
 
 Four MSigDB collections were tested (msigdbr 26.1.0): Hallmark (50), C2:CP
 (3,910; Reactome, WikiPathways, KEGG MEDICUS, BioCarta and PID), C5:GO:BP
@@ -282,9 +306,8 @@ diagnostics draw documented seeds from base 19450809 <!-- N-05, N-06 -->.
 The full pipeline was executed independently on two machines: the 1,819 raw
 input files agree by md5 <!-- N-52 --> and the pipeline's test suite passes
 on both (415 tests, 0 failures <!-- N-51 -->); primary artifacts were
-verified identical across machines. Analysis code, versioned inputs, and the
-complete decision record (protocol amendments with their timing) accompany
-the paper.
+verified identical across machines. Analysis code and versioned inputs
+sufficient to regenerate the reported analyses accompany the paper.
 
 ---
 
@@ -307,11 +330,30 @@ the paper.
   **二重統計のためライセンスに使わない** — run コミット(8eed384)の凍結ヘッダと
   N-76 行(不使用)にのみ保存。
 - 手術年齢の共変量非投入の理由文(C-10 段落)は Q-03 の要旨の圧縮。年齢層別診断を
-  しない理由の詳細は Discussion/limitation 側(判断点4の残り)に置く想定。
+  しない理由の詳細は Discussion/limitation 側(Q-03/Q-13 — 判断点4は決着済み)に置く想定。
+- **選定事由の記載方針(2026-08-14 確定)**: 分野の既定から外れる選択で査読者が
+  「なぜ?」と聞くと予想される箇所に1文の事由を書く。慣行どおりの選択には書かない。
+  この基準で4点を追記: BM 検定の採用(順序関係を原始とするコミットメント+完全枚挙)/
+  HC の選定(多数の弱い効果への感度)/ tie-block ES の理由(順序の注入禁止)/
+  セットレベル π0=1 の非対称(依存下で plug-in が分散支配・反保守側に誤る)。
+  n_perm 9,999 は慣行的値のため本文で事由を書かない(D4 の導出は手元)。
+- λ=0.5 の選定事由を 410 節に追記(2026-08-14、研究者指示): D1 の批准済み導出の圧縮
+  (π0=1 は仮説の検出チャネルを塞ぐ/固定 λ の保守性は帰無 p の周辺一様性のみで成立/
+  適応的 λ は独立性仮定で適用外/平坦な対立密度下で低 λ が MSE 優位)。弱拡散前提は
+  **選定事由(設計時の作業仮説)として書く**のであって形の主張ではない — Q-15 (2)
+  (形に賭けない)と整合。「small per-gene effects attenuated by within-arm case
+  mixture」の文言はバイナリ観の反映だが、仮説の正式な文言化(Intro、研究者領分)と
+  執筆時に整合させること。
 - 非2値化の一文(C-16)を 410 節末尾に追加(2026-08-14、判断点1決着)。引用は
   ASA 声明系3本(DOI は claim_map C-16 の根拠列)。unit の陽性/非陽性ラベルは全 unit で
   不使用 — C-01 は両水準結合(DEG かつ HC)、C-03/C-04 は「検出されなかった」の記述形。
   文言検査時に positive/negative 型のラベル語が紛れていないか確認する。
+- 決定履歴語の掃引(2026-08-14、研究者指示): 「protocol amendment」「decision record」への
+  言及を本文から削除(査読者は決定の行き来を考慮しない。再現性文は「code and versioned
+  inputs sufficient to regenerate」に限定 — 公開対象の選別は研究者裁量、§0.5b 明確化と整合)。
+- **予測マップ+解釈規則は論文内に提示が必要**(正本=論文 — 外部計画への参照で済ませない。
+  非2値化の一文が「interpretation map, Methods」を指すため)。置き場所(Methods 内の
+  小表 or Intro)は図表構成(判断点5)と同時に確定。
 - IREP の入力規約は 130 ヘッダの写し(N-68)。データ提供側の線量そのものの来歴は
   REBC-THYR 原論文への引用で受ける(引用は Intro/Methods 冒頭、書誌は研究者)。
 - Table/Supplementary 番号は全て(仮)。図表構成の確定(判断点5)後に振り直す。

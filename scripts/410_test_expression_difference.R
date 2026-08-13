@@ -26,10 +26,10 @@
 #
 # Inference is Storey q on the exact p-values with the plug-in pi0 estimate at
 # lambda = 0.5 (q = pi0_hat * BH; reorg plan v2 D1), the same correction the
-# DEGES screen in 310 uses. Under a weakly diffuse alternative the empirical
-# p-value distribution runs nearly parallel to the correction's self-consistency
-# line, so R(alpha) jumps by thousands of genes over a short q interval ("the
-# cliff"). That is a property of this signal shape, not a defect: q_curve
+# DEGES screen in 310 uses. On these data the empirical p-value distribution
+# runs nearly parallel to the correction's self-consistency line, so R(alpha)
+# jumps by thousands of genes over a short q interval ("the cliff"). That is
+# a property of the observed p-value distribution, not a defect: q_curve
 # records R(alpha) so reports can show the whole curve instead of a single
 # threshold count. pi0 is reported with permutation-calibrated uncertainty:
 # each label shuffle is scored against its own gene-wise null (row ranks across
