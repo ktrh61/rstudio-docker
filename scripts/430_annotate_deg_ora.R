@@ -1,20 +1,34 @@
-# deg_ora_annotation.R
-# Descriptive over-representation annotation of the R_Tumor DEG list (claim
-# map C-14; level and reading fixed there before this script's first run).
+# 430_annotate_deg_ora.R
+# Descriptive over-representation annotation of the R_Tumor DEG list --
+# the composition of the already-discovered gene list, reported as
+# hypothesis-generating annotation (claim map C-14; level and reading fixed
+# there before the first run).
 #
-# Position: this is a characterization of the already-discovered gene list,
-# not a second discovery machinery. The calibrated set-level inference is 420
-# (subject-permutation null, D6-calibrated); the hypergeometric test used
-# here conditions on the q < 0.10 membership cut and treats genes as
-# exchangeable under a gene-sampling null that ignores co-expression, which
-# is known to be anti-conservative on expression data. Flags below are
-# therefore reported as hypothesis-generating annotation ("supported only
-# under the gene-sampling null" when 420 is null for the same family), all
-# results are reported including zero, and no existing claim moves with the
-# outcome. Rationale for carrying the lens at all: the calibrated machinery
-# is measured on the conservative side (pooled global-null 0.064 vs nominal
-# 0.10), and the hypothesis targets weak diffuse signal (paper claim map
-# C-14, objections ledger Q-08/Q-10).
+# Provenance: ORA was part of this study's original protocol (the Thyroid
+# submission of the study's first form). It was removed during the pipeline
+# rebuild on AI-era advice that the researcher does not accept as a prior
+# commitment, and restored to the numbered stream as a designed analysis on
+# 2026-08-13 (claim map C-14 revision notes). The computation was first
+# executed 2026-08-12 as a writing-phase supplementary calculation
+# (diagnostics/, superseded); algorithm, inputs and outputs are unchanged
+# here, and the restored run was verified equal to the superseded one.
+#
+# Position: this is a characterization of the discovered list, not a second
+# discovery machinery, and no claim of the paper moves with its outcome.
+# Experiment-level set inference is 420 (label-permutation null,
+# D6-calibrated). The weighting between the two engines is not a preference
+# but a sampling-model fact (Goeman & Buhlmann 2007,
+# doi:10.1093/bioinformatics/btm051): the two p-values refer to different
+# randomness, and only the label-permutation null refers to the experiment
+# actually performed -- gene-sampling p-values are based on a model that
+# does not resemble the experiment and can be wildly anti-conservative
+# under co-expression. The hypergeometric p used here is exact under its
+# stated gene-sampling null; what that null ignores (co-expression) is
+# disclosed wherever the results appear. Flags are read as "supported only
+# under the gene-sampling null" when 420 is null for the same family; all
+# results are reported including zero. The one forbidden reading is using
+# these q-values as stand-alone experiment-level enrichment claims
+# (objections ledger Q-15 (3b)).
 #
 # Design (fixed before first run): only R_Tumor (the one unit with DEGs);
 # three lists -- up (effect > 0.5, high in the High arm), down, combined;
@@ -28,7 +42,7 @@
 #         lib/gsea_collections.R               (families; size window)
 #         lib/gsea_permutation.R               (gsea_pathway_index)
 #         lib/annotation.R                     (strip_ensembl_version)
-# Output: diagnostics/output/deg_ora_annotation.rds
+# Output: processed/thyr_deg_ora_annotation.rds
 
 source("setup.R")
 
@@ -128,7 +142,5 @@ result <- list(
   ),
   table = ora
 )
-out_dir <- file.path(paths$root, "diagnostics", "output")
-dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
-saveRDS(result, file.path(out_dir, "deg_ora_annotation.rds"))
-cat("\nSaved:", file.path(out_dir, "deg_ora_annotation.rds"), "\n")
+saveRDS(result, file.path(paths$processed, "thyr_deg_ora_annotation.rds"))
+cat("\nSaved:", file.path(paths$processed, "thyr_deg_ora_annotation.rds"), "\n")

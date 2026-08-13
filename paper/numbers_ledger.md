@@ -160,11 +160,11 @@
 | N-57 | per-set p + BH: pooled P(≥1) = 0.045(参考: WY-FWER 0.112) | **採用時測定**(2026-08-08、実データ走行前・開発 B=999): 採用された推論の held-out 較正値 | repo/diagnostics/output/gsea_null_calibration_alternatives_20260808.log:40 キー「Pooled P(>=1): BH 0.045」 | Methods(選定経緯) | verified |
 | N-58 | pooled tail-ratio 0.140 / 再標準化 0.221(最悪セル 0.44 = B_Normal/radiation) | **棄却測定**(2026-08-08、実データ走行前): 旧 D2 の tail-ratio 系 FDR の較正破綻(名目 0.10) | repo/diagnostics/output/gsea_null_calibration_restd_20260808.log:40 キー「plain 0.140 ; restandardized 0.221」・:22(0.44) | Methods(選定経緯)/ Q-10, Q-12 | verified |
 
-### N. R_Tumor DEG の ORA 注釈(追補計算 2026-08-12、claim_map C-14 — 水準は仮説生成)
+### N. R_Tumor DEG の ORA 注釈(claim_map C-14 — 水準は仮説生成。初回実行 2026-08-12 は追補計算 = diagnostics/、2026-08-13 に scripts/430 へ編入し正準再実行 — 旧版と table/config identical・log 1-466 行バイト同一を確認済み)
 
 | N-ID | 値 | 定義 | 出典 | 使用箇所 | 状態 |
 |---|---|---|---|---|---|
-| N-59 | up: 0/0/0/0、down: 12/105/205/7、combined: 6/37/71/2(順に H / C2:CP / C5:GO:BP / C2:CGP:radiation。フラグ = family×list 内 BH q_bh<0.10) | ORA フラグ数の全マトリクス。up リストはフラグ皆無、down リスト(High 群で低発現側)に集中。family 別セット数は 50/2262/3856/24 で 420/D6 と一致(整合性検査) | repo/diagnostics/output/deg_ora_annotation.log:8-19(Summary ブロック); 全表は同 output/deg_ora_annotation.rds `$table` | Supp.Tab.2 / Disc(仮説生成) | verified |
+| N-59 | up: 0/0/0/0、down: 12/105/205/7、combined: 6/37/71/2(順に H / C2:CP / C5:GO:BP / C2:CGP:radiation。フラグ = family×list 内 BH q_bh<0.10) | ORA フラグ数の全マトリクス。up リストはフラグ皆無、down リスト(High 群で低発現側)に集中。family 別セット数は 50/2262/3856/24 で 420/D6 と一致(整合性検査) | repo/output/430_annotate_deg_ora.log:8-19(Summary ブロック); 全表は repo/processed/thyr_deg_ora_annotation.rds `$table` | Supp.Tab.2 / Disc(仮説生成) | verified |
 | N-60 | radiation down 7 セット: ZHOU_CELL_CYCLE_GENES_IN_IR_RESPONSE_24HR k=46/126(期待 6.4、p 1.09e-27)・同 6HR k=30/84(p 3.53e-18)・RASHI_RESPONSE_TO_IONIZING_RADIATION_6 q 0.0081・SMIRNOV_RESPONSE_TO_IR_6HR_DN q 0.0081・GHANDHI_BYSTANDER_IRRADIATION_UP q 0.0196・WARTERS_RESPONSE_TO_IR_SKIN q 0.0497・MACAEVA_PBMC_RESPONSE_TO_IR q 0.0872(combined では ZHOU 2 セットのみ) | radiation ファミリーのフラグ詳細(全て down = High 群で低発現側) | 同 log:22-30 | Supp.Tab.2 / Disc(仮説生成) | verified |
 | N-61 | H down 12 セットの上位: E2F_TARGETS k=46/199(p 1.89e-18)・G2M_CHECKPOINT k=41/198(p 8.26e-15)・EMT・MYC_TARGETS_V1・MITOTIC_SPINDLE・KRAS_SIGNALING_UP ほか; H combined 6 セット(E2F・G2M・MITOTIC_SPINDLE・DNA_REPAIR・SPERMATOGENESIS・MYC_V1) | Hallmark のフラグ詳細(増殖・細胞周期プログラムが down 側に集中) | 同 log:449-466 | Supp.Tab.2 / Disc(仮説生成) | verified |
 | N-62 | C2:CP combined 上位例: REACTOME_RESOLUTION_OF_D_LOOP_STRUCTURES k=17/35・CELL_CYCLE_CHECKPOINTS k=63/286・DNA_REPAIR k=68/322・HOMOLOGY_DIRECTED_REPAIR k=37/135・DNA_DOUBLE_STRAND_BREAK_REPAIR k=42/165(いずれも q≤0.0001) | canonical pathways のフラグ上位(DNA 修復・HR・チェックポイント系のテーマ) | 同 log:31-45(down 側含む全 105/37 セットは rds `$table`) | Supp.Tab.2 / Disc(仮説生成) | verified |
@@ -215,7 +215,7 @@
 | Tab.4(仮)420/D6 サマリ(ユニット × コレクション) | processed/thyr_enrichment_test.rds + diagnostics/output/gsea_null_calibration.rds より(表化スクリプト未作成) | C-未、N-24〜N-28 | draft |
 | Supp.Tab.1(仮)D6 較正 16 セル表(m_sets・p_any・95%CI・mean/max 発見数) | diagnostics/gsea_null_calibration.R ← 310 正規化。正準値 = run/xeon_final_20260811/logs/d6_calibration.log(rds は diagnostics/output/gsea_null_calibration.rds) | C-06、N-24(注記に N-25, N-26) | draft |
 | Supp.Data.1(仮)420 全セット結果の完全開示(全 unit × family の pathway・size・ES・NES・p・q_bh 全量) | processed/thyr_enrichment_test.rds より整形のみ(計算なし・整形スクリプト未作成)。Q-08/Q-10 予備線「可能性の棚は開示で遺す」の実体 | C-05 | draft |
-| Supp.Tab.2(仮)R_Tumor DEG の ORA 注釈(family × list の全結果) | diagnostics/deg_ora_annotation.R ← thyr_expression_test.rds(実行済み 2026-08-12、output/deg_ora_annotation.{log,rds}) | C-14、N-59〜N-62 | draft |
+| Supp.Tab.2(仮)R_Tumor DEG の ORA 注釈(family × list の全結果) | scripts/430_annotate_deg_ora.R ← thyr_expression_test.rds(430 編入 2026-08-13。正準 = processed/thyr_deg_ora_annotation.rds + output/430_annotate_deg_ora.log。旧 diagnostics 版と同値確認済み) | C-14、N-59〜N-62 | draft |
 
 (番号・採否は図表構成の確定後に更新)
 
@@ -258,3 +258,11 @@
   二重統計のためライセンスに使わず、run コミットの凍結ヘッダと N-76 行にのみ保存。
   現行 220 ヘッダは同日この線で書き換え(コメントのみ、挙動不変。run 状態は N-01 の
   ハッシュで凍結済み)。N-76 出典を `git show 8eed384:` 参照に付け替え。
+- 2026-08-13: ORA の 430 化(研究者指示): diagnostics/deg_ora_annotation.R を
+  scripts/430_annotate_deg_ora.R へ git mv(履歴保持)し、ヘッダを新根拠構造
+  (Thyroid 来歴・G&B sampling-model 軸・Q-15 (3b) 転落基準)で改稿、出力を
+  processed/thyr_deg_ora_annotation.rds へ変更して正準イメージで再実行(exit 0)。
+  同値検査: 旧 diagnostics 版と table・config が identical、log は 1-466 行バイト同一
+  (相違は最終行の保存先パスのみ)→ N-59〜N-62 の値・行番号引用は不変のまま出典パスのみ
+  付け替え。旧成果物(diagnostics/output/)は追補計算の記録として残置。
+  セクション N の表題に来歴を追記

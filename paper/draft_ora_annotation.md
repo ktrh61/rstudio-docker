@@ -1,7 +1,9 @@
 # ORA 注釈(C-14)Results / Discussion ドラフト
 
 状態: draft(Claude Code 起草 2026-08-12、研究者が書き直す前提)。
-写像元: diagnostics/deg_ora_annotation.R(+同 output/ の log・rds)。
+写像元: scripts/430_annotate_deg_ora.R(2026-08-13 に 430 編入。正準出力 =
+processed/thyr_deg_ora_annotation.rds + output/430_annotate_deg_ora.log。
+旧 diagnostics 版と同値確認済み)。
 数値は numbers_ledger N-59〜N-62 経由。水準 = 仮説生成(C-14 で実行前に固定)。
 Methods 側の記述(手法1文)は 420/D6 の Methods に併置する想定で本稿には含めない
 (必要文言は起草メモ参照)。

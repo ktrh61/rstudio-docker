@@ -1,9 +1,9 @@
 # Methods ドラフト(全節)
 
 状態: draft(Claude Code 起草 2026-08-13、研究者が書き直す前提の下書き)。
-写像元: scripts/010〜530(各ヘッダ)、diagnostics/(signature_agreement.R、
-reo_lowmid_{outliers,purity,confound}.R、external_gene_anchors.R、
-deg_ora_annotation.R、age_arm_difference.R)、config.R、lib/。
+写像元: scripts/010〜530(各ヘッダ。430 = ORA 注釈、2026-08-13 編入)、
+diagnostics/(signature_agreement.R、reo_lowmid_{outliers,purity,confound}.R、
+external_gene_anchors.R、age_arm_difference.R)、config.R、lib/。
 数値は全て numbers_ledger の N-ID 経由(タグ併記)。設定値・規則の N 行は
 セクション P(N-66〜N-76、2026-08-13 追加)として台帳化済み。
 D6 較正と ORA 注釈の文面の正本はそれぞれ draft_methods_results_d6.md /
@@ -132,7 +132,7 @@ that results do not depend on displaying a single threshold count.
 
 ## Gene-set level inference
 
-<!-- 写像元: 420, lib/gsea_permutation.R, lib/gsea_collections.R -->
+<!-- 写像元: 420, 430(ORA 注釈), lib/gsea_permutation.R, lib/gsea_collections.R -->
 
 Set-level enrichment consumes the whole per-gene ranking (threshold-free; no
 DEG-list cut decides what is tested), ranked by tie-averaged normal scores of
