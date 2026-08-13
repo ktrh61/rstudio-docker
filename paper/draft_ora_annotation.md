@@ -44,6 +44,17 @@ rests on this annotation.
 
 ## 起草メモ(本文に載せない)
 
+- **2026-08-13 来歴訂正・根拠差し替え(研究者承諾 — claim_map C-14 改訂メモ参照)**:
+  ORA は Thyroid 原プロトコルの設計解析の復元であり、GSEA 主・ORA 副の濃淡の根拠は
+  「事前固定」ではなく G&B 2007 の sampling-model 軸+本文での一文開示。開示文の例
+  (Methods 併置文の直後を想定): "The two procedures' p-values refer to different
+  randomness: only the label-permutation null refers to the experiment actually
+  performed, and experiment-level claims rest on it; the over-representation
+  q-values describe the discovered list against a gene-sampling reference."
+  可視性は無制約 — 本稿の「短報2文」は**下限**であり、Results 段落規模・図・
+  Abstract 言及への拡張は共著者交渉で可(水準ラベル携行のみ非交渉)。
+  転落基準(ORA q を実験レベルの単独主張に使わない)は Q-15 (3b)。
+
 - Methods 併置用の1文(420 Methods の末尾を想定):
   "As a descriptive complement, the discovered R_Tumor list was annotated by
   one-sided hypergeometric over-representation against the identical set
