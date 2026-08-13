@@ -169,6 +169,14 @@
 | N-61 | H down 12 セットの上位: E2F_TARGETS k=46/199(p 1.89e-18)・G2M_CHECKPOINT k=41/198(p 8.26e-15)・EMT・MYC_TARGETS_V1・MITOTIC_SPINDLE・KRAS_SIGNALING_UP ほか; H combined 6 セット(E2F・G2M・MITOTIC_SPINDLE・DNA_REPAIR・SPERMATOGENESIS・MYC_V1) | Hallmark のフラグ詳細(増殖・細胞周期プログラムが down 側に集中) | 同 log:449-466 | Supp.Tab.2 / Disc(仮説生成) | verified |
 | N-62 | C2:CP combined 上位例: REACTOME_RESOLUTION_OF_D_LOOP_STRUCTURES k=17/35・CELL_CYCLE_CHECKPOINTS k=63/286・DNA_REPAIR k=68/322・HOMOLOGY_DIRECTED_REPAIR k=37/135・DNA_DOUBLE_STRAND_BREAK_REPAIR k=42/165(いずれも q≤0.0001) | canonical pathways のフラグ上位(DNA 修復・HR・チェックポイント系のテーマ) | 同 log:31-45(down 側含む全 105/37 セットは rds `$table`) | Supp.Tab.2 / Disc(仮説生成) | verified |
 
+### O. 腕間年齢差の推定(追補計算 2026-08-13、claim_map C-15 — 開示であり交絡検定ではない)
+
+| N-ID | 値 | 定義 | 出典 | 使用箇所 | 状態 |
+|---|---|---|---|---|---|
+| N-63 | HL 中央値差(High−Sporadic、年)+ BM 効果 P(Sporadic<High)(410 と同一推定量 `.bm_effect`、検定は不使用・p 値なし)、腕内復元抽出 percentile ブートストラップ B=9999・seed 19450809・95% CI(2.5/97.5)。被曝時年齢は Sporadic 全 NA のため腕間推定なし(NA 員数のみ記録) | 腕間年齢差推定の設定一式 | diagnostics/output/age_arm_difference.log:1(設定行)・:11-15(AGE_EXPOSURE NA 員数); rds は同 output/age_arm_difference.rds `$config` | Methods / Tab.2 脚注 | verified |
+| N-64 | R 系(Sporadic n=12 vs High n=15): HL +2.5 年 [−1.0, 6.0]、P(Sporadic<High) 0.625 [0.400, 0.828](CI はゼロ差/0.5 を跨ぐ) | 手術時年齢の腕間差(R 系)。腕別中央値[範囲]は N-12 と一致(整合性検査) | 同 log:3-5; rds `$summary` R 行(hl 2.5 [−1, 6]、effect 0.6250 [0.4000, 0.8278]) | Results(コホート記述)/ Tab.2 脚注 | verified |
+| N-65 | B 系(Sporadic n=27 vs High n=9): HL +8.0 年 [3.0, 12.0]、P(Sporadic<High) 0.850 [0.681, 0.973](CI はゼロ差/0.5 を跨がない) | 手術時年齢の腕間差(B 系)。腕別中央値[範囲]は N-13 と一致(整合性検査) | 同 log:7-9; rds `$summary` B 行(hl 8 [3, 12]、effect 0.8498 [0.6811, 0.9733]) | Results(コホート記述)/ Tab.2 脚注 | verified |
+
 ## 図表台帳(図・表は1行ずつ — キャプションも検査対象)
 
 | 列 | 内容 |
@@ -215,3 +223,7 @@
 - 2026-08-12: 追補計算の第2適用(N-59〜N-62): R_Tumor DEG の ORA 注釈(C-14 で水準・読みを
   実行前に固定)。diagnostics/deg_ora_annotation.R → 同 output/ の log+rds(乱数なし・
   正準イメージ内・exit 0)。family 別セット数 50/2262/3856/24 は 420/D6 と一致(整合性検査)。
+- 2026-08-13: 追補計算の第3適用(N-63〜N-65): 腕間年齢差の CI つき推定(C-15 で読みを
+  実行前に固定。研究者 Go 2026-08-13)。diagnostics/age_arm_difference.R → 同 output/ の
+  log+rds(seed 19450809・B=9999・正準イメージ内・exit 0)。腕別 n・中央値[範囲]は
+  N-09/N-12/N-13 と一致(整合性検査)。照合は log↔rds `$summary` の突き合わせで verified。
