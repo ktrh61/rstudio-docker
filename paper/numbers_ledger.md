@@ -177,6 +177,22 @@
 | N-64 | R 系(Sporadic n=12 vs High n=15): HL +2.5 年 [−1.0, 6.0]、P(Sporadic<High) 0.625 [0.400, 0.828](CI はゼロ差/0.5 を跨ぐ) | 手術時年齢の腕間差(R 系)。腕別中央値[範囲]は N-12 と一致(整合性検査) | 同 log:3-5; rds `$summary` R 行(hl 2.5 [−1, 6]、effect 0.6250 [0.4000, 0.8278]) | Results(コホート記述)/ Tab.2 脚注 | verified |
 | N-65 | B 系(Sporadic n=27 vs High n=9): HL +8.0 年 [3.0, 12.0]、P(Sporadic<High) 0.850 [0.681, 0.973](CI はゼロ差/0.5 を跨がない) | 手術時年齢の腕間差(B 系)。腕別中央値[範囲]は N-13 と一致(整合性検査) | 同 log:7-9; rds `$summary` B 行(hl 8 [3, 12]、effect 0.8498 [0.6811, 0.9733]) | Results(コホート記述)/ Tab.2 脚注 | verified |
 
+### P. 設定値・規則の台帳化(Methods 起草用 2026-08-13 — 出典はコミット済みコード、計算なし)
+
+| N-ID | 値 | 定義 | 出典 | 使用箇所 | 状態 |
+|---|---|---|---|---|---|
+| N-66 | GENCODE v36(GDC 参照 GTF)の exon-union 遺伝子長; 発現は STAR - Counts(open access) | 参照アノテーションとデータ種別 | scripts/020 ヘッダ(GENCODE v36)・scripts/010 ヘッダ(STAR - Counts) | Methods | verified |
+| N-67 | stranded 列合計の小/大比 ≤ 0.5 なら stranded(大きい列を採用)、それ以外は unstranded 列 | ライブラリ strand 判定規則(検体別) | scripts/120 ヘッダ(Dobin's general rule, ratio form) | Methods | verified |
+| N-68 | NIOSH-IREP 甲状腺モデル「AS associated with the expected value of ERR」; 電子 E>15keV、線量 cSv=mGy/10、被曝年 1986、出生年=1986−被曝時年齢、手術年=出生年+手術時年齢。値は研究者計算の正準 CSV | IREP 入力規約 | scripts/130:1-15 ヘッダ; 来歴・入力同一性監査は計画v2 B.11 | Methods | verified |
+| N-69 | dose 0 → Sporadic; 0<AS≤33.3 Low; 33.3<AS<66.6 Mid; AS≥66.6 High(境界例なし、2026-07-28 検証) | AS 帯規則 | config.R:36-43(AS_LOW_MAX 33.3・AS_HIGH_MIN 66.6) | Methods | verified |
+| N-70 | 0.6 | pooled 共通尺度の相対純度閾値(main BM 採用条件) | config.R:45-46(PURITY_THRESHOLD) | Methods | verified |
+| N-71 | iDEGES 3 反復; スクリーン = 置換 BM + BH q<0.10(DEGES_FDR); スケーリングは MUREN; 前処理 protein_coding → filterByExpr | 310 正規化の設定 | scripts/310:37(ITERATION 3L)・config.R:55-57(DEGES_FDR 0.10)・310 ヘッダ | Methods | verified |
+| N-72 | ランキング = 符号付き BM 統計量の tie-averaged normal scores; ES = gseaParam=1 の block 評価(tie-free 入力で標準 GSEA と一致); 推論 = per-set 符号条件付き置換 p + family 内 BH、q_bh<0.10; size 窓 15–500 | 420 セットレベル推論の設定 | scripts/420 ヘッダ; lib/gsea_collections.R:27-28(15L/500L); config.R:51-53(FDR_CUT 0.10) | Methods | verified |
+| N-73 | unit 内独立ラベルシャッフル 9,999 回、unit 別 seed(基底 19450809)で shuffle プロファイル同士を相関(410 の perm_index は意図的に不使用 — 等 n unit で同一 index となるため) | 署名一致の帰無参照帯の設定 | diagnostics/signature_agreement.R:57(AGREEMENT_SEED_BASE)・:84,97(N_PERM 使用)・ヘッダ | Methods | verified |
+| N-74 | 候補プール = \|effect−0.5\| 上位 500; dead zone \|r\|<log2(1.2); R0 = 非 dead-zone 検体で符号一致(例外≤1)かつ q10(\|r\|)≥log2(1.5); R1 = 逆転 >50% かつ <100% | REO 候補ペア選定規則 | scripts/510:44(N_CANDIDATES 500L)・:48(log2(1.5))・:100,130,136(規則実装); config.R:48-49(DEAD_ZONE log2(1.2)) | Methods | verified |
+| N-75 | 貪欲選定: 遺伝子再使用禁止 + 既採用ペアとの Spearman <0.75、目標 10 ペア; 530 の Mid>Low 片側 BM は mc・seed 19860426(正準シード) | REO パネル確定と評価検定の設定 | scripts/520:30-31(TARGET_PANEL_SIZE 10L・CORRELATION_THRESHOLD 0.75); scripts/530:78(seed = SEED); config.R:5-8 | Methods | verified |
+| N-76 | 群内純度順位保存 0.93–0.99(腕別推定との比較)、High vs Sporadic 腫瘍プロファイル相関 0.99 | 220 の腕プーリング妥当性の**来歴実測値**(ヘッダ記載。一次ログではない — 証拠階層は設計選択の来歴) | scripts/220 ヘッダ(verified on this data の節) | Methods(採否は研究者判断) | verified |
+
 ## 図表台帳(図・表は1行ずつ — キャプションも検査対象)
 
 | 列 | 内容 |
@@ -227,3 +243,7 @@
   実行前に固定。研究者 Go 2026-08-13)。diagnostics/age_arm_difference.R → 同 output/ の
   log+rds(seed 19450809・B=9999・正準イメージ内・exit 0)。腕別 n・中央値[範囲]は
   N-09/N-12/N-13 と一致(整合性検査)。照合は log↔rds `$summary` の突き合わせで verified。
+- 2026-08-13: セクション P(N-66〜N-76)を Methods 起草に伴い追加 — 本文が引く設定値・
+  規則・来歴実測(N-76)の台帳化。追補計算ではない(計算なし、出典は全てコミット済み
+  コードの行参照)。照合はコード直読で verified(Claude Code、2026-08-13)。N-76 のみ
+  一次ログでなくヘッダ記載の来歴値である旨を行内に明記。
