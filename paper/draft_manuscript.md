@@ -24,13 +24,13 @@ stranded-column totals (ratio rule: the library is called stranded when the smal
 
 <!-- 写像元: 130, 140 -->
 
-Radiation attributability per exposed case was quantified as the NIOSH-IREP thyroid-model Assigned Share (AS; probability of causation associated with the expected value of the excess relative risk), computed from each case's recorded thyroid dose and ages with a fixed input convention (electrons E > 15 keV; dose in cSv = mGy/10; exposure year 1986; birth year = 1986 − age at exposure; surgery year = birth year + age at surgery <!-- N-68 -->). The values are carried as a versioned input file; provenance and the input-identity audit are recorded in the analysis plan.
+Radiation attributability per exposed case was quantified with the thyroid model of the National Institutes of Health Interactive RadioEpidemiological Program (NIH IREP, version 5.7.3; Kocher et al. 2008) as the Assigned Share associated with the expected value of the excess relative risk (AS), computed from each case's recorded thyroid dose and ages with a fixed input convention (electrons E > 15 keV; dose in cSv = mGy/10; exposure year 1986; birth year = 1986 − age at exposure; surgery year = birth year + age at surgery), with all IREP assumptions and settings at their defaults (user-defined uncertainty distribution Lognormal (1,1); 10,000 iterations; random number seed 99) <!-- N-68 -->. The AS values are carried as a versioned input file with the analysis code; their dose and age inputs were verified case-by-case against the clinical table.
 
-Cases were banded on AS with a single pre-fixed rule: unexposed cases (dose 0) form the Sporadic band; exposed cases fall in Low (0 < AS ≤ 33.3), Mid (33.3 < AS < 66.6), or High (AS ≥ 66.6); no case sits on a boundary
+Cases were banded on AS with a single pre-fixed rule: unexposed cases (dose 0) form the Sporadic band; exposed cases fall in Low (0 < AS < 33.3), Mid (33.3 ≤ AS < 66.6), or High (AS ≥ 66.6); no case sits on a boundary
 <!-- N-69 -->. The clinical composition of all 440 cases across driver × band × pairing is given in Table 1(仮) <!-- N-11 -->.
 
-【訳】被曝症例ごとの放射線起因性は、NIOSH-IREP 甲状腺モデルの Assigned Share (AS; 過剰相対リスクの期待値に対応する原因確率)として定量した。各症例の記録甲状腺線量と年齢から、固定した入力規約(電子 E > 15 keV; 線量は cSv = mGy/10;被曝年 1986; 出生年 = 1986 − 被曝時年齢; 手術年 = 出生年 + 手術時年齢
-<!-- N-68 -->)で計算した。値は版管理された入力ファイルとして持ち回り、来歴と入力同一性の監査は解析計画に記録されている。症例は単一の事前固定規則で AS 帯に割り付けた: 非被曝(線量 0)は Sporadic 帯、被曝症例は Low(0 < AS ≤ 33.3)・Mid(33.3 < AS < 66.6)・High(AS ≥ 66.6)。境界上の症例は存在しない <!-- N-69 -->。440 症例全体の driver × 帯 × ペア有無の臨床構成は
+【訳】被曝症例ごとの放射線起因性は、NIH の Interactive RadioEpidemiological Program(NIH IREP、バージョン 5.7.3; Kocher et al. 2008)の甲状腺モデルにより、過剰相対リスク(ERR)の期待値に対応する Assigned Share(AS)として定量した。各症例の記録甲状腺線量と年齢から、固定した入力規約(電子 E > 15 keV; 線量は cSv = mGy/10;被曝年 1986; 出生年 = 1986 − 被曝時年齢; 手術年 = 出生年 + 手術時年齢)で計算し、IREP の仮定・設定はすべて既定値のまま用いた(ユーザー定義不確かさ分布 Lognormal (1,1)、反復 10,000 回、乱数シード 99)
+<!-- N-68 -->。AS 値は解析コードとともに版管理された入力ファイルとして持ち回り、線量・年齢の入力は臨床表と全例照合した。症例は単一の事前固定規則で AS 帯に割り付けた: 非被曝(線量 0)は Sporadic 帯、被曝症例は Low(0 < AS < 33.3)・Mid(33.3 ≤ AS < 66.6)・High(AS ≥ 66.6)。境界上の症例は存在しない <!-- N-69 -->。440 症例全体の driver × 帯 × ペア有無の臨床構成は
 表1(仮)に示す <!-- N-11 -->。
 
 ### Quality control and analysis cohorts
@@ -369,7 +369,7 @@ Across the 16 unit × collection cells, the share of null replicates producing a
 
 被曝指標・その他:
 
-- Kocher DC, et al. Interactive RadioEpidemiological Program (IREP): a web-based tool for estimating probability of causation/assigned share. Health Phys 2008;95:119–147. doi:10.1097/01.HP.0000291191.49583.f7 — NIOSH-IREP(Methods: Exposure metric。使用版 5.7.3)
+- Kocher DC, et al. Interactive RadioEpidemiological Program (IREP): a web-based tool for estimating probability of causation/assigned share. Health Phys 2008;95:119–147. doi:10.1097/01.HP.0000291191.49583.f7 — NIH IREP(Methods: Exposure metric。使用版 5.7.3)
 - Geman D, et al. Classifying gene expression profiles from pairwise mRNA comparisons. Stat Appl Genet Mol Biol 2004;3:Article19. doi:10.2202/1544-6115.1071 — 検体内順位比較(REO)の原型(Methods: REO)
 - R Core Team. R: A language and environment for statistical computing. v4.5.3, 2026(citation() 形式で執筆時に確定)— (Methods: Software)
 - その他の使用パッケージ(SummarizedExperiment・limma・GenomicDataCommons・rtracklayer・data.table・Matrix・Rcpp・MASS・parallel)は Supp の版表が網羅 —個別引用は原典論文を持つもののみ執筆時に判断〔使用パッケージ〕。事前収集済みの原典(PubMed 照合済み 2026-08-14): Bioconductor/SummarizedExperiment = Huber W, et al. Nat Methods 2015;12:115–121, doi:10.1038/nmeth.3252 / limma = Ritchie ME, et al. Nucleic Acids Res 2015;43:e47, doi:10.1093/nar/gkv007 / rtracklayer = Lawrence M, et al. Bioinformatics 2009;25:1841–1842, doi:10.1093/bioinformatics/btp328

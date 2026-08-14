@@ -36,8 +36,8 @@ pin_blas_threads <- function() {
 # Assigned-share band boundaries (percent). Band rule (single convention;
 # boundary cases do not occur in this cohort, verified 2026-07-28):
 #   dose_mgy == 0                     -> Sporadic (AS not required)
-#   dose_mgy > 0 & 0 < AS <= 33.3    -> Low
-#   dose_mgy > 0 & 33.3 < AS < 66.6  -> Mid
+#   dose_mgy > 0 & 0 < AS < 33.3     -> Low
+#   dose_mgy > 0 & 33.3 <= AS < 66.6 -> Mid
 #   dose_mgy > 0 & AS >= 66.6        -> High
 AS_LOW_MAX <- 33.3
 AS_HIGH_MIN <- 66.6

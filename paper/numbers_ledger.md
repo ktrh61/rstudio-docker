@@ -189,7 +189,7 @@
 |---|---|---|---|---|---|
 | N-66 | GENCODE v36(GDC 参照 GTF)の exon-union 遺伝子長; 発現は STAR - Counts(open access) | 参照アノテーションとデータ種別 | scripts/020 ヘッダ(GENCODE v36)・scripts/010 ヘッダ(STAR - Counts) | Methods | verified |
 | N-67 | stranded 列合計の小/大比 ≤ 0.5 なら stranded(大きい列を採用)、それ以外は unstranded 列 | ライブラリ strand 判定規則(検体別) | scripts/120 ヘッダ(Dobin's general rule, ratio form) | Methods | verified |
-| N-68 | NIOSH-IREP 甲状腺モデル「AS associated with the expected value of ERR」; 電子 E>15keV、線量 cSv=mGy/10、被曝年 1986、出生年=1986−被曝時年齢、手術年=出生年+手術時年齢。値は研究者計算の正準 CSV | IREP 入力規約 | scripts/130:1-15 ヘッダ; 来歴・入力同一性監査は計画v2 B.11 | Methods | verified |
+| N-68 | NIH IREP(v5.7.3 引用)甲状腺モデル「AS associated with the expected value of ERR」; 電子 E>15keV、線量 cSv=mGy/10、被曝年 1986、出生年=1986−被曝時年齢、手術年=出生年+手術時年齢; IREP 設定は全て既定値(ユーザー定義不確かさ分布 Lognormal(1,1)・反復 10,000・乱数シード 99)。値は研究者計算の正準 CSV | IREP 入力規約 | scripts/130 ヘッダ; 来歴・入力同一性監査は計画v2 B.11 | Methods | verified |
 | N-69 | dose 0 → Sporadic; 0<AS≤33.3 Low; 33.3<AS<66.6 Mid; AS≥66.6 High(境界例なし、2026-07-28 検証) | AS 帯規則 | config.R:36-43(AS_LOW_MAX 33.3・AS_HIGH_MIN 66.6) | Methods | verified |
 | N-70 | 0.6 | pooled 共通尺度の相対純度閾値(main BM 採用条件) | config.R:45-46(PURITY_THRESHOLD) | Methods | verified |
 | N-71 | iDEGES 3 反復; スクリーン = 置換 BM + BH q<0.10(DEGES_FDR); スケーリングは MUREN; 前処理 protein_coding → filterByExpr | 310 正規化の設定 | scripts/310:37(ITERATION 3L)・config.R:55-57(DEGES_FDR 0.10)・310 ヘッダ | Methods | verified |

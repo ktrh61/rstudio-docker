@@ -6,9 +6,9 @@
 # Band rule (single convention; boundary-valued cases do not occur in this
 # cohort, so unifying the historical closure variants changes no assignment):
 #   dose_mgy == 0                                -> Sporadic (AS not required)
-#   dose_mgy > 0 & 0 < AS <= AS_LOW_MAX          -> Low
-#   dose_mgy > 0 & AS_LOW_MAX < AS < AS_HIGH_MIN -> Mid
-#   dose_mgy > 0 & AS >= AS_HIGH_MIN             -> High
+#   dose_mgy > 0 & 0 < AS < AS_LOW_MAX            -> Low
+#   dose_mgy > 0 & AS_LOW_MAX <= AS < AS_HIGH_MIN -> Mid
+#   dose_mgy > 0 & AS >= AS_HIGH_MIN              -> High
 # AS_LOW_MAX / AS_HIGH_MIN come from config.R.
 
 RET_DRIVER_VALUES <- c("CCDC6-RET", "NCOA4-RET", "RET-OTHER")
@@ -68,8 +68,8 @@ assign_band <- function(dose_mgy, assigned_share) {
   band_status[as_bad] <- "as_missing"
   as_ok <- exposed & is.finite(assigned_share)
 
-  low <- as_ok & assigned_share > 0 & assigned_share <= AS_LOW_MAX
-  mid <- as_ok & assigned_share > AS_LOW_MAX & assigned_share < AS_HIGH_MIN
+  low <- as_ok & assigned_share > 0 & assigned_share < AS_LOW_MAX
+  mid <- as_ok & assigned_share >= AS_LOW_MAX & assigned_share < AS_HIGH_MIN
   high <- as_ok & assigned_share >= AS_HIGH_MIN
   band[low] <- "Low"
   band[mid] <- "Mid"
