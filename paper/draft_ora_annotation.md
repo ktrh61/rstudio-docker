@@ -18,8 +18,8 @@ Methods), the 794 genes lower in the High arm were strongly concentrated in
 proliferation, cell-cycle and DNA-repair programs (E2F targets 46/199, G2M
 checkpoint 41/198, Reactome DNA repair 68/322 <!-- N-61, N-62 -->), a single
 theme that extends into the radiation-curated family, whose leading flagged
-sets are themselves cell-cycle genes responding to irradiation (46/126,
-expected 14.2 in the combined list <!-- N-60 -->). The 971 genes higher in
+sets are themselves cell-cycle genes responding to irradiation (46 of 126 in
+the down list, expected 6.4 <!-- N-60 -->). The 971 genes higher in
 the High arm showed no such concentration in any curated family
 <!-- N-59 --> (full results in Supplementary Table SY).
 
@@ -50,6 +50,9 @@ this annotation.
 
 ## 起草メモ(本文に載せない)
 
+- **数値修正(2026-08-14、Results 起草時の照合で検出)**: Results 文の radiation 例示が
+  down リストの k(46/126)に combined の期待値(14.2)を付けていた取り違えを修正 —
+  正しくは down リストの k=46/126・期待 6.4(N-60。combined は k=50/126・期待 14.2)。
 - **2026-08-13 来歴訂正・根拠差し替え(研究者承諾 — claim_map C-14 改訂メモ参照)**:
   ORA は Thyroid 原プロトコルの設計解析の復元であり、GSEA 主・ORA 副の濃淡の根拠は
   「事前固定」ではなく G&B 2007 の sampling-model 軸+本文での一文開示。開示文の例

@@ -222,6 +222,7 @@
 | Supp.Tab.1(仮)D6 較正 16 セル表(m_sets・p_any・95%CI・mean/max 発見数) | diagnostics/gsea_null_calibration.R ← 310 正規化。正準値 = run/xeon_final_20260811/logs/d6_calibration.log(rds は diagnostics/output/gsea_null_calibration.rds) | C-06、N-24(注記に N-25, N-26) | draft |
 | Supp.Data.1(仮)420 全セット結果の完全開示(全 unit × family の pathway・size・ES・NES・p・q_bh 全量) | processed/thyr_enrichment_test.rds より整形のみ(計算なし・整形スクリプト未作成)。Q-08/Q-10 予備線「可能性の棚は開示で遺す」の実体 | C-05 | draft |
 | Supp.Tab.2(仮)R_Tumor DEG の ORA 注釈(family × list の全結果) | scripts/430_annotate_deg_ora.R ← thyr_expression_test.rds(430 編入 2026-08-13。正準 = processed/thyr_deg_ora_annotation.rds + output/430_annotate_deg_ora.log。旧 diagnostics 版と同値確認済み) | C-14、N-59〜N-62 | draft |
+| Supp.Tab.3(仮)腕間 concordance(normal / tumor 両ペア: rho・シャッフル帯・p の2行+識別不能注記) | diagnostics/signature_agreement.R(正準値 = run/xeon_results/logs/signature_agreement.log) | C-07、C-17、N-33・N-34 | draft |
 
 (番号・採否は図表構成の確定後に更新)
 
