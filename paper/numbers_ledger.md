@@ -215,16 +215,16 @@
 | Fig.1(仮)遺伝子別 BM 証拠 | figures/fig_gene_bm_evidence.R ← processed/thyr_expression_test.rds + thyr_se_raw.rds。正準 repo/output/figures/fig_gene_bm_evidence.png(二機バイト一致) | C-未、N-16・N-18(付随ログ fig_gene_bm_evidence.log:2-5) | draft |
 | Fig.2(仮)MA プロット | figures/fig_ma_gene_bm.R ← processed/thyr_normalized_counts.rds + thyr_expression_test.rds + thyr_se_raw.rds。正準 repo/output/figures/fig_ma_gene_bm.png(2026-08-10 01:40 版。B.14 で二機 md5 一致) | C-未、N-16・N-49 | draft |
 | Fig.3(仮)REO グレーディング | figures/fig_reo_grading.R ← processed/thyr_reo_panel.rds + thyr_reo_evaluation.rds + thyr_se_raw.rds + thyr_case_assigned_share.rds。正準 repo/output/figures/fig_reo_grading.png(二機バイト一致) | C-未、N-41・N-50 | draft |
-| フロー図(仮)コホートフロー(6段、**両 driver 層並記** — 2026-08-14 研究者承諾: 層別途中経過は本文でなくこの図が担う) | 生成スクリプト未作成 ← thyr_cohort_flow.rds(230 出力)。数値は N-08(合算+RET/BRAF 別) | C-10、N-08 | draft |
+| フロー図(仮)コホートフロー(6段、**両 driver 層並記** — 2026-08-14 研究者承諾: 層別途中経過は本文でなくこの図が担う) | figures/fig_cohort_flow.R ← thyr_cohort_flow.rds(230 出力)。数値は N-08(合算+RET/BRAF 別)。**未実行 — 実行 Go 待ち** | C-10、N-08 | draft |
 | Tab.1(仮)臨床コホート構成(Driver × AS 帯 × pair) | tables/tab_cohort_composition.R ← thyr_clinical.rds + thyr_case_assigned_share.rds + SE | C-未、N-11 | draft |
-| Tab.2(仮)解析コホート症例特性(群×帯: n・性別・年齢・サブタイプ) | 生成スクリプト未作成(現状は §15 コマンド B の集計のみ。表化の要否・体裁は研究者判断) | C-未、N-12・N-13 | draft |
-| Tab.3(仮)410 主結果(ユニット × 検定遺伝子数・DEG・HC p) | processed/thyr_expression_test.rds より(表化スクリプト未作成) | C-未、N-15(遺伝子数)・N-16・N-19・N-20 | draft |
-| Tab.4(仮)420/D6 サマリ(ユニット × コレクション) | processed/thyr_enrichment_test.rds + diagnostics/output/gsea_null_calibration.rds より(表化スクリプト未作成) | C-未、N-24〜N-28 | draft |
+| Tab.2(仮)解析コホート症例特性(群×帯: n・性別・年齢・サブタイプ) | tables/tab_case_characteristics.R ← thyr_analysis_cohorts.rds + thyr_clinical.rds(§15 B と同経路。**未実行 — 実行 Go 待ち**。初回実行で N-09/N-12/N-13 と照合) | C-未、N-12・N-13 | draft |
+| Tab.3(仮)410 主結果(ユニット × 検定遺伝子数・DEG・HC p) | tables/tab_gene_level_summary.R ← thyr_expression_test.rds(**未実行**。初回実行で N-15〜N-20 と照合) | C-未、N-15(遺伝子数)・N-16・N-19・N-20 | draft |
+| Tab.4(仮)420/D6 サマリ(ユニット × コレクション) | tables/tab_set_level_summary.R ← thyr_enrichment_test.rds + diagnostics/output/gsea_null_calibration.rds(**未実行**。較正 rds のセル表は防御的に探索 — 初回実行で N-24/N-27/N-28 と照合) | C-未、N-24〜N-28 | draft |
 | Supp.Tab.1(仮)D6 較正 16 セル表(m_sets・p_any・95%CI・mean/max 発見数) | diagnostics/gsea_null_calibration.R ← 310 正規化。正準値 = run/xeon_final_20260811/logs/d6_calibration.log(rds は diagnostics/output/gsea_null_calibration.rds) | C-06、N-24(注記に N-25, N-26) | draft |
-| Supp.Data.1(仮)420 全セット結果の完全開示(全 unit × family の pathway・size・ES・NES・p・q_bh 全量) | processed/thyr_enrichment_test.rds より整形のみ(計算なし・整形スクリプト未作成)。Q-08/Q-10 予備線「可能性の棚は開示で遺す」の実体 | C-05 | draft |
+| Supp.Data.1(仮)420 全セット結果の完全開示(全 unit × family の pathway・size・ES・NES・p・q_bh 全量) | tables/supp_data_420_full.R ← thyr_enrichment_test.rds(整形のみ・計算なし。**未実行**)。Q-08/Q-10 予備線「可能性の棚は開示で遺す」の実体 | C-05 | draft |
 | Supp.Tab.2(仮)R_Tumor DEG の ORA 注釈(family × list の全結果) | scripts/430_annotate_deg_ora.R ← thyr_expression_test.rds(430 編入 2026-08-13。正準 = processed/thyr_deg_ora_annotation.rds + output/430_annotate_deg_ora.log。旧 diagnostics 版と同値確認済み) | C-14、N-59〜N-62 | draft |
-| Supp.Tab.3(仮)腕間 concordance(normal / tumor 両ペア: rho・シャッフル帯・p の2行+識別不能注記) | diagnostics/signature_agreement.R(正準値 = run/xeon_results/logs/signature_agreement.log) | C-07、C-17、N-33・N-34 | draft |
-| Supp.Tab.4(仮)使用パッケージ版表(パッケージ名・版の一覧 — 2026-08-14 引用整理に伴い追加) | 整形スクリプト未作成 ← docker/versions.tsv(固定版)+ run/xeon_provenance/session_info.txt(実走時の実効版)。機械生成のみ・計算なし | Methods(Software 節が参照) | draft |
+| Supp.Tab.3(仮)腕間 concordance(normal / tumor 両ペア: rho・シャッフル帯・p の2行+識別不能注記) | tables/supp_tab_concordance.R ← diagnostics/output/signature_agreement.rds(**未実行** — rds のフィールド名は初回実行で確認・調整)。正準値 = run/xeon_results/logs/signature_agreement.log | C-07、C-17、N-33・N-34 | draft |
+| Supp.Tab.4(仮)使用パッケージ版表(パッケージ名・版の一覧 — 2026-08-14 引用整理に伴い追加) | tables/supp_tab_package_versions.R ← docker/versions.tsv(**未実行**。実走時の実効版 = run/xeon_provenance/session_info.txt は組版時に併記)。機械生成のみ・計算なし | Methods(Software 節が参照) | draft |
 
 (番号・採否は図表構成の確定後に更新)
 
@@ -277,3 +277,8 @@
   セクション N の表題に来歴を追記
 - 2026-08-14: 3バケツ整理の実装(研究者批准): 本台帳を足場(検査機構)と位置づけ、
   採録確定まで併走→削除の運用を明記。非掲載数値の出典自蔵は手元台帳側の責務
+- 2026-08-14: 図表整形スクリプト7本を作成(全て整形のみ・計算なし・**未実行**):
+  figures/fig_cohort_flow.R、tables/tab_case_characteristics.R・tab_gene_level_summary.R・
+  tab_set_level_summary.R・supp_data_420_full.R・supp_tab_concordance.R・
+  supp_tab_package_versions.R。図表台帳の該当行を実体パスへ付け替え。初回実行時に
+  各 N 行との照合を行う(スクリプト内に照合対象を明記)。実行は研究者 Go 待ち
