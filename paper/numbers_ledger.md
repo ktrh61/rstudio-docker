@@ -124,7 +124,7 @@
 | --- | --- | --- | --- | --- | --- |
 | N-35 | 候補プール up 317 / down 182、57694 ペア評価、全基準通過 153 ペア | 510 候補選定 | run/xeon_results/logs/510_select_reo_pairs.log:4-6 | Methods | verified |
 | N-36 | median_diff [1.159, 4.700]、reversal_rate [0.53, 0.87] | 通過 153 ペアの範囲 | 同 log:7 | Methods / Supp | verified |
-| N-37 | パネル 10 ペア、境界 = R0 基準で score > 2 を positive | 520 パネル確定 | run/xeon_results/logs/520_finalize_reo_panel.log:7 「Selected panel pairs: 10」・log:9 「Boundary (R0-based)」 | Methods / Results | verified |
+| N-37 | パネル 10 ペア、境界 = score > 2 を positive(閾値 = 訓練 Sporadic の最大逆転スコア; ログ表記 R0-based)| 520 パネル確定 | run/xeon_results/logs/520_finalize_reo_panel.log:7 「Selected panel pairs: 10」・log:9 「Boundary (R0-based)」 | Methods / Results | verified |
 | N-38 | 訓練分類: R0 12/12 negative、R1 13/15 positive(2 negative); score 範囲 R0 [0,2] / R1 [0,10] | 520 訓練成績 | 同 log:3-6(分類表)・log:8(score 範囲) | Results | verified |
 | N-39 | P1 DBH/PROM1、P2 ZNF560/CSTA、P3 CA4/CTHRC1、P4 ADRA2B/FCGR2B、P5 DNASE1L2/LOX、P6 PNMA8B/FCER1A、P7 CASKIN1/CD1C、P8 GPR62/IL13RA2、P9 NPAS1/PBK、P10 ICAM4/S100A8(up/down、median_diff 降順) | パネル 10 ペアの構成 | run/xeon_results/output/reo_panel.csv 全10行(二機バイト一致; Ensembl ID・median_diff・reversal_rate も同 CSV) | Tab(パネル構成) | verified |
 | N-40 | 片側 BM p = 0.1127(mc)、効果 P(Low<Mid) = 0.616 | 530 Read B(out-of-sample: Mid > Low 逆転スコア) | run/xeon_results/logs/530_evaluate_reo_panel.log:3 | 主結果 / Abstract | verified |
@@ -192,13 +192,14 @@
 | N-68 | NIH IREP(v5.7.3 引用)甲状腺モデル「AS associated with the expected value of ERR」; 電子 E>15keV、線量 cSv=mGy/10、被曝年 1986、出生年=1986−被曝時年齢、手術年=出生年+手術時年齢; IREP 設定は全て既定値(ユーザー定義不確かさ分布 Lognormal(1,1)・反復 10,000・乱数シード 99)。値は研究者計算の正準 CSV | IREP 入力規約 | scripts/130 ヘッダ; 来歴・入力同一性監査は計画v2 B.11 | Methods | verified |
 | N-69 | dose 0 → Sporadic; 0<AS≤33.3 Low; 33.3<AS<66.6 Mid; AS≥66.6 High(境界例なし、2026-07-28 検証) | AS 帯規則 | config.R:36-43(AS_LOW_MAX 33.3・AS_HIGH_MIN 66.6) | Methods | verified |
 | N-70 | 0.6 | pooled 共通尺度の相対純度閾値(main BM 採用条件) | config.R:45-46(PURITY_THRESHOLD) | Methods | verified |
-| N-71 | iDEGES 3 反復; スクリーン = 置換 BM + BH q<0.10(DEGES_FDR); スケーリングは MUREN; 前処理 protein_coding → filterByExpr | 310 正規化の設定 | scripts/310:37(ITERATION 3L)・config.R:55-57(DEGES_FDR 0.10)・310 ヘッダ | Methods | verified |
+| N-71 | iDEGES 3 反復; スクリーン = 置換 BM(exact)→ Storey q<0.10(plug-in λ=0.5、DEGES_FDR)+ floorPDEG 0.05(q 閾値集合と生 p 上位 5% の大きい方を採用); スケーリングは MUREN(lts); 前処理 protein_coding → filterByExpr | 310 正規化の設定(2026-08-14 訂正: 従前の「BH q<0.10」は誤記 — 実装は storey_q) | lib/norm_deges.R:137-153(storey_q・floorPDEG 採用規則)・scripts/310:37-46(ITERATION 3L・FLOOR_PDEG 0.05・MUREN_METHOD lts・BM_METHOD exact)・config.R:57(DEGES_FDR 0.10) | Methods | verified |
 | N-72 | ランキング = 符号付き BM 統計量の tie-averaged normal scores; ES = gseaParam=1 の block 評価(tie-free 入力で標準 GSEA と一致); 推論 = per-set 符号条件付き置換 p + family 内 BH、q_bh<0.10; size 窓 15–500 | 420 セットレベル推論の設定 | scripts/420 ヘッダ; lib/gsea_collections.R:27-28(15L/500L); config.R:51-53(FDR_CUT 0.10) | Methods | verified |
 | N-73 | unit 内独立ラベルシャッフル 9,999 回、unit 別 seed(基底 19450809)で shuffle プロファイル同士を相関(410 の perm_index は意図的に不使用 — 等 n unit で同一 index となるため) | 署名一致の帰無参照区間の設定 | diagnostics/signature_agreement.R:57(AGREEMENT_SEED_BASE)・:84,97(N_PERM 使用)・ヘッダ | Methods | verified |
 | N-74 | 候補プール = \|effect−0.5\| 上位 500; dead zone \|r\|<log2(1.2); R0 = 非 dead-zone 検体で符号一致(例外≤1)かつ q10(\|r\|)≥log2(1.5); R1 = 逆転 >50% かつ <100% | REO 候補ペア選定規則 | scripts/510:44(N_CANDIDATES 500L)・:48(log2(1.5))・:100,130,136(規則実装); config.R:48-49(DEAD_ZONE log2(1.2)) | Methods | verified |
 | N-75 | 貪欲選定: 遺伝子再使用禁止 + 既採用ペアとの Spearman <0.75、目標 10 ペア; 530 の Mid>Low 片側 BM は mc・seed 19860426(正準シード) | REO パネル確定と評価検定の設定 | scripts/520:30-31(TARGET_PANEL_SIZE 10L・CORRELATION_THRESHOLD 0.75); scripts/530:78(seed = SEED); config.R:5-8 | Methods | verified |
 | N-76 | 群内純度順位保存 0.93–0.99(群別推定との比較)、High vs Sporadic 腫瘍プロファイル相関 0.99 | 220 の両群プーリング妥当性の**来歴実測値**(設計時測定。一次ログではない — 証拠階層は設計選択の来歴)。二重統計に当たるためライセンスには使わない(研究者決定 2026-08-13)— プーリングの記述は理論構造(相対尺度の共通化・driver 支配前提・軸の別・役割の限定)で立てる | `git show 8eed384:scripts/220_estimate_tumor_purity.R` ヘッダ行8-10(run 時点の凍結版。現行ヘッダは 2026-08-13 に理論ライセンスへ書き換え、実測値の記録はこの行と run コミットに保存) | **不使用**(査読応答の受けとして保存) | verified |
 | N-77 | 906/906 ライブラリが stranded_second(reverse)判定、比 0.056–0.110(生値 min 0.0558948828・max 0.1095053129、閾値 0.5) | strand 判定の実測結果 — 閾値の恣意性が実務上不活性であることの開示 | meta/strand_selection_20260722_073758.tsv の selected・ratio 列の全数集計(906 行) | Methods | verified |
+| N-78 | PC-OD = 第1主成分の検体ローディングへの反復 Grubbs 検定(両側、α = 0.05)、棄却毎に最大絶対ローディングの検体を除去して再計算、棄却なしで停止; 入力は 群 × 組織 部分行列(filterByExpr 縮約・未正規化 log-CPM、prior.count 2) | 210 外れ値スクリーンの規則一式 | lib/qc_pc_od.R:1-39(α 既定 0.05・Grubbs 臨界値・反復規則)・scripts/210:69-81(run_pcod: filterByExpr・log-CPM 設定)・210 ヘッダ(8 部分行列) | Methods | verified |
 
 ## 図表台帳(図・表は1行ずつ — キャプションも検査対象)
 
@@ -285,3 +286,8 @@
   各 N 行との照合を行う(スクリプト内に照合対象を明記)。実行は研究者 Go 待ち
 - 2026-08-14: N-77 追加(strand 判定の全数一様性、meta/strand_selection tsv の集計を照合済み)—
   比率規則に引用文献がない代わりに閾値不感応の実測を Methods で開示(研究者 Go)
+- 2026-08-14: Methods 監査(研究者指示)に伴う訂正・追補: N-71 を実装に一致(BH→Storey q、
+  floorPDEG 0.05・MUREN lts・exact 宣言を追記)、N-37 の R0 表記を「訓練 Sporadic の最大
+  逆転スコア」記述へ、N-78(PC-OD 規則一式)を新設。本文側は同監査で A2 件+抜け8 件+
+  軽微2 件を反映(ペア解決 _merged 規則・contamDE 前処理と max-one 尺度・REO スコア定義・
+  TPM 自前再計算・純度中央値2層ほか)
