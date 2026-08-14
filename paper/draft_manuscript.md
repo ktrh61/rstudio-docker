@@ -61,9 +61,9 @@ All inference is organized in four analysis units — the exposed-vs-sporadic co
 
 <!-- 写像元: 310, lib/norm_deges.R -->
 
-Each unit's count matrix (protein-coding genes, filterByExpr; edgeR) was normalized with a DEGES scheme (Kadota et al. 2012; iterated form of Sun et al. 2013) reimplemented in-house: MUREN normalization (Feng and Li 2020) alternating with a permutation Brunner–Munzel screen — substituted for the original scheme's model-based DEG screen — that removes potential DEGs (BH q < 0.10) from the scaling-factor estimation, iterated three times (iDEGES) <!-- N-71 -->. The per-unit tested-gene counts, screen pi0 estimates, iteration convergence (Jaccard), and resulting scaling-factor ranges are reported in Supplementary(仮) <!-- N-15 -->.
+Each unit's count matrix (protein-coding genes, filterByExpr; edgeR) was normalized with a DEGES scheme (Kadota et al. 2012; iterated form of Sun et al. 2013) reimplemented in-house: MUREN normalization (Feng and Li 2021) alternating with a permutation Brunner–Munzel screen — substituted for the original scheme's model-based DEG screen — that removes potential DEGs (BH q < 0.10) from the scaling-factor estimation, iterated three times (iDEGES) <!-- N-71 -->. The per-unit tested-gene counts, screen pi0 estimates, iteration convergence (Jaccard), and resulting scaling-factor ranges are reported in Supplementary(仮) <!-- N-15 -->.
 
-【訳】各 unit のカウント行列(protein-coding、filterByExpr; edgeR)は、自作再実装の DEGES 方式(Kadota et al. 2012; 反復形は Sun et al. 2013)で正規化した: MUREN 正規化(Feng and Li 2020)と、潜在的 DEG(BH q < 0.10)をスケーリング係数推定から除去する置換 Brunner–Munzel スクリーン(原方式のモデルベース DEG スクリーンを置換)との交互反復を3回(iDEGES)<!-- N-71 -->。unit 別の検定遺伝子数、スクリーンの pi0 推定値、反復収束(Jaccard)、スケーリング係数の範囲は Supplementary(仮)に報告する <!-- N-15 -->。
+【訳】各 unit のカウント行列(protein-coding、filterByExpr; edgeR)は、自作再実装の DEGES 方式(Kadota et al. 2012; 反復形は Sun et al. 2013)で正規化した: MUREN 正規化(Feng and Li 2021)と、潜在的 DEG(BH q < 0.10)をスケーリング係数推定から除去する置換 Brunner–Munzel スクリーン(原方式のモデルベース DEG スクリーンを置換)との交互反復を3回(iDEGES)<!-- N-71 -->。unit 別の検定遺伝子数、スクリーンの pi0 推定値、反復収束(Jaccard)、スケーリング係数の範囲は Supplementary(仮)に報告する <!-- N-15 -->。
 
 ### Gene-level differential expression
 
@@ -307,7 +307,7 @@ Across the 16 unit × collection cells, the share of null replicates producing a
 ### A. 本文が現に引くもの
 
 - Morton LM, et al. Radiation-related genomic profile of papillary thyroid carcinoma after the Chernobyl accident. Science 2021;372:eabg2538. doi:10.1126/science.abg2538 — コホート出典(Methods: Data sources / Results §1)
-- Storey JD. A direct approach to false discovery rates. J R Stat Soc B 2002;64:479–498 ★(DOI 未記載)— λ=0.5 の無チューニング既定(Methods: Gene-level)
+- Storey JD. A direct approach to false discovery rates. J R Stat Soc B 2002;64:479–498 ★(PubMed 非収載の統計誌 — DOI 10.1111/1467-9868.00346 を原誌で確認)— λ=0.5 の無チューニング既定(Methods: Gene-level)
 - Donoho D, Jin J. Higher criticism for detecting sparse heterogeneous mixtures. Ann Stat 2004;32:962–994. doi:10.1214/009053604000000265 — HC の選定事由(Methods: Gene-level)
 - Wasserstein RL, Lazar NA. The ASA statement on p-values. Am Stat 2016;70:129–133. doi:10.1080/00031305.2016.1154108 — 非2値化(Methods: Gene-level)
 - Greenland S, Senn SJ, Rothman KJ, Carlin JB, Poole C, Goodman SN, Altman DG. Eur J Epidemiol 2016;31:337–350. doi:10.1007/s10654-016-0149-3 — 同上
@@ -321,29 +321,29 @@ Across the 16 unit × collection cells, the share of null replicates producing a
 
 検定・多重性:
 
-- Brunner E, Munzel U. The nonparametric Behrens-Fisher problem: asymptotic theory and a small-sample approximation. Biom J 2000;42:17–25 ★ — BM 検定の原典〔手法引用/自作実装 — exact/MC 置換枚挙。CRAN の漸近実装は不使用(棄却記録は手元台帳 T-08)〕(Methods: Gene-level — 本文反映済み)
-- Benjamini Y, Hochberg Y. Controlling the false discovery rate. J R Stat Soc B 1995;57:289–300 ★ — BH 調整(Methods: Gene-set)
-- Hodges JL, Lehmann EL. Estimates of location based on rank tests. Ann Math Stat 1963;34:598–611 ★ — HL 推定量(Methods: Age。慣用のため省略可)
+- Brunner E, Munzel U. The nonparametric Behrens-Fisher problem: asymptotic theory and a small-sample approximation. Biom J 2000;42:17–25 ★(PubMed 非収載の統計誌 — 書誌は原誌で確認)— BM 検定の原典〔手法引用/自作実装 — exact/MC 置換枚挙。CRAN の漸近実装は不使用(棄却記録は手元台帳 T-08)〕(Methods: Gene-level — 本文反映済み)
+- Benjamini Y, Hochberg Y. Controlling the false discovery rate. J R Stat Soc B 1995;57:289–300 ★(PubMed 非収載 — 原誌で確認)— BH 調整(Methods: Gene-set)
+- Hodges JL, Lehmann EL. Estimates of location based on rank tests. Ann Math Stat 1963;34:598–611 ★(PubMed 非収載 — 原誌で確認)— HL 推定量(Methods: Age。慣用のため省略可)
 
 セット解析:
 
 - Subramanian A, et al. Gene set enrichment analysis. PNAS 2005;102:15545–15550. doi:10.1073/pnas.0506580102 — 標準 GSEA 統計量・MSigDB〔手法引用/自作実装 — tie-block 拡張、tie-free 一致は自動テストで強制〕(Methods: Gene-set — 本文反映済み)
-- Liberzon A, et al. The Molecular Signatures Database hallmark gene set collection. Cell Syst 2015;1:417–425 ★ — Hallmark(Methods: Gene-set)
+- Liberzon A, et al. The Molecular Signatures Database (MSigDB) hallmark gene set collection. Cell Syst 2015;1:417–425. doi:10.1016/j.cels.2015.12.004 — Hallmark(Methods: Gene-set)
 
 前処理・正規化・純度(いずれも Methods: Data sources / Normalization / QC):
 
-- Dobin A, et al. STAR: ultrafast universal RNA-seq aligner. Bioinformatics 2013;29:15–21 ★ — STAR counts の来歴(GDC パイプライン言及の形でも可)
-- Grossman RL, et al. Toward a shared vision for cancer genomic data. N Engl J Med 2016;375:1109–1112 ★ — GDC
-- Robinson MD, McCarthy DJ, Smyth GK. edgeR. Bioinformatics 2010;26:139–140 ★— filterByExpr / DGEList / CPM〔使用パッケージ〕
-- Kadota K, Nishiyama T, Shimizu K. A normalization strategy for comparing tag count data. Algorithms Mol Biol 2012;7:5 ★ — DEGES
-- Sun J, Nishiyama T, Shimizu K, Kadota K. TCC. BMC Bioinformatics 2013;14:219 ★ — iDEGES(3反復)の系譜〔手法引用/自作実装 — TCC パッケージ不使用、スクリーンは BM に置換(本文明記済み)〕
-- Feng Y, Li LM. MUREN: a robust and multi-reference approach of RNA-seq transcript normalization. BMC Bioinformatics 2020 ★ — MUREN〔手法引用/自作実装〕
-- Shen Q, et al. contamDE: differential expression analysis of RNA-seq data for contaminated tumor samples. Bioinformatics 2016;32:705–712 ★ — 純度推定〔手法引用/自作実装〕(本文反映済み)
+- Dobin A, et al. STAR: ultrafast universal RNA-seq aligner. Bioinformatics 2013;29:15–21. doi:10.1093/bioinformatics/bts635 — STAR counts の来歴(GDC パイプライン言及の形でも可)
+- Grossman RL, et al. Toward a shared vision for cancer genomic data. N Engl J Med 2016;375:1109–1112. doi:10.1056/NEJMp1607591 — GDC
+- Robinson MD, McCarthy DJ, Smyth GK. edgeR: a Bioconductor package for differential expression analysis of digital gene expression data. Bioinformatics 2010;26:139–140. doi:10.1093/bioinformatics/btp616— filterByExpr / DGEList / CPM〔使用パッケージ〕
+- Kadota K, Nishiyama T, Shimizu K. A normalization strategy for comparing tag count data. Algorithms Mol Biol 2012;7:5. doi:10.1186/1748-7188-7-5 — DEGES
+- Sun J, Nishiyama T, Shimizu K, Kadota K. TCC: an R package for comparing tag count data with robust normalization strategies. BMC Bioinformatics 2013;14:219. doi:10.1186/1471-2105-14-219 — iDEGES(3反復)の系譜〔手法引用/自作実装 — TCC パッケージ不使用、スクリーンは BM に置換(本文明記済み)〕
+- Feng Y, Li LM. MUREN: a robust and multi-reference approach of RNA-seq transcript normalization. BMC Bioinformatics 2021;22:386. doi:10.1186/s12859-021-04288-0 — MUREN(※書誌照合で年・巻を訂正: 2020;21 → 2021;22)〔手法引用/自作実装〕
+- Shen Q, et al. contamDE: differential expression analysis of RNA-seq data for contaminated tumor samples. Bioinformatics 2016;32:705–712. doi:10.1093/bioinformatics/btv657 — 純度推定〔手法引用/自作実装〕(本文反映済み)
 
 被曝指標・その他:
 
-- Kocher DC, et al. Interactive RadioEpidemiological Program (IREP). Health Phys 2008;95:119–147 ★ — NIOSH-IREP(Methods: Exposure metric。使用版 5.7.3)
-- Geman D, et al. Classifying gene expression profiles from pairwise mRNA comparisons. Stat Appl Genet Mol Biol 2004;3:Article19 ★ — 検体内順位比較(REO)の原型(Methods: REO)
+- Kocher DC, et al. Interactive RadioEpidemiological Program (IREP): a web-based tool for estimating probability of causation/assigned share. Health Phys 2008;95:119–147. doi:10.1097/01.HP.0000291191.49583.f7 — NIOSH-IREP(Methods: Exposure metric。使用版 5.7.3)
+- Geman D, et al. Classifying gene expression profiles from pairwise mRNA comparisons. Stat Appl Genet Mol Biol 2004;3:Article19. doi:10.2202/1544-6115.1071 — 検体内順位比較(REO)の原型(Methods: REO)
 - R Core Team. R 4.5.3. 2026 ★ — (Methods: Software)
 - その他の使用パッケージ(SummarizedExperiment・limma・GenomicDataCommons・rtracklayer・data.table・Matrix・Rcpp・MASS・parallel)は Supp の版表が網羅 —個別引用は原典論文を持つもののみ執筆時に判断〔使用パッケージ〕
 
