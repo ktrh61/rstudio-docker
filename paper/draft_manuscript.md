@@ -193,11 +193,11 @@ to this pattern is taken up in Discussion.
 ### 3. Gene-set level(C-05, C-06, 420 + D6)
 
 <!-- C-05 -->
-At the gene-set level, the calibrated test declared no set at q_bh < 0.10 in any of the 16 contrast × collection cells <!-- N-27 --> — Hallmark (50 sets), C2:CP (3,910; the union of Reactome, WikiPathways, KEGG MEDICUS, BioCarta and PID), C5:GO:BP (7,538) and the radiation-curated C2:CGP family (28); 6,141–6,242 sets per contrast after filtering <!-- N-29, N-55, N-28 -->. The smallest adjusted value anywhere was q = 0.114, in the B_Tumor × radiation cell <!-- N-28 --> (complete listing in Supp. Data 1(仮); Table 4(仮)).
+At the gene-set level, the calibrated test declared no set at q_bh < 0.10 in any of the 16 contrast × collection cells <!-- N-27 --> (four MSigDB collections, Methods; 6,141–6,242 sets per contrast after filtering <!-- N-28 -->). The smallest adjusted value anywhere was q = 0.114, in the B_Tumor × radiation cell <!-- N-28 --> (complete listing in Supp. Data 1(仮); Table 4(仮)).
 <!-- C-06 -->
 Under null inputs, the set-level machinery produced at least one discovery in 102 of 1,600 replicates pooled across the 16 contrast × collection cells (0.064; nominal 0.10 <!-- N-56 -->), with a single disclosed excess (B_Normal/Hallmark: 0.18, 95% CI 0.110–0.270 <!-- N-25 -->); the spiked set was recovered at rank 1 of 50 (q 0.0101 <!-- N-31 -->) with no other set at q < 0.10 <!-- N-32 --> (per-cell calibration in Supp. Tab. 1(仮)).
 
-【訳】遺伝子セットレベルでは、較正済み検定は 16 の対比 × collection セルのいずれでも q_bh < 0.10 のセットを宣言しなかった <!-- N-27 --> — Hallmark(50 セット)・C2:CP (3,910; Reactome・WikiPathways・KEGG MEDICUS・BioCarta・PID の統合)・C5:GO:BP(7,538)・放射線キュレーションの C2:CGP ファミリー(28)、フィルタ後は対比あたり 6,141–6,242 セット <!-- N-29, N-55, N-28 -->。全セルで最小の調整値は B_Tumor × radiation セルの q = 0.114 だった <!-- N-28 -->(全結果は Supp. Data 1(仮)・表4(仮))。帰無入力の下では、セットレベル機構は 16 セル合算 1,600 レプリケート中 102 で1つ以上の発見を生じ(0.064; 名目 0.10 <!-- N-56 -->)、開示済みの超過は1セルのみ(B_Normal/Hallmark: 0.18、95% CI 0.110–0.270 <!-- N-25 -->)。spike-in セットは 50 セット中 rank 1(q 0.0101
+【訳】遺伝子セットレベルでは、較正済み検定は 16 の対比 × collection セルのいずれでも q_bh < 0.10 のセットを宣言しなかった <!-- N-27 -->(MSigDB 4 コレクション、Methods 参照; フィルタ後は対比あたり 6,141–6,242 セット <!-- N-28 -->)。全セルで最小の調整値は B_Tumor × radiation セルの q = 0.114 だった <!-- N-28 -->(全結果は Supp. Data 1(仮)・表4(仮))。帰無入力の下では、セットレベル機構は 16 セル合算 1,600 レプリケート中 102 で1つ以上の発見を生じ(0.064; 名目 0.10 <!-- N-56 -->)、開示済みの超過は1セルのみ(B_Normal/Hallmark: 0.18、95% CI 0.110–0.270 <!-- N-25 -->)。spike-in セットは 50 セット中 rank 1(q 0.0101
 <!-- N-31 -->)で回収され、それ以外に q < 0.10 のセットはなかった <!-- N-32 -->
 (セル別較正は Supp. Tab. 1(仮))。
 
