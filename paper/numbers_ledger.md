@@ -215,6 +215,7 @@
 | Fig.1(仮)遺伝子別 BM 証拠 | figures/fig_gene_bm_evidence.R ← processed/thyr_expression_test.rds + thyr_se_raw.rds。正準 repo/output/figures/fig_gene_bm_evidence.png(二機バイト一致) | C-未、N-16・N-18(付随ログ fig_gene_bm_evidence.log:2-5) | draft |
 | Fig.2(仮)MA プロット | figures/fig_ma_gene_bm.R ← processed/thyr_normalized_counts.rds + thyr_expression_test.rds + thyr_se_raw.rds。正準 repo/output/figures/fig_ma_gene_bm.png(2026-08-10 01:40 版。B.14 で二機 md5 一致) | C-未、N-16・N-49 | draft |
 | Fig.3(仮)REO グレーディング | figures/fig_reo_grading.R ← processed/thyr_reo_panel.rds + thyr_reo_evaluation.rds + thyr_se_raw.rds + thyr_case_assigned_share.rds。正準 repo/output/figures/fig_reo_grading.png(二機バイト一致) | C-未、N-41・N-50 | draft |
+| フロー図(仮)コホートフロー(6段、**両 driver 層並記** — 2026-08-14 研究者承諾: 層別途中経過は本文でなくこの図が担う) | 生成スクリプト未作成 ← thyr_cohort_flow.rds(230 出力)。数値は N-08(合算+RET/BRAF 別) | C-10、N-08 | draft |
 | Tab.1(仮)臨床コホート構成(Driver × AS 帯 × pair) | tables/tab_cohort_composition.R ← thyr_clinical.rds + thyr_case_assigned_share.rds + SE | C-未、N-11 | draft |
 | Tab.2(仮)解析コホート症例特性(群×帯: n・性別・年齢・サブタイプ) | 生成スクリプト未作成(現状は §15 コマンド B の集計のみ。表化の要否・体裁は研究者判断) | C-未、N-12・N-13 | draft |
 | Tab.3(仮)410 主結果(ユニット × 検定遺伝子数・DEG・HC p) | processed/thyr_expression_test.rds より(表化スクリプト未作成) | C-未、N-15(遺伝子数)・N-16・N-19・N-20 | draft |
