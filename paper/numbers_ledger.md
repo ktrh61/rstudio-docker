@@ -198,6 +198,7 @@
 | N-74 | 候補プール = \|effect−0.5\| 上位 500; dead zone \|r\|<log2(1.2); R0 = 非 dead-zone 検体で符号一致(例外≤1)かつ q10(\|r\|)≥log2(1.5); R1 = 逆転 >50% かつ <100% | REO 候補ペア選定規則 | scripts/510:44(N_CANDIDATES 500L)・:48(log2(1.5))・:100,130,136(規則実装); config.R:48-49(DEAD_ZONE log2(1.2)) | Methods | verified |
 | N-75 | 貪欲選定: 遺伝子再使用禁止 + 既採用ペアとの Spearman <0.75、目標 10 ペア; 530 の Mid>Low 片側 BM は mc・seed 19860426(正準シード) | REO パネル確定と評価検定の設定 | scripts/520:30-31(TARGET_PANEL_SIZE 10L・CORRELATION_THRESHOLD 0.75); scripts/530:78(seed = SEED); config.R:5-8 | Methods | verified |
 | N-76 | 群内純度順位保存 0.93–0.99(腕別推定との比較)、High vs Sporadic 腫瘍プロファイル相関 0.99 | 220 の腕プーリング妥当性の**来歴実測値**(設計時測定。一次ログではない — 証拠階層は設計選択の来歴)。二重統計に当たるためライセンスには使わない(研究者決定 2026-08-13)— プーリングの記述は理論構造(相対尺度の共通化・driver 支配前提・軸の別・役割の限定)で立てる | `git show 8eed384:scripts/220_estimate_tumor_purity.R` ヘッダ行8-10(run 時点の凍結版。現行ヘッダは 2026-08-13 に理論ライセンスへ書き換え、実測値の記録はこの行と run コミットに保存) | **不使用**(査読応答の受けとして保存) | verified |
+| N-77 | 906/906 ライブラリが stranded_second(reverse)判定、比 0.056–0.110(生値 min 0.0558948828・max 0.1095053129、閾値 0.5) | strand 判定の実測結果 — 閾値の恣意性が実務上不活性であることの開示 | meta/strand_selection_20260722_073758.tsv の selected・ratio 列の全数集計(906 行) | Methods | verified |
 
 ## 図表台帳(図・表は1行ずつ — キャプションも検査対象)
 
@@ -282,3 +283,5 @@
   tab_set_level_summary.R・supp_data_420_full.R・supp_tab_concordance.R・
   supp_tab_package_versions.R。図表台帳の該当行を実体パスへ付け替え。初回実行時に
   各 N 行との照合を行う(スクリプト内に照合対象を明記)。実行は研究者 Go 待ち
+- 2026-08-14: N-77 追加(strand 判定の全数一様性、meta/strand_selection tsv の集計を照合済み)—
+  比率規則に引用文献がない代わりに閾値不感応の実測を Methods で開示(研究者 Go)
