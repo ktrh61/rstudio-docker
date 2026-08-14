@@ -49,7 +49,7 @@
 | N-04 | WORKERS = 4 / N_PERM = 9999 | 並列度・置換回数(再現契約のコミット値) | `git show 8eed384:config.R` 行21「WORKERS <- 4L」・行64「N_PERM <- 9999L」 | Methods | verified |
 | N-05 | BM exact・two-sided・n_perm 9999・perm_seed 19860426・Storey q<0.10(plug-in pi0, λ=0.5)・主オムニバス hc(α0=0.1) | 410 検定設定一式 | repo/processed/thyr_expression_test.rds `$config`(§15 A。md5 `a6e083f593d5600d8f4110a74a4d6ede`、run/xeon_results/processed/ の同名と一致) | Methods | verified |
 | N-06 | B=9999 共有帰無・R=100 反復・seed 19450809・q<0.10 | D6 帰無較正の設定 | run/xeon_final_20260811/logs/d6_calibration.log:1 キー「B = 9999 shared null」 | Methods | verified |
-| N-07 | 410 の置換インデックスを再利用(9999/unit) | 420 の帰無生成方式 | run/xeon_final_20260811/logs/420_test_gene_sets.log:1 キー「Reusing 410's permutation index」(unit 別ハッシュは N-05 の rds `$config$perm_index_hash`) | Methods | verified |
+| N-07 | 410 の置換インデックスを再利用(9999/対比) | 420 の帰無生成方式 | run/xeon_final_20260811/logs/420_test_gene_sets.log:1 キー「Reusing 410's permutation index」(対比別ハッシュは N-05 の rds `$config$perm_index_hash`) | Methods | verified |
 
 ### B. コホート
 
@@ -67,7 +67,7 @@
 | N-ID | 値 | 定義 | 出典 | 使用箇所 | 状態 |
 | --- | --- | --- | --- | --- | --- |
 | N-14 | 58448 genes × 906 samples | SE(発現行列)の寸法 | run/xeon_results/logs/310_normalize_counts.log:1 キー「SE: 58448 genes x 906 samples」 | Methods | verified |
-| N-15 | ユニット別: filterByExpr 後 15621/15466/16002/15863、pi0_hat(iter3) 0.593/0.956/0.943/0.727、収束 Jaccard(iter3) 0.962/0.967/0.993/0.987、norm.factors 範囲 [0.9058,1.1095]/[0.9106,1.0665]/[0.8772,1.0947]/[0.8988,1.0873](順に R_Tumor/R_Normal/B_Tumor/B_Normal) | 310 正規化サマリ(4ユニット) | 同 log:9-32(各「Unit <名>」ブロックの iteration 3 行と norm.factors 行) | Methods / Supp | verified |
+| N-15 | 対比別: filterByExpr 後 15621/15466/16002/15863、pi0_hat(iter3) 0.593/0.956/0.943/0.727、収束 Jaccard(iter3) 0.962/0.967/0.993/0.987、norm.factors 範囲 [0.9058,1.1095]/[0.9106,1.0665]/[0.8772,1.0947]/[0.8988,1.0873](順に R_Tumor/R_Normal/B_Tumor/B_Normal) | 310 正規化サマリ(4対比) | 同 log:9-32(各「Unit <名>」ブロックの iteration 3 行と norm.factors 行) | Methods / Supp | verified |
 
 ### D. 410 遺伝子別検定(主結果)
 
@@ -75,10 +75,10 @@
 | --- | --- | --- | --- | --- | --- |
 | N-16 | 1765 / 0 / 0 / 1(R_Tumor/R_Normal/B_Tumor/B_Normal) | DEG 数(Storey q<0.10) | repo/processed/thyr_expression_test.rds `units[[u]]$genes$q_storey < 0.10`(§15 A); ログ照合 run/xeon_results/logs/fig_gene_bm_evidence.log:2-5 | 主結果 / Fig / Abstract | verified |
 | N-17 | R_Tumor: up 971 / down 794; B_Normal: up 1 / down 0(up = effect>0.5 = High 群で高発現) | DEG の方向内訳 | 同 rds `genes$effect`(§15 A2) | Results | verified |
-| N-18 | 4.03e-06 / 4.08e-05 / 1.68e-05 / 1.13e-06 | ユニット別 min p_exact | 同 rds `min(genes$p_exact)`(§15 A); ログ照合 fig_gene_bm_evidence.log:2-5 | Results / Supp | verified |
+| N-18 | 4.03e-06 / 4.08e-05 / 1.68e-05 / 1.13e-06 | 対比別 min p_exact | 同 rds `min(genes$p_exact)`(§15 A); ログ照合 fig_gene_bm_evidence.log:2-5 | Results / Supp | verified |
 | N-19 | 0.593 / 0.955 / 0.943 / 0.727 | Storey pi0(410、plug-in λ=0.5) | 同 rds `units[[u]]$pi0$estimate`(§15 A) | Results / Supp | verified |
 | N-20 | 0.0112 / 0.3199 / 0.1815 / 0.0773 | 主オムニバス HC p(α0=0.1) | 同 rds `units[[u]]$omnibus` の hc 行(§15 A) | 主結果 / Abstract | verified |
-| N-21 | オムニバス全表: 4ユニット × {count α=1e-2/1e-3/1e-4, max, hc} の observed / 帰無中央値 / p(R_Tumor count@1e-2: 1026/82/0.0128 … B_Normal hc: 36.31/−0.41/0.0773。全20行は出典参照) | オムニバス検定の完全な表 | 同 rds `units[[u]]$omnibus`(§15 A の print 出力) | Supp | verified |
+| N-21 | オムニバス全表: 4対比 × {count α=1e-2/1e-3/1e-4, max, hc} の observed / 帰無中央値 / p(R_Tumor count@1e-2: 1026/82/0.0128 … B_Normal hc: 36.31/−0.41/0.0773。全20行は出典参照) | オムニバス検定の完全な表 | 同 rds `units[[u]]$omnibus`(§15 A の print 出力) | Supp | verified |
 | N-22 | ENSG00000198908.12(BHLHB9)、effect 0.967、q_storey 0.0130、rank 1 | B_Normal 唯一の DEG | 同 rds B_Normal `genes`(q_storey<0.10 の1行。effect 0.9670782、q 0.01298213); symbol は raw の STAR counts tsv 行「ENSG00000198908.12→BHLHB9(protein_coding)」 | Results | verified |
 | N-23 | 0.0125 | B_Normal オムニバスの最小 p(max 統計量; observed 17.70、帰無中央値 6.99) | 同 rds B_Normal `$omnibus` の max 行(§15 A) | Results | verified |
 
@@ -88,7 +88,7 @@
 
 | N-ID | 値 | 定義 | 出典 | 使用箇所 | 状態 |
 | --- | --- | --- | --- | --- | --- |
-| N-24 | 16セル全表(4ユニット×4コレクション: m_sets、p_any、95%CI、mean/max 発見数。p_any 範囲 0.01–0.18) | D6 較正の完全な表 | run/xeon_final_20260811/logs/d6_calibration.log:6-39(rds は repo/diagnostics/output/gsea_null_calibration.rds) | Supp | verified |
+| N-24 | 16セル全表(4対比×4コレクション: m_sets、p_any、95%CI、mean/max 発見数。p_any 範囲 0.01–0.18) | D6 較正の完全な表 | run/xeon_final_20260811/logs/d6_calibration.log:6-39(rds は repo/diagnostics/output/gsea_null_calibration.rds) | Supp | verified |
 | N-25 | 0.18(95%CI 0.110–0.270) | 唯一の名目 0.10 超過: B_Normal/H の p_any(CI 下限も 0.10 超) | 同 log:19 キー「13 B_Normal H 50 100 18 0.18 0.110311」・log:36(ci_hi 0.2695) | Results / Disc | verified |
 | N-26 | B_Tumor/radiation 0.10(CI 0.049–0.176)、B_Normal/radiation 0.12(CI 0.064–0.200) | CI が 0.10 を跨ぐ境界セル | 同 log:18・22(ci_hi は log:35・39) | Supp / Disc | verified |
 
@@ -98,10 +98,10 @@
 
 | N-ID | 値 | 定義 | 出典 | 使用箇所 | 状態 |
 | --- | --- | --- | --- | --- | --- |
-| N-27 | 0(16/16 セル) | 420 本試験の発見数(q<0.10、全 unit × collection) | run/xeon_final_20260811/logs/420_test_gene_sets.log:5-8(各行「q<0.10 0」×4) | 主結果 / Abstract | verified |
-| N-28 | min q 表: R_Tumor(6192セット) H 0.179/C2:CP 0.928/C5:GO:BP 0.936/rad 0.302; R_Normal(6141) 0.380/1.000/1.000/0.980; B_Tumor(6242) 0.520/0.892/0.262/0.114; B_Normal(6223) 0.284/0.283/0.467/0.137 | ユニット×コレクションの min q と総セット数 | 同 log:5-8 | Supp | verified |
+| N-27 | 0(16/16 セル) | 420 本試験の発見数(q<0.10、全対比 × collection) | run/xeon_final_20260811/logs/420_test_gene_sets.log:5-8(各行「q<0.10 0」×4) | 主結果 / Abstract | verified |
+| N-28 | min q 表: R_Tumor(6192セット) H 0.179/C2:CP 0.928/C5:GO:BP 0.936/rad 0.302; R_Normal(6141) 0.380/1.000/1.000/0.980; B_Tumor(6242) 0.520/0.892/0.262/0.114; B_Normal(6223) 0.284/0.283/0.467/0.137 | 対比×コレクションの min q と総セット数 | 同 log:5-8 | Supp | verified |
 | N-29 | H=50, C2:CP=3910, C5:GO:BP=7538, C2:CGP:radiation=28 | フィルタ前のセット数 | 同 log:2-3 キー「Gene sets before filtering」 | Methods | verified |
-| N-55 | C2:CP 検定済み内訳(R_Tumor, 2262セット): Reactome 1095 / WikiPathways 633 / KEGG MEDICUS 217 / BioCarta 134 / PID 183(未分類 0)。msigdbr 26.1.0 | C2:CP の構成(=Reactome・KEGG を含む統合であることの数値根拠。他 unit はフィルタ差で僅差) | 定義: lib/gsea_collections.R `GSEA_COLLECTION_SPECS`(CP:REACTOME/CP:WIKIPATHWAYS/CP:KEGG_MEDICUS/CP:BIOCARTA/CP:PID); 内訳: repo/processed/thyr_enrichment_test.rds `units$R_Tumor$pathway` の接頭辞集計(2026-08-12 コンテナ内で照合) | Methods / Q-06 | verified |
+| N-55 | C2:CP 検定済み内訳(R_Tumor, 2262セット): Reactome 1095 / WikiPathways 633 / KEGG MEDICUS 217 / BioCarta 134 / PID 183(未分類 0)。msigdbr 26.1.0 | C2:CP の構成(=Reactome・KEGG を含む統合であることの数値根拠。他対比はフィルタ差で僅差) | 定義: lib/gsea_collections.R `GSEA_COLLECTION_SPECS`(CP:REACTOME/CP:WIKIPATHWAYS/CP:KEGG_MEDICUS/CP:BIOCARTA/CP:PID); 内訳: repo/processed/thyr_enrichment_test.rds `units$R_Tumor$pathway` の接頭辞集計(2026-08-12 コンテナ内で照合) | Methods / Q-06 | verified |
 
 ### G. spike-in 対照
 
@@ -155,8 +155,8 @@
 
 | N-ID | 値 | 定義 | 出典 | 使用箇所 | 状態 |
 |---|---|---|---|---|---|
-| N-53 | 20 セル中 19 で k=0(層A 5 リスト × 4 unit。全 33 entries が現行注釈に 1:1 解決、全遺伝子が全 unit の検定対象に存在) | 外部放射線関連遺伝子リスト(Abend 2013 正常8/腫瘍6、Abend 2012 ペア差11、Dom 2012 正常7、CLIP2)と DEG 集合(q<0.10)の員数照合 | diagnostics/output/external_gene_anchors.log:2「All symbols resolved」・:5-24(Membership summary); rds は diagnostics/output/external_gene_anchors.rds `$summary` | Disc / Supp | verified |
-| N-54 | S100A10: R_Tumor で effect 0.167(High 群で低発現)、p_exact 0.00208、q_storey 0.079、rank 233 | 唯一の非ゼロセル(dom2012_normal × R_Tumor = **組織対応外セル**: 正常組織由来リストを腫瘍ユニットで照合したもの)。Dom 2012 では被曝側正常組織で上方制御であり、組織側・方向のいずれも原報告と一致しない | 同 log:17「dom2012_normal R_Tumor [cross-tissue] k=1」・:102(per-gene detail); rds `$detail` | Disc / Supp | verified |
+| N-53 | 20 セル中 19 で k=0(層A 5 リスト × 4 対比。全 33 entries が現行注釈に 1:1 解決、全遺伝子が全対比の検定対象に存在) | 外部放射線関連遺伝子リスト(Abend 2013 正常8/腫瘍6、Abend 2012 ペア差11、Dom 2012 正常7、CLIP2)と DEG 集合(q<0.10)の員数照合 | diagnostics/output/external_gene_anchors.log:2「All symbols resolved」・:5-24(Membership summary); rds は diagnostics/output/external_gene_anchors.rds `$summary` | Disc / Supp | verified |
+| N-54 | S100A10: R_Tumor で effect 0.167(High 群で低発現)、p_exact 0.00208、q_storey 0.079、rank 233 | 唯一の非ゼロセル(dom2012_normal × R_Tumor = **組織対応外セル**: 正常組織由来リストを腫瘍対比で照合したもの)。Dom 2012 では被曝側正常組織で上方制御であり、組織側・方向のいずれも原報告と一致しない | 同 log:17「dom2012_normal R_Tumor [cross-tissue] k=1」・:102(per-gene detail); rds `$detail` | Disc / Supp | verified |
 
 ### M. D6 較正の派生値・採用時測定(執筆用、2026-08-12 追加)
 
@@ -194,7 +194,7 @@
 | N-70 | 0.6 | pooled 共通尺度の相対純度閾値(main BM 採用条件) | config.R:45-46(PURITY_THRESHOLD) | Methods | verified |
 | N-71 | iDEGES 3 反復; スクリーン = 置換 BM(exact)→ Storey q<0.10(plug-in λ=0.5、DEGES_FDR)+ floorPDEG 0.05(q 閾値集合と生 p 上位 5% の大きい方を採用); スケーリングは MUREN(lts); 前処理 protein_coding → filterByExpr | 310 正規化の設定(2026-08-14 訂正: 従前の「BH q<0.10」は誤記 — 実装は storey_q) | lib/norm_deges.R:137-153(storey_q・floorPDEG 採用規則)・scripts/310:37-46(ITERATION 3L・FLOOR_PDEG 0.05・MUREN_METHOD lts・BM_METHOD exact)・config.R:57(DEGES_FDR 0.10) | Methods | verified |
 | N-72 | ランキング = 符号付き BM 統計量の tie-averaged normal scores; ES = gseaParam=1 の block 評価(tie-free 入力で標準 GSEA と一致); 推論 = per-set 符号条件付き置換 p + family 内 BH、q_bh<0.10; size 窓 15–500 | 420 セットレベル推論の設定 | scripts/420 ヘッダ; lib/gsea_collections.R:27-28(15L/500L); config.R:51-53(FDR_CUT 0.10) | Methods | verified |
-| N-73 | unit 内独立ラベルシャッフル 9,999 回、unit 別 seed(基底 19450809)で shuffle プロファイル同士を相関(410 の perm_index は意図的に不使用 — 等 n unit で同一 index となるため) | 署名一致の帰無参照区間の設定 | diagnostics/signature_agreement.R:57(AGREEMENT_SEED_BASE)・:84,97(N_PERM 使用)・ヘッダ | Methods | verified |
+| N-73 | 対比内独立ラベルシャッフル 9,999 回、対比別 seed(基底 19450809)で shuffle プロファイル同士を相関(410 の perm_index は意図的に不使用 — 等 n 対比で同一 index となるため) | 署名一致の帰無参照区間の設定 | diagnostics/signature_agreement.R:57(AGREEMENT_SEED_BASE)・:84,97(N_PERM 使用)・ヘッダ | Methods | verified |
 | N-74 | 候補プール = \|effect−0.5\| 上位 500; dead zone \|r\|<log2(1.2); R0 = 非 dead-zone 検体で符号一致(例外≤1)かつ q10(\|r\|)≥log2(1.5); R1 = 逆転 >50% かつ <100% | REO 候補ペア選定規則 | scripts/510:44(N_CANDIDATES 500L)・:48(log2(1.5))・:100,130,136(規則実装); config.R:48-49(DEAD_ZONE log2(1.2)) | Methods | verified |
 | N-75 | 貪欲選定: 遺伝子再使用禁止 + 既採用ペアとの Spearman <0.75、目標 10 ペア; 530 の Mid>Low 片側 BM は mc・seed 19860426(正準シード) | REO パネル確定と評価検定の設定 | scripts/520:30-31(TARGET_PANEL_SIZE 10L・CORRELATION_THRESHOLD 0.75); scripts/530:78(seed = SEED); config.R:5-8 | Methods | verified |
 | N-76 | 群内純度順位保存 0.93–0.99(群別推定との比較)、High vs Sporadic 腫瘍プロファイル相関 0.99 | 220 の両群プーリング妥当性の**来歴実測値**(設計時測定。一次ログではない — 証拠階層は設計選択の来歴)。二重統計に当たるためライセンスには使わない(研究者決定 2026-08-13)— プーリングの記述は理論構造(相対尺度の共通化・driver 支配前提・軸の別・役割の限定)で立てる | `git show 8eed384:scripts/220_estimate_tumor_purity.R` ヘッダ行8-10(run 時点の凍結版。現行ヘッダは 2026-08-13 に理論ライセンスへ書き換え、実測値の記録はこの行と run コミットに保存) | **不使用**(査読応答の受けとして保存) | verified |
@@ -220,10 +220,10 @@
 | フロー図(仮)コホートフロー(6段、**両 driver 層並記** — 2026-08-14 研究者承諾: 層別途中経過は本文でなくこの図が担う) | figures/fig_cohort_flow.R ← thyr_cohort_flow.rds(230 出力)。数値は N-08(合算+RET/BRAF 別)。**未実行 — 実行 Go 待ち** | C-10、N-08 | draft |
 | Tab.1(仮)臨床コホート構成(Driver × AS 帯 × pair) | tables/tab_cohort_composition.R ← thyr_clinical.rds + thyr_case_assigned_share.rds + SE | C-未、N-11 | draft |
 | Tab.2(仮)解析コホート症例特性(群×帯: n・性別・年齢・サブタイプ) | tables/tab_case_characteristics.R ← thyr_analysis_cohorts.rds + thyr_clinical.rds(§15 B と同経路。**未実行 — 実行 Go 待ち**。初回実行で N-09/N-12/N-13 と照合) | C-未、N-12・N-13 | draft |
-| Tab.3(仮)410 主結果(ユニット × 検定遺伝子数・DEG・HC p) | tables/tab_gene_level_summary.R ← thyr_expression_test.rds(**未実行**。初回実行で N-15〜N-20 と照合) | C-未、N-15(遺伝子数)・N-16・N-19・N-20 | draft |
-| Tab.4(仮)420/D6 サマリ(ユニット × コレクション) | tables/tab_set_level_summary.R ← thyr_enrichment_test.rds + diagnostics/output/gsea_null_calibration.rds(**未実行**。較正 rds のセル表は防御的に探索 — 初回実行で N-24/N-27/N-28 と照合) | C-未、N-24〜N-28 | draft |
+| Tab.3(仮)410 主結果(対比 × 検定遺伝子数・DEG・HC p) | tables/tab_gene_level_summary.R ← thyr_expression_test.rds(**未実行**。初回実行で N-15〜N-20 と照合) | C-未、N-15(遺伝子数)・N-16・N-19・N-20 | draft |
+| Tab.4(仮)420/D6 サマリ(対比 × コレクション) | tables/tab_set_level_summary.R ← thyr_enrichment_test.rds + diagnostics/output/gsea_null_calibration.rds(**未実行**。較正 rds のセル表は防御的に探索 — 初回実行で N-24/N-27/N-28 と照合) | C-未、N-24〜N-28 | draft |
 | Supp.Tab.1(仮)D6 較正 16 セル表(m_sets・p_any・95%CI・mean/max 発見数) | diagnostics/gsea_null_calibration.R ← 310 正規化。正準値 = run/xeon_final_20260811/logs/d6_calibration.log(rds は diagnostics/output/gsea_null_calibration.rds) | C-06、N-24(注記に N-25, N-26) | draft |
-| Supp.Data.1(仮)420 全セット結果の完全開示(全 unit × family の pathway・size・ES・NES・p・q_bh 全量) | tables/supp_data_420_full.R ← thyr_enrichment_test.rds(整形のみ・計算なし。**未実行**)。Q-08/Q-10 予備線「可能性の棚は開示で遺す」の実体 | C-05 | draft |
+| Supp.Data.1(仮)420 全セット結果の完全開示(全対比 × family の pathway・size・ES・NES・p・q_bh 全量) | tables/supp_data_420_full.R ← thyr_enrichment_test.rds(整形のみ・計算なし。**未実行**)。Q-08/Q-10 予備線「可能性の棚は開示で遺す」の実体 | C-05 | draft |
 | Supp.Tab.2(仮)R_Tumor DEG の ORA 注釈(family × list の全結果) | scripts/430_annotate_deg_ora.R ← thyr_expression_test.rds(430 編入 2026-08-13。正準 = processed/thyr_deg_ora_annotation.rds + output/430_annotate_deg_ora.log。旧 diagnostics 版と同値確認済み) | C-14、N-59〜N-62 | draft |
 | Supp.Tab.3(仮)層間 concordance(normal / tumor 両ペア: rho・参照区間・p の2行+識別不能注記) | tables/supp_tab_concordance.R ← diagnostics/output/signature_agreement.rds(**未実行** — rds のフィールド名は初回実行で確認・調整)。正準値 = run/xeon_results/logs/signature_agreement.log | C-07、C-17、N-33・N-34 | draft |
 | Supp.Tab.4(仮)使用パッケージ版表(パッケージ名・版の一覧 — 2026-08-14 引用整理に伴い追加) | tables/supp_tab_package_versions.R ← docker/versions.tsv(**未実行**。実走時の実効版 = run/xeon_provenance/session_info.txt は組版時に併記)。機械生成のみ・計算なし | Methods(Software 節が参照) | draft |
@@ -295,3 +295,5 @@
   実現値=Results): 症例フロー数列・群内訳・REO セット員数・REO 構築歩留まり(N-35/N-36)を
   Methods から Results へ移送(N-08 は Methods に n=63 のみ残置、N-35/N-36 は Results §6 冒頭へ
   新設移載)。使用箇所列を N-08/N-09/N-35/N-36 で更新
+- 2026-08-14: 用語統一第2弾(unit→対比/contrast)を本台帳にも適用(記述列の「ユニット/unit」。
+  出典列の rds アクセサ `units[[u]]` 等は実体フィールド名のため不変更)
