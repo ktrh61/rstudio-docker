@@ -113,7 +113,9 @@ Relative expression ordering (REO) works on within-sample gene ranks and is ther
 
 <!-- C-08 の手法側 -->
 The finalized panel was then applied, untouched, to the intermediate-band RET tumors it was never trained on (R_Low, R_Mid <!-- N-10 -->) as a graded, out-of-sample check. Because both training bands entered panel construction, any separation within them is circular; Low and Mid are the only bands where the score can be examined out of sample, and the design fixes the expected direction in advance (the higher assigned-share band above the lower). The single pre-specified test is therefore the one-sided Brunner–Munzel comparison of Mid over Low (Monte Carlo, seed 19860426
-<!-- N-75 -->). This evaluation does not alter the panel or its boundary, and the band-wise score profile is reported descriptively without assuming any dose–response form.【訳】相対発現順序(REO)は検体内の遺伝子順位で動作し、検体間正規化から自由である。発現は TPM(長さ正規化)とした — 検体内での遺伝子間比較がそれを要求するためである。候補ペアは RET 腫瘍訓練腕で、Brunner–Munzel 効果の大きさ |effect − 0.5|上位 500 遺伝子から生成した(閾値フリーのプール; q < 0.10 の DEG 集合は意図的に使わない)。ペアの適格条件: 検体内 log2-TPM 差 r が Sporadic で安定した符号を持ち(dead zone |r| < log2(1.2); 非 dead-zone 検体で例外は高々1; |r| の第10百分位 ≥ log2(1.5))、High 検体の 50% 超かつ全例未満で逆転すること <!-- N-74 -->。順位は
+<!-- N-75 -->). This evaluation does not alter the panel or its boundary, and the band-wise score profile is reported descriptively without assuming any dose–response form.
+
+【訳】相対発現順序(REO)は検体内の遺伝子順位で動作し、検体間正規化から自由である。発現は TPM(長さ正規化)とした — 検体内での遺伝子間比較がそれを要求するためである。候補ペアは RET 腫瘍訓練腕で、Brunner–Munzel 効果の大きさ |effect − 0.5|上位 500 遺伝子から生成した(閾値フリーのプール; q < 0.10 の DEG 集合は意図的に使わない)。ペアの適格条件: 検体内 log2-TPM 差 r が Sporadic で安定した符号を持ち(dead zone |r| < log2(1.2); 非 dead-zone 検体で例外は高々1; |r| の第10百分位 ≥ log2(1.5))、High 検体の 50% 超かつ全例未満で逆転すること <!-- N-74 -->。順位は
 中央値 r のシフトで付けた。最終パネルは順位順の貪欲選定で、遺伝子の再使用と、採用済みペアと Spearman ≥ 0.75 で相関するペアを除外し、目標 10 ペアとした
 <!-- N-75, N-37 -->。up 317・down 182 遺伝子から 57,694 ペアを評価し 153 が全基準を通過(中央値シフト 1.159–4.700、逆転率 0.53–0.87)<!-- N-35, N-36 -->。パネルと
 訓練由来の分類境界(R0 尺度で score > 2 を positive)は表(仮)に示す <!-- N-37, N-39 -->。確定したパネルは、訓練に使っていない中間帯 RET 腫瘍(R_Low・R_Mid <!-- N-10 -->)へ変更なしで適用し、段階的な out-of-sample 検査とした。訓練2帯はパネル構築に入っているため帯内の分離は循環であり、スコアを out-of-sample で検査できる帯は Low と Mid のみで、設計が方向を事前に指定する(assigned share の高い帯が上)。したがって唯一の事前指定検定は Mid over Low の片側 Brunner–Munzel 比較である(モンテカルロ、シード 19860426 <!-- N-75 -->)。この評価はパネルにも境界にも変更を加えず、帯別スコアプロファイルは線量反応の形を仮定せず記述的に報告する。<!-- C-08 の手法側 -->
@@ -157,7 +159,13 @@ The publication run executed R 4.5.3 on Ubuntu 24.04 <!-- N-02 --> with the refe
 【訳】本番実行は R 4.5.3 / Ubuntu 24.04 <!-- N-02 -->、参照 BLAS/LAPACK 3.12.0
 <!-- N-03 -->、ワーカー 4・ラベルシャッフル 9,999 を固定された再現契約とし<!-- N-04 -->、クリーンなリポジトリ状態から実行した <!-- N-01 -->。正準の推論
 シードは 19860426、診断は基底 19450809 から文書化されたシードを引く <!-- N-05, N-06 -->。全パイプラインは2台のマシンで独立に実行され、1,819 の生入力ファイルは md5 一致 <!-- N-52 -->、テストスイートは両機で通過(415 テスト、失敗 0
-<!-- N-51 -->)、主要成果物は機械間で同一と検証された。核心の統計機構 — exact/モンテカルロ Brunner–Munzel 検定、Storey plug-in 推定量、tie ブロック濃縮統計量とその置換 q 値、DEGES-MUREN 正規化、contamDE 純度モデル、主成分外れ値スクリーン、REO パネル機構 — はパッケージからでなく解析コード内の自作実装であり、手法の原典は初出箇所で引用する。実際に使用した外部パッケージ(edgeR・SummarizedExperiment・msigdbr・limma・GenomicDataCommons・rtracklayer・Rcpp・MASS ほか)はコンテナビルドで版固定され、Supplementary Table(仮)に版つきで一覧する。報告した解析の再生成に足る解析コードと版管理された入力を論文に添付する。## Results ### 1. Cohort(C-10, C-15) <!-- C-10 -->
+<!-- N-51 -->)、主要成果物は機械間で同一と検証された。核心の統計機構 — exact/モンテカルロ Brunner–Munzel 検定、Storey plug-in 推定量、tie ブロック濃縮統計量とその置換 q 値、DEGES-MUREN 正規化、contamDE 純度モデル、主成分外れ値スクリーン、REO パネル機構 — はパッケージからでなく解析コード内の自作実装であり、手法の原典は初出箇所で引用する。実際に使用した外部パッケージ(edgeR・SummarizedExperiment・msigdbr・limma・GenomicDataCommons・rtracklayer・Rcpp・MASS ほか)はコンテナビルドで版固定され、Supplementary Table(仮)に版つきで一覧する。報告した解析の再生成に足る解析コードと版管理された入力を論文に添付する。
+
+## Results
+
+### 1. Cohort(C-10, C-15)
+
+<!-- C-10 -->
 Of the 440 cases of the REBC-THYR cohort (Morton et al. 2021) <!-- N-11 -->, the main analysis cohort comprised 63 paired, driver-stratified cases — 9 B_High, 27 B_Sporadic, 15 R_High and 12 R_Sporadic <!-- N-09 --> — reached through the pre-specified flow of driver classification, band eligibility, pairing, outlier screening and purity thresholding (440 → 248 → 77 → 70 → 69 → 63 <!-- N-08 -->; Tables 1–2(仮)). The largest reductions are driver classification (440 → 248) and the restriction to the Sporadic and High bands (248 → 77) <!-- N-08 -->; driver-specific attrition is shown in the cohort-flow figure(仮). The REO evaluation set added 36 paired RET tumors of the intermediate bands (17 R_Low, 19 R_Mid
 <!-- N-10 -->). In both driver strata the High arm sat somewhat older at surgery than the Sporadic arm (RET: median 23 [range 14–31] vs 20.5 [14–27] years; BRAF: 29 [19–39] vs 24 [11–29]) <!-- N-12, N-13 -->.
 <!-- C-15 -->
@@ -202,7 +210,11 @@ Under null inputs, the set-level machinery produced at least one discovery in 10
 As a descriptive annotation of the discovered list (hypothesis-generating; Methods), the 794 genes lower in the High arm were strongly concentrated in proliferation, cell-cycle and DNA-repair programs (E2F targets 46/199, G2M checkpoint 41/198, Reactome DNA repair 68/322 <!-- N-61, N-62 -->), a single theme that extends into the radiation-curated family, whose leading flagged sets are themselves cell-cycle genes responding to irradiation (46 of 126 in the down list, expected 6.4 <!-- N-60 -->). The 971 genes higher in the High arm showed no such concentration in any curated family <!-- N-59 --> (full results in Supp. Tab. 2(仮)).
 
 【訳】発見済みリストの記述的注釈(仮説生成; Methods)として、High 腕で低発現の 794 遺伝子は増殖・細胞周期・DNA 修復プログラムに強く集中し(E2F targets 46/199・G2M checkpoint 41/198・Reactome DNA repair 68/322 <!-- N-61, N-62 -->)、この単一テーマは放射線キュレーション・ファミリーにも及ぶ — そこでフラグが立った上位セット自体が照射に応答する細胞周期遺伝子である(down リストで 126 中 46、期待 6.4 <!-- N-60 -->)。High 腕で高発現の 971 遺伝子には、どのファミリーにもそのような集中はなかった
-<!-- N-59 -->(全結果は Supp. Tab. 2(仮))。### 5. Between-arm concordance of the exposure contrast(C-07, C-17) <!-- C-07 -->
+<!-- N-59 -->(全結果は Supp. Tab. 2(仮))。
+
+### 5. Between-arm concordance of the exposure contrast(C-07, C-17)
+
+<!-- C-07 -->
 The pre-specified between-arm comparison in normal tissue — Spearman correlation, across arms, of the per-gene signed statistics of the exposure contrast — gave rho = +0.376 over 15,459 shared genes, inside its label-shuffle reference band ([−0.46, +0.46]; two-sided p = 0.1199)
 <!-- N-34 -->. With no within-unit signal in R_Normal <!-- N-16 -->, the pre-fixed reading applies: whether the two normal-tissue contrasts share an exposure trace is not identifiable here. <!-- C-17 --> The symmetric
 tumor-pair comparison, computed as a design completion, is reported in Supp. Tab. 3(仮) <!-- N-33 --> and taken up as hypothesis-generating in Discussion.
@@ -223,8 +235,10 @@ Within the evaluation bands the reversal score correlated with tumor purity (poo
 【訳】10 ペアの REO パネルは訓練腕を設計どおり分離した(R_Sporadic は 12 例全て negative、R_High は 15 例中 13 が positive; 境界は score > 2 <!-- N-38, N-37 -->;パネル構成は表(仮)<!-- N-39 -->)。パネルを変更せず中間帯に適用すると、症例別の逆転スコアは帯順に上昇した — 中央値は Sporadic / Low / Mid / High で 0 / 1 / 4 / 6
 <!-- N-41 -->(図3(仮))— 分類は R_Low が negative 9 / positive 8、R_Mid が 8 / 11 <!-- N-42 -->。out-of-sample で検査可能な唯一の比較(Mid 対 Low; 方向は事前指定、
 Methods 参照)は片側 Brunner–Munzel p = 0.1127、効果 P(Low<Mid) = 0.616 だった
-<!-- N-40 -->。この段階的プロファイルは記述的観察として報告し、線量反応の形は仮定も主張もしない。訓練側から鏡映した外れ値スクリーンはどちらの評価帯でも該当例を出さなかった(17 例中 0・19 例中 0 <!-- N-43 -->)— スクリーンは除外権限を持たず、評価は適格
-全例で一度だけ実施した。評価帯内では逆転スコアは腫瘍純度と相関し(pooled Spearman +0.538 <!-- N-45 -->)、帯–スコア相関は +0.142、純度を条件付けると +0.146(偏 Spearman;片側置換 p = 0.2162)<!-- N-48, N-46 -->、帯と純度自体はほぼ無相関だった(+0.036
+<!-- N-40 -->。この段階的プロファイルは記述的観察として報告し、線量反応の形は仮定も主張もしない。訓練側から鏡映した外れ値スクリーンはどちらの評価帯でも該当例を出さなかった(17 例中 0・19 例中 0 <!-- N-43 -->)— スクリーンは除外権限を持たず、評価は適格全例で一度だけ実施した。評価帯内では逆転スコアは腫瘍純度と相関し(pooled Spearman +0.538 <!-- N-45 -->)、帯–スコア相関は +0.142、純度を条件付けると +0.146(偏 Spearman; 片側置換 p = 0.2162)<!-- N-48, N-46 -->、帯と純度自体はほぼ無相関だった(+0.036 <!-- N-48 -->)。純度層別の比較は Supplementary に示す <!-- N-47 -->。
+
+## Discussion
+
 <!-- 執筆状態: 全節 draft(2026-08-14、Claude Code 起草 — 批准済みの読みの機械的文章化。研究者が Results から書き直す際の素材)。見出しと順序は仮。各節は claim_map の Disc 受け列に対応 -->
 
 ### 主結果の受け(C-01〜C-05)
