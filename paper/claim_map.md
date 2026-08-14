@@ -205,3 +205,12 @@
   取り込みを検証済み)。正本/再掲の同期機構は廃止 — 各段落の実体は manuscript の1箇所のみ。
   Methods↔Results の対構造(深度配分の原則)が1ファイルで検査可能に。生きている参照
   (C-14 根拠列・Q-14・T-03)を manuscript へ付け替え。バケツ1の実体ファイルがこれで成立
+- 2026-08-14: **用語統一(研究者指示: 変更コストによる現状維持は不採用)**: 本文の "arm" を
+  全廃し2軸に分離 — 曝露対比の側(症例集合)= group(High group / between-group /
+  training groups 等、訳は「群」)、driver 層 = stratum(RET stratum / between-stratum
+  concordance、訳は「層」)。band(AS 水準)・unit・cohort は不変。見出し2本を改称:
+  「Between-arm concordance …」→「Between-stratum concordance …」(Methods/Results §5)、
+  「Between-arm age difference」→「Between-group age difference」。訳側の「腕」も全対応
+  (層間 concordance 見出し含む)。EN 66置換・件数アサーション付きで一括適用、残存 arm/腕 ゼロ
+  (メモ節の決定記録1箇所のみ改称注記つきで温存)。本マップ・objections_ledger の過去記録内の
+  「腕」表記は記録として不変更(読み替え: 腕=群、RET/BRAF 腕=層)
