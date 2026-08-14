@@ -54,7 +54,7 @@ Group age structure is reported descriptively (per-group median and range, Table
 
 All inference is organized in four analysis contrasts — exposed versus sporadic within each driver stratum and tissue: R_Tumor, R_Normal (RET stratum), B_Tumor, B_Normal (BRAF stratum). Each contrast is tested within itself; no cross-contrast family-wise inference is performed, and no study-wide FDR is claimed. In every contrast, group x is Sporadic and group y is High, so effects > 0.5 indicate higher expression in the exposed group. Throughout, two-sample comparison uses the Brunner–Munzel statistic (Brunner and Munzel 2000): the protocol takes the order relation as its primitive — a commitment that recurs in the rank-based REO panel and the tie-invariant enrichment statistic below.
 
-【訳】全ての推論は4つの解析対比 — 各 driver 層 × 組織内の被曝対散発対比: R_Tumor・R_Normal(RET 層)、B_Tumor・B_Normal(BRAF 層)— に組織化される。各対比は対比内で検定され、対比横断の family-wise 推論は行わず、研究全体の FDR は主張しない。全対比 で群 x は Sporadic、群 y は High であり、効果 > 0.5 は被曝群での高発現を意味する。全体を通じて、2標本比較には Brunner–Munzel 統計量(Brunner and Munzel 2000)を用いる: 本プロトコルは順序関係を原始に取る — このコミットメントは後述の順位ベース REO パネルと tie 不変の濃縮統計量にも回帰する。
+【訳】全ての推論は4つの解析対比 — 各 driver 層 × 組織内の被曝対散発対比: R_Tumor・R_Normal(RET 層)、B_Tumor・B_Normal(BRAF 層)— に組織化される。各対比は対比内で検定され、対比横断の family-wise 推論は行わず、研究全体の FDR は主張しない。全対比で群 x は Sporadic、群 y は High であり、効果 > 0.5 は被曝群での高発現を意味する。全体を通じて、2標本比較には Brunner–Munzel 統計量(Brunner and Munzel 2000)を用いる: 本プロトコルは順序関係を原始に取る — このコミットメントは後述の順位ベース REO パネルと tie 不変の濃縮統計量にも回帰する。
 
 ### Normalization
 
@@ -62,7 +62,7 @@ All inference is organized in four analysis contrasts — exposed versus sporadi
 
 Each contrast's count matrix (protein-coding genes, filterByExpr; edgeR) was normalized with a DEGES scheme (Kadota et al. 2012; iterated form of Sun et al. 2013) reimplemented in-house: MUREN normalization (Feng and Li 2021; pairwise least-trimmed-squares regression mode) alternating with an exactly enumerated permutation Brunner–Munzel screen — substituted for the original scheme's model-based DEG screen — that removes potential DEGs from the scaling-factor estimation (Storey q < 0.10, the same estimator as the gene-level inference below, with the TCC floorPDEG guard: the larger of the q-threshold set and the top 5% of genes by raw p is removed), iterated three times (iDEGES) <!-- N-71 -->. The per-contrast tested-gene counts, screen pi0 estimates, iteration convergence (Jaccard), and resulting scaling-factor ranges are reported in Supplementary(仮) <!-- N-15 -->.
 
-【訳】各対比 のカウント行列(protein-coding、filterByExpr; edgeR)は、自作再実装の DEGES 方式(Kadota et al. 2012; 反復形は Sun et al. 2013)で正規化した: MUREN 正規化(Feng and Li 2021; pairwise least-trimmed-squares 回帰モード)と、潜在的 DEG をスケーリング係数推定から除去する完全枚挙の置換 Brunner–Munzel スクリーン(原方式のモデルベース DEG スクリーンを置換; Storey q < 0.10 — 後述の遺伝子レベル推論と同一の推定量 — に TCC の floorPDEG ガードを併用し、q 閾値集合と生 p 上位 5% の大きい方を除去)との交互反復を3回(iDEGES)<!-- N-71 -->。対比別の検定遺伝子数、スクリーンの pi0 推定値、反復収束(Jaccard)、スケーリング係数の範囲は Supplementary(仮)に報告する <!-- N-15 -->。
+【訳】各対比のカウント行列(protein-coding、filterByExpr; edgeR)は、自作再実装の DEGES 方式(Kadota et al. 2012; 反復形は Sun et al. 2013)で正規化した: MUREN 正規化(Feng and Li 2021; pairwise least-trimmed-squares 回帰モード)と、潜在的 DEG をスケーリング係数推定から除去する完全枚挙の置換 Brunner–Munzel スクリーン(原方式のモデルベース DEG スクリーンを置換; Storey q < 0.10 — 後述の遺伝子レベル推論と同一の推定量 — に TCC の floorPDEG ガードを併用し、q 閾値集合と生 p 上位 5% の大きい方を除去)との交互反復を3回(iDEGES)<!-- N-71 -->。対比別の検定遺伝子数、スクリーンの pi0 推定値、反復収束(Jaccard)、スケーリング係数の範囲は Supplementary(仮)に報告する <!-- N-15 -->。
 
 ### Gene-level differential expression
 
@@ -73,7 +73,7 @@ Each gene was tested for a High-vs-Sporadic difference with the exact permutatio
 <!-- C-16 -->
 No contrast-level binary significance label is assigned: contrast-level evidence is reported continuously — the per-gene q-values, the pre-specified omnibus p and the rejection curve — following the methodological guidance against dichotomizing evidence near a threshold (Wasserstein & Lazar 2016; Greenland et al. 2016; Amrhein et al. 2019), with the interpretation of each outcome pattern pre-assigned before the results were seen rather than left to post-hoc labeling (interpretation map, Methods).
 
-【訳】各遺伝子は exact 置換 Brunner–Munzel 検定(両側)で High 対 Sporadic の差を検定した — 全 C(n, nx) 割当の完全枚挙のため遺伝子レベルの p 値にシードは不要(対比レベル帰無のための保存済みラベルシャッフル index は 9,999 回・シード 19860426 <!-- N-04, N-05 -->)。実装はコードと共に提供する自作の exact/モンテカルロ置換枚挙である — どの p 値にも漸近近似は入らない。効果 P(X<Y) は超過確率として直接読め、この群サイズでは置換分布が完全枚挙できるため、遺伝子レベルの推論はカウントモデルの仮定もモンテカルロ誤差も持ち込まない。遺伝子レベルの推論は exact p 値に対する Storey q 値(plug-in pi0、λ = 0.5)で、プロトコル共通の q < 0.10 を閾値とする <!-- N-05 -->。推定量はチューニングでなく作業仮説と設計から a priori に固定した: 仮説は多数の遺伝子に広がる弱いシグナル(群内の症例混合で減衰した小さな遺伝子別効果)なので、π0 を 1 に置くことはまさにそのシグナルの不在を補正に組み込むことになる。固定 λ plug-in の保守性は帰無 p 値の周辺一様性のみを要件とし、これは exact 検定が遺伝子間の依存に関わらず保証する。一方、λ の適応的選択は独立ないし弱依存の検定を仮定する保証しか持たず、単一のラベルベクトルを共有する共発現遺伝子には適用できない。さらに弱く広がったシグナルの下では対立 p 密度はほぼ平坦で、λ を上げてもバイアス削減は僅かなのに分散コストは一次である — λ = 0.5 は無チューニングの Storey (2002) 既定値である。pi0 は置換較正した不確かさ(保存済みの各ラベルシャッフルに plug-in 推定量を適用して得る、当該対比 自身の帰無の下での推定量分布)を付して報告する。対比レベルのオムニバス置換検定が遺伝子表に付随し、対比水準の推論的主張を担う — 「対比にシグナルがあるか」への回答はここで与えられ、遺伝子リストの大きさによってではない。Higher Criticism(α0 = 0.1)が事前指定の主オムニバス統計量であり(多数の弱い効果への感度で a priori に選定 — Donoho & Jin 2004)、count 型・max 型の行は記述的に報告する <!-- N-05 -->。棄却曲線 R(α) 全体を保持し、結果が単一閾値の件数表示に依存しないようにする。対比に2値の有意性ラベルは付与しない: 対比水準の証拠は連続量のまま — 遺伝子別 q 値、事前指定オムニバスの p、棄却曲線 — で報告する。これは閾値近傍の証拠の2値化を退ける方法論的勧告(Wasserstein & Lazar 2016; Greenland et al. 2016; Amrhein et al. 2019)に従うものであり、各結果パターンの解釈は結果を見る前に事前割当されている(解釈マップ、Methods)。<!-- C-16 -->
+【訳】各遺伝子は exact 置換 Brunner–Munzel 検定(両側)で High 対 Sporadic の差を検定した — 全 C(n, nx) 割当の完全枚挙のため遺伝子レベルの p 値にシードは不要(対比レベル帰無のための保存済みラベルシャッフル index は 9,999 回・シード 19860426 <!-- N-04, N-05 -->)。実装はコードと共に提供する自作の exact/モンテカルロ置換枚挙である — どの p 値にも漸近近似は入らない。効果 P(X<Y) は超過確率として直接読め、この群サイズでは置換分布が完全枚挙できるため、遺伝子レベルの推論はカウントモデルの仮定もモンテカルロ誤差も持ち込まない。遺伝子レベルの推論は exact p 値に対する Storey q 値(plug-in pi0、λ = 0.5)で、プロトコル共通の q < 0.10 を閾値とする <!-- N-05 -->。推定量はチューニングでなく作業仮説と設計から a priori に固定した: 仮説は多数の遺伝子に広がる弱いシグナル(群内の症例混合で減衰した小さな遺伝子別効果)なので、π0 を 1 に置くことはまさにそのシグナルの不在を補正に組み込むことになる。固定 λ plug-in の保守性は帰無 p 値の周辺一様性のみを要件とし、これは exact 検定が遺伝子間の依存に関わらず保証する。一方、λ の適応的選択は独立ないし弱依存の検定を仮定する保証しか持たず、単一のラベルベクトルを共有する共発現遺伝子には適用できない。さらに弱く広がったシグナルの下では対立 p 密度はほぼ平坦で、λ を上げてもバイアス削減は僅かなのに分散コストは一次である — λ = 0.5 は無チューニングの Storey (2002) 既定値である。pi0 は置換較正した不確かさ(保存済みの各ラベルシャッフルに plug-in 推定量を適用して得る、当該対比自身の帰無の下での推定量分布)を付して報告する。対比レベルのオムニバス置換検定が遺伝子表に付随し、対比水準の推論的主張を担う — 「対比にシグナルがあるか」への回答はここで与えられ、遺伝子リストの大きさによってではない。Higher Criticism(α0 = 0.1)が事前指定の主オムニバス統計量であり(多数の弱い効果への感度で a priori に選定 — Donoho & Jin 2004)、count 型・max 型の行は記述的に報告する <!-- N-05 -->。棄却曲線 R(α) 全体を保持し、結果が単一閾値の件数表示に依存しないようにする。対比に2値の有意性ラベルは付与しない: 対比水準の証拠は連続量のまま — 遺伝子別 q 値、事前指定オムニバスの p、棄却曲線 — で報告する。これは閾値近傍の証拠の2値化を退ける方法論的勧告(Wasserstein & Lazar 2016; Greenland et al. 2016; Amrhein et al. 2019)に従うものであり、各結果パターンの解釈は結果を見る前に事前割当されている(解釈マップ、Methods)。<!-- C-16 -->
 
 ### Gene-set level inference
 
@@ -92,7 +92,7 @@ As a descriptive complement, the discovered R_Tumor list was annotated by one-si
 <!-- N-72 -->。セットレベル推論一式は、実対比への適用前に held-out 帰無レプリケート(同一手続きに通したラベル置換)で較正し、セットレベル FDR 手続きの選択自体もこの較正により実データ実行前に固定した(Supplementary Methods)<!-- N-06 -->。spike-in 対照(1つの
 Hallmark セット × 1.15 倍を一方の群の 9 検体に)が感度側のカウンターパートである
 <!-- N-30 -->。<!-- C-06 -->
-記述的な補完として、発見済み R_Tumor リストを同一のセット宇宙に対する片側超幾何の過剰代表で注釈した(up / down / 合算の3リスト; universe = 当該対比 の検定遺伝子; family × list 内 BH)— 全結果を仮説生成の注釈として報告する(Supplementary Table SY)<!-- N-59 -->。2つの手続きの p 値は異なるランダム性を参照する: 実際に行った実験のランダム性を参照するのはラベル置換帰無のみであり、実験レベルの主張はそこに乗る。過剰代表の q 値は、gene-sampling の参照に対する発見済みリストの記述である(Goeman & Bühlmann 2007)。<!-- C-14 -->
+記述的な補完として、発見済み R_Tumor リストを同一のセット宇宙に対する片側超幾何の過剰代表で注釈した(up / down / 合算の3リスト; universe = 当該対比の検定遺伝子; family × list 内 BH)— 全結果を仮説生成の注釈として報告する(Supplementary Table SY)<!-- N-59 -->。2つの手続きの p 値は異なるランダム性を参照する: 実際に行った実験のランダム性を参照するのはラベル置換帰無のみであり、実験レベルの主張はそこに乗る。過剰代表の q 値は、gene-sampling の参照に対する発見済みリストの記述である(Goeman & Bühlmann 2007)。<!-- C-14 -->
 
 ### Between-stratum concordance of the exposure contrast
 
@@ -145,7 +145,7 @@ The between-group difference in age at surgery (High − Sporadic) was estimated
 <!-- C-13 -->
 Externally validated radiation-associated gene lists (qRT-PCR-validated cores of Abend 2013, Abend 2012, Dom 2012, and CLIP2 <!-- N-53 -->) were cross-referenced against each contrast's q < 0.10 gene set as a descriptive membership count (k of n list genes among the contrast's tested genes), with no enrichment statistic: the lists are small, platforms and contrasts differ across sources, and the reading was fixed symmetrically in advance — any count is reported as description and no claim moves with the outcome.
 
-【訳】外部で検証済みの放射線関連遺伝子リスト(Abend 2013・Abend 2012・Dom 2012 の qRT-PCR 検証コアと CLIP2 <!-- N-53 -->)を、各対比 の q < 0.10 遺伝子集合と員数照合した(対比の検定遺伝子中のリスト遺伝子 n のうち k)— 濃縮統計量は計算しない:リストは小さく、プラットフォームと対比は出典間で異なり、読みは事前に対称に固定した — どの員数も記述として報告し、どの主張も結果で動かない。<!-- C-13 -->
+【訳】外部で検証済みの放射線関連遺伝子リスト(Abend 2013・Abend 2012・Dom 2012 の qRT-PCR 検証コアと CLIP2 <!-- N-53 -->)を、各対比の q < 0.10 遺伝子集合と員数照合した(対比の検定遺伝子中のリスト遺伝子 n のうち k)— 濃縮統計量は計算しない:リストは小さく、プラットフォームと対比は出典間で異なり、読みは事前に対称に固定した — どの員数も記述として報告し、どの主張も結果で動かない。<!-- C-13 -->
 
 ### Software, seeds and reproducibility
 
@@ -186,8 +186,8 @@ In B_Normal the evidence is reported as it stands, without a binary label: one g
 <!-- N-23 -->, and the contrast's π0 estimate (0.727) sat below those of the other two quiet contrasts (0.955, 0.943) <!-- N-19 -->. The reading pre-assigned
 to this pattern is taken up in Discussion.
 
-【訳】事前指定の予測マップがシグナルを期待する 対比である R_Tumor では、検定対象 15,621 遺伝子のうち 1,765 が Storey q < 0.10 で High 群と Sporadic 群の間で発現差を示し <!-- N-16, N-15 -->、事前指定の 対比レベル・オムニバスがシグナルの存在を支持した(Higher Criticism p = 0.0112 <!-- N-20 -->)(図1–2(仮)・表3(仮))。発見遺伝子は双方向に分布した: High 群で高発現 971・低発現 794 <!-- N-17 -->。R_Normal では q < 0.10 の遺伝子はなく、オムニバスの支持もなかった(HC p = 0.3199)<!-- N-16, N-20 -->。B_Tumor も同様に発見なし(q < 0.10 は 0 遺伝子; HC p = 0.1815)<!-- N-16, N-20 --> — 事前固定の読みに従い、このセルは方向不可知であり、その静けさを特異性の対照とは読まない。B_Normal の証拠は2値ラベルなしにそのまま報告する: 1遺伝子が遺伝子レベル閾値を越え(BHLHB9、effect 0.967、q = 0.013 <!-- N-22 -->)、事前指定の主オムニバスは HC p = 0.0773
-<!-- N-20 -->、記述的な max 統計量行は p = 0.0125 <!-- N-23 -->、この対比 の π0 推定値(0.727)は他の2つの静かな対比(0.955・0.943)より低かった <!-- N-19 -->。このパターンに
+【訳】事前指定の予測マップがシグナルを期待する対比である R_Tumor では、検定対象 15,621 遺伝子のうち 1,765 が Storey q < 0.10 で High 群と Sporadic 群の間で発現差を示し <!-- N-16, N-15 -->、事前指定の対比レベル・オムニバスがシグナルの存在を支持した(Higher Criticism p = 0.0112 <!-- N-20 -->)(図1–2(仮)・表3(仮))。発見遺伝子は双方向に分布した: High 群で高発現 971・低発現 794 <!-- N-17 -->。R_Normal では q < 0.10 の遺伝子はなく、オムニバスの支持もなかった(HC p = 0.3199)<!-- N-16, N-20 -->。B_Tumor も同様に発見なし(q < 0.10 は 0 遺伝子; HC p = 0.1815)<!-- N-16, N-20 --> — 事前固定の読みに従い、このセルは方向不可知であり、その静けさを特異性の対照とは読まない。B_Normal の証拠は2値ラベルなしにそのまま報告する: 1遺伝子が遺伝子レベル閾値を越え(BHLHB9、effect 0.967、q = 0.013 <!-- N-22 -->)、事前指定の主オムニバスは HC p = 0.0773
+<!-- N-20 -->、記述的な max 統計量行は p = 0.0125 <!-- N-23 -->、この対比の π0 推定値(0.727)は他の2つの静かな対比(0.955・0.943)より低かった <!-- N-19 -->。このパターンに
 事前割当された読みは Discussion で扱う。
 
 ### 3. Gene-set level(C-05, C-06, 420 + D6)
@@ -197,7 +197,7 @@ At the gene-set level, the calibrated test declared no set at q_bh < 0.10 in any
 <!-- C-06 -->
 Under null inputs, the set-level machinery produced at least one discovery in 102 of 1,600 replicates pooled across the 16 contrast × collection cells (0.064; nominal 0.10 <!-- N-56 -->), with a single disclosed excess (B_Normal/Hallmark: 0.18, 95% CI 0.110–0.270 <!-- N-25 -->); the spiked set was recovered at rank 1 of 50 (q 0.0101 <!-- N-31 -->) with no other set at q < 0.10 <!-- N-32 --> (per-cell calibration in Supp. Tab. 1(仮)).
 
-【訳】遺伝子セットレベルでは、較正済み検定は 16 の 対比 × collection セルのいずれでも q_bh < 0.10 のセットを宣言しなかった <!-- N-27 --> — Hallmark(50 セット)・C2:CP (3,910; Reactome・WikiPathways・KEGG MEDICUS・BioCarta・PID の統合)・C5:GO:BP(7,538)・放射線キュレーションの C2:CGP ファミリー(28)、フィルタ後は 対比あたり 6,141–6,242 セット <!-- N-29, N-55, N-28 -->。全セルで最小の調整値は B_Tumor × radiation セルの q = 0.114 だった <!-- N-28 -->(全結果は Supp. Data 1(仮)・表4(仮))。帰無入力の下では、セットレベル機構は 16 セル合算 1,600 レプリケート中 102 で1つ以上の発見を生じ(0.064; 名目 0.10 <!-- N-56 -->)、開示済みの超過は1セルのみ(B_Normal/Hallmark: 0.18、95% CI 0.110–0.270 <!-- N-25 -->)。spike-in セットは 50 セット中 rank 1(q 0.0101
+【訳】遺伝子セットレベルでは、較正済み検定は 16 の対比 × collection セルのいずれでも q_bh < 0.10 のセットを宣言しなかった <!-- N-27 --> — Hallmark(50 セット)・C2:CP (3,910; Reactome・WikiPathways・KEGG MEDICUS・BioCarta・PID の統合)・C5:GO:BP(7,538)・放射線キュレーションの C2:CGP ファミリー(28)、フィルタ後は対比あたり 6,141–6,242 セット <!-- N-29, N-55, N-28 -->。全セルで最小の調整値は B_Tumor × radiation セルの q = 0.114 だった <!-- N-28 -->(全結果は Supp. Data 1(仮)・表4(仮))。帰無入力の下では、セットレベル機構は 16 セル合算 1,600 レプリケート中 102 で1つ以上の発見を生じ(0.064; 名目 0.10 <!-- N-56 -->)、開示済みの超過は1セルのみ(B_Normal/Hallmark: 0.18、95% CI 0.110–0.270 <!-- N-25 -->)。spike-in セットは 50 セット中 rank 1(q 0.0101
 <!-- N-31 -->)で回収され、それ以外に q < 0.10 のセットはなかった <!-- N-32 -->
 (セル別較正は Supp. Tab. 1(仮))。
 
@@ -216,7 +216,7 @@ The pre-specified between-stratum comparison in normal tissue — Spearman corre
 <!-- N-34 -->. With no within-contrast signal in R_Normal <!-- N-16 -->, the pre-fixed reading applies: whether the two normal-tissue contrasts share an exposure trace is not identifiable here. <!-- C-17 --> The symmetric
 tumor-pair comparison, computed as a design completion, is reported in Supp. Tab. 3(仮) <!-- N-33 --> and taken up as hypothesis-generating in Discussion.
 
-【訳】正常組織における事前指定の層間比較 — 曝露対比の遺伝子別符号付き統計量を層間で Spearman 相関 — は、共有 15,459 遺伝子で rho = +0.376 となり、ラベルシャッフルの参照区間([−0.46, +0.46]; 両側 p = 0.1199)の内側だった <!-- N-34 -->。R_Normal に 対比内シグナルがない <!-- N-16 --> ため、事前固定の読みが適用される: 2つの正常組織対比が曝露痕跡を共有するか否かは、ここでは識別できない。対称補完として計算した腫瘍ペアの比較は Supp. Tab. 3(仮)に報告し <!-- N-33 -->、Discussion で仮説生成として扱う。
+【訳】正常組織における事前指定の層間比較 — 曝露対比の遺伝子別符号付き統計量を層間で Spearman 相関 — は、共有 15,459 遺伝子で rho = +0.376 となり、ラベルシャッフルの参照区間([−0.46, +0.46]; 両側 p = 0.1199)の内側だった <!-- N-34 -->。R_Normal に対比内シグナルがない <!-- N-16 --> ため、事前固定の読みが適用される: 2つの正常組織対比が曝露痕跡を共有するか否かは、ここでは識別できない。対称補完として計算した腫瘍ペアの比較は Supp. Tab. 3(仮)に報告し <!-- N-33 -->、Discussion で仮説生成として扱う。
 
 ### 6. REO grading(C-08, C-09, C-12, 510–530)
 
@@ -252,7 +252,7 @@ Conditioning on driver and testing each contrast within itself, the exposure con
 
 B_Normal is the one contrast where the two evidence levels diverge — a single discovered gene (BHLHB9 <!-- N-22 -->) against a primary omnibus lending no support (HC p = 0.0773 <!-- N-20 -->) — and no binary label is assigned (Methods) <!-- C-16 -->. The reading, however, is not left open: the interpretation map, fixed before the reported results were seen, assigns this pattern — normal-tissue signal confined to the BRAF stratum — a confounding-first reading, because a shared glandular exposure trace should appear at least as clearly on the RET side, whose exposed group leans higher-dose. The leading candidate confounder is age: the between-group difference is largest in this stratum (+8.0 years [3.0–12.0] <!-- N-65 -->), normal thyroid is the tissue where age effects are established (Coclet et al. 1989), and the same stratum's tumors, carrying the same age difference, produced nothing (0 genes at q < 0.10; all set-level cells quiet <!-- N-16, N-27 -->). The economical summary — age moves normal tissue, not tumor — supports the confounding-first reading here and simultaneously weakens age as an explanation of the R_Tumor findings. One calibration caveat attaches to this contrast: the only held-out excess sits in B_Normal/Hallmark (0.18, 95% CI 0.110–0.270 <!-- N-25 -->); no set-level result for this contrast crossed any threshold, and any reading of that cell carries this disclosed excess.
 
-【訳】B_Normal は二つの証拠水準が乖離する唯一の 対比である — 発見遺伝子1件(BHLHB9 <!-- N-22 -->)に対し、主オムニバスは支持を与えない(HC p = 0.0773 <!-- N-20 -->)— そして2値ラベルは付与しない(Methods)<!-- C-16 -->。ただし読みは開放されていない: 報告結果を見る前に固定された解釈マップが、このパターン — normal 側シグナルの BRAF 層への限局 — に交絡第一の読みを割り当てている。共有された腺の曝露痕跡ならば、被曝群がより高線量側に寄る RET 側に少なくとも同等に現れるはずだからである。交絡の筆頭候補は年齢である: 群間差はこの層で最大(+8.0 年 [3.0–12.0] <!-- N-65 -->)、正常甲状腺は年齢効果が確立している側の組織であり(Coclet et al. 1989)、同じ層の腫瘍は同じ年齢差を抱えながら何も生まなかった(q < 0.10 は 0 遺伝子、セットレベルも全セル静か <!-- N-16, N-27 -->)。最も経済的な要約 — 年齢は正常組織を動かし、腫瘍を動かさない — はここでの交絡第一の読みを支持し、同時に R_Tumor 所見の年齢による説明を弱める。この対比 には較正上の注意が1つ付く: held-out 較正の唯一の超過が B_Normal/Hallmark にある(0.18、95% CI 0.110–0.270 <!-- N-25 -->)。この対比 のセットレベル結果はどの閾値も越えておらず、当該セルを読む場合はこの開示済み超過を携行する。
+【訳】B_Normal は二つの証拠水準が乖離する唯一の対比である — 発見遺伝子1件(BHLHB9 <!-- N-22 -->)に対し、主オムニバスは支持を与えない(HC p = 0.0773 <!-- N-20 -->)— そして2値ラベルは付与しない(Methods)<!-- C-16 -->。ただし読みは開放されていない: 報告結果を見る前に固定された解釈マップが、このパターン — normal 側シグナルの BRAF 層への限局 — に交絡第一の読みを割り当てている。共有された腺の曝露痕跡ならば、被曝群がより高線量側に寄る RET 側に少なくとも同等に現れるはずだからである。交絡の筆頭候補は年齢である: 群間差はこの層で最大(+8.0 年 [3.0–12.0] <!-- N-65 -->)、正常甲状腺は年齢効果が確立している側の組織であり(Coclet et al. 1989)、同じ層の腫瘍は同じ年齢差を抱えながら何も生まなかった(q < 0.10 は 0 遺伝子、セットレベルも全セル静か <!-- N-16, N-27 -->)。最も経済的な要約 — 年齢は正常組織を動かし、腫瘍を動かさない — はここでの交絡第一の読みを支持し、同時に R_Tumor 所見の年齢による説明を弱める。この対比には較正上の注意が1つ付く: held-out 較正の唯一の超過が B_Normal/Hallmark にある(0.18、95% CI 0.110–0.270 <!-- N-25 -->)。この対比のセットレベル結果はどの閾値も越えておらず、当該セルを読む場合はこの開示済み超過を携行する。
 
 ### 年齢(C-15、Q-13 (i)〜(iv))
 
@@ -275,7 +275,7 @@ The over-representation annotation of the R_Tumor list is read under a gene-samp
 
 Cross-referencing the externally validated radiation-associated gene lists (Methods) against each contrast's discovered genes returned zero overlap in 19 of 20 cells, including every tissue-matched cell <!-- N-53 -->. The single non-zero cell was cross-tissue: S100A10, from the Dom normal-tissue list, appeared among the R_Tumor discoveries, with direction opposite to the original report <!-- N-54 -->. Under the reading fixed in advance these membership counts are description: non-overlap is the norm between the prior studies themselves — Dom et al. (2012) found none of the earlier signatures enriched in their own contrast — and no claim of this study moves with these counts <!-- C-13 -->.
 
-【訳】外部で検証済みの放射線関連遺伝子リスト(Methods)を各対比 の発見遺伝子と照合した結果、20 セル中 19 で重なりはゼロであり、組織対応のセルは全てゼロだった <!-- N-53 -->。唯一の非ゼロセルは組織対応外だった: Dom の正常組織リスト由来の S100A10 が R_Tumor の発見遺伝子に現れ、方向は原報告と逆であった <!-- N-54 -->。事前に固定した読みの下でこの員数は記述である: 非重なりは先行研究どうしの間でも通例であり — Dom et al. (2012) 自身が先行署名の非濃縮を報告している — 本研究のどの主張もこの員数では動かない <!-- C-13 -->。
+【訳】外部で検証済みの放射線関連遺伝子リスト(Methods)を各対比の発見遺伝子と照合した結果、20 セル中 19 で重なりはゼロであり、組織対応のセルは全てゼロだった <!-- N-53 -->。唯一の非ゼロセルは組織対応外だった: Dom の正常組織リスト由来の S100A10 が R_Tumor の発見遺伝子に現れ、方向は原報告と逆であった <!-- N-54 -->。事前に固定した読みの下でこの員数は記述である: 非重なりは先行研究どうしの間でも通例であり — Dom et al. (2012) 自身が先行署名の非濃縮を報告している — 本研究のどの主張もこの員数では動かない <!-- C-13 -->。
 
 ### 層間 concordance — tumor ペア(C-17)
 
@@ -283,7 +283,7 @@ Cross-referencing the externally validated radiation-associated gene lists (Meth
 
 The two driver-conditioned tumor contrasts resemble each other beyond label-exchange chance: Spearman rho +0.459 over 15,560 shared genes, outside its label-shuffle reference interval ([−0.39, +0.39]; two-sided p = 0.0197 <!-- N-33 -->; Supp. Tab. 3(仮)) <!-- C-17 -->. As hypothesis generation only: this is what an exposure-associated component visible across driver backgrounds — an oncogene-independent trace — would look like, and it is compatible with B_Tumor's within-contrast quiet, which requires only sub-threshold structure aligned with the R_Tumor contrast. It is equally compatible with shared covariate structure, purity foremost (the exposed groups sit purer at least on the RET side <!-- N-44 -->), and this design cannot separate the two. An adjacent fragment points the same way without crossing any threshold: the closest any calibrated set-level cell came to discovery was B_Tumor × radiation (q = 0.114 <!-- N-28 -->). No outcome of this comparison tests the shared-glandular-memory hypothesis, and no claim of this study rests on it.
 
-【訳】driver で条件付けた二つの腫瘍対比は、ラベル交換の偶然を超えて互いに似ている: 共有 15,560 遺伝子で Spearman rho +0.459、ラベルシャッフルの参照区間([−0.39, +0.39])の外側、両側 p = 0.0197 <!-- N-33 -->(Supp. Tab. 3(仮))<!-- C-17 -->。仮説生成としてのみ: これは driver 背景を越えて見える曝露関連成分 — oncogene 非依存の痕跡 — が示すはずの姿であり、B_Tumor の 対比内の静けさとも矛盾しない(R_Tumor の対比と向きの揃った閾値下構造があれば足りる)。同時に、共有された共変量構造 — 筆頭は純度(少なくとも RET 側で被曝群は高純度 <!-- N-44 -->)— とも等しく整合し、本デザインは両者を分離できない。隣接する断片も、どの閾値も越えないまま同じ方向を指す: 較正済みセットレベルの全セルで発見に最も近づいたのは B_Tumor × radiation だった(q = 0.114 <!-- N-28 -->)。この比較のどの結果も共有腺記憶仮説を検定せず、本研究のどの主張もこれに依存しない。
+【訳】driver で条件付けた二つの腫瘍対比は、ラベル交換の偶然を超えて互いに似ている: 共有 15,560 遺伝子で Spearman rho +0.459、ラベルシャッフルの参照区間([−0.39, +0.39])の外側、両側 p = 0.0197 <!-- N-33 -->(Supp. Tab. 3(仮))<!-- C-17 -->。仮説生成としてのみ: これは driver 背景を越えて見える曝露関連成分 — oncogene 非依存の痕跡 — が示すはずの姿であり、B_Tumor の対比内の静けさとも矛盾しない(R_Tumor の対比と向きの揃った閾値下構造があれば足りる)。同時に、共有された共変量構造 — 筆頭は純度(少なくとも RET 側で被曝群は高純度 <!-- N-44 -->)— とも等しく整合し、本デザインは両者を分離できない。隣接する断片も、どの閾値も越えないまま同じ方向を指す: 較正済みセットレベルの全セルで発見に最も近づいたのは B_Tumor × radiation だった(q = 0.114 <!-- N-28 -->)。この比較のどの結果も共有腺記憶仮説を検定せず、本研究のどの主張もこれに依存しない。
 
 ### 正常組織の対照 — Abend/Ory の受け(C-07)
 
@@ -291,7 +291,7 @@ The two driver-conditioned tumor contrasts resemble each other beyond label-exch
 
 The normal-tissue comparison carried the hypothesis: long-term exposure memory reported in normal thyroid (Abend et al. 2013) and shared normal-tissue signatures reported without driver stratification (Ory et al. 2026) predict that the two driver-conditioned normal contrasts should resemble each other, and this comparison is the device that makes that prediction testable under driver conditioning. It returned indeterminacy: rho +0.376, inside its reference interval <!-- N-34 -->, with no within-contrast signal in R_Normal <!-- N-16 -->. Under the pre-fixed reading, whether the two strata share a normal-tissue exposure trace is not identifiable in this cohort <!-- C-07 -->; the comparison neither supports nor contradicts the shared-memory reports, and it remains the design under which a larger cohort could decide the question.
 
-【訳】正常組織の比較が仮説を担っていた: 正常甲状腺に報告された長期の曝露記憶(Abend et al. 2013)と、driver 非層別で報告された正常組織の共有署名(Ory et al. 2026)は、driver で条件付けた二つの正常対比が互いに似ることを予測し、この比較はその予測を driver 条件付けの下で検定可能にする装置である。結果は不確定に終わった: rho +0.376 は参照区間の内側 <!-- N-34 -->、R_Normal に 対比内シグナルなし <!-- N-16 -->。事前固定の読みの下では、二つの層が正常組織の曝露痕跡を共有するか否かは本コホートでは識別できない <!-- C-07 -->。この比較は共有記憶の報告を支持も否定もしない — そして、より大きなコホートがこの問いを決められる設計として残る。
+【訳】正常組織の比較が仮説を担っていた: 正常甲状腺に報告された長期の曝露記憶(Abend et al. 2013)と、driver 非層別で報告された正常組織の共有署名(Ory et al. 2026)は、driver で条件付けた二つの正常対比が互いに似ることを予測し、この比較はその予測を driver 条件付けの下で検定可能にする装置である。結果は不確定に終わった: rho +0.376 は参照区間の内側 <!-- N-34 -->、R_Normal に対比内シグナルなし <!-- N-16 -->。事前固定の読みの下では、二つの層が正常組織の曝露痕跡を共有するか否かは本コホートでは識別できない <!-- C-07 -->。この比較は共有記憶の報告を支持も否定もしない — そして、より大きなコホートがこの問いを決められる設計として残る。
 
 ### Limitations(C-11 ほか)
 
@@ -313,14 +313,14 @@ For each analysis contrast, exposure labels were shuffled B + R times with a see
 within-collection Benjamini–Hochberg adjustment, which measured 0.045 in the same pre-real-data setting <!-- N-57 -->.
 
 【訳】遺伝子セットの q 値は発現行列の依存構造 — 遺伝子は共発現し、セットは重複する — を継承するため、セットレベルの名目 FDR を額面どおりに信用することはできない。そこで我々は、実対比への適用に先立ち、セットレベル手続き全体の動作特性を held-out 帰無レプリケートで測定し、その測定を較正対象の結果と並べて報告する。
-各解析対比で、推論に使うものと独立のシードにより曝露ラベルを B + R 回シャッフルし(基底シード 19450809; B = 9999、R = 100 <!-- N-06 -->)、block 濃縮統計量を全シャッフルについて一度に計算した。最初の B 本が共有帰無プールをなし、残る R 本の各々を擬似観測として、実データに適用するのと厳密に同一の推論 — プールに対する正規化濃縮、セット別置換 p 値、各コレクション内の Benjamini–Hochberg 調整、事前指定閾値 q < 0.10 <!-- N-06 --> — に通した。ラベル交換の下で擬似観測はプールと交換可能なので、各 対比 × collection セルについて「発見を1つ以上生んだレプリケートの割合」は、FDR と family-wise 誤りが一致する完全帰無下の P(偽発見 ≥ 1) を推定する。この割合を正確二項信頼区間およびレプリケートあたり平均発見数とともに報告する(Supplementary Table SX)。R 本のレプリケートは1つの帰無プールを共有するため発見指標は弱い正の相関を持ち、二項区間はその分やや狭い — これは補正せず記録する。この較正は、実データ実行に先立ちセットレベル推論そのものの選択も固定した。当初指定されていた、pooled 正規化濃縮スコアからの tail-ratio FDR は、このデータ上で較正不良と実測され(pooled P(≥1) 0.140、再標準化変種で 0.221、名目 0.10 に対して; 最悪セル 0.44 <!-- N-58 -->)、コレクション内 Benjamini–Hochberg を伴うセット別置換 p に置き換えられた — 後者は同じ実データ前の設定で 0.045 と測定された <!-- N-57 -->。
+各解析対比で、推論に使うものと独立のシードにより曝露ラベルを B + R 回シャッフルし(基底シード 19450809; B = 9999、R = 100 <!-- N-06 -->)、block 濃縮統計量を全シャッフルについて一度に計算した。最初の B 本が共有帰無プールをなし、残る R 本の各々を擬似観測として、実データに適用するのと厳密に同一の推論 — プールに対する正規化濃縮、セット別置換 p 値、各コレクション内の Benjamini–Hochberg 調整、事前指定閾値 q < 0.10 <!-- N-06 --> — に通した。ラベル交換の下で擬似観測はプールと交換可能なので、各対比 × collection セルについて「発見を1つ以上生んだレプリケートの割合」は、FDR と family-wise 誤りが一致する完全帰無下の P(偽発見 ≥ 1) を推定する。この割合を正確二項信頼区間およびレプリケートあたり平均発見数とともに報告する(Supplementary Table SX)。R 本のレプリケートは1つの帰無プールを共有するため発見指標は弱い正の相関を持ち、二項区間はその分やや狭い — これは補正せず記録する。この較正は、実データ実行に先立ちセットレベル推論そのものの選択も固定した。当初指定されていた、pooled 正規化濃縮スコアからの tail-ratio FDR は、このデータ上で較正不良と実測され(pooled P(≥1) 0.140、再標準化変種で 0.221、名目 0.10 に対して; 最悪セル 0.44 <!-- N-58 -->)、コレクション内 Benjamini–Hochberg を伴うセット別置換 p に置き換えられた — 後者は同じ実データ前の設定で 0.045 と測定された <!-- N-57 -->。
 
 ### Supplementary Results — 較正表の読み(Supp Table SX に併記する注記)
 
 <!-- C-06 -->
 Across the 16 contrast × collection cells, the share of null replicates producing at least one discovery at q < 0.10 ranged from 0.01 to 0.18 <!-- N-24 -->, and 13 of 16 cells were at or below the nominal 0.10. Two further cells in the radiation-curated family straddled it (B_Tumor 0.10, CI 0.049–0.176; B_Normal 0.12, CI 0.064–0.200 <!-- N-26 -->). Together with the spike-in recovery (NES 2.28, p 0.0002 <!-- N-31 -->), the two controls bound the machinery from both sides: null inputs do not generate discoveries beyond the nominal level, and a planted coherent signal of modest size is detected. The one calibration excess (B_Normal/Hallmark) is disclosed and is taken into account wherever set-level results for that cell are read.
 
-【訳】16 の 対比 × collection セル全体で、q < 0.10 の発見を1つ以上生んだ帰無レプリケートの割合は 0.01 から 0.18 の範囲にあり <!-- N-24 -->、16 セル中 13 は名目 0.10 以下だった。radiation ファミリーのさらに2セルがこれを跨いだ(B_Tumor 0.10、CI 0.049–0.176; B_Normal 0.12、CI 0.064–0.200 <!-- N-26 -->)。spike-in の回収(NES 2.28、p 0.0002 <!-- N-31 -->)と合わせて、2つの対照は機構を両側から挟む: 帰無入力は名目水準を超える発見を生まず、植えられた中程度の協調シグナルは検出される。唯一の較正超過(B_Normal/Hallmark)は開示済みであり、当該セルのセットレベル結果を読むあらゆる場所で考慮される。
+【訳】16 の対比 × collection セル全体で、q < 0.10 の発見を1つ以上生んだ帰無レプリケートの割合は 0.01 から 0.18 の範囲にあり <!-- N-24 -->、16 セル中 13 は名目 0.10 以下だった。radiation ファミリーのさらに2セルがこれを跨いだ(B_Tumor 0.10、CI 0.049–0.176; B_Normal 0.12、CI 0.064–0.200 <!-- N-26 -->)。spike-in の回収(NES 2.28、p 0.0002 <!-- N-31 -->)と合わせて、2つの対照は機構を両側から挟む: 帰無入力は名目水準を超える発見を生まず、植えられた中程度の協調シグナルは検出される。唯一の較正超過(B_Normal/Hallmark)は開示済みであり、当該セルのセットレベル結果を読むあらゆる場所で考慮される。
 
 ---
 
@@ -411,7 +411,7 @@ Across the 16 contrast × collection cells, the share of null replicates produci
 - **選定事由の記載方針(2026-08-14 確定)**: 分野の既定から外れる選択で査読者が「なぜ?」と聞くと予想される箇所に1文の事由を書く。慣行どおりの選択には書かない。
 - **深度配分の原則(2026-08-14 確定、Mid>Low の往復から一般化)**: Results に載る全ての検定・read について「それが何を検定するのか」を Methods が1文で持ち、Results は結果+Methods 参照に留める。この原則で4点を追補: HC の役割文(対比水準の主張を担う — Q-16 の水準論を本文に可視化)/ ORA の濃淡開示一文(Q-15 決着の実装)/ 節題を「Between-arm concordance of the exposure contrast」へ(判断点2の用語決定; 2026-08-14 の用語統一 arm→group/stratum で「Between-stratum concordance」に改称)/ REO 診断 (iii) の動機文(純度駆動の可能性の分離)。この基準で4点を追記: BM 検定の採用(順序関係を原始とするコミットメント+完全枚挙)/ HC の選定(多数の弱い効果への感度)/ tie-block ES の理由(順序の注入禁止)/セットレベル π0=1 の非対称(依存下で plug-in が分散支配・反保守側に誤る)。n_perm 9,999 は慣行的値のため本文で事由を書かない(D4 の導出は手元)。
 - λ=0.5 の選定事由を 410 節に追記(2026-08-14、研究者指示): D1 の批准済み導出の圧縮(π0=1 は仮説の検出チャネルを塞ぐ/固定 λ の保守性は帰無 p の周辺一様性のみで成立/適応的 λ は独立性仮定で適用外/平坦な対立密度下で低 λ が MSE 優位)。弱拡散前提は**選定事由(設計時の作業仮説)として書く**のであって形の主張ではない — Q-15 (2) (形に賭けない)と整合。「small per-gene effects attenuated by within-group case mixture」の文言はバイナリ観の反映だが、仮説の正式な文言化(Intro、研究者領分)と執筆時に整合させること。
-- 非2値化の一文(C-16)を 410 節末尾に追加(2026-08-14、判断点1決着)。引用は ASA 声明系3本(DOI は claim_map C-16 の根拠列)。対比の陽性/非陽性ラベルは全対比 で不使用 — C-01 は両水準結合(DEG かつ HC)、C-03/C-04 は「検出されなかった」の記述形。文言検査時に positive/negative 型のラベル語が紛れていないか確認する。
+- 非2値化の一文(C-16)を 410 節末尾に追加(2026-08-14、判断点1決着)。引用は ASA 声明系3本(DOI は claim_map C-16 の根拠列)。対比の陽性/非陽性ラベルは全対比で不使用 — C-01 は両水準結合(DEG かつ HC)、C-03/C-04 は「検出されなかった」の記述形。文言検査時に positive/negative 型のラベル語が紛れていないか確認する。
 - 決定履歴語の掃引(2026-08-14、研究者指示): 「protocol amendment」「decision record」への言及を本文から削除(査読者は決定の行き来を考慮しない。再現性文は「code and versioned inputs sufficient to regenerate」に限定 — 公開対象の選別は研究者裁量、§0.5b 明確化と整合)。
 - **予測マップ+解釈規則は論文内に提示が必要**(正本=論文 — 外部計画への参照で済ませない。非2値化の一文が「interpretation map, Methods」を指すため)。置き場所(Methods 内の小表 or Intro)は図表構成(判断点5)と同時に確定。
 - IREP の入力規約は 130 ヘッダの写し(N-68)。データ提供側の線量そのものの来歴は REBC-THYR 原論文への引用で受ける(引用は Intro/Methods 冒頭、書誌は研究者)。
@@ -424,7 +424,7 @@ Across the 16 contrast × collection cells, the share of null replicates produci
 - 再掲2段落の正本: C-06 = draft_methods_results_d6.md、C-14 = draft_ora_annotation.md。編集は正本側で行い本稿へ同期(トリガー1で照合)。
 - **C-14 正本の数値取り違えを修正**(2026-08-14): radiation 例示が down の k(46/126)に combined の期待値(14.2)を付けていた → down の期待 6.4 に修正(N-60)。正本側も修正済み。
 - 丸めの規約: rho は3桁表示(+0.376 = N-34 の +0.3756、帯 [−0.46, +0.46] = 同[−0.4615, +0.4580])。他の数値は台帳の桁のまま。凍結時に表示桁を台帳へ追記予定。
-- B_Normal(C-16)は評語なしの連続量記述で、読み(規則5条件適用)は Discussion 送り。「他の2つの静かな対比 より低い π0」は N-19 の数値の並置で、比較検定ではない。
+- B_Normal(C-16)は評語なしの連続量記述で、読み(規則5条件適用)は Discussion 送り。「他の2つの静かな対比より低い π0」は N-19 の数値の並置で、比較検定ではない。
 - tumor 側 concordance(C-17)は本文ポインタ+Supp. Tab. 3(仮)+Discussion 送り(判断点2決着どおり)。
 - ORA の可視性は現状「短報1段落」— 共著者交渉で拡張可(C-14 の可視性無制約)。拡張時は正本(draft_ora_annotation)側を先に改稿。
 - **フロー提示の方針(2026-08-14 研究者承諾)**: 駆動遺伝子別の途中経過(N-08 の RET 73→…→27 / BRAF 175→…→36)は本文でなく**コホートフロー図(両層並記)**が担う。本文は合算チェーン+最大削減2段の半文+フロー図参照まで。図の最終形は作図時(判断点5)に確定。
