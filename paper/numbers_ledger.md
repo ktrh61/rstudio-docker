@@ -107,7 +107,7 @@
 
 | N-ID | 値 | 定義 | 出典 | 使用箇所 | 状態 |
 | --- | --- | --- | --- | --- | --- |
-| N-30 | HALLMARK_ADIPOGENESIS 195 遺伝子 × 1.15 倍、B_Tumor High 腕 9 検体 | spike-in の設計 | run/xeon_results/logs/spikein.log:1 キー「Spiked HALLMARK_ADIPOGENESIS (195 genes present) by 1.15x」 | Methods | verified |
+| N-30 | HALLMARK_ADIPOGENESIS 195 遺伝子 × 1.15 倍、B_Tumor High 群 9 検体 | spike-in の設計 | run/xeon_results/logs/spikein.log:1 キー「Spiked HALLMARK_ADIPOGENESIS (195 genes present) by 1.15x」 | Methods | verified |
 | N-31 | NES 2.28、p 0.0002、q_bh 0.0101(H 50 セット中 rank 1)、q<0.10 で回収 TRUE | spike-in の回収 | 同 log:2 | Results / Supp | verified |
 | N-32 | 0 | spike 以外の Hallmark セットで q<0.10(偽陽性の余剰なし) | 同 log:3 キー「besides the spike at q<0.10: 0」 | Results / Supp | verified |
 
@@ -175,13 +175,13 @@
 | N-61 | H down 12 セットの上位: E2F_TARGETS k=46/199(p 1.89e-18)・G2M_CHECKPOINT k=41/198(p 8.26e-15)・EMT・MYC_TARGETS_V1・MITOTIC_SPINDLE・KRAS_SIGNALING_UP ほか; H combined 6 セット(E2F・G2M・MITOTIC_SPINDLE・DNA_REPAIR・SPERMATOGENESIS・MYC_V1) | Hallmark のフラグ詳細(増殖・細胞周期プログラムが down 側に集中) | 同 log:449-466 | Supp.Tab.2 / Disc(仮説生成) | verified |
 | N-62 | C2:CP combined 上位例: REACTOME_RESOLUTION_OF_D_LOOP_STRUCTURES k=17/35・CELL_CYCLE_CHECKPOINTS k=63/286・DNA_REPAIR k=68/322・HOMOLOGY_DIRECTED_REPAIR k=37/135・DNA_DOUBLE_STRAND_BREAK_REPAIR k=42/165(いずれも q≤0.0001) | canonical pathways のフラグ上位(DNA 修復・HR・チェックポイント系のテーマ) | 同 log:31-45(down 側含む全 105/37 セットは rds `$table`) | Supp.Tab.2 / Disc(仮説生成) | verified |
 
-### O. 腕間年齢差の推定(追補計算 2026-08-13、claim_map C-15 — 開示であり交絡検定ではない)
+### O. 群間年齢差の推定(追補計算 2026-08-13、claim_map C-15 — 開示であり交絡検定ではない)
 
 | N-ID | 値 | 定義 | 出典 | 使用箇所 | 状態 |
 |---|---|---|---|---|---|
-| N-63 | HL 中央値差(High−Sporadic、年)+ BM 効果 P(Sporadic<High)(410 と同一推定量 `.bm_effect`、検定は不使用・p 値なし)、腕内復元抽出 percentile ブートストラップ B=9999・seed 19450809・95% CI(2.5/97.5)。被曝時年齢は Sporadic 全 NA のため腕間推定なし(NA 員数のみ記録) | 腕間年齢差推定の設定一式 | diagnostics/output/age_arm_difference.log:1(設定行)・:11-15(AGE_EXPOSURE NA 員数); rds は同 output/age_arm_difference.rds `$config` | Methods / Tab.2 脚注 | verified |
-| N-64 | R 系(Sporadic n=12 vs High n=15): HL +2.5 年 [−1.0, 6.0]、P(Sporadic<High) 0.625 [0.400, 0.828](CI はゼロ差/0.5 を跨ぐ) | 手術時年齢の腕間差(R 系)。腕別中央値[範囲]は N-12 と一致(整合性検査) | 同 log:3-5; rds `$summary` R 行(hl 2.5 [−1, 6]、effect 0.6250 [0.4000, 0.8278]) | Results(コホート記述)/ Tab.2 脚注 | verified |
-| N-65 | B 系(Sporadic n=27 vs High n=9): HL +8.0 年 [3.0, 12.0]、P(Sporadic<High) 0.850 [0.681, 0.973](CI はゼロ差/0.5 を跨がない) | 手術時年齢の腕間差(B 系)。腕別中央値[範囲]は N-13 と一致(整合性検査) | 同 log:7-9; rds `$summary` B 行(hl 8 [3, 12]、effect 0.8498 [0.6811, 0.9733]) | Results(コホート記述)/ Tab.2 脚注 | verified |
+| N-63 | HL 中央値差(High−Sporadic、年)+ BM 効果 P(Sporadic<High)(410 と同一推定量 `.bm_effect`、検定は不使用・p 値なし)、群内復元抽出 percentile ブートストラップ B=9999・seed 19450809・95% CI(2.5/97.5)。被曝時年齢は Sporadic 全 NA のため群間推定なし(NA 員数のみ記録) | 群間年齢差推定の設定一式 | diagnostics/output/age_arm_difference.log:1(設定行)・:11-15(AGE_EXPOSURE NA 員数); rds は同 output/age_arm_difference.rds `$config` | Methods / Tab.2 脚注 | verified |
+| N-64 | R 系(Sporadic n=12 vs High n=15): HL +2.5 年 [−1.0, 6.0]、P(Sporadic<High) 0.625 [0.400, 0.828](CI はゼロ差/0.5 を跨ぐ) | 手術時年齢の群間差(R 系)。群別中央値[範囲]は N-12 と一致(整合性検査) | 同 log:3-5; rds `$summary` R 行(hl 2.5 [−1, 6]、effect 0.6250 [0.4000, 0.8278]) | Results(コホート記述)/ Tab.2 脚注 | verified |
+| N-65 | B 系(Sporadic n=27 vs High n=9): HL +8.0 年 [3.0, 12.0]、P(Sporadic<High) 0.850 [0.681, 0.973](CI はゼロ差/0.5 を跨がない) | 手術時年齢の群間差(B 系)。群別中央値[範囲]は N-13 と一致(整合性検査) | 同 log:7-9; rds `$summary` B 行(hl 8 [3, 12]、effect 0.8498 [0.6811, 0.9733]) | Results(コホート記述)/ Tab.2 脚注 | verified |
 
 ### P. 設定値・規則の台帳化(Methods 起草用 2026-08-13 — 出典はコミット済みコード、計算なし)
 
@@ -194,10 +194,10 @@
 | N-70 | 0.6 | pooled 共通尺度の相対純度閾値(main BM 採用条件) | config.R:45-46(PURITY_THRESHOLD) | Methods | verified |
 | N-71 | iDEGES 3 反復; スクリーン = 置換 BM + BH q<0.10(DEGES_FDR); スケーリングは MUREN; 前処理 protein_coding → filterByExpr | 310 正規化の設定 | scripts/310:37(ITERATION 3L)・config.R:55-57(DEGES_FDR 0.10)・310 ヘッダ | Methods | verified |
 | N-72 | ランキング = 符号付き BM 統計量の tie-averaged normal scores; ES = gseaParam=1 の block 評価(tie-free 入力で標準 GSEA と一致); 推論 = per-set 符号条件付き置換 p + family 内 BH、q_bh<0.10; size 窓 15–500 | 420 セットレベル推論の設定 | scripts/420 ヘッダ; lib/gsea_collections.R:27-28(15L/500L); config.R:51-53(FDR_CUT 0.10) | Methods | verified |
-| N-73 | unit 内独立ラベルシャッフル 9,999 回、unit 別 seed(基底 19450809)で shuffle プロファイル同士を相関(410 の perm_index は意図的に不使用 — 等 n unit で同一 index となるため) | 署名一致の帰無参照帯の設定 | diagnostics/signature_agreement.R:57(AGREEMENT_SEED_BASE)・:84,97(N_PERM 使用)・ヘッダ | Methods | verified |
+| N-73 | unit 内独立ラベルシャッフル 9,999 回、unit 別 seed(基底 19450809)で shuffle プロファイル同士を相関(410 の perm_index は意図的に不使用 — 等 n unit で同一 index となるため) | 署名一致の帰無参照区間の設定 | diagnostics/signature_agreement.R:57(AGREEMENT_SEED_BASE)・:84,97(N_PERM 使用)・ヘッダ | Methods | verified |
 | N-74 | 候補プール = \|effect−0.5\| 上位 500; dead zone \|r\|<log2(1.2); R0 = 非 dead-zone 検体で符号一致(例外≤1)かつ q10(\|r\|)≥log2(1.5); R1 = 逆転 >50% かつ <100% | REO 候補ペア選定規則 | scripts/510:44(N_CANDIDATES 500L)・:48(log2(1.5))・:100,130,136(規則実装); config.R:48-49(DEAD_ZONE log2(1.2)) | Methods | verified |
 | N-75 | 貪欲選定: 遺伝子再使用禁止 + 既採用ペアとの Spearman <0.75、目標 10 ペア; 530 の Mid>Low 片側 BM は mc・seed 19860426(正準シード) | REO パネル確定と評価検定の設定 | scripts/520:30-31(TARGET_PANEL_SIZE 10L・CORRELATION_THRESHOLD 0.75); scripts/530:78(seed = SEED); config.R:5-8 | Methods | verified |
-| N-76 | 群内純度順位保存 0.93–0.99(腕別推定との比較)、High vs Sporadic 腫瘍プロファイル相関 0.99 | 220 の腕プーリング妥当性の**来歴実測値**(設計時測定。一次ログではない — 証拠階層は設計選択の来歴)。二重統計に当たるためライセンスには使わない(研究者決定 2026-08-13)— プーリングの記述は理論構造(相対尺度の共通化・driver 支配前提・軸の別・役割の限定)で立てる | `git show 8eed384:scripts/220_estimate_tumor_purity.R` ヘッダ行8-10(run 時点の凍結版。現行ヘッダは 2026-08-13 に理論ライセンスへ書き換え、実測値の記録はこの行と run コミットに保存) | **不使用**(査読応答の受けとして保存) | verified |
+| N-76 | 群内純度順位保存 0.93–0.99(群別推定との比較)、High vs Sporadic 腫瘍プロファイル相関 0.99 | 220 の両群プーリング妥当性の**来歴実測値**(設計時測定。一次ログではない — 証拠階層は設計選択の来歴)。二重統計に当たるためライセンスには使わない(研究者決定 2026-08-13)— プーリングの記述は理論構造(相対尺度の共通化・driver 支配前提・軸の別・役割の限定)で立てる | `git show 8eed384:scripts/220_estimate_tumor_purity.R` ヘッダ行8-10(run 時点の凍結版。現行ヘッダは 2026-08-13 に理論ライセンスへ書き換え、実測値の記録はこの行と run コミットに保存) | **不使用**(査読応答の受けとして保存) | verified |
 | N-77 | 906/906 ライブラリが stranded_second(reverse)判定、比 0.056–0.110(生値 min 0.0558948828・max 0.1095053129、閾値 0.5) | strand 判定の実測結果 — 閾値の恣意性が実務上不活性であることの開示 | meta/strand_selection_20260722_073758.tsv の selected・ratio 列の全数集計(906 行) | Methods | verified |
 
 ## 図表台帳(図・表は1行ずつ — キャプションも検査対象)
@@ -224,7 +224,7 @@
 | Supp.Tab.1(仮)D6 較正 16 セル表(m_sets・p_any・95%CI・mean/max 発見数) | diagnostics/gsea_null_calibration.R ← 310 正規化。正準値 = run/xeon_final_20260811/logs/d6_calibration.log(rds は diagnostics/output/gsea_null_calibration.rds) | C-06、N-24(注記に N-25, N-26) | draft |
 | Supp.Data.1(仮)420 全セット結果の完全開示(全 unit × family の pathway・size・ES・NES・p・q_bh 全量) | tables/supp_data_420_full.R ← thyr_enrichment_test.rds(整形のみ・計算なし。**未実行**)。Q-08/Q-10 予備線「可能性の棚は開示で遺す」の実体 | C-05 | draft |
 | Supp.Tab.2(仮)R_Tumor DEG の ORA 注釈(family × list の全結果) | scripts/430_annotate_deg_ora.R ← thyr_expression_test.rds(430 編入 2026-08-13。正準 = processed/thyr_deg_ora_annotation.rds + output/430_annotate_deg_ora.log。旧 diagnostics 版と同値確認済み) | C-14、N-59〜N-62 | draft |
-| Supp.Tab.3(仮)腕間 concordance(normal / tumor 両ペア: rho・シャッフル帯・p の2行+識別不能注記) | tables/supp_tab_concordance.R ← diagnostics/output/signature_agreement.rds(**未実行** — rds のフィールド名は初回実行で確認・調整)。正準値 = run/xeon_results/logs/signature_agreement.log | C-07、C-17、N-33・N-34 | draft |
+| Supp.Tab.3(仮)層間 concordance(normal / tumor 両ペア: rho・参照区間・p の2行+識別不能注記) | tables/supp_tab_concordance.R ← diagnostics/output/signature_agreement.rds(**未実行** — rds のフィールド名は初回実行で確認・調整)。正準値 = run/xeon_results/logs/signature_agreement.log | C-07、C-17、N-33・N-34 | draft |
 | Supp.Tab.4(仮)使用パッケージ版表(パッケージ名・版の一覧 — 2026-08-14 引用整理に伴い追加) | tables/supp_tab_package_versions.R ← docker/versions.tsv(**未実行**。実走時の実効版 = run/xeon_provenance/session_info.txt は組版時に併記)。機械生成のみ・計算なし | Methods(Software 節が参照) | draft |
 
 (番号・採否は図表構成の確定後に更新)
@@ -249,9 +249,9 @@
 - 2026-08-12: 追補計算の第2適用(N-59〜N-62): R_Tumor DEG の ORA 注釈(C-14 で水準・読みを
   実行前に固定)。diagnostics/deg_ora_annotation.R → 同 output/ の log+rds(乱数なし・
   正準イメージ内・exit 0)。family 別セット数 50/2262/3856/24 は 420/D6 と一致(整合性検査)。
-- 2026-08-13: 追補計算の第3適用(N-63〜N-65): 腕間年齢差の CI つき推定(C-15 で読みを
+- 2026-08-13: 追補計算の第3適用(N-63〜N-65): 群間年齢差の CI つき推定(C-15 で読みを
   実行前に固定。研究者 Go 2026-08-13)。diagnostics/age_arm_difference.R → 同 output/ の
-  log+rds(seed 19450809・B=9999・正準イメージ内・exit 0)。腕別 n・中央値[範囲]は
+  log+rds(seed 19450809・B=9999・正準イメージ内・exit 0)。群別 n・中央値[範囲]は
   N-09/N-12/N-13 と一致(整合性検査)。照合は log↔rds `$summary` の突き合わせで verified。
 - 2026-08-13: セクション P(N-66〜N-76)を Methods 起草に伴い追加 — 本文が引く設定値・
   規則・来歴実測(N-76)の台帳化。追補計算ではない(計算なし、出典は全てコミット済み
@@ -262,7 +262,7 @@
   検証実測は本文に載せない。来歴は 220 ヘッダに保存、行は査読応答の受けとして残す。
 - 2026-08-13(同日改訂、研究者決定): プーリングの記述は script ヘッダ・Methods とも
   **理論構造で立てる**に変更 — (1) ContamDE 純度は同時推定集合内でのみ相対比較可能で、
-  腕別 run は尺度を分断し単一閾値の意味を壊す(腕別で先に回して観察された事実)、
+  群別 run は尺度を分断し単一閾値の意味を壊す(群別で先に回して観察された事実)、
   (2) 共通参照仮定は driver 層別設計自体の前提に乗る、(3) 純度軸は曝露対比と別軸、
   (4) 役割はコホート内相対フィルタ+診断共変量のみ。実測値(0.93–0.99/0.99)は
   二重統計のためライセンスに使わず、run コミットの凍結ヘッダと N-76 行にのみ保存。
