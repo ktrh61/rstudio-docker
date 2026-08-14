@@ -55,8 +55,8 @@
 
 | N-ID | 値 | 定義 | 出典 | 使用箇所 | 状態 |
 | --- | --- | --- | --- | --- | --- |
-| N-08 | 440 → 248 → 77 → 70 → 69 → 63(n_RET 73→73→34→31→31→27、n_BRAF 175→175→43→39→38→36) | コホートフロー6段(all_cases → driver_classified → band_sporadic_or_high → paired → pcod_clean → purity_pass) | run/xeon_results/logs/230_finalize_analysis_cohorts.log:1-8 キー「Cohort flow (main BM)」 | Methods / フロー図表 | verified |
-| N-09 | B_High 9 / B_Sporadic 27 / R_High 15 / R_Sporadic 12 | main BM 63症例の群内訳 | 同 log:9-12 キー「include_main_bm by group」 | Methods / Results | verified |
+| N-08 | 440 → 248 → 77 → 70 → 69 → 63(n_RET 73→73→34→31→31→27、n_BRAF 175→175→43→39→38→36) | コホートフロー6段(all_cases → driver_classified → band_sporadic_or_high → paired → pcod_clean → purity_pass) | run/xeon_results/logs/230_finalize_analysis_cohorts.log:1-8 キー「Cohort flow (main BM)」 | Results / フロー図表(Methods は n = 63 のみ) | verified |
+| N-09 | B_High 9 / B_Sporadic 27 / R_High 15 / R_Sporadic 12 | main BM 63症例の群内訳 | 同 log:9-12 キー「include_main_bm by group」 | Results | verified |
 | N-10 | training 27 / evaluation 36(R_Low 17・R_Mid 19) | REO コホート | 同 log:13 キー「REO training: 27」 | Methods / Results | verified |
 | N-11 | 臨床 440 症例; AS 帯 non_exposed 81 / no_reference 146 / (0,33.3) 100 / [33.3,66.6) 82 / [66.6,100] 31; paired 392 / unpaired 48 | 臨床全数と AS バンド構成(整合性検査通過) | run/xeon_results/logs/tab_cohort_composition.log:1-4(Driver×AS帯×pair の全225行は同 log:9-233) | Tab(コホート構成) | verified |
 | N-12 | R系 4群(R_Sporadic/R_Low/R_Mid/R_High): n 12/17/19/15、女/男 10/2・13/4・14/5・11/4、手術時年齢中央値[範囲] 20.5[14–27]/30[22–44]/25[17–31]/23[14–31]、被曝時年齢 NA/12[6–19]/3[0–13]/2[0–12]、CCDC6-RET 6/8/12/7、NCOA4-RET 2/5/3/4、RET-OTHER 4/4/4/4 | 症例特性(R系、群×帯) | run/xeon_results/processed/thyr_analysis_cohorts.rds + thyr_clinical.rds を case_submitter_id=REBC_ID で結合(§15 B で再現。2026-08-12 コンテナ内で再実行し一致) | Tab(症例特性) | verified |
@@ -122,8 +122,8 @@
 
 | N-ID | 値 | 定義 | 出典 | 使用箇所 | 状態 |
 | --- | --- | --- | --- | --- | --- |
-| N-35 | 候補プール up 317 / down 182、57694 ペア評価、全基準通過 153 ペア | 510 候補選定 | run/xeon_results/logs/510_select_reo_pairs.log:4-6 | Methods | verified |
-| N-36 | median_diff [1.159, 4.700]、reversal_rate [0.53, 0.87] | 通過 153 ペアの範囲 | 同 log:7 | Methods / Supp | verified |
+| N-35 | 候補プール up 317 / down 182、57694 ペア評価、全基準通過 153 ペア | 510 候補選定 | run/xeon_results/logs/510_select_reo_pairs.log:4-6 | Results | verified |
+| N-36 | median_diff [1.159, 4.700]、reversal_rate [0.53, 0.87] | 通過 153 ペアの範囲 | 同 log:7 | Results / Supp | verified |
 | N-37 | パネル 10 ペア、境界 = score > 2 を positive(閾値 = 訓練 Sporadic の最大逆転スコア; ログ表記 R0-based)| 520 パネル確定 | run/xeon_results/logs/520_finalize_reo_panel.log:7 「Selected panel pairs: 10」・log:9 「Boundary (R0-based)」 | Methods / Results | verified |
 | N-38 | 訓練分類: R0 12/12 negative、R1 13/15 positive(2 negative); score 範囲 R0 [0,2] / R1 [0,10] | 520 訓練成績 | 同 log:3-6(分類表)・log:8(score 範囲) | Results | verified |
 | N-39 | P1 DBH/PROM1、P2 ZNF560/CSTA、P3 CA4/CTHRC1、P4 ADRA2B/FCGR2B、P5 DNASE1L2/LOX、P6 PNMA8B/FCER1A、P7 CASKIN1/CD1C、P8 GPR62/IL13RA2、P9 NPAS1/PBK、P10 ICAM4/S100A8(up/down、median_diff 降順) | パネル 10 ペアの構成 | run/xeon_results/output/reo_panel.csv 全10行(二機バイト一致; Ensembl ID・median_diff・reversal_rate も同 CSV) | Tab(パネル構成) | verified |
@@ -291,3 +291,7 @@
   逆転スコア」記述へ、N-78(PC-OD 規則一式)を新設。本文側は同監査で A2 件+抜け8 件+
   軽微2 件を反映(ペア解決 _merged 規則・contamDE 前処理と max-one 尺度・REO スコア定義・
   TPM 自前再計算・純度中央値2層ほか)
+- 2026-08-14: 深度配分の折衷(研究者決定、BJC/ERC/npj PO 様式を踏まえ Methods=規則+最終 n、
+  実現値=Results): 症例フロー数列・群内訳・REO セット員数・REO 構築歩留まり(N-35/N-36)を
+  Methods から Results へ移送(N-08 は Methods に n=63 のみ残置、N-35/N-36 は Results §6 冒頭へ
+  新設移載)。使用箇所列を N-08/N-09/N-35/N-36 で更新
