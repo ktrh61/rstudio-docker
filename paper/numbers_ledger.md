@@ -147,7 +147,7 @@
 | N-ID | 値 | 定義 | 出典 | 使用箇所 | 状態 |
 | --- | --- | --- | --- | --- | --- |
 | N-49 | \|M\| 中央値: R_Tumor 0.183 / R_Normal 0.108 / B_Tumor 0.105 / B_Normal 0.121 | MA プロットの効果量サマリ(q<0.10 数は N-16 と一致) | run/i9canon/fig_ma_gene_bm.log:2-5(正準図 = repo/output/figures/fig_ma_gene_bm.png 2026-08-10 01:40 版; 図は B.14 で二機 md5 一致) | Fig(MA)caption | verified |
-| N-50 | AS 中央値: R_Sporadic 0.0 / R_Low 15.6 / R_Mid 55.5 / R_High 86.7(スコア中央値 0/1/4/6 は N-41 と一致) | fig_reo_grading の帯別 assigned share | run/xeon_results/logs/fig_reo_grading.log:2-5 | Fig(REO)caption | verified |
+| N-50 | AS 中央値: R_Sporadic **未定義**(非被曝 — 2026-08-15 図改修で専用ストリップ表示に変更、旧表記 0.0 は y=0 配置の名残)/ R_Low 15.6 / R_Mid 55.5 / R_High 86.7(スコア中央値 0/1/4/6 は N-41 と一致) | fig_reo_grading の帯別 assigned share | run/xeon_results/logs/fig_reo_grading.log:2-5 | Fig(REO)caption | verified |
 | N-51 | [FAIL 0 \| WARN 0 \| SKIP 0 \| PASS 415](両機) | テストスイート結果 | run/xeon_results/logs/tests.log:48; run/i9canon/tests.log:28 | Methods(再現性) | verified |
 | N-52 | raw 1819 ファイル md5 全一致(唯一の差分は Xeon 側のみの logs/*.parcel 1件で発現データ本体ではない) | 二機の入力同一性 | run/xeon_provenance/i9_raw_md5.txt(1819行) vs xeon_raw_md5.txt(1820行)、差分は raw_diff.txt:1-2 | Methods(再現性) | verified |
 
@@ -304,3 +304,7 @@
   cairo 指定+拡張(除外注記・REO 評価セット枝・最終箱4群分割 — いずれも既存 N 値の範囲)、
   supp_tab_concordance は実構造(pairs$normal/tumor)へ写像確定 — 参照区間 = rho_null 中央 95%
   が N-33/N-34 を厳密再現することを実測確認。出力は output/(gitignore、再生成可能)
+- 2026-08-15: fig_reo_grading を改修(研究者 Go): ジッター全廃(整数スコア・実 AS に偽変動を
+  与えない)、R_Sporadic は AS 未定義として専用ストリップ(積み上げ=員数)表示、未発火だった
+  NA→66.6 代入のデッドコードを stopifnot に置換(発火実績ゼロを実測確認 — 15/15 とも実値)。
+  N-50 の R_Sporadic を未定義表記に訂正

@@ -31,13 +31,25 @@ as_of <- setNames(as.numeric(as_df$assigned_share), as.character(as_df$REBC_ID))
 as_for_sample <- function(sid) unname(as_of[samp2case[sid]])
 
 tr <- reo$training
-spo <- data.frame(band = "R_Sporadic", score = as.integer(tr$r0_score),
-  as = 0, stringsAsFactors = FALSE) # dose 0 by definition
+
+# R_High: assigned share must resolve for every training sample -- no silent
+# imputation (the earlier `is.na -> 66.6` fallback is retired; it never fired).
 hi_as <- as_for_sample(tr$r1_samples)
-hi_as[is.na(hi_as)] <- 66.6
-hi <- data.frame(band = "R_High", score = as.integer(tr$r1_score), as = hi_as)
+stopifnot(!anyNA(hi_as))
+hi <- data.frame(band = "R_High", score = as.integer(tr$r1_score), y = hi_as,
+  stringsAsFactors = FALSE)
 mid <- data.frame(band = ev$samples$band, score = ev$samples$score,
-  as = ev$samples$assigned_share, stringsAsFactors = FALSE)
+  y = ev$samples$assigned_share, stringsAsFactors = FALSE)
+
+# R_Sporadic: AS is UNDEFINED for unexposed cases (not zero). The band is drawn
+# in a separate strip below the AS axis; within the strip, identical scores are
+# stacked, so vertical position is a case counter, not a value.
+STRIP_BASE <- -10
+STRIP_STEP <- -3.4
+spo_scores <- as.integer(tr$r0_score)
+spo <- do.call(rbind, lapply(split(spo_scores, spo_scores), function(v)
+  data.frame(band = "R_Sporadic", score = v,
+    y = STRIP_BASE + (seq_along(v) - 1) * STRIP_STEP, stringsAsFactors = FALSE)))
 
 d <- rbind(spo, hi, mid)
 d$band <- factor(d$band, levels = c("R_Sporadic", "R_Low", "R_Mid", "R_High"))
@@ -46,19 +58,24 @@ d$set <- ifelse(d$band %in% c("R_Sporadic", "R_High"), "training", "evaluation")
 thr <- reo$boundary$negative_max # A: positive if score > thr
 pal <- PAL_BANDS # lib/plot_theme.R
 n_pairs <- nrow(reo$panel)
+y_min <- min(d$y) - 4
 
-set.seed(1L)
-p <- ggplot(d, aes(x = score, y = as)) +
+# No jitter anywhere: scores are integers (exact) and AS separates the exposed
+# points vertically on its own; the Sporadic strip stacks instead of jittering.
+p <- ggplot(d, aes(x = score, y = y)) +
   geom_hline(yintercept = c(33.3, 66.6), linetype = "dashed", colour = "grey70") +
+  geom_hline(yintercept = -5, linetype = "dotted", colour = "grey60") +
   geom_vline(xintercept = thr + 0.5, linetype = "dashed", colour = "grey40") +
   annotate("text", x = thr + 0.5, y = 103, label = paste0("positive: score > ", thr),
     hjust = -0.03, vjust = 1, size = 3, colour = "grey30") +
-  geom_jitter(aes(colour = band, shape = set), width = 0.15, height = 1.6,
-    size = 2.6, alpha = 0.9, stroke = 0.8) +
+  annotate("text", x = n_pairs + 0.5, y = STRIP_BASE, hjust = 1, vjust = 1, size = 2.9,
+    colour = "grey30",
+    label = "R_Sporadic strip: AS undefined (unexposed);\nstacked points count cases") +
+  geom_point(aes(colour = band, shape = set), size = 2.6, alpha = 0.9, stroke = 0.8) +
   scale_colour_manual(values = pal, name = "Exposure band") +
   scale_shape_manual(values = c(training = 1L, evaluation = 16L), name = "Set") +
   scale_x_continuous(breaks = 0:n_pairs, limits = c(-0.5, n_pairs + 0.5)) +
-  scale_y_continuous(breaks = c(0, 33.3, 66.6, 100), limits = c(-5, 105)) +
+  scale_y_continuous(breaks = c(0, 33.3, 66.6, 100), limits = c(y_min, 105)) +
   labs(x = paste0("REO reversal score (panel of ", n_pairs, " pairs)"),
     y = "Assigned share  (radiation attributability, %)",
     title = "REO reversal scores and assigned share (RET tumors)",
@@ -69,6 +86,8 @@ save_figure(p, "fig_reo_grading.png", width = 8.2, height = 5.6)
 
 for (b in levels(d$band)) {
   s <- d$score[d$band == b]
-  message(sprintf("  %-11s n=%2d score median %.1f | AS median %.1f",
-    b, length(s), stats::median(s), stats::median(d$as[d$band == b])))
+  as_msg <- if (b == "R_Sporadic") "AS undefined (strip)" else
+    sprintf("AS median %.1f", stats::median(d$y[d$band == b]))
+  message(sprintf("  %-11s n=%2d score median %.1f | %s", b, length(s),
+    stats::median(s), as_msg))
 }
