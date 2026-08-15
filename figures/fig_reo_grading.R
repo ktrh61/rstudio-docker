@@ -1,7 +1,7 @@
 # fig_reo_grading.R
 # Figure for the REO out-of-sample evaluation, same concept as the v7
 # 13_reo_evaluation_poc plot: REO reversal score (x) against assigned share
-# (radiation attribution %, y), coloured by exposure band, training arms open /
+# (assigned share %, y), coloured by exposure band, training groups open /
 # evaluation arms filled, with the AS band boundaries (33.3/66.6) and the A
 # classification threshold marked. Shows the graded pattern (band medians rise
 # with assigned share) at the descriptive-observation level fixed in the plan
@@ -60,8 +60,8 @@ p <- ggplot(d, aes(x = score, y = as)) +
   scale_x_continuous(breaks = 0:n_pairs, limits = c(-0.5, n_pairs + 0.5)) +
   scale_y_continuous(breaks = c(0, 33.3, 66.6, 100), limits = c(-5, 105)) +
   labs(x = paste0("REO reversal score (panel of ", n_pairs, " pairs)"),
-    y = "Assigned share  (radiation attribution, %)",
-    title = "REO reversal grades with radiation attribution (RET/PTC tumours)",
+    y = "Assigned share  (radiation attributability, %)",
+    title = "REO reversal scores and assigned share (RET tumors)",
     subtitle = "Out-of-sample R_Low / R_Mid (filled) vs training R_Sporadic / R_High (open); descriptive grading") +
   theme_thyr(base_size = 12, subtitle_size = 9.5, legend_position = "right")
 
