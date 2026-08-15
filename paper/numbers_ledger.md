@@ -201,6 +201,7 @@
 | N-77 | 906/906 ライブラリが stranded_second(reverse)判定、比 0.056–0.110(生値 min 0.0558948828・max 0.1095053129、閾値 0.5) | strand 判定の実測結果 — 閾値の恣意性が実務上不活性であることの開示 | meta/strand_selection_20260722_073758.tsv の selected・ratio 列の全数集計(906 行) | Methods | verified |
 | N-78 | PC-OD(Nakayama, Yata & Aoshima 2024, JJSDS 7:739–766)= 第1主成分の検体ローディングへの反復 Grubbs 検定(Grubbs 1969; 両側、α = 0.05)、棄却毎に最大絶対ローディングの検体を除去して再計算、棄却なしで停止; 入力は群 × 組織の部分行列(filterByExpr 縮約・未正規化 log-CPM、prior.count 2) | 210 外れ値スクリーンの規則一式 | lib/qc_pc_od.R:1-39(α 既定 0.05・Grubbs 臨界値・反復規則)・scripts/210:69-81(run_pcod: filterByExpr・log-CPM 設定)・210 ヘッダ(8 部分行列) | Methods | verified |
 | N-79 | コンテナビルドの日付固定: 基底 ubuntu:noble-20260410(不変タグ)+同日 apt snapshot(20260410T000000Z)、R パッケージは P3M 日付スナップショット 2026-04-09(CRAN + Bioconductor 3.22)、R 4.5.3 は参照 BLAS でソースビルド、OpenBLAS 非導入は設計 | 環境再構築の固定機構(再現性節) | Dockerfile:5-16(ヘッダ)・:29(FROM)・:33-37(apt snapshot)・:82-88(P3M/Bioc 3.22) | Methods | verified |
+| N-80 | BHLHB9(ENSG00000198908.12)は chrX(102,720,688–102,753,540; GENCODE v36) | B_Normal 唯一の DEG の性染色体所属(性候補の開示) | raw/reference/gencode.v36.annotation.gtf の gene 行(2026-08-15 実測照合: chrX・gene_name BHLHB9) | Results / Disc | verified |
 
 ## 図表台帳(図・表は1行ずつ — キャプションも検査対象)
 
