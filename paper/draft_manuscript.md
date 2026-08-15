@@ -24,12 +24,12 @@ stranded-column totals (ratio rule: the library is called stranded when the smal
 
 <!-- 写像元: 130, 140 -->
 
-Radiation attributability per exposed case was quantified with the thyroid model of the National Institutes of Health Interactive RadioEpidemiological Program (NIH IREP, version 5.7.3; Kocher et al. 2008) as the Assigned Share associated with the expected value of the excess relative risk (AS), computed from each case's recorded thyroid dose and ages with a fixed input convention (electrons E > 15 keV; dose in cSv = mGy/10; exposure year 1986; birth year = 1986 − age at exposure; surgery year = birth year + age at surgery), with all IREP assumptions and settings at their defaults (user-defined uncertainty distribution Lognormal (1,1); 10,000 iterations; random number seed 99) <!-- N-68 -->. The AS values are carried as a versioned input file with the analysis code; their dose and age inputs were verified case-by-case against the clinical table.
+Radiation attributability per exposed case was quantified with the thyroid model of the National Institutes of Health Interactive RadioEpidemiological Program (NIH IREP, version 5.7.3; Kocher et al. 2008) as the Assigned Share associated with the expected value of the excess relative risk (AS), computed from each case's recorded thyroid dose and ages with a fixed input convention (electrons E > 15 keV; sex as recorded; dose in cSv = mGy/10; exposure year 1986; birth year = 1986 − age at exposure; surgery year = birth year + age at surgery), with all IREP assumptions and settings at their defaults (user-defined uncertainty distribution Lognormal (1,1); 10,000 iterations; random number seed 99) <!-- N-68 -->. The AS values are carried as a versioned input file with the analysis code; their dose and age inputs were verified case-by-case against the clinical table.
 
 Cases were banded on AS with a single pre-fixed rule: unexposed cases (dose 0) form the Sporadic band; exposed cases fall in Low (0 < AS < 33.3), Mid (33.3 ≤ AS < 66.6), or High (AS ≥ 66.6); no case sits on a boundary
 <!-- N-69 -->. The clinical composition of all 440 cases across driver × band × pairing is given in Table 1(仮) <!-- N-11 -->.
 
-【訳】被曝症例ごとの放射線起因性は、NIH の Interactive RadioEpidemiological Program(NIH IREP、バージョン 5.7.3; Kocher et al. 2008)の甲状腺モデルにより、過剰相対リスク(ERR)の期待値に対応する Assigned Share(AS)として定量した。各症例の記録甲状腺線量と年齢から、固定した入力規約(電子 E > 15 keV; 線量は cSv = mGy/10;被曝年 1986; 出生年 = 1986 − 被曝時年齢; 手術年 = 出生年 + 手術時年齢)で計算し、IREP の仮定・設定はすべて既定値のまま用いた(ユーザー定義不確かさ分布 Lognormal (1,1)、反復 10,000 回、乱数シード 99)
+【訳】被曝症例ごとの放射線起因性は、NIH の Interactive RadioEpidemiological Program(NIH IREP、バージョン 5.7.3; Kocher et al. 2008)の甲状腺モデルにより、過剰相対リスク(ERR)の期待値に対応する Assigned Share(AS)として定量した。各症例の記録甲状腺線量と年齢から、固定した入力規約(電子 E > 15 keV; 性別は記録値のまま; 線量は cSv = mGy/10;被曝年 1986; 出生年 = 1986 − 被曝時年齢; 手術年 = 出生年 + 手術時年齢)で計算し、IREP の仮定・設定はすべて既定値のまま用いた(ユーザー定義不確かさ分布 Lognormal (1,1)、反復 10,000 回、乱数シード 99)
 <!-- N-68 -->。AS 値は解析コードとともに版管理された入力ファイルとして持ち回り、線量・年齢の入力は臨床表と全例照合した。症例は単一の事前固定規則で AS 帯に割り付けた: 非被曝(線量 0)は Sporadic 帯、被曝症例は Low(0 < AS < 33.3)・Mid(33.3 ≤ AS < 66.6)・High(AS ≥ 66.6)。境界上の症例は存在しない <!-- N-69 -->。440 症例全体の driver × 帯 × ペア有無の臨床構成は
 表1(仮)に示す <!-- N-11 -->。
 
@@ -41,12 +41,9 @@ All eligibility conditions were finalized into explicit per-case flags before an
 
 Case pairing resolves, per case, the GDC merged-aliquot expression assays (sample identifiers suffixed _merged; one merged tumor and one merged normal, enforced unique) — a case lacking either is unpaired. The main analysis cohort comprises driver-classified (RET or BRAF) cases in the Sporadic or High band with a paired tumor/normal sample, both tissues outlier-clean, and pooled relative purity ≥ 0.6 <!-- N-70 --> (n = 63 <!-- N-08 -->); the realized case flow and group composition are reported in Results (cohort-flow figure(仮); Tables 1–2(仮)). The REO training set is the RET subset of this cohort, and the REO evaluation set is the paired RET tumors of the Low and Mid bands, deliberately left unfiltered by the outlier and purity conditions (its own QC is reported as diagnostics, below).
 
-<!-- C-10 -->
-Group age structure is reported descriptively (per-group median and range, Table 2(仮) <!-- N-12, N-13 -->) together with interval estimates of the between-group difference (below); age is not entered as a covariate, because age at exposure is a component of the AS definition and adjusting for it would remove part of the exposure metric itself.
-
 【訳】全ての適格条件は推論に先立って症例別の明示的フラグとして確定し、下流の全スクリプトが同一のフラグを読む。検体外れ値は純度推定より前に(異常検体が純度の当てはめを汚染しないよう)、主成分ローディングへの反復 Grubbs 検定(PC-OD)でスクリーニングした: 群 × 組織の各部分行列(filterByExpr 縮約; 未正規化 log-CPM — 生のライブラリサイズは正規化が隠す組成外れ値を保存する)で、第1主成分の検体ローディングを両側 Grubbs 臨界値(α = 0.05)で検査し、最も極端な検体を除いて主成分を再計算、棄却が出なくなるまで反復した <!-- N-78 -->。相対腫瘍純度はその後、MUREN 正規化したペア付きカウント(protein-coding、filterByExpr)に対する contamDE 法(Shen et al. 2016; 自作実装)で症例ごとに推定した — driver コホートごとに両群(Sporadic・High)を合わせた1回の実行である: contamDE の純度は同時に推定した集合内でのみ相対的なので、プールした実行こそが両群に単一の共通尺度(コホート内最大値 = 1 の相対スコアとして報告; 単一の閾値が単一の意味を持つ尺度)を与える。この仮定する共通腫瘍参照は driver 層別という設計自体の前提(両群の腫瘍発現は driver の生物学が支配する)に乗っており、純度が測る腫瘍対正常の混入軸は検定対象の曝露対比とは別の軸である。推定値の役割はコホート内の相対フィルタと診断用共変量のみである。症例のペア解決は GDC の merged-aliquot 発現アッセイ(検体 ID 接尾辞 _merged; 症例ごとに merged 腫瘍1・merged 正常1、一意性を強制)を用い、どちらかを欠く症例はペアなしとする。主解析コホートは、driver 分類済み(RET または BRAF)で Sporadic か High 帯、腫瘍/正常ペアを持ち、両組織とも外れ値クリーン、かつプール相対純度 ≥ 0.6
 <!-- N-70 --> の症例からなる(n = 63 <!-- N-08 -->)。実現した症例フローと群構成は Results に報告する(コホートフロー図(仮); 表1–2(仮))。REO 訓練セットはこのコホートの RET 部分集合、REO 評価セットは Low・Mid 帯のペア付き RET 腫瘍で、意図的に外れ値・純度条件で濾過していない(その QC は後述の
-診断として報告)。群の年齢構造は記述的に報告し(群別中央値と範囲、表2(仮)<!-- N-12, N-13 -->)、群間差の区間推定(後述)を併記する。年齢は共変量に入れない — 被曝時年齢は AS の定義の構成要素であり、調整は曝露指標そのものの一部除去になるためである。
+診断として報告)。
 
 ### Analysis contrasts
 
@@ -55,6 +52,18 @@ Group age structure is reported descriptively (per-group median and range, Table
 All inference is organized in four analysis contrasts — exposed versus sporadic within each driver stratum and tissue: R_Tumor, R_Normal (RET stratum), B_Tumor, B_Normal (BRAF stratum). Each contrast is tested within itself; no cross-contrast family-wise inference is performed, and no study-wide FDR is claimed. In every contrast, group x is Sporadic and group y is High, so effects > 0.5 indicate higher expression in the exposed group. Throughout, two-sample comparison uses the Brunner–Munzel statistic (Brunner and Munzel 2000): the protocol takes the order relation as its primitive — a commitment that recurs in the rank-based REO panel and the tie-invariant enrichment statistic below. Throughout, discovery thresholds sit at the 0.10 false-discovery level; the estimator behind each threshold is stated where that level of inference is introduced.
 
 【訳】全ての推論は4つの解析対比 — 各 driver 層 × 組織内の被曝対散発対比: R_Tumor・R_Normal(RET 層)、B_Tumor・B_Normal(BRAF 層)— に組織化される。各対比は対比内で検定され、対比横断の family-wise 推論は行わず、研究全体の FDR は主張しない。全対比で群 x は Sporadic、群 y は High であり、効果 > 0.5 は被曝群での高発現を意味する。全体を通じて、2標本比較には Brunner–Munzel 統計量(Brunner and Munzel 2000)を用いる: 本プロトコルは順序関係を原始に取る — このコミットメントは後述の順位ベース REO パネルと tie 不変の濃縮統計量にも回帰する。全体を通じて、発見の閾値は誤発見水準 0.10 に置く。閾値の背後の推定量は、各推論水準の導入箇所で述べる。
+
+### Candidate confounders
+
+<!-- 写像元: diagnostics/age_arm_difference.R(年齢推定)、140/Table 2(組成)。性連鎖注釈は実行 Go 待ち -->
+
+<!-- C-15 / C-10(年齢の共変量非投入) -->
+Three candidate confounders of the exposure contrasts are pre-specified from the design and disclosed rather than adjusted for; none is tested, and no claim moves with any disclosure. The first is age: assigned share is a function of age at exposure, and with a single exposure event the banding itself induces age structure across the bands, so this candidate is guaranteed by construction. The between-group difference in age at surgery (High − Sporadic) is therefore estimated in each driver stratum by the Hodges–Lehmann median difference and the rank-based effect P(Sporadic < High) — the protocol's Brunner–Munzel effect estimator — each with a 95% percentile bootstrap confidence interval (within-group resampling, 9,999 replicates, seed 19450809 <!-- N-63 -->); this is a disclosure of magnitude and uncertainty, not a confounding test, and no p-value is computed. Age at exposure is structurally not comparable between groups (the Sporadic group is unexposed) <!-- N-63 -->. Age is not entered as a covariate, because age at exposure is a component of the AS definition and adjusting for it would remove part of the exposure metric itself; group age structure is reported descriptively (per-group median and range, Table 2(仮) <!-- N-12, N-13 -->).
+
+The second is sex: the assigned-share values are numerically insensitive to the recorded sex input, so sex is not absorbed into the exposure metric, and sex-chromosome genes differ mechanically between groups of unequal sex composition; the per-group composition is therefore reported in full (Table 2(仮) <!-- N-12, N-13 -->), and discovered genes are annotated for sex-chromosome membership. The third is oncogene subtype: the literature associates radiation-related papillary carcinoma with particular RET fusion partners, so the fusion-partner composition is reported per band (Table 2(仮) <!-- N-12 -->); the BRAF stratum carries a single mutation by construction.
+
+【訳】曝露対比の候補交絡因子3つを設計から事前指定し、調整でなく開示する。いずれも検定せず、どの開示によっても主張は動かない。第一は年齢である: assigned share は被曝時年齢の関数であり、曝露が単一事象であるため、帯化そのものが帯間に年齢構造を誘導する — この候補は構成により保証されている。したがって手術時年齢の群間差(High − Sporadic)を driver 層ごとに、Hodges–Lehmann 中央値差と順位ベースの効果 P(Sporadic < High)(本プロトコルの Brunner–Munzel 効果推定量)で推定し、それぞれに 95% percentile ブートストラップ信頼区間を付す(群内復元抽出、9,999 レプリケート、シード 19450809 <!-- N-63 -->)。これは大きさと不確かさの開示であって交絡の検定ではなく、p 値は計算しない。被曝時年齢は構造的に群間比較が成立しない(Sporadic 群は非被曝)<!-- N-63 -->。年齢は共変量に入れない — 被曝時年齢は AS の定義の構成要素であり、調整は曝露指標そのものの一部除去になるためである。群の年齢構造は記述的に報告する(群別中央値と範囲、表2(仮)<!-- N-12, N-13 -->)。第二は性である: assigned share の値は入力した性別に対して数値的に不感応であり、性は曝露指標に吸収されない。性構成が異なる群間では性染色体遺伝子が機械的に発現差を生むため、群別の性構成を全数報告し(表2(仮)<!-- N-12, N-13 -->)、発見遺伝子には性染色体所属の注釈を付す。第三は oncogene サブタイプである: 文献は放射線関連乳頭癌を特定の RET 融合パートナーと関連づけるため、融合パートナー構成を帯別に報告する(表2(仮)<!-- N-12 -->)。BRAF 層は構成により単一変異である。
+<!-- C-15 -->
 
 ### Normalization
 
@@ -126,17 +135,6 @@ Because the evaluation cohort is deliberately unfiltered, its QC is reported as 
 <!-- N-44 -->; <!-- C-12 --> (iii) because the reversal score correlates with purity within the evaluation bands, a graded band profile could in principle be purity-driven rather than band-driven — the two are separated by the partial Spearman correlation of band with score conditioning on purity (permutation reference) and by purity-stratified one-sided Brunner–Munzel comparisons of Mid over Low (two strata split at the median tumor purity) <!-- N-46, N-47 -->.
 
 【訳】評価コホートは意図的に未濾過のため、その QC は除外権限を持たない診断として報告する <!-- C-09 -->: (i) 訓練側の外れ値スクリーン(PC-OD)を R_Low/R_Mid 腫瘍に鏡映し、評価は適格全例で一度だけ実行 — スクリーンは件数の報告のみ <!-- N-43 -->; (ii) 評価帯の腫瘍純度は、RET コホート全体を1回の contamDE にプールして訓練と同一の共通尺度で推定 <!-- N-44 -->; (iii) 逆転スコアは評価帯内で純度と相関するため、帯の段階的プロファイルは原理的には帯でなく純度駆動であり得る — 両者は、純度を条件付けた帯–スコアの偏 Spearman 相関(置換参照)と、純度層別(腫瘍純度の中央値で2層)の Mid over Low 片側 Brunner–Munzel 比較で分離する <!-- C-12, N-46, N-47 -->。
-
-### Between-group age difference
-
-<!-- 写像元: diagnostics/age_arm_difference.R -->
-
-<!-- C-15 -->
-The between-group difference in age at surgery (High − Sporadic) was estimated in each driver stratum by the Hodges–Lehmann median difference and the rank-based effect P(Sporadic < High) — the same Brunner–Munzel effect estimator used throughout — each with a 95% percentile bootstrap confidence interval (within-group resampling, 9,999 replicates, seed 19450809
-<!-- N-63 -->). This is a disclosure of magnitude and uncertainty, not a confounding test; no p-value is computed. Age at exposure is structurally not comparable between groups (the Sporadic group is unexposed) <!-- N-63 -->.
-
-【訳】手術時年齢の群間差(High − Sporadic)は driver 層ごとに、Hodges–Lehmann 中央値差と順位ベースの効果 P(Sporadic < High)(全体で使用しているのと同じ Brunner–Munzel 効果推定量)で推定し、それぞれに 95% percentile ブートストラップ信頼区間を付した(群内復元抽出、9,999 レプリケート、シード 19450809 <!-- N-63 -->)。これは大きさと不確かさの開示であって交絡の検定ではなく、p 値は計算しない。被曝時年齢は構造的に群間比較が成立しない(Sporadic 群は非被曝)<!-- N-63 -->。
-<!-- C-15 -->
 
 ### External anchor cross-reference
 

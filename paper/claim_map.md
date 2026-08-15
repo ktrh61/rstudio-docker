@@ -220,3 +220,12 @@
   exposed versus sporadic within each driver stratum and tissue」。訳は「対比」。
   台帳3ファイルも同時統一(rds コードアクセサ `units[[u]]`・`units$…` とファイル名
   lib/units.R は実体名のため不変更)。R_Tumor 等の対比名は不変
+- 2026-08-15: **交絡フェーズの再構成(研究者指示)**: Methods「Between-group age difference」を
+  「Candidate confounders」へ改組し Analysis contrasts 直後へ移設 — 3候補を事前指定型で並置:
+  年齢(AS の構成が帯に年齢構造を誘導 → HL+CI の区間推定; 共変量非投入の理由文=C-10 も
+  QC 節から吸収)、性(AS に数値不活性で吸収されず+性染色体の機械経路 → 構成全数開示+
+  発見遺伝子の性連鎖注釈 — **注釈の実行は Go 待ち**)、oncogene サブタイプ(文献の曝露連関 →
+  帯別構成開示; BRAF 層は構成により単一変異)。年齢単独節が生む「他候補はスルー」の非対称を
+  解消。背景事実: B_Normal 唯一の DEG BHLHB9 は chrX(GENCODE v36 で実測確認 2026-08-15)、
+  B 層の性構成は 85% vs 44% と非対称。「性は AS 経由で吸収済み」論法は不使用(甲状腺 AS は
+  性に数値不活性 — 研究者実測)。C-15 の Results 側・N-63〜65 は不変

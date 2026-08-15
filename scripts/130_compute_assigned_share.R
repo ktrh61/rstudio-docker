@@ -3,7 +3,7 @@
 # are IREP results computed by the researcher (NIH IREP thyroid model,
 # cited as version 5.7.3,
 # "Assigned Share associated with the expected value of ERR"; radiation type
-# electrons E>15keV; dose entered in cSv = mGy/10; birth year = 1986 -
+# electrons E>15keV; sex as recorded; dose entered in cSv = mGy/10; birth year = 1986 -
 # AGE_EXPOSURE, exposure year 1986, surgery year = birth year + AGE_SURGERY;
 # all IREP assumptions and settings at their defaults: user-defined
 # uncertainty distribution Lognormal(1,1), 10,000 iterations, random number
