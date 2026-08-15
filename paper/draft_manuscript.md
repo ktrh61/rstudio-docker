@@ -212,7 +212,7 @@ The three disclosed candidate confounders (Methods) are reported in Table 2(仮)
 
 <!-- C-01 -->
 In R_Tumor — the contrast where the pre-specified interpretation map expects the signal — 1,765 of 15,621 tested genes differed between the High and Sporadic groups at Storey q < 0.10 <!-- N-16, N-15 -->, and the pre-specified contrast-level omnibus supported the presence of signal (Higher Criticism p = 0.0112
-<!-- N-20 -->) (Figs. 1–2(仮), Table 3(仮)). <!-- C-02 --> The discovered genes ran in both directions: 971 higher and 794 lower in the exposed group <!-- N-17 -->. <!-- C-03 --> In R_Normal no gene reached q < 0.10 and the
+<!-- N-20 -->) (Figs. 1–2(仮), Table 3(仮)). <!-- C-02 --> The discovered genes ran in both directions: 971 higher and 794 lower in the exposed group <!-- N-17 -->. The sex-chromosome annotation of the discovered list (Methods) counted 57 X-linked genes among the 1,765 (36 higher, 21 lower in the exposed group) and no Y-linked gene; the contrast's tested genes include 572 X-linked and 2 Y-linked <!-- N-82 -->. <!-- C-03 --> In R_Normal no gene reached q < 0.10 and the
 omnibus lent no support (HC p = 0.3199) <!-- N-16, N-20 -->. <!-- C-04 --> B_Tumor likewise yielded no discovery (0 genes at q < 0.10; HC p = 0.1815)
 <!-- N-16, N-20 -->; under the pre-fixed reading this cell is direction-agnostic, and its quiet is not read as a specificity control. <!-- C-16 -->
 In B_Normal the evidence is reported as it stands, without a binary label: one gene crossed the gene-level threshold (BHLHB9 — an X-linked gene <!-- N-80 --> — effect 0.967, q = 0.013
@@ -220,7 +220,7 @@ In B_Normal the evidence is reported as it stands, without a binary label: one g
 <!-- N-23 -->, and the contrast's π0 estimate (0.727) sat below those of the other two quiet contrasts (0.955, 0.943) <!-- N-19 -->. The reading pre-assigned
 to this pattern is taken up in Discussion.
 
-【訳】事前指定の解釈マップがシグナルを期待する対比である R_Tumor では、検定対象 15,621 遺伝子のうち 1,765 が Storey q < 0.10 で High 群と Sporadic 群の間で発現差を示し <!-- N-16, N-15 -->、事前指定の対比レベル・オムニバスがシグナルの存在を支持した(Higher Criticism p = 0.0112 <!-- N-20 -->)(図1–2(仮)・表3(仮))。発見遺伝子は双方向に分布した: 被曝群で高発現 971・低発現 794 <!-- N-17 -->。R_Normal では q < 0.10 の遺伝子はなく、オムニバスの支持もなかった(HC p = 0.3199)<!-- N-16, N-20 -->。B_Tumor も同様に発見なし(q < 0.10 は 0 遺伝子; HC p = 0.1815)<!-- N-16, N-20 --> — 事前固定の読みに従い、このセルは方向不可知であり、その静けさを特異性の対照とは読まない。B_Normal の証拠は2値ラベルなしにそのまま報告する: 1遺伝子が遺伝子レベル閾値を越え(BHLHB9 — X 連鎖遺伝子 <!-- N-80 --> — effect 0.967、q = 0.013 <!-- N-22 -->)、事前指定の主オムニバスは HC p = 0.0773
+【訳】事前指定の解釈マップがシグナルを期待する対比である R_Tumor では、検定対象 15,621 遺伝子のうち 1,765 が Storey q < 0.10 で High 群と Sporadic 群の間で発現差を示し <!-- N-16, N-15 -->、事前指定の対比レベル・オムニバスがシグナルの存在を支持した(Higher Criticism p = 0.0112 <!-- N-20 -->)(図1–2(仮)・表3(仮))。発見遺伝子は双方向に分布した: 被曝群で高発現 971・低発現 794 <!-- N-17 -->。発見リストの性染色体注釈(Methods)では、1,765 遺伝子中 57 が X 連鎖(被曝群で高発現 36・低発現 21)、Y 連鎖は 0 だった。当該対比の検定遺伝子には X 連鎖 572・Y 連鎖 2 が含まれる <!-- N-82 -->。R_Normal では q < 0.10 の遺伝子はなく、オムニバスの支持もなかった(HC p = 0.3199)<!-- N-16, N-20 -->。B_Tumor も同様に発見なし(q < 0.10 は 0 遺伝子; HC p = 0.1815)<!-- N-16, N-20 --> — 事前固定の読みに従い、このセルは方向不可知であり、その静けさを特異性の対照とは読まない。B_Normal の証拠は2値ラベルなしにそのまま報告する: 1遺伝子が遺伝子レベル閾値を越え(BHLHB9 — X 連鎖遺伝子 <!-- N-80 --> — effect 0.967、q = 0.013 <!-- N-22 -->)、事前指定の主オムニバスは HC p = 0.0773
 <!-- N-20 -->、記述的な max 統計量行は p = 0.0125 <!-- N-23 -->、この対比の π0 推定値(0.727)は他の2つの静かな対比(0.955・0.943)より低かった <!-- N-19 -->。このパターンに
 事前割当された読みは Discussion で扱う。
 

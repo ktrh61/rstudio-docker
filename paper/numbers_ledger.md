@@ -203,6 +203,7 @@
 | N-79 | コンテナビルドの日付固定: 基底 ubuntu:noble-20260410(不変タグ)+同日 apt snapshot(20260410T000000Z)、R パッケージは P3M 日付スナップショット 2026-04-09(CRAN + Bioconductor 3.22)、R 4.5.3 は参照 BLAS でソースビルド、OpenBLAS 非導入は設計 | 環境再構築の固定機構(再現性節) | Dockerfile:5-16(ヘッダ)・:29(FROM)・:33-37(apt snapshot)・:82-88(P3M/Bioc 3.22) | Methods | verified |
 | N-80 | BHLHB9(ENSG00000198908.12)は chrX(102,720,688–102,753,540; GENCODE v36) | B_Normal 唯一の DEG の性染色体所属(性候補の開示) | raw/reference/gencode.v36.annotation.gtf の gene 行(2026-08-15 実測照合: chrX・gene_name BHLHB9) | Results / Disc | verified |
 | N-81 | High 群の AS 中央値: R_High 86.7 [68.2–93.7] / B_High 75.9 [68.5–93.6](参考: 線量中央値 583 / 526 mGy) | C-16 の「R 側が曝露指標上で高い」論拠の数値(追補計算 2026-08-15、研究者 Go) | processed/thyr_analysis_cohorts.rds(include_main_bm、driver × band=High の assigned_share/dose_mgy 中央値 — 正準イメージ rebc-r453:refblas 内で算出。R_High 86.7 は N-50 と一致) | Disc | verified |
+| N-82 | R_Tumor 発見 1,765 遺伝子中 chrX 57(被曝群で高発現 36・低発現 21)・chrY 0; 検定対象 15,621 中 chrX 572・chrY 2 | R_Tumor 発見リストの性染色体所属の開示(Methods の注釈宣言の受け、性候補の開示 — 員数のみ、検定なし) | diagnostics/sex_chromosome_annotation.R(GENCODE v36 GTF gene 行 × thyr_expression_test.rds、正準イメージ rebc-r453:refblas 内で算出 2026-08-16。B_Normal 唯一 DEG=BHLHB9 chrX の N-80 一致を stopifnot で確認) | Results | verified |
 
 ## 図表台帳(図・表は1行ずつ — キャプションも検査対象)
 
@@ -312,3 +313,6 @@
   N-50 の R_Sporadic を未定義表記に訂正
 - 2026-08-15: N-81 追加(High 群 AS 中央値 R 86.7 / B 75.9 — C-16 論拠「leans higher-dose」の
   無数値状態を解消する追補計算、固定入力・研究者 Go)。C-07 に識別不能の論理根拠1文を追加
+- 2026-08-16: N-82 追加(R_Tumor 発見リストの性染色体員数 — 保留だった性連鎖注釈の計算を実施、
+  研究者 Go)。診断 = diagnostics/sex_chromosome_annotation.R(出力は diagnostics/output/、
+  git 追跡外・再生成可能)。読み規則の事前固定は不要と裁定済み(記述的診断)
