@@ -202,6 +202,7 @@
 | N-78 | PC-OD(Nakayama, Yata & Aoshima 2024, JJSDS 7:739–766)= 第1主成分の検体ローディングへの反復 Grubbs 検定(Grubbs 1969; 両側、α = 0.05)、棄却毎に最大絶対ローディングの検体を除去して再計算、棄却なしで停止; 入力は群 × 組織の部分行列(filterByExpr 縮約・未正規化 log-CPM、prior.count 2) | 210 外れ値スクリーンの規則一式 | lib/qc_pc_od.R:1-39(α 既定 0.05・Grubbs 臨界値・反復規則)・scripts/210:69-81(run_pcod: filterByExpr・log-CPM 設定)・210 ヘッダ(8 部分行列) | Methods | verified |
 | N-79 | コンテナビルドの日付固定: 基底 ubuntu:noble-20260410(不変タグ)+同日 apt snapshot(20260410T000000Z)、R パッケージは P3M 日付スナップショット 2026-04-09(CRAN + Bioconductor 3.22)、R 4.5.3 は参照 BLAS でソースビルド、OpenBLAS 非導入は設計 | 環境再構築の固定機構(再現性節) | Dockerfile:5-16(ヘッダ)・:29(FROM)・:33-37(apt snapshot)・:82-88(P3M/Bioc 3.22) | Methods | verified |
 | N-80 | BHLHB9(ENSG00000198908.12)は chrX(102,720,688–102,753,540; GENCODE v36) | B_Normal 唯一の DEG の性染色体所属(性候補の開示) | raw/reference/gencode.v36.annotation.gtf の gene 行(2026-08-15 実測照合: chrX・gene_name BHLHB9) | Results / Disc | verified |
+| N-81 | High 群の AS 中央値: R_High 86.7 [68.2–93.7] / B_High 75.9 [68.5–93.6](参考: 線量中央値 583 / 526 mGy) | C-16 の「R 側が曝露指標上で高い」論拠の数値(追補計算 2026-08-15、研究者 Go) | processed/thyr_analysis_cohorts.rds(include_main_bm、driver × band=High の assigned_share/dose_mgy 中央値 — 正準イメージ rebc-r453:refblas 内で算出。R_High 86.7 は N-50 と一致) | Disc | verified |
 
 ## 図表台帳(図・表は1行ずつ — キャプションも検査対象)
 
@@ -308,3 +309,5 @@
   与えない)、R_Sporadic は AS 未定義として専用ストリップ(積み上げ=員数)表示、未発火だった
   NA→66.6 代入のデッドコードを stopifnot に置換(発火実績ゼロを実測確認 — 15/15 とも実値)。
   N-50 の R_Sporadic を未定義表記に訂正
+- 2026-08-15: N-81 追加(High 群 AS 中央値 R 86.7 / B 75.9 — C-16 論拠「leans higher-dose」の
+  無数値状態を解消する追補計算、固定入力・研究者 Go)。C-07 に識別不能の論理根拠1文を追加
