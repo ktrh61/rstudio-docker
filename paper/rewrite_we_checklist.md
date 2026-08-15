@@ -72,9 +72,10 @@ npj PO(Nature 系)は能動推奨、BJC/ERC は能動可。
 
 ## Discussion(書き直し時に We を検討する宣言文)
 
-- [ ] ★ "no claim of this study moves with these counts / rests on it" 系 3 箇所(C-13・C-17×2)— 主張非依存の宣言。同型定型の3連なので、We 化と同時に言い回しを散らすと呪文感が消える(全て必要な文 — 削らない)。
-- [ ] ★ "The reading, however, is not left open: the interpretation map, fixed before the reported results were seen, assigns..." (B_Normal, C-16) — 事前固定マップの条件適用。例: We fixed the interpretation map before seeing the results; it assigns...
-- [ ] ★ "Under the pre-fixed reading, whether the two strata share a normal-tissue exposure trace is not identifiable in this cohort" (C-07) — 識別不能の宣言。We 化例: Under the reading we fixed in advance, ... is not identifiable...
+- [ ] ★ "Throughout this section, readings drawn from the interpretation map (Methods) were assigned to outcome patterns before the results were seen; interpretations that go beyond the map are labelled as hypothesis-generating." (Disc §1) — 事前固定の一括宣言(2026-08-15 改稿で各節の反復をこの1文に集約。スコープは「マップ由来の読み」に限定 — C-17 の仮説生成枠は対象外という線を保つこと)。例: We assigned the readings ... before seeing the results...
+- [ ] ★ "no claim ... moves with these counts / rests on it / rests on this annotation" 系(C-13・C-17・C-14)— 主張非依存の宣言。言い回しの散らしは 2026-08-15 改稿で実施済み(moves with / rests on it / rests on this annotation)。全て必要な文 — 削らない。
+- [ ] ★ "instead the pattern receives the reading the map assigned to it in advance — confounding first" (B_Normal, C-16) — 事前固定マップの条件適用(2026-08-15 改稿で短縮形へ — 実体は不変)。
+- [ ] ★ "Whether the two strata share a normal-tissue exposure trace is not identifiable in this cohort" (C-07) — 識別不能の宣言(2026-08-15 改稿で前置き句を削除 — 実体は不変)。
 
 ## 受動のままで良い代表例(変換不要の確認用)
 

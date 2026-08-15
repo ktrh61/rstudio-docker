@@ -240,3 +240,14 @@
   Methods の宣言文がこれを担う)。併せて「pre-specified from the design」を「follow from the
   design」へ修正(chrX 判明後に追加した計器を含む以上、暦の先行でなくデータ非依存の導出可能性
   のみを主張する)
+- 2026-08-15: **Discussion 全面改稿+外部アンカーの Results 移送(研究者指示: 叩き台として
+  機能する学術文体へ)**: (1) C-13 の事実(19/20 ゼロ・S100A10 = N-53/54)を Results §7 に新設
+  移送、Disc は読みのみ(対称規則・非重なりの通例性・no claim moves)。(2) Disc を 8→7 節に再構成:
+  Principal findings / B_Normal(258→217語に圧縮、性候補含む)/ Candidate confounders(旧・年齢
+  単独節を改組、Methods と対構造、Q-13 4観察+Vriens をここに一本化し C-14 節の重複を解消、
+  パートナー勾配なしの記述を追加)/ Reading the annotation / Concordance across strata(C-17+
+  C-07 統合 — tumor=仮説生成・normal=識別不能の対)/ External anchors / Limitations(不変)。
+  (3) 規律句の密度削減: 事前固定の宣言を Disc §1 の1文に集約(スコープは「マップ由来の読み」
+  に限定 — C-17 は対象外)、★保護4件の実体は維持(文言はチェックリストで追随)。C/N タグ全数
+  保存、対応検査(EN↔訳)通過。**未決のまま**: 解釈マップ実体の紙面掲載(判断点5連動)— 改稿で
+  唐突感は軽減したが根治はマップ提示待ち
