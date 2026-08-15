@@ -41,8 +41,8 @@ df <- do.call(rbind, lapply(unit_order, function(u) {
   )
 }))
 df$unit <- factor(df$unit, levels = unit_order)
-lab_up <- sprintf("up in High (q<%.2f)", FDR_CUT)
-lab_down <- sprintf("up in Sporadic (q<%.2f)", FDR_CUT)
+lab_up <- sprintf("higher in exposed (q<%.2f)", FDR_CUT)
+lab_down <- sprintf("lower in exposed (q<%.2f)", FDR_CUT)
 df$sig <- ifelse(df$q < FDR_CUT,
   ifelse(df$x >= 0, lab_up, lab_down),
   "n.s.")
@@ -63,12 +63,14 @@ p <- ggplot(df, aes(x = x, y = y)) +
   scale_colour_manual(values = pal, name = NULL, drop = FALSE) +
   facet_wrap(~unit, ncol = 2) +
   labs(
-    x = expression("signed Brunner-Munzel effect  " * (P(X < Y) - P(X > Y))
-      * "   " %->% "  higher in High"),
+    x = expression("signed Brunner–Munzel effect  " * (P(X < Y) - P(X > Y))
+      * "   " %->% "  higher in exposed"),
     y = expression(-log[10] * "(exact permutation p)"),
-    title = "Gene-level Brunner-Munzel evidence (410), per analysis unit",
-    subtitle = paste0("Rank-based effect (no fold change); coloured by Storey q < ",
-      FDR_CUT, ". Unit readings follow the pre-registered prediction map.")
+    title = "Gene-level Brunner–Munzel evidence, per analysis contrast",
+    subtitle = sprintf(paste0(
+      "Rank-based effect (no fold change); colored by Storey q < %.2f.\n",
+      "Contrast readings follow the interpretation map fixed before the reported results existed."
+    ), FDR_CUT)
   ) +
   theme_thyr()
 

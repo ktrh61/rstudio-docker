@@ -53,8 +53,8 @@ df <- do.call(rbind, lapply(unit_order, function(u) {
   )
 }))
 df$unit <- factor(df$unit, levels = unit_order)
-lab_up <- sprintf("up in High (q<%.2f)", FDR_CUT)
-lab_down <- sprintf("up in Sporadic (q<%.2f)", FDR_CUT)
+lab_up <- sprintf("higher in exposed (q<%.2f)", FDR_CUT)
+lab_down <- sprintf("lower in exposed (q<%.2f)", FDR_CUT)
 df$sig <- factor(ifelse(df$q < FDR_CUT,
   ifelse(df$M >= 0, lab_up, lab_down), "n.s."),
   levels = c(lab_up, lab_down, "n.s."))
@@ -72,10 +72,11 @@ p <- ggplot(df, aes(x = A, y = M)) +
   labs(
     x = expression("A:  average abundance  " * (log[2] * " CPM)")),
     y = expression("M:  " * log[2] * " fold change  (High - Sporadic)"),
-    title = "Gene-level MA plot (310 CPM, 410 Brunner-Munzel q), per unit",
-    subtitle = paste0("Fold change for display only (DE call is rank-based BM); ",
-      "coloured by Storey q < ", FDR_CUT,
-      ". Unit readings follow the pre-registered prediction map.")
+    title = "Gene-level MA plot, per analysis contrast",
+    subtitle = sprintf(paste0(
+      "Fold change for display only (the DE call is the rank-based Brunner–Munzel test); colored by Storey q < %.2f.\n",
+      "Contrast readings follow the interpretation map fixed before the reported results existed."
+    ), FDR_CUT)
   ) +
   theme_thyr()
 
