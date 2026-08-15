@@ -170,15 +170,12 @@ The publication run executed R 4.5.3 on Ubuntu 24.04 <!-- N-02 --> with the refe
 
 <!-- C-10 -->
 Of the 440 cases of the REBC-THYR cohort (Morton et al. 2021) <!-- N-11 -->, the main analysis cohort comprised 63 paired, driver-stratified cases — 9 B_High, 27 B_Sporadic, 15 R_High and 12 R_Sporadic <!-- N-09 --> — reached through the pre-specified flow of driver classification, band eligibility, pairing, outlier screening and purity thresholding (Tables 1–2(仮)). Most of the reduction reflects the pre-specified eligibility restrictions — driver classification and the restriction to the extreme bands — rather than technical losses to pairing, outlier screening or purity; the full flow, stratified by driver, is shown in the cohort-flow figure(仮) <!-- N-08 -->. The REO evaluation set added 36 paired RET tumors of the intermediate bands (17 R_Low, 19 R_Mid
-<!-- N-10 -->). In both driver strata the High group sat somewhat older at surgery than the Sporadic group (RET: median 23 [range 14–31] vs 20.5 [14–27] years; BRAF: 29 [19–39] vs 24 [11–29]) <!-- N-12, N-13 -->.
+<!-- N-10 -->). In both driver strata the High group sat somewhat older at surgery than the Sporadic group <!-- N-12, N-13 -->.
 <!-- C-15 -->
-The between-group age difference is disclosed as an estimate rather than tested: Hodges–Lehmann +2.5 years (95% bootstrap CI −1.0 to 6.0; P(Sporadic<High) 0.625 [0.400–0.828]) in the RET stratum <!-- N-64 --> and +8.0 years (3.0 to 12.0; 0.850 [0.681–0.973]) in the BRAF stratum
-<!-- N-65 -->. Age at exposure exists only for exposed cases and admits no between-group comparison <!-- N-63 -->.
+The three disclosed candidate confounders (Methods) are reported in Table 2(仮): the per-group age distributions, with interval estimates of the between-group age difference as table footnotes (disclosed, not tested <!-- N-64, N-65 -->), and the per-group sex and fusion-partner compositions. Age at exposure exists only for exposed cases and admits no between-group comparison <!-- N-63 -->.
 
 【訳】REBC-THYR コホート(Morton et al. 2021)の 440 症例 <!-- N-11 --> のうち、主解析コホートは、driver 分類・帯適格性・ペア有無・外れ値スクリーン・純度閾値という事前指定のフロー(表1–2(仮))を経た 63 のペア付き driver 層別症例 — B_High 9・B_Sporadic 27・R_High 15・R_Sporadic 12
-<!-- N-09 --> — である。削減の大半は事前指定の適格性制限 — driver 分類と両端帯への制限 — によるもので、ペア・外れ値スクリーン・純度による技術的損失ではない。フローの全体は driver 層別でコホートフロー図(仮)に示す <!-- N-08 -->。REO 評価セットとして中間帯のペア付き RET 腫瘍 36 例(R_Low 17・R_Mid 19 <!-- N-10 -->)を加えた。いずれの driver 層でも High 群は
-Sporadic 群よりやや高い手術時年齢に分布した(RET: 中央値 23 [範囲 14–31] 対 20.5 [14–27] 歳; BRAF: 29 [19–39] 対 24 [11–29])<!-- N-12, N-13 -->。群間年齢差は検定でなく推定として開示する: Hodges–Lehmann 中央値差は RET 層で+2.5 年(95% ブートストラップ CI −1.0〜6.0; P(Sporadic<High) 0.625 [0.400–0.828])
-<!-- N-64 -->、BRAF 層で +8.0 年(3.0〜12.0; 0.850 [0.681–0.973])<!-- N-65 -->。被曝時年齢は被曝症例にのみ定義され、群間比較は成立しない <!-- N-63 -->。
+<!-- N-09 --> — である。削減の大半は事前指定の適格性制限 — driver 分類と両端帯への制限 — によるもので、ペア・外れ値スクリーン・純度による技術的損失ではない。フローの全体は driver 層別でコホートフロー図(仮)に示す <!-- N-08 -->。REO 評価セットとして中間帯のペア付き RET 腫瘍 36 例(R_Low 17・R_Mid 19 <!-- N-10 -->)を加えた。いずれの driver 層でも High 群は Sporadic 群よりやや高い手術時年齢に分布した <!-- N-12, N-13 -->。開示対象の候補交絡因子3つ(Methods)は表2(仮)に報告する: 群別の年齢分布(群間年齢差の区間推定は表脚注 — 開示であって検定ではない <!-- N-64, N-65 -->)、および群別の性構成と融合パートナー構成。被曝時年齢は被曝症例にのみ定義され、群間比較は成立しない <!-- N-63 -->。
 
 ### 2. Gene-level differential expression(C-01〜C-04, C-16, 410)
 
