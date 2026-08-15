@@ -85,12 +85,12 @@ Each gene was tested for a High-vs-Sporadic difference with the exact permutatio
 
 <!-- 写像元: 410(オムニバス・R(α)); 非2値化は C-16 -->
 
-A contrast-level omnibus permutation test accompanies the gene table and carries the contrast-level inferential claim — the question of whether a contrast carries any signal is answered here, not by the size of its gene list; Higher Criticism (α0 = 0.1) is the pre-specified primary omnibus statistic, chosen a priori for its sensitivity to many weak effects (Donoho & Jin 2004), with count- and max-type rows reported descriptively <!-- N-05 -->. The full rejection curve R(α) is retained so that results do not depend on displaying a single threshold count.
+The contrast-level inferential claim is carried by an omnibus permutation test: the question of whether a contrast carries any label-aligned signal is answered here, not by the size of its gene list. Higher Criticism (α0 = 0.1) is the pre-specified primary omnibus statistic, chosen for its sensitivity to many weak effects (Donoho & Jin 2004), with count- and max-type rows reported descriptively <!-- N-05 -->. The full rejection curve R(α) is retained so that results do not depend on displaying a single threshold count.
 
 <!-- C-16 -->
 No contrast-level binary significance label is assigned: contrast-level evidence is reported continuously — the per-gene q-values, the pre-specified omnibus p and the rejection curve — following the methodological guidance against dichotomizing evidence near a threshold (Wasserstein & Lazar 2016; Greenland et al. 2016; Amrhein et al. 2019), with the interpretation of each outcome pattern pre-assigned before the results were seen rather than left to post-hoc labeling (interpretation map, Methods).
 
-【訳】対比レベルのオムニバス置換検定が遺伝子表に付随し、対比水準の推論的主張を担う — 「対比にシグナルがあるか」への回答はここで与えられ、遺伝子リストの大きさによってではない。Higher Criticism(α0 = 0.1)が事前指定の主オムニバス統計量であり(多数の弱い効果への感度で a priori に選定 — Donoho & Jin 2004)、count 型・max 型の行は記述的に報告する <!-- N-05 -->。棄却曲線 R(α) 全体を保持し、結果が単一閾値の件数表示に依存しないようにする。対比に2値の有意性ラベルは付与しない: 対比水準の証拠は連続量のまま — 遺伝子別 q 値、事前指定オムニバスの p、棄却曲線 — で報告する。これは閾値近傍の証拠の2値化を退ける方法論的勧告(Wasserstein & Lazar 2016; Greenland et al. 2016; Amrhein et al. 2019)に従うものであり、各結果パターンの解釈は結果を見る前に事前割当されている(解釈マップ、Methods)。<!-- C-16 -->
+【訳】対比水準の推論的主張はオムニバス置換検定が担う: 「対比にラベル整列シグナルがあるか」への回答はここで与えられ、遺伝子リストの大きさによってではない。Higher Criticism(α0 = 0.1)が事前指定の主オムニバス統計量であり(多数の弱い効果への感度で選定 — Donoho & Jin 2004)、count 型・max 型の行は記述的に報告する <!-- N-05 -->。棄却曲線 R(α) 全体を保持し、結果が単一閾値の件数表示に依存しないようにする。対比に2値の有意性ラベルは付与しない: 対比水準の証拠は連続量のまま — 遺伝子別 q 値、事前指定オムニバスの p、棄却曲線 — で報告する。これは閾値近傍の証拠の2値化を退ける方法論的勧告(Wasserstein & Lazar 2016; Greenland et al. 2016; Amrhein et al. 2019)に従うものであり、各結果パターンの解釈は結果を見る前に事前割当されている(解釈マップ、Methods)。<!-- C-16 -->
 
 ### Gene-set level inference
 
