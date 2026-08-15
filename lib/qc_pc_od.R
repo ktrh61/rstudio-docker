@@ -1,3 +1,7 @@
+# PC-OD: PC-scores-based outlier detection (Nakayama, Yata & Aoshima 2024,
+# Jpn J Stat Data Sci 7:739-766, doi:10.1007/s42081-024-00255-0). Iterated
+# Grubbs test (Grubbs 1969, Technometrics 11:1-21) on the first PC's dual
+# vector; in-house implementation following the paper's algorithm.
 PC_OD <- function(X, alpha = 0.05) {
   n_all <- ncol(X)
   samples <- seq_len(n_all)
