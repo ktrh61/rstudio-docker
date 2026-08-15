@@ -207,9 +207,9 @@ Under signal-free inputs — label permutations pushed through the identical pro
 ### 4. Composition of the discovered list(C-14, 430)
 
 <!-- C-14 -->
-As a descriptive annotation of the discovered list (hypothesis-generating; Methods), the 794 genes lower in the High group were strongly concentrated in proliferation, cell-cycle and DNA-repair programs (E2F targets 46/199, G2M checkpoint 41/198, Reactome DNA repair 68/322 <!-- N-61, N-62 -->), a single theme that extends into the radiation-curated family, whose leading flagged sets are themselves cell-cycle genes responding to irradiation (46 of 126 in the down list, expected 6.4 <!-- N-60 -->). The 971 genes higher in the High group showed no such concentration in any curated family <!-- N-59 --> (full results in Supp. Tab. 2(仮)).
+In the descriptive annotation of the discovered list (hypothesis-generating; Methods), the 794 genes lower in the High group were strongly concentrated in proliferation, cell-cycle and DNA-repair programs (E2F targets 46/199, G2M checkpoint 41/198, Reactome DNA repair 68/322 <!-- N-61, N-62 -->), a single theme that extends into the radiation-curated family, whose leading flagged sets are themselves cell-cycle genes responding to irradiation (46 of 126 in the down list, expected 6.4 <!-- N-60 -->). The 971 genes higher in the High group showed no such concentration in any curated family <!-- N-59 --> (full results in Supp. Tab. 2(仮)).
 
-【訳】発見済みリストの記述的注釈(仮説生成; Methods)として、High 群で低発現の 794 遺伝子は増殖・細胞周期・DNA 修復プログラムに強く集中し(E2F targets 46/199・G2M checkpoint 41/198・Reactome DNA repair 68/322 <!-- N-61, N-62 -->)、この単一テーマは放射線キュレーション・ファミリーにも及ぶ — そこでフラグが立った上位セット自体が照射に応答する細胞周期遺伝子である(down リストで 126 中 46、期待 6.4 <!-- N-60 -->)。High 群で高発現の 971 遺伝子には、どのファミリーにもそのような集中はなかった
+【訳】発見済みリストの記述的注釈(仮説生成; Methods)では、High 群で低発現の 794 遺伝子は増殖・細胞周期・DNA 修復プログラムに強く集中し(E2F targets 46/199・G2M checkpoint 41/198・Reactome DNA repair 68/322 <!-- N-61, N-62 -->)、この単一テーマは放射線キュレーション・ファミリーにも及ぶ — そこでフラグが立った上位セット自体が照射に応答する細胞周期遺伝子である(down リストで 126 中 46、期待 6.4 <!-- N-60 -->)。High 群で高発現の 971 遺伝子には、どのファミリーにもそのような集中はなかった
 <!-- N-59 -->(全結果は Supp. Tab. 2(仮))。
 
 ### 5. Between-stratum concordance of the exposure contrast(C-07, C-17)
