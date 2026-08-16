@@ -202,7 +202,7 @@
 | N-78 | PC-OD(Nakayama, Yata & Aoshima 2024, JJSDS 7:739–766)= 第1主成分の検体ローディングへの反復 Grubbs 検定(Grubbs 1969; 両側、α = 0.05)、棄却毎に最大絶対ローディングの検体を除去して再計算、棄却なしで停止; 入力は群 × 組織の部分行列(filterByExpr 縮約・未正規化 log-CPM、prior.count 2) | 210 外れ値スクリーンの規則一式 | lib/qc_pc_od.R:1-39(α 既定 0.05・Grubbs 臨界値・反復規則)・scripts/210:69-81(run_pcod: filterByExpr・log-CPM 設定)・210 ヘッダ(8 部分行列) | Methods | verified |
 | N-79 | コンテナビルドの日付固定: 基底 ubuntu:noble-20260410(不変タグ)+同日 apt snapshot(20260410T000000Z)、R パッケージは P3M 日付スナップショット 2026-04-09(CRAN + Bioconductor 3.22)、R 4.5.3 は参照 BLAS でソースビルド、OpenBLAS 非導入は設計 | 環境再構築の固定機構(再現性節) | Dockerfile:5-16(ヘッダ)・:29(FROM)・:33-37(apt snapshot)・:82-88(P3M/Bioc 3.22) | Methods | verified |
 | N-80 | BHLHB9(ENSG00000198908.12)は chrX(102,720,688–102,753,540; GENCODE v36) | B_Normal 唯一の DEG の性染色体所属(性候補の開示) | raw/reference/gencode.v36.annotation.gtf の gene 行(2026-08-15 実測照合: chrX・gene_name BHLHB9) | Results / Disc | verified |
-| N-81 | High 群の AS 中央値: R_High 86.7 [68.2–93.7] / B_High 75.9 [68.5–93.6](参考: 線量中央値 583 / 526 mGy) | C-16 の「R 側が曝露指標上で高い」論拠の数値(追補計算 2026-08-15、研究者 Go) | processed/thyr_analysis_cohorts.rds(include_main_bm、driver × band=High の assigned_share/dose_mgy 中央値 — 正準イメージ rebc-r453:refblas 内で算出。R_High 86.7 は N-50 と一致) | Disc | verified |
+| N-81 | High 群の AS 中央値: R_High 86.7 [68.2–93.7] / B_High 75.9 [68.5–93.6](参考: 線量中央値 583 / 526 mGy) | **本文不使用**(2026-08-16: B_Normal 段落の軽量化により撤去 — 発見1遺伝子に対し重すぎる論証だったため。算出値は Q-16 の台帳回答用に保存)。旧用途 = C-16 の「R 側が曝露指標上で高い」論拠(追補計算 2026-08-15、研究者 Go) | processed/thyr_analysis_cohorts.rds(include_main_bm、driver × band=High の assigned_share/dose_mgy 中央値 — 正準イメージ rebc-r453:refblas 内で算出。R_High 86.7 は N-50 と一致) | Disc | verified |
 | N-82 | R_Tumor 発見 1,765 遺伝子中 chrX 57(被曝群で高発現 36・低発現 21)・chrY 0; 検定対象 15,621 中 chrX 572・chrY 2 | R_Tumor 発見リストの性染色体所属の開示(Methods の注釈宣言の受け、性候補の開示 — 員数のみ、検定なし) | diagnostics/sex_chromosome_annotation.R(GENCODE v36 GTF gene 行 × thyr_expression_test.rds、正準イメージ rebc-r453:refblas 内で算出 2026-08-16。B_Normal 唯一 DEG=BHLHB9 chrX の N-80 一致を stopifnot で確認) | Results | verified |
 
 ## 図表台帳(図・表は1行ずつ — キャプションも検査対象)
@@ -316,6 +316,10 @@
 - 2026-08-16: N-82 追加(R_Tumor 発見リストの性染色体員数 — 保留だった性連鎖注釈の計算を実施、
   研究者 Go)。診断 = diagnostics/sex_chromosome_annotation.R(出力は diagnostics/output/、
   git 追跡外・再生成可能)。読み規則の事前固定は不要と裁定済み(記述的診断)
+- 2026-08-16: 引用監査に伴う Discussion 改訂: 年齢バウンドの4観察を解体(Vriens 2011・Coclet 1989
+  を撤去 — 前者は 2倍ゲート由来の負で本研究の効果クラスを検出不能かつ「25年幅」が原典に不在、
+  後者は成人定常回転の測定で年齢効果を確立しない)。Chatsirisupachai 2021 を C-14 に内容特異の
+  形で追加。N-81 は本文不使用へ。主張水準は「画定」から「開示・排除不能」へ低下
 - 2026-08-16: 引用忠実性監査(全引用の出典照合、敵対的検証つき)に伴う台帳訂正2件:
   N-69 の帯境界を実装(lib/cohort_design.R:71-73)に合わせ訂正(33.3 は Mid 側。本文は元から
   実装と一致、境界例なしのため結果不変)/ N-68 に曝露率 acute を追記(IREP の既定値なし
