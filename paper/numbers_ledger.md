@@ -204,6 +204,7 @@
 | N-80 | BHLHB9(ENSG00000198908.12)は chrX(102,720,688–102,753,540; GENCODE v36) | B_Normal 唯一の DEG の性染色体所属(性候補の開示) | raw/reference/gencode.v36.annotation.gtf の gene 行(2026-08-15 実測照合: chrX・gene_name BHLHB9) | Results / Disc | verified |
 | N-81 | High 群の AS 中央値: R_High 86.7 [68.2–93.7] / B_High 75.9 [68.5–93.6](参考: 線量中央値 583 / 526 mGy) | **本文不使用**(2026-08-16: B_Normal 段落の軽量化により撤去 — 発見1遺伝子に対し重すぎる論証だったため。算出値は Q-16 の台帳回答用に保存)。旧用途 = C-16 の「R 側が曝露指標上で高い」論拠(追補計算 2026-08-15、研究者 Go) | processed/thyr_analysis_cohorts.rds(include_main_bm、driver × band=High の assigned_share/dose_mgy 中央値 — 正準イメージ rebc-r453:refblas 内で算出。R_High 86.7 は N-50 と一致) | Disc | verified |
 | N-82 | R_Tumor 発見 1,765 遺伝子中 chrX 57(被曝群で高発現 36・低発現 21)・chrY 0; 検定対象 15,621 中 chrX 572・chrY 2 | R_Tumor 発見リストの性染色体所属の開示(Methods の注釈宣言の受け、性候補の開示 — 員数のみ、検定なし) | diagnostics/sex_chromosome_annotation.R(GENCODE v36 GTF gene 行 × thyr_expression_test.rds、正準イメージ rebc-r453:refblas 内で算出 2026-08-16。B_Normal 唯一 DEG=BHLHB9 chrX の N-80 一致を stopifnot で確認) | Results | verified |
+| N-83 | IREP 開示定数: REF(electrons E>15keV)= 単一値 1.0(参照 >250 keV 光子と同等; REF 表脚注は放射性核種β線への適用を明記)/ chronic 選択時は DDREF 分布(甲状腺、平均 1.6)が全線量域に適用され AS 低下、acute では ~0.2 Sv 未満で段階適用 | IREP 内部被曝開示の定数(Methods 開示段落。本文に載る数値は 1.0 のみ、他は方向記述) | Land et al. 2003(NIH Pub 03-5387)Table IV.H.1・Kocher et al. 2008(PMC4018571 全文)— 照合 2026-08-16 引用監査ワークフロー。**Land は部分抽出のため凍結前に PDF 再確認の札** | Methods | draft |
 
 ## 図表台帳(図・表は1行ずつ — キャプションも検査対象)
 
