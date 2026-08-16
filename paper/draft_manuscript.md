@@ -325,9 +325,9 @@ The two cross-stratum comparisons carry different weights and return different v
 
 <!-- C-13(読み側 — 事実は Results §7)。対称読みの事前固定 -->
 
-The external anchor counts (Results) are read as description under the symmetric rule fixed in advance. Zero overlap with the qRT-PCR-validated cores is the norm rather than the exception among the prior studies themselves — Dom et al. (2012) tested four earlier tumor-derived signatures, as gene sets, against their own exposed-versus-non-exposed normal-tissue contrast and found none enriched — and the single cross-tissue overlap (S100A10, direction reversed <!-- N-54 -->) is noted without weight. No claim of this study moves with these counts <!-- C-13 -->.
+The external anchor counts (Results) are read as description under the symmetric rule fixed in advance. Zero overlap with the qRT-PCR-validated cores is the norm rather than the exception among the prior studies themselves — Dom et al. (2012) tested four earlier tumor-derived signatures, as gene sets, against their own exposed-versus-non-exposed normal-tissue contrast and found none enriched — and the single cross-tissue overlap (S100A10, direction reversed <!-- N-54 --> — Dom's reported list being wholly upregulated in exposed normal tissue, any down-in-exposed overlap from it reverses by construction) is noted without weight. No claim of this study moves with these counts <!-- C-13 -->.
 
-【訳】外部アンカーの員数(Results)は、事前に固定した対称規則の下で記述として読む。qRT-PCR 検証済みコアとの重なりゼロは、先行研究どうしの間でも例外でなく通例であり — Dom et al. (2012) 自身が、先行4署名(いずれも腫瘍由来)をセットとして自らの被曝対非被曝の正常組織対比にかけ、いずれの濃縮も検出していない — 唯一の組織対応外の重なり(S100A10、方向逆転 <!-- N-54 -->)は重みを付けずに記す。本研究のどの主張もこの員数では動かない <!-- C-13 -->。
+【訳】外部アンカーの員数(Results)は、事前に固定した対称規則の下で記述として読む。qRT-PCR 検証済みコアとの重なりゼロは、先行研究どうしの間でも例外でなく通例であり — Dom et al. (2012) 自身が、先行4署名(いずれも腫瘍由来)をセットとして自らの被曝対非被曝の正常組織対比にかけ、いずれの濃縮も検出していない — 唯一の組織対応外の重なり(S100A10、方向逆転 <!-- N-54 --> — Dom の報告リストは全て被曝正常組織で上昇方向なので、被曝群低発現側の重なりは構成上必ず逆転になる)は重みを付けずに記す。本研究のどの主張もこの員数では動かない <!-- C-13 -->。
 
 ### Limitations(C-11)
 
