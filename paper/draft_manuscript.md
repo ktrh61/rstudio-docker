@@ -430,7 +430,7 @@ Across the 16 contrast × collection cells, the share of null replicates produci
 
 - Abend M, et al. PLoS One 2012;7:e39103. doi:10.1371/journal.pone.0039103(PubMed 照合済み)— ペア差リスト(11 遺伝子)
 - Abend M, et al. Iodine-131 dose-dependent gene expression. Br J Cancer 2013;109:2286–2294. doi:10.1038/bjc.2013.574(PubMed 照合済み)— 正常8/腫瘍6
-- Dom G, et al. A gene expression signature distinguishes normal tissues of sporadic and radiation-induced papillary thyroid carcinomas. Br J Cancer 2012;107:994–1000. doi:10.1038/bjc.2012.302(PubMed 照合済み)— 正常7 (SERPINE1 のメンバー番号は原文 PDF で凍結前に要確認 — 既存の札)
+- Dom G, et al. A gene expression signature distinguishes normal tissues of sporadic and radiation-induced papillary thyroid carcinomas. Br J Cancer 2012;107:994–1000. doi:10.1038/bjc.2012.302(PubMed 照合済み)— 正常7 = SERPINE1・DUSP1・TRIB1・S100A10・ANXA1・GNAL・RDH12(原文 Results と Fig. 2 legend で照合 2026-08-16、diagnostics/external_gene_anchors.csv と 1:1 一致 — 札解除。clade E の番号は SERPINE1 と legend に明記)
 - Hess J, et al. Gain of chromosome band 7q11 in papillary thyroid carcinomas of young patients is associated with exposure to low-dose irradiation. PNAS 2011;108:9595–9600. doi:10.1073/pnas.1017137108(PubMed 照合済み)— CLIP2 (追加検証: doi:10.1038/onc.2014.311)
 
 正常組織・対照・仮説:
