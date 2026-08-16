@@ -204,7 +204,8 @@
 | N-80 | BHLHB9(ENSG00000198908.12)は chrX(102,720,688–102,753,540; GENCODE v36) | B_Normal 唯一の DEG の性染色体所属(性候補の開示) | raw/reference/gencode.v36.annotation.gtf の gene 行(2026-08-15 実測照合: chrX・gene_name BHLHB9) | Results / Disc | verified |
 | N-81 | High 群の AS 中央値: R_High 86.7 [68.2–93.7] / B_High 75.9 [68.5–93.6](参考: 線量中央値 583 / 526 mGy) | **本文不使用**(2026-08-16: B_Normal 段落の軽量化により撤去 — 発見1遺伝子に対し重すぎる論証だったため。算出値は Q-16 の台帳回答用に保存)。旧用途 = C-16 の「R 側が曝露指標上で高い」論拠(追補計算 2026-08-15、研究者 Go) | processed/thyr_analysis_cohorts.rds(include_main_bm、driver × band=High の assigned_share/dose_mgy 中央値 — 正準イメージ rebc-r453:refblas 内で算出。R_High 86.7 は N-50 と一致) | Disc | verified |
 | N-82 | R_Tumor 発見 1,765 遺伝子中 chrX 57(被曝群で高発現 36・低発現 21)・chrY 0; 検定対象 15,621 中 chrX 572・chrY 2 | R_Tumor 発見リストの性染色体所属の開示(Methods の注釈宣言の受け、性候補の開示 — 員数のみ、検定なし) | diagnostics/sex_chromosome_annotation.R(GENCODE v36 GTF gene 行 × thyr_expression_test.rds、正準イメージ rebc-r453:refblas 内で算出 2026-08-16。B_Normal 唯一 DEG=BHLHB9 chrX の N-80 一致を stopifnot で確認) | Results | verified |
-| N-83 | IREP 開示定数: REF(electrons E>15keV)= 単一値 1.0(参照 >250 keV 光子と同等; REF 表脚注は放射性核種β線への適用を明記)/ chronic 選択時は DDREF 分布(甲状腺、平均 1.6)が全線量域に適用され AS 低下、acute では ~0.2 Sv 未満で段階適用 | IREP 内部被曝開示の定数(Methods 開示段落。本文に載る数値は 1.0 のみ、他は方向記述) | Land et al. 2003(NIH Pub 03-5387)Table IV.H.1・Kocher et al. 2008(PMC4018571 全文)— 照合 2026-08-16 引用監査ワークフロー。**Land は部分抽出のため凍結前に PDF 再確認の札** | Methods | draft |
+| N-83 | IREP 開示定数: REF(electrons E>15keV)= 単一値 1.0(「Single-valued at 1.0 (assumed to be same as value for reference higher-energy photons)」— 区分は Chronic or acute 共通)。放射性核種β線は**平均エネルギー**で区分に割り付ける(脚注 c は E<15keV 側にあり「including average energies of beta particles emitted by radionuclides」— I-131 平均β ~192 keV は E>15keV 区分)。DDREF: chronic は全線量域に適用/acute は D ≥ D_L で 1(D_L = 0.03–0.2 Gy の対数一様、以下はロジスティックで chronic 値へ接続、D_L 時点 >0.99)。甲状腺・乳腺は DDREF=1 に大きい確率の離散分布(平均 1.6 は Kocher 2008 帰属)。※Table IV.H.1 脚注 b は「0.2 cGy」と表記し本文 IV.F の 0.2 Sv と単位不整合(原文誤植疑い — どちらの読みでも本文の論法は成立、採用は Gy 読み = 保守側) | IREP 内部被曝開示の定数(Methods 開示段落。本文の数値は 1.0・0.03–0.2 Gy) | Land et al. 2003(NIH Pub 03-5387)全文 PDF — dceg.cancer.gov/tools/analysis/ircp/nih-no-03-5387.pdf、md5 643161533fb7e58c9f9e6d7c2d91407c(CDC docket の wayback 版と同一)。逐語照合 2026-08-16(ASCII85+Flate 全展開、研究者指示の先行確認) | Methods | verified |
+| N-84 | 帯別線量: Low n=100 min 16 中央値 41(<200mGy 100 = 全例)/ Mid n=82 min 48 中央値 112(<200mGy 73)/ High n=31 **min 188** 中央値 526(<200mGy 3); 主コホート High n=24 min 188(<200mGy 1) | AS 帯別の線量分布(IREP 開示段落の High 帯最小線量の出典。P(D_L>0.188)≈3.3% は対数一様 ln(0.2/0.188)/ln(0.2/0.03) — 手元導出、本文不使用) | processed/thyr_analysis_cohorts.rds(band × dose_mgy、rebc-r453:refblas 内で算出 2026-08-16、研究者 Go の確認計算) | Methods | verified |
 
 ## 図表台帳(図・表は1行ずつ — キャプションも検査対象)
 
@@ -321,6 +322,11 @@
   を撤去 — 前者は 2倍ゲート由来の負で本研究の効果クラスを検出不能かつ「25年幅」が原典に不在、
   後者は成人定常回転の測定で年齢効果を確立しない)。Chatsirisupachai 2021 を C-14 に内容特異の
   形で追加。N-81 は本文不使用へ。主張水準は「画定」から「開示・排除不能」へ低下
+- 2026-08-16: IREP 開示の完成(研究者指示の Land 2003 先行確認): 全文 PDF を取得し逐語照合
+  (N-83 verified 化 — 放射性核種β線の脚注帰属を訂正、DDREF 規則 D_L = 0.03–0.2 Gy 対数一様を
+  確定、脚注 b の cGy/Gy 不整合を記録)。N-84 追加(帯別線量 — High min 188 mGy、研究者 Go の
+  確認計算)。本文の chronic 反実仮想を目盛り論法(High 帯上の共通倍率圧縮)に差し替え、
+  Q-17 を新設(chronic 論争への5層の受け)
 - 2026-08-16: 引用忠実性監査(全引用の出典照合、敵対的検証つき)に伴う台帳訂正2件:
   N-69 の帯境界を実装(lib/cohort_design.R:71-73)に合わせ訂正(33.3 は Mid 側。本文は元から
   実装と一致、境界例なしのため結果不変)/ N-68 に曝露率 acute を追記(IREP の既定値なし
