@@ -4,8 +4,10 @@
 # cited as version 5.7.3,
 # "Assigned Share associated with the expected value of ERR"; radiation type
 # electrons E>15keV; exposure rate acute (no default exists for this input;
-# researcher-confirmed 2026-08-16); sex as recorded; dose entered in
-# cSv = mGy/10; birth year = 1986 -
+# researcher-confirmed 2026-08-16); organ dose entered as Constant (value)
+# (also a no-default required choice; researcher-confirmed 2026-08-16 — no
+# per-case dose uncertainty information was available); sex as recorded;
+# dose entered in cSv = mGy/10; birth year = 1986 -
 # AGE_EXPOSURE, exposure year 1986, surgery year = birth year + AGE_SURGERY;
 # the remaining IREP assumptions and settings at their defaults: user-defined
 # uncertainty distribution Lognormal(1,1), 10,000 iterations, random number
