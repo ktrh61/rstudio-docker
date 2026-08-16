@@ -189,7 +189,7 @@
 |---|---|---|---|---|---|
 | N-66 | GENCODE v36(GDC 参照 GTF)の exon-union 遺伝子長; 発現は STAR - Counts(open access) | 参照アノテーションとデータ種別 | scripts/020 ヘッダ(GENCODE v36)・scripts/010 ヘッダ(STAR - Counts) | Methods | verified |
 | N-67 | stranded 列合計の小/大比 ≤ 0.5 なら stranded(大きい列を採用)、それ以外は unstranded 列 | ライブラリ strand 判定規則(検体別) | scripts/120 ヘッダ(Dobin's general rule, ratio form) | Methods | verified |
-| N-68 | NIH IREP(v5.7.3 引用)甲状腺モデル「AS associated with the expected value of ERR」; 電子 E>15keV、性別は記録値のまま、線量 cSv=mGy/10、被曝年 1986、出生年=1986−被曝時年齢、手術年=出生年+手術時年齢; IREP 設定は全て既定値(ユーザー定義不確かさ分布 Lognormal(1,1)・反復 10,000・乱数シード 99)。値は研究者計算の正準 CSV | IREP 入力規約 | scripts/130 ヘッダ; 来歴・入力同一性監査は計画v2 B.11 | Methods | verified |
+| N-68 | NIH IREP(v5.7.3 引用)甲状腺モデル「AS associated with the expected value of ERR」; 電子 E>15keV、**曝露率 acute**(既定値なしの必須選択 — 研究者確認 2026-08-16。公表済み Chernobyl POC 論文2本も acute)、性別は記録値のまま、線量 cSv=mGy/10、被曝年 1986、出生年=1986−被曝時年齢、手術年=出生年+手術時年齢; 残りの IREP 設定は既定値(ユーザー定義不確かさ分布 Lognormal(1,1)・反復 10,000・乱数シード 99)。値は研究者計算の正準 CSV | IREP 入力規約 | scripts/130 ヘッダ; 来歴・入力同一性監査は計画v2 B.11 | Methods | verified |
 | N-69 | dose 0 → Sporadic; 0<AS<33.3 Low; 33.3≤AS<66.6 Mid; AS≥66.6 High(境界例なし、2026-07-28 検証) | AS 帯規則 | config.R:36-43(AS_LOW_MAX 33.3・AS_HIGH_MIN 66.6)・lib/cohort_design.R:71-73(境界の帰属: 33.3 は Mid 側 — 2026-08-16 照合で本行の旧記載を訂正、本文は実装と一致していた) | Methods | verified |
 | N-70 | 0.6 | pooled 共通尺度の相対純度閾値(main BM 採用条件) | config.R:45-46(PURITY_THRESHOLD) | Methods | verified |
 | N-71 | iDEGES 3 反復; スクリーン = 置換 BM(exact)→ Storey q<0.10(plug-in λ=0.5、DEGES_FDR)+ floorPDEG 0.05(q 閾値集合と生 p 上位 5% の大きい方を採用); スケーリングは MUREN(lts); 前処理 protein_coding → filterByExpr | 310 正規化の設定(2026-08-14 訂正: 従前の「BH q<0.10」は誤記 — 実装は storey_q) | lib/norm_deges.R:137-153(storey_q・floorPDEG 採用規則)・scripts/310:37-46(ITERATION 3L・FLOOR_PDEG 0.05・MUREN_METHOD lts・BM_METHOD exact)・config.R:57(DEGES_FDR 0.10) | Methods | verified |
@@ -316,3 +316,7 @@
 - 2026-08-16: N-82 追加(R_Tumor 発見リストの性染色体員数 — 保留だった性連鎖注釈の計算を実施、
   研究者 Go)。診断 = diagnostics/sex_chromosome_annotation.R(出力は diagnostics/output/、
   git 追跡外・再生成可能)。読み規則の事前固定は不要と裁定済み(記述的診断)
+- 2026-08-16: 引用忠実性監査(全引用の出典照合、敵対的検証つき)に伴う台帳訂正2件:
+  N-69 の帯境界を実装(lib/cohort_design.R:71-73)に合わせ訂正(33.3 は Mid 側。本文は元から
+  実装と一致、境界例なしのため結果不変)/ N-68 に曝露率 acute を追記(IREP の既定値なし
+  必須入力 — 研究者確認。監査の指摘で記録欠落が判明)
