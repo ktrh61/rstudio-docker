@@ -3,4 +3,5 @@ unassigned,figures/fig_cohort_flow.R,output/figures/fig_cohort_flow.png,provisio
 unassigned,figures/fig_gene_bm_evidence.R,output/figures/fig_gene_bm_evidence.png,provisional,thyr_expression_test.rds;thyr_se_raw.rds,
 unassigned,figures/fig_ma_gene_bm.R,output/figures/fig_ma_gene_bm.png,provisional,thyr_normalized_counts.rds;thyr_expression_test.rds;thyr_se_raw.rds,
 unassigned,figures/fig_reo_grading.R,output/figures/fig_reo_grading.png,provisional,thyr_reo_panel.rds;thyr_reo_evaluation.rds;thyr_se_raw.rds;thyr_case_assigned_share.rds,
+unassigned,figures/fig_d6_calibration.R,output/figures/fig_d6_calibration.png,provisional,gsea_null_calibration.rds,
 unassigned,tables/tab_cohort_composition.R,,provisional,thyr_clinical.rds;thyr_case_assigned_share.rds;thyr_se_raw.rds,
