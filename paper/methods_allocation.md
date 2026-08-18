@@ -56,8 +56,12 @@ Supp へ: 入力規約・適格基準の細目、実装詳細、推定量選定�
 |---|---|---|---|
 | B1(様式較正) | 1 Data・6 Normalization・14 Software(+AI 開示拡張の実装) | 643 → ~470(実績 525: Data 96・Norm 98・Software 331 — 開示 +80 が環境圧縮 −81 を相殺) | 起草済み・検収待ち |
 | B2 | 3 QC・5 Confounders・10 Between-stratum・12 REO diag | 937 → ~400(実績 652: QC 235・Conf 231・Between 108・REOdiag 78 — ★文の密度により目標超過) | 起草済み・検収待ち |
-| B3 | 7 Gene-level・8 Omnibus・13 External anchor | 649 → ~330 | 未着手 |
-| B4(主張密度最大) | 2 AS・9 Gene-set・11 REO panel | 1,355 → ~470 | 未着手 |
+| B3 | 7 Gene-level・8 Omnibus・13 External anchor | 649 → ~330(実績 467: Gene 212・Omni 181・Anchor 74) | 起草済み |
+| B4(主張密度最大) | 2 AS・9 Gene-set・11 REO panel | 1,355 → ~470(実績 1,028: AS 341・GS 358・REO 329 — Q-17/Q-06/C-06/C-14 の本文残し義務が床) | 起草済み |
+
+**機械的分割フェーズ完走(2026-08-18)**: Methods 3,764 → 2,856・本文 6,221。5,000 との残差
+1,221 の分担 = 読み通しでの追加 Supp 送り判定(研究者)+★文言スリム化パス+
+Disc(1,598)/Results/Intro 最終パス。
 | — | 4 Analysis contrasts | 180(不変) | 対象外 |
 
 各バッチ: 起草(Supp 移動+本文新段落+対訳)→ 機械検査 → 研究者確認 → Go → コミット。
