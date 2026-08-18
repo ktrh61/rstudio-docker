@@ -187,8 +187,8 @@
 
 | N-ID | 値 | 定義 | 出典 | 使用箇所 | 状態 |
 |---|---|---|---|---|---|
-| N-66 | GENCODE v36(GDC 参照 GTF)の exon-union 遺伝子長; 発現は STAR - Counts(open access) | 参照アノテーションとデータ種別 | scripts/020 ヘッダ(GENCODE v36)・scripts/010 ヘッダ(STAR - Counts) | Methods | verified |
-| N-67 | stranded 列合計の小/大比 ≤ 0.5 なら stranded(大きい列を採用)、それ以外は unstranded 列 | ライブラリ strand 判定規則(検体別) | scripts/120 ヘッダ(Dobin's general rule, ratio form) | Methods | verified |
+| N-66 | GENCODE v36(GDC 参照 GTF)の exon-union 遺伝子長; 発現は STAR - Counts(open access) | 参照アノテーションとデータ種別 | scripts/020 ヘッダ(GENCODE v36)・scripts/010 ヘッダ(STAR - Counts) | Supp Methods | verified |
+| N-67 | stranded 列合計の小/大比 ≤ 0.5 なら stranded(大きい列を採用)、それ以外は unstranded 列 | ライブラリ strand 判定規則(検体別) | scripts/120 ヘッダ(Dobin's general rule, ratio form) | Supp Methods | verified |
 | N-68 | NIH IREP(v5.7.3 引用)甲状腺モデル「AS associated with the expected value of ERR」; 電子 E>15keV、**曝露率 acute**(既定値なしの必須選択 — 研究者確認 2026-08-16。公表済み Chernobyl POC 論文2本も acute)、**臓器線量は定数(Constant (value))として入力**(既定値なしの必須選択 — 研究者確認 2026-08-16。それ以上の線量情報を持たないため択一)、性別は記録値のまま、線量 cSv=mGy/10、被曝年 1986、出生年=1986−被曝時年齢、手術年=出生年+手術時年齢; 残りの IREP 設定は既定値(ユーザー定義不確かさ分布 Lognormal(1,1)・反復 10,000・乱数シード 99)。値は研究者計算の正準 CSV | IREP 入力規約 | scripts/130 ヘッダ; 来歴・入力同一性監査は計画v2 B.11 | Methods | verified |
 | N-69 | dose 0 → Sporadic; 0<AS<33.3 Low; 33.3≤AS<66.6 Mid; AS≥66.6 High(境界例なし、2026-07-28 検証) | AS 帯規則 | config.R:36-43(AS_LOW_MAX 33.3・AS_HIGH_MIN 66.6)・lib/cohort_design.R:71-73(境界の帰属: 33.3 は Mid 側 — 2026-08-16 照合で本行の旧記載を訂正、本文は実装と一致していた) | Methods | verified |
 | N-70 | 0.6 | pooled 共通尺度の相対純度閾値(main BM 採用条件) | config.R:45-46(PURITY_THRESHOLD) | Methods | verified |
@@ -198,9 +198,9 @@
 | N-74 | 候補プール = \|effect−0.5\| 上位 500; dead zone \|r\|<log2(1.2); R0 = 非 dead-zone 検体で符号一致(例外≤1)かつ q10(\|r\|)≥log2(1.5); R1 = 逆転 >50% かつ <100% | REO 候補ペア選定規則 | scripts/510:44(N_CANDIDATES 500L)・:48(log2(1.5))・:100,130,136(規則実装); config.R:48-49(DEAD_ZONE log2(1.2)) | Methods | verified |
 | N-75 | 貪欲選定: 遺伝子再使用禁止 + 既採用ペアとの Spearman <0.75、目標 10 ペア; 530 の Mid>Low 片側 BM は mc・seed 19860426(正準シード) | REO パネル確定と評価検定の設定 | scripts/520:30-31(TARGET_PANEL_SIZE 10L・CORRELATION_THRESHOLD 0.75); scripts/530:78(seed = SEED); config.R:5-8 | Methods | verified |
 | N-76 | 群内純度順位保存 0.93–0.99(群別推定との比較)、High vs Sporadic 腫瘍プロファイル相関 0.99 | 220 の両群プーリング妥当性の**来歴実測値**(設計時測定。一次ログではない — 証拠階層は設計選択の来歴)。二重統計に当たるためライセンスには使わない(研究者決定 2026-08-13)— プーリングの記述は理論構造(相対尺度の共通化・driver 支配前提・軸の別・役割の限定)で立てる | `git show 8eed384:scripts/220_estimate_tumor_purity.R` ヘッダ行8-10(run 時点の凍結版。現行ヘッダは 2026-08-13 に理論ライセンスへ書き換え、実測値の記録はこの行と run コミットに保存) | **不使用**(査読応答の受けとして保存) | verified |
-| N-77 | 906/906 ライブラリが stranded_second(reverse)判定、比 0.056–0.110(生値 min 0.0558948828・max 0.1095053129、閾値 0.5) | strand 判定の実測結果 — 閾値の恣意性が実務上不活性であることの開示 | meta/strand_selection_20260722_073758.tsv の selected・ratio 列の全数集計(906 行) | Methods | verified |
+| N-77 | 906/906 ライブラリが stranded_second(reverse)判定、比 0.056–0.110(生値 min 0.0558948828・max 0.1095053129、閾値 0.5) | strand 判定の実測結果 — 閾値の恣意性が実務上不活性であることの開示 | meta/strand_selection_20260722_073758.tsv の selected・ratio 列の全数集計(906 行) | Supp Methods | verified |
 | N-78 | PC-OD(Nakayama, Yata & Aoshima 2024, JJSDS 7:739–766)= 第1主成分の検体ローディングへの反復 Grubbs 検定(Grubbs 1969; 両側、α = 0.05)、棄却毎に最大絶対ローディングの検体を除去して再計算、棄却なしで停止; 入力は群 × 組織の部分行列(filterByExpr 縮約・未正規化 log-CPM、prior.count 2) | 210 外れ値スクリーンの規則一式 | lib/qc_pc_od.R:1-39(α 既定 0.05・Grubbs 臨界値・反復規則)・scripts/210:69-81(run_pcod: filterByExpr・log-CPM 設定)・210 ヘッダ(8 部分行列) | Methods | verified |
-| N-79 | コンテナビルドの日付固定: 基底 ubuntu:noble-20260410(不変タグ)+同日 apt snapshot(20260410T000000Z)、R パッケージは P3M 日付スナップショット 2026-04-09(CRAN + Bioconductor 3.22)、R 4.5.3 は参照 BLAS でソースビルド、OpenBLAS 非導入は設計 | 環境再構築の固定機構(再現性節) | Dockerfile:5-16(ヘッダ)・:29(FROM)・:33-37(apt snapshot)・:82-88(P3M/Bioc 3.22) | Methods | verified |
+| N-79 | コンテナビルドの日付固定: 基底 ubuntu:noble-20260410(不変タグ)+同日 apt snapshot(20260410T000000Z)、R パッケージは P3M 日付スナップショット 2026-04-09(CRAN + Bioconductor 3.22)、R 4.5.3 は参照 BLAS でソースビルド、OpenBLAS 非導入は設計 | 環境再構築の固定機構(再現性節) | Dockerfile:5-16(ヘッダ)・:29(FROM)・:33-37(apt snapshot)・:82-88(P3M/Bioc 3.22) | Supp Methods | verified |
 | N-80 | BHLHB9(ENSG00000198908.12)は chrX(102,720,688–102,753,540; GENCODE v36) | B_Normal 唯一の DEG の性染色体所属(性候補の開示) | raw/reference/gencode.v36.annotation.gtf の gene 行(2026-08-15 実測照合: chrX・gene_name BHLHB9) | Results / Disc | verified |
 | N-81 | High 群の AS 中央値: R_High 86.7 [68.2–93.7] / B_High 75.9 [68.5–93.6](参考: 線量中央値 583 / 526 mGy) | **本文不使用**(2026-08-16: B_Normal 段落の軽量化により撤去 — 発見1遺伝子に対し重すぎる論証だったため。算出値は Q-16 の台帳回答用に保存)。旧用途 = C-16 の「R 側が曝露指標上で高い」論拠(追補計算 2026-08-15、研究者 Go) | processed/thyr_analysis_cohorts.rds(include_main_bm、driver × band=High の assigned_share/dose_mgy 中央値 — 正準イメージ rebc-r453:refblas 内で算出。R_High 86.7 は N-50 と一致) | Disc | verified |
 | N-82 | R_Tumor 発見 1,765 遺伝子中 chrX 57(被曝群で高発現 36・低発現 21)・chrY 0; 検定対象 15,621 中 chrX 572・chrY 2 | R_Tumor 発見リストの性染色体所属の開示(Methods の注釈宣言の受け、性候補の開示 — 員数のみ、検定なし) | diagnostics/sex_chromosome_annotation.R(GENCODE v36 GTF gene 行 × thyr_expression_test.rds、正準イメージ rebc-r453:refblas 内で算出 2026-08-16。B_Normal 唯一 DEG=BHLHB9 chrX の N-80 一致を stopifnot で確認) | Results | verified |
@@ -426,3 +426,8 @@
   科学的判断の委譲否定 — 形容詞でなく機構の名指しで丸投げ自走と識別する設計(研究者要求)。
   ERC Declarations 用短縮形も同時確定。実装は B1(Software 小節の改稿)。
   既存 AI 開示札(2026-08-18 前段、転記のみ)の内容を本決定で上書き
+- 2026-08-18: Methods 圧縮 B1 実施(研究者検収・Go): Data sources 186→96・Normalization
+  131→98・Software 326→331(AI 開示拡張 +80 が環境圧縮 −81 を相殺)。Supp Methods に
+  同名3小節を新設(移動は逐語)。タグ移動 N-66/67/77/79 → Supp Methods(使用箇所列同期済み)。
+  本文 7,129→7,011。**構造基準値の改訂: H3 40・【訳】40**(以後この基準)。
+  投影と吸収在庫は paper/methods_allocation.md の予算注記に記録
