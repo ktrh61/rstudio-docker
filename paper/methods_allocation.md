@@ -55,7 +55,7 @@ Supp へ: 入力規約・適格基準の細目、実装詳細、推定量選定�
 | バッチ | 小節 | 現状→目標 | 状態 |
 |---|---|---|---|
 | B1(様式較正) | 1 Data・6 Normalization・14 Software(+AI 開示拡張の実装) | 643 → ~470(実績 525: Data 96・Norm 98・Software 331 — 開示 +80 が環境圧縮 −81 を相殺) | 起草済み・検収待ち |
-| B2 | 3 QC・5 Confounders・10 Between-stratum・12 REO diag | 937 → ~400 | 未着手 |
+| B2 | 3 QC・5 Confounders・10 Between-stratum・12 REO diag | 937 → ~400(実績 652: QC 235・Conf 231・Between 108・REOdiag 78 — ★文の密度により目標超過) | 起草済み・検収待ち |
 | B3 | 7 Gene-level・8 Omnibus・13 External anchor | 649 → ~330 | 未着手 |
 | B4(主張密度最大) | 2 AS・9 Gene-set・11 REO panel | 1,355 → ~470 | 未着手 |
 | — | 4 Analysis contrasts | 180(不変) | 対象外 |
