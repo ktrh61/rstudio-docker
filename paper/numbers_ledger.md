@@ -337,3 +337,54 @@
   表S1〜S8・データ1。本文の(仮)17参照を全置換、SX/SY 解消、Intro のマップ参照は番号なし化。
   作表3本実行(特性・遺伝子・セット — 台帳と全一致)。TabS2(正規化)・TabS4(REO パネル)は
   作表スクリプト未作成の札(manifest に pending 記録)
+- 2026-08-18: 投稿規定の原典確認(研究者指示 — Methods 分量配分の検討入力。研究者決定:
+  ETJ は注力対象外とし、BJC→ERC→npj PO の三段構えで設計目標は BJC 5,000 語に単一化):
+  (1) BJC 現行 GTA(nature.com/bjc/authors-and-referees/gta、2026-08-18 生 HTML 逐語)—
+  Article = "5,000 words (excluding abstract, references and figure legends)"・Tables/Figures
+  "Max of 6"・structured abstract max 200 words・references "Typically max 60"。2026-08-16
+  記録(5,000語・主6品目)と一致し、保留札「現行版 GTA 再確認」のうち語数・品目数は解除
+  (残札 = 図2の4パネル=2品目換算の編集部確認、投稿時)。SI 条項 = "The article must be
+  complete and self-explanatory without the Supplementary Information"(Methods 分割の設計制約)。
+  (2) ERC 著者ガイドライン(journals.bioscientifica.com/erc/pages/author-guidelines —
+  Cloudflare により機械取得不可のため研究者がブラウザ取得、Claude Code が全文検分)—
+  Research = 6,000 語("Be limited to 6,000 words for submissions")、算入基礎 = "Word count of
+  the full article, excluding references and figure legends"(abstract は算入)、abstract は
+  単一段落 250 語、図 10・文献 60("as recommended" — 推奨)、Vancouver 数値引用、Supp 許容
+  (査読対象・掲載料あり)、二重匿名査読(2026-01-26〜)、語数をタイトルページに表示。
+  本日セッション前半の「ERC 5,000 語」(検索スニペット由来)は誤りと確定し本行で訂正。
+  (3) npj PO content types(nature.com/npjprecisiononcology/content-types、2026-08-18 生 HTML
+  逐語)— 語数・頁数の制限なし("We do not impose strict limits on word count or page
+  numbers")、Methods は本文必須("All descriptions of Methods should be provided in the main
+  manuscript file and not in the Supplementary Information")、Discussion は小見出し・
+  limitations・conclusions 節不可、abstract 150 語、文献 60(緩)、図凡例 350 語/図。
+  帰結: BJC 5,000(abstract 別枠)に収めれば ERC は自動適合(abstract 250 込みでも 6,000 に
+  余裕)。npj は語数不問だが Methods→Supp が規定違反方向のため、分割は本文へ機械的に
+  再統合可能な二層設計とする。原典 PDF(研究者保存 2026-08-18、いずれも
+  /mnt/c/Users/kotaro/OneDrive/論文関連（説明用資料含）/ 配下): BJC投稿規定.pdf
+  (md5 9a358740e9db29c34e78d56da4266d54)、ERC投稿規定.pdf
+  (md5 637978fc9c2ed403dd31f583c461aaba)。※PDF は保存操作の記録であり、逐語の根拠は
+  各ページ本文(BJC/npj は取得 HTML、ERC は研究者提供の全文)。
+  札(新規): 生成 AI 使用の開示 — ERC は開示文言必須("disclose in a statement whether or
+  not they have used generative AI ... the name, version, model, and source")、BJC も GTA に
+  "Use of an LLM should be properly documented in the Methods section"。開示は本文 Software
+  節に記載済み(Claude Fable 5・GPT-5.6sol — 用途・データ範囲・検証・責任)で、残作業は
+  投稿時の各誌書式への転記のみ(ERC = Declarations 文言、BJC = Methods 記載)。当初
+  「暫定結果閲覧歴の開示深度」と併記したが成熟度が異なるため分離(次エントリで同件決着)
+- 2026-08-18: 「暫定結果閲覧歴の開示深度」札を決着(研究者決定: **論文レベル非開示**)。
+  対象: 計画v2 §0.6 決定記録(2026-08-07)が「旧パイプラインの暫定結果(R_Tumor 有意・
+  B_Tumor 静か・B_Normal 異常高)を閲覧済みの状態でマップ固定」と記録し、紙面文言
+  "before the reported results existed" を超える開示の深さがコレスポ判断として保留されて
+  いた件(0815 指示書の未遂リスト由来)。根拠: (1) 閲覧対象は修正前実装の開発時出力 —
+  MUREN の fixed-reference/self-reference 意味論・推定量が原理論から逸脱しており
+  (56a7b33 "Align optimized MUREN with original theory"、2026-07-23 = マップ固定の2週間前)、
+  固定時点で欠陥は既知。報告プロトコルの暫定結果に当たらない(事象の実態は、自作スクリプト
+  土台からの積み上げ開発における通常反復での出力閲覧)。(2) 旧観察の最顕著特徴 B_Normal
+  異常高は修正後に非残存(報告結果 1 DEG・HC p 0.0773 = N-16, N-23)。(3) マップは全パターン
+  事前割当のため、閲覧が読みの割当を歪める経路が構造的にない。期待の根拠は文献列
+  (Morton の隙間・Abend/Ory)で旧出力を引かない。紙面の4箇所(Intro 設計段落・Methods
+  マップ文・Disc §1 一括宣言・表2キャプション)の文言は正確なスコープで真であり不変更。
+  付随処置: Q-18 新設(誠実な査読受け)/計画v2 §0.6 に日付つき文脈追記(事実保持・
+  性格づけ訂正)/文言凍結検査を We チェックリスト全域項目に追加(強化系への滑り禁止)。
+  検査で発見: Methods の C-16 文に旧形 "pre-assigned before the results were seen" が
+  1箇所残存(2026-08-15 統一の取りこぼし、「Contrast-level omnibus」節)— 正準形への
+  揃えは★保護文言のため研究者判断待ち(チェックリストで監視)
