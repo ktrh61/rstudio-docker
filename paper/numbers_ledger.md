@@ -394,3 +394,25 @@
   位置の更新のみで不変。本文節から図表素材が構造的に分離され、語数カウンタの特例除外は
   不要化。**構造基準値の改訂: 対訳分割により【訳】36 → 37**(以後この基準で検査)。
   figures/manifest.csv Tab2 行・本台帳の図表台帳行を同期
+- 2026-08-18: Methods/Results の様式決定(研究者決定 — 共著者の「Results に Methods 的記述を
+  厚めに」様式の予備検討): 規範的内容(事前固定宣言・推定量仕様・手続き規則)は Methods 前置を
+  維持し、Results 受けは各節冒頭の方向づけ1文(「To assess X, we ... (Methods)」型)まで —
+  Results 書き直し時の検査項目とする。根拠(3誌の原典逐語): BJC = Methods→Results 順・
+  "The Results section should briefly present the experimental data" / ERC = Methods→Results
+  順・"The results should read as a narrative leading the reader through the experiments"
+  (物語様式の**許容**であり要求ではない)/ npj PO = Methods 末尾のため Results の方向づけは
+  様式上の必然。補強2点: 移送しても語数は浮かない(BJC/ERC とも Methods・Results 同一枠)/
+  事前(規則)対実現(値)の境界は本論文の装置であり深度配分(2026-08-14)を維持。
+  共著者説明札3点: (1) BJC の Results 定義逐語、(2) 語数利得ゼロ、(3) 事前固定マップ設計に
+  おける Methods 前置の装置性(表2 の RR 先例札と同系)。ERC で厚みを求められた場合の譲歩線 =
+  方向づけ1→2文の追記のみ(規範的内容は移送しない)
+- 2026-08-18: BJC→ERC 転送チェックリスト(リジェクト時の再調査回避のため記録。転送時に照合):
+  (1) Abstract を構造化200語 → 単一段落 ≤250語へ組み直し(唯一の内容作業)、(2) 引用を
+  Vancouver 数値順へ(et al. の前に最低3著者)、(3) 二重匿名化 — タイトルページを
+  "Separate file not for review" で別ファイル化・ファイル名匿名化・自己言及の三人称化・
+  本文から所属/資金情報を除去、(4) タイトルページに語数表示(full article、references と
+  figure legends 除き)+タイトル ≤85字の確認、(5) AI 開示を ERC 必須文言へ転記(name・
+  version・model・source)、(6) 体裁 = ダブルスペース・連続行番号・本文 Word 形式・
+  合計 40MB 上限、(7) 補足データは査読対象+掲載料あり(不掲載希望は採択前に編集部へ)。
+  無作業で通る項目: 語数(BJC 設計 ≈5,250 < 6,000)・図表(≤10 推奨)・文献(≤60 推奨、
+  現47)。原典 = ERC 著者ガイドライン PDF(2026-08-18 保存、md5 637978fc9c2ed403dd31f583c461aaba)
