@@ -76,7 +76,7 @@ All inference is organized in four analysis contrasts — exposed versus sporadi
 The interpretation map fixed for the four contrasts is given in Table 2; readings for every outcome pattern were assigned before the reported results existed.
 
 | Contrast | Pre-specified standing | Basis |
-|---|---|---|
+| --- | --- | --- |
 | R_Tumor | Hypothesis-bearing; signal expected | primary expectation of the working hypothesis (Introduction); the driver-conditioned gap left by Morton et al. (2021) |
 | R_Normal | Hypothesis-bearing; signal possible | long-term molecular memory of exposure — dose-dependent expression within exposed normal tissue (Abend et al. 2013); exposed-versus-unexposed normal-tissue signatures (Ory et al. 2026) |
 | B_Normal | Test cell for a shared trace | counterpart of the cross-stratum normal comparison; the shared signatures of Ory et al. (2026) were reported without driver stratification |
@@ -439,7 +439,7 @@ Across the 16 contrast × collection cells, the share of null replicates produci
 - Nikiforova MN, et al. Proximity of chromosomal loci that participate in radiation-induced rearrangements in human cells. Science 2000;290:138–141. doi:10.1126/science.290.5489.138(PubMed 照合済み 2026-08-15、pmid 11021799)— RET と融合相手の核内空間隣接(機構論)(Intro — 本文反映済み)
 - Caudill CM, et al. Dose-dependent generation of RET/PTC in human thyroid cells after in vitro exposure to gamma-radiation. J Clin Endocrinol Metab 2005;90:2364–2369. doi:10.1210/jc.2004-1811(PubMed 照合済み 2026-08-15、pmid 15671095)— 誘導の線量依存性(Intro — 本文反映済み)
 - Hamatani K, et al. RET/PTC rearrangements preferentially occurred in papillary thyroid cancer among atomic bomb survivors exposed to high radiation dose. Cancer Res 2008;68:7176–7182. doi:10.1158/0008-5472.CAN-08-0293(PubMed 照合済み 2026-08-15、pmid 18757433)— 独立曝露設定(原爆・外部γ線)でのヒト線量関連(Intro — 本文反映済み)
-- R Core Team (2026). R: A Language and Environment for Statistical Computing. R Foundation for Statistical Computing, Vienna, Austria. https://www.R-project.org/(citation() 出力どおり 2026-08-16、rebc-r453:refblas 内 R 4.5.3 (2026-03-11) — 版数の書式は投稿誌指定に合わせ後工程)— (Methods: Software)
+- R Core Team (2026). R: A Language and Environment for Statistical Computing. R Foundation for Statistical Computing, Vienna, Austria. <https://www.R-project.org/(citation()> 出力どおり 2026-08-16、rebc-r453:refblas 内 R 4.5.3 (2026-03-11) — 版数の書式は投稿誌指定に合わせ後工程)— (Methods: Software)
 - その他の使用パッケージ(SummarizedExperiment・limma・GenomicDataCommons・rtracklayer・data.table・Matrix・Rcpp・MASS・parallel)は Supp の版表が網羅 —個別引用は原典論文を持つもののみ執筆時に判断〔使用パッケージ〕。事前収集済みの原典(PubMed 照合済み 2026-08-14): Bioconductor/SummarizedExperiment = Huber W, et al. Nat Methods 2015;12:115–121, doi:10.1038/nmeth.3252 / limma = Ritchie ME, et al. Nucleic Acids Res 2015;43:e47, doi:10.1093/nar/gkv007 / rtracklayer = Lawrence M, et al. Bioinformatics 2009;25:1841–1842, doi:10.1093/bioinformatics/btp328
 
 ### C. Intro / Discussion で必要になる見込み
