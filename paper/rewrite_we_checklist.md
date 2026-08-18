@@ -11,6 +11,11 @@ npj PO(Nature 系)は能動推奨、BJC/ERC は能動可。
 凡例: ★ = 批准済みリント/claim_map が文言まで保護している文(言い回しを変える場合は検査を通すこと)。
 アンカーは現行文の冒頭数語(行番号は書き直しで動くため使わない)。
 
+## 全域: 事前固定文言の凍結(2026-08-18 研究者決定 — 閲覧歴札の決着に伴う。トリガー2と Abstract 起草時に照合)
+
+- [ ] ★ "before the reported results existed" の4箇所(Intro 設計段落・Methods: Analysis contrasts のマップ文・Disc §1 の一括宣言・表2キャプション)は**このスコープのまま凍結**。圧縮・言い換え・Abstract 起草で "prospectively specified" / "prior to any (data) analysis" / "blinded" / "before any results were seen" 系へ**強化しない**(§0.6 の開発史と矛盾を作る)。スコープを曖昧にする弱化も不可。根拠: numbers_ledger 改訂メモ 2026-08-18・Q-18。
+- [ ] 注意: Methods の C-16 文(下記 Contrast-level omnibus の★)は旧形 "pre-assigned before the results were seen" のまま残存(2026-08-15 統一の取りこぼし)。正準形 "before the reported results existed" スコープへの揃えは研究者判断待ち — 揃うまで本項で監視。
+
 ## Methods
 
 ### Exposure metric
