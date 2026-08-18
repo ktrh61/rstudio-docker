@@ -72,19 +72,10 @@ All inference is organized in four analysis contrasts — exposed versus sporadi
 
 【訳】全ての推論は4つの解析対比 — 各 driver 層 × 組織内の被曝対散発対比: R_Tumor・R_Normal(RET 層)、B_Tumor・B_Normal(BRAF 層)— に組織化される。各対比は対比内で検定され、対比横断の family-wise 推論は行わず、研究全体の FDR は主張しない。全対比で群 x は Sporadic、群 y は High であり、効果 > 0.5 は被曝群での高発現を意味する。全体を通じて、2標本比較には Brunner–Munzel 統計量(Brunner and Munzel 2000)を用いる。その推定対象は相対効果 p = P(X < Y) + ½ P(X = Y) であり、以下 P(X<Y) と略記する(tie 項はカウントデータが tie を持つため保持する): 本プロトコルは順序関係を原始に取る — このコミットメントは後述の順位ベース REO パネルと tie 不変の濃縮統計量にも回帰する。全体を通じて、発見の閾値は誤発見水準 0.10 に置く。閾値の背後の推定量は、各推論水準の導入箇所で述べる。
 
-<!-- 解釈マップの実体(計画v2 §0.6 批准マップの転記 — 判断点5 の置き場所決定: Methods 小表)。C-01/C-04/C-05/C-07/C-16 の読みの参照先 -->
+<!-- 解釈マップ(計画v2 §0.6 批准マップの転記)。実体 = 「Figure legends and table captions」節の表2キャプション直下(2026-08-18 移設 — 本節は参照文のみ)。C-01/C-04/C-05/C-07/C-16 の読みの参照先 -->
 The interpretation map fixed for the four contrasts is given in Table 2; readings for every outcome pattern were assigned before the reported results existed.
 
-| Contrast | Pre-specified standing | Basis |
-| --- | --- | --- |
-| R_Tumor | Hypothesis-bearing; signal expected | primary expectation of the working hypothesis (Introduction); the driver-conditioned gap left by Morton et al. (2021) |
-| R_Normal | Hypothesis-bearing; signal possible | long-term molecular memory of exposure — dose-dependent expression within exposed normal tissue (Abend et al. 2013); exposed-versus-unexposed normal-tissue signatures (Ory et al. 2026) |
-| B_Normal | Test cell for a shared trace | counterpart of the cross-stratum normal comparison; the shared signatures of Ory et al. (2026) were reported without driver stratification |
-| B_Tumor | Direction-agnostic; not excludable | point-mutation drivers become less likely as dose rises in the source cohort (Morton et al. 2021) |
-
-Pattern rules, fixed with the map: signal in R_Tumor is read as agreement with prior expectation; tumor signal confined to the BRAF stratum would be hypothesis-discordant and read with non-aetiological explanations first; concordant signal in both normal contrasts is read as consistent with a shared glandular trace, discordant signal as suggesting a driver-linked trace type; normal-tissue signal confined to the BRAF stratum is read as confounding first; confined to the RET stratum, as not identifiable between attenuated sharing and a driver-linked type; and an all-null outcome is reported as a bounded null. No outcome pattern requires post-hoc labelling.
-
-【訳】4対比について固定した解釈マップを表2に示す。全ての結果パターンへの読みは、報告結果が存在する前に割り当てられた。(表: R_Tumor = 仮説担持・シグナル期待〔作業仮説の一次期待(Introduction); Morton et al. 2021 が残した driver 条件付きの隙間〕/ R_Normal = 仮説担持・シグナルあり得る〔被曝の長期分子記憶 — 被曝例内の線量依存発現(Abend et al. 2013)と被曝対非被曝の正常組織署名(Ory et al. 2026)〕/ B_Normal = 共有痕跡のテストセル〔層間正常比較の相手方; Ory et al. 2026 の共有署名は driver 非層別で報告された〕/ B_Tumor = 方向不可知・排除不能〔ソースコホートでは線量が上がるほど点変異 driver は生じにくい(Morton et al. 2021)〕)。マップと同時に固定したパターン規則: R_Tumor のシグナルは事前期待との一致として読む。BRAF 層に限局した腫瘍シグナルは仮説不協和であり、非病因的説明を第一として読む。両正常対比の一致シグナルは共有腺痕跡と整合、不一致シグナルは driver 連関の痕跡タイプの示唆として読む。BRAF 層に限局した正常組織シグナルは交絡第一で、RET 層に限局した場合は減衰した共有と driver 連関タイプの間で識別不能として読む。全対比 null は bounded null として報告する。どの結果パターンも事後のラベリングを要しない。
+【訳】4対比について固定した解釈マップを表2に示す。全ての結果パターンへの読みは、報告結果が存在する前に割り当てられた。
 
 ### Candidate confounders
 
@@ -373,6 +364,18 @@ Across the 16 contrast × collection cells, the share of null replicates produci
 **Table 1 | Case characteristics of the analysis groups.** Main analysis cohort (R_Sporadic, R_High, B_Sporadic, B_High) and REO evaluation set (R_Low, R_Mid): group size, sex, age at surgery and age at exposure (median [range]), and driver composition (fusion partner within the RET stratum) <!-- N-12, N-13 -->. Footnotes give the between-group age-at-surgery differences (High − Sporadic) as Hodges–Lehmann median differences and the rank-based effect P(Sporadic < High), each with a 95% percentile bootstrap confidence interval (within-group resampling) <!-- N-64, N-65 -->. These are disclosures of magnitude and uncertainty: no hypothesis test is performed and no p-value is computed. Age at exposure is undefined for the unexposed Sporadic groups <!-- N-63 -->.
 
 **Table 2 | Interpretation map for the four exposure contrasts, fixed before the reported results existed.** Each contrast carries a pre-specified standing and its basis; the pattern rules fixed together with the map are given as table footnotes. No outcome pattern requires post-hoc labelling.
+
+<!-- 表2 本体+脚注規則(正本。Methods: Analysis contrasts から 2026-08-18 移設 — 投稿整形時に一方向切り出し、編集可能な第2コピーは作らない。規則の (a)-(f) 脚注化は研究者の書き直し待ち) -->
+| Contrast | Pre-specified standing | Basis |
+| --- | --- | --- |
+| R_Tumor | Hypothesis-bearing; signal expected | primary expectation of the working hypothesis (Introduction); the driver-conditioned gap left by Morton et al. (2021) |
+| R_Normal | Hypothesis-bearing; signal possible | long-term molecular memory of exposure — dose-dependent expression within exposed normal tissue (Abend et al. 2013); exposed-versus-unexposed normal-tissue signatures (Ory et al. 2026) |
+| B_Normal | Test cell for a shared trace | counterpart of the cross-stratum normal comparison; the shared signatures of Ory et al. (2026) were reported without driver stratification |
+| B_Tumor | Direction-agnostic; not excludable | point-mutation drivers become less likely as dose rises in the source cohort (Morton et al. 2021) |
+
+Pattern rules, fixed with the map: signal in R_Tumor is read as agreement with prior expectation; tumor signal confined to the BRAF stratum would be hypothesis-discordant and read with non-aetiological explanations first; concordant signal in both normal contrasts is read as consistent with a shared glandular trace, discordant signal as suggesting a driver-linked trace type; normal-tissue signal confined to the BRAF stratum is read as confounding first; confined to the RET stratum, as not identifiable between attenuated sharing and a driver-linked type; and an all-null outcome is reported as a bounded null. No outcome pattern requires post-hoc labelling.
+
+【訳】(表2本体: R_Tumor = 仮説担持・シグナル期待〔作業仮説の一次期待(Introduction); Morton et al. 2021 が残した driver 条件付きの隙間〕/ R_Normal = 仮説担持・シグナルあり得る〔被曝の長期分子記憶 — 被曝例内の線量依存発現(Abend et al. 2013)と被曝対非被曝の正常組織署名(Ory et al. 2026)〕/ B_Normal = 共有痕跡のテストセル〔層間正常比較の相手方; Ory et al. 2026 の共有署名は driver 非層別で報告された〕/ B_Tumor = 方向不可知・排除不能〔ソースコホートでは線量が上がるほど点変異 driver は生じにくい(Morton et al. 2021)〕)。マップと同時に固定したパターン規則: R_Tumor のシグナルは事前期待との一致として読む。BRAF 層に限局した腫瘍シグナルは仮説不協和であり、非病因的説明を第一として読む。両正常対比の一致シグナルは共有腺痕跡と整合、不一致シグナルは driver 連関の痕跡タイプの示唆として読む。BRAF 層に限局した正常組織シグナルは交絡第一で、RET 層に限局した場合は減衰した共有と driver 連関タイプの間で識別不能として読む。全対比 null は bounded null として報告する。どの結果パターンも事後のラベリングを要しない。
 
 **Table 3 | Gene-level exposure contrast, per analysis contrast.** Tested genes after filtering, Storey π0 (plug-in, λ = 0.5), discoveries at q < 0.10 with direction (higher / lower in the exposed group), minimum exact permutation p, and the pre-specified primary omnibus (Higher Criticism) p from the contrast's own label-permutation null <!-- N-15, N-16, N-17, N-18, N-19, N-20 -->.
 
