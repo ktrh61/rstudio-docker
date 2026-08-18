@@ -261,3 +261,8 @@
   existed」に統一(§0.6 決定記録の精密な線 — 旧パイプライン暫定結果の閲覧歴の開示深度は研究者判断
   待ち)。**Intro 予告列はこの起草で実体化 — 研究者批准待ち**
 - 2026-08-16: 引用監査(24 エージェント、敵対的検証つき)に伴う一括改訂。本文側 = Discussion 年齢バウンドの4観察を解体(Vriens 2011・Coclet 1989 撤回)、B_Normal 段落を軽量化(発見1遺伝子に比例した記述へ)、C-14 の年齢受けを内容特異形に(Chatsirisupachai 2021)、IREP 開示段落を新設(acute/constant の記録、目盛り論法、N-83/N-84)、Limitations に年齢と AS 転送の譲歩。台帳側 = Q-13 全面改訂・Q-17 新設、本マップは C-15/C-16 の根拠列を同期(**C の主張文言と水準列は全行不変** — 変わったのは受けの論証と根拠のみ)
+- 2026-08-18: C-16 の Methods 文から時制句を削除(研究者 Go): "pre-assigned before the results
+  were seen rather than left to post-hoc labeling" → "pre-assigned rather than ..."(対訳同期)。
+  実体(非2値化・事前割当・マップ参照)は不変。スコープ主張はマップ段落の正準文 "before the
+  reported results existed" に集約(2026-08-15 統一の取りこぼし解消 — 凍結対象は4箇所で確定。
+  背景の閲覧歴札決着と凍結検査は numbers_ledger 改訂メモ 2026-08-18・Q-18)

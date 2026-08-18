@@ -14,7 +14,6 @@ npj PO(Nature 系)は能動推奨、BJC/ERC は能動可。
 ## 全域: 事前固定文言の凍結(2026-08-18 研究者決定 — 閲覧歴札の決着に伴う。トリガー2と Abstract 起草時に照合)
 
 - [ ] ★ "before the reported results existed" の4箇所(Intro 設計段落・Methods: Analysis contrasts のマップ文・Disc §1 の一括宣言・表2キャプション)は**このスコープのまま凍結**。圧縮・言い換え・Abstract 起草で "prospectively specified" / "prior to any (data) analysis" / "blinded" / "before any results were seen" 系へ**強化しない**(§0.6 の開発史と矛盾を作る)。スコープを曖昧にする弱化も不可。根拠: numbers_ledger 改訂メモ 2026-08-18・Q-18。
-- [ ] 注意: Methods の C-16 文(下記 Contrast-level omnibus の★)は旧形 "pre-assigned before the results were seen" のまま残存(2026-08-15 統一の取りこぼし)。正準形 "before the reported results existed" スコープへの揃えは研究者判断待ち — 揃うまで本項で監視。
 
 ## Methods
 
@@ -48,7 +47,7 @@ npj PO(Nature 系)は能動推奨、BJC/ERC は能動可。
 - [ ] "Higher Criticism (α0 = 0.1) is the pre-specified primary omnibus statistic, chosen..." — 主オムニバスの事前指定。例: We pre-specified Higher Criticism as...
 - [ ] ※Intro 起草後の再訪: 主張担持文("The contrast-level inferential claim is carried by...")の文言を Intro 予告列とハーモナイズ(2026-08-15 に "label-aligned signal" 形へ精密化済み — 曝露帰属はオムニバスでなく解釈マップの領分、の線を保つこと)
 - [ ] "The full rejection curve R(α) is retained so that..." — 単一閾値表示に依存させない判断。例: We retain the full rejection curve so that...
-- [ ] ★ "No contrast-level binary significance label is assigned... pre-assigned before the results were seen" — 非2値化+解釈の事前割当(C-16)。例: We assign no binary label... We pre-assigned the interpretation of each pattern...
+- [ ] ★ "No contrast-level binary significance label is assigned... pre-assigned rather than left to post-hoc labeling" — 非2値化+解釈の事前割当(C-16。時制句は 2026-08-18 に削除 — スコープ主張はマップ段落の正準文に集約)。例: We assign no binary label... We pre-assigned the interpretation of each pattern...
 
 ### Gene-set level inference
 
