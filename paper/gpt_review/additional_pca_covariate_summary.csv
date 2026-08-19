@@ -1,0 +1,5 @@
+"component","covariate","n_complete","spearman_rho"
+"PC1","age_surgery",27,-0.290226023856326
+"PC1","tumor_purity",27,-0.396214896214896
+"PC2","age_surgery",27,-0.0416797668896096
+"PC2","tumor_purity",27,0.225885225885226
