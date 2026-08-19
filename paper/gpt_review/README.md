@@ -4,9 +4,9 @@
 
 ## Revised review and manuscript
 
-- `review.md`: user feedback 1–9を受けた再評価。多重性、PC-OD、純度差の評価を訂正し、後に不適切と判明した共変量調整案、選択後の効果量要約、通常の `prcomp` PCAも明示的に撤回。
-- `draft_manuscript_5000_words.md`: 修正版の英語本文試案。BJCの計数対象に相当するIntroductionからDiscussionまでは約4,587語、structured Abstractは見出し込み約190語（Markdown記号を除く空白区切り）。Abstractは本文5,000語とは別枠の200語上限に合わせた。
-- `supplementary_methods_for_5000_word_version.md`: 修正版 Supplemental Methods 試案、2,725語。
+- `review.md`: 現行原稿に対する事実ベースの再レビュー。多重性、PC-OD、追加解析、REO、gene-set/ORA、解釈フレームワークの射程を整理し、撤回済みのGPT提案を本番根拠から分離。
+- `draft_manuscript_5000_words.md`: 修正版の英語本文試案。BJCの計数対象に相当するIntroductionからDiscussionまでは見出し込み約4,965語、structured Abstractは見出し込み196語（Markdown記号を除く空白区切り）。Abstractは本文5,000語とは別枠の200語上限に合わせた。
+- `supplementary_methods_for_5000_word_version.md`: 修正版 Supplemental Methods 試案、2,970語。
 - `proposed_record_corrections.md`: 開発時の出力確認を過大評価した内部記録の訂正案。正本ファイルには未適用。
 
 ## Additional descriptive audit

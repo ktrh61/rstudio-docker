@@ -22,13 +22,13 @@ Dose was entered as a point value, and dosimetric or risk-model uncertainty was 
 
 ## Quality control and analysis cohorts
 
-The outlier procedure operated separately within each observed group-by-tissue submatrix after filterByExpr. It used unnormalized log counts per million with prior count 2. The most extreme sample on the first principal component was removed iteratively using the two-sided PC-OD rule at alpha=0.05 until no further sample was rejected (Nakayama et al. 2024). PC-OD was a QC and cohort-definition step, not a gene-level hypothesis test, and its finalized flags were held fixed in downstream inference. It flagged no RET tumor or normal sample; its only flag among the four main target groups was one High-AS BRAF tumor. Thus, it did not alter the primary RET-tumor cohort.
+The outlier procedure operated separately within each observed group-by-tissue submatrix after filterByExpr. It used unnormalized log counts per million with prior count 2. The most extreme sample on the first principal component was removed iteratively using the two-sided PC-OD rule at alpha=0.05 until no further sample was rejected (Nakayama et al. 2024). PC-OD was a QC and cohort-definition step, not a gene-level hypothesis test, and its finalized flags were held fixed in downstream inference. It flagged no tumor or normal sample in the RET fusion-positive stratum; its only flag among the four main target groups was one High-AS BRAF V600E-positive tumor. Thus, it did not alter the primary RET-tumor cohort.
 
 Relative tumor purity used the maximum-one proportion estimator from contamDE-lm, implemented in house for the proportion step only, without its differential-expression model (Shen et al. 2016; Ji et al. 2020). Protein-coding, filterByExpr-reduced paired counts were MUREN-normalized before estimation. Both dose-zero and High-AS samples were estimated jointly within each driver cohort, producing a common relative scale. Purity was treated as a relative score within the jointly estimated cases, not an absolute cellular fraction.
 
 Case pairing used the GDC merged-aliquot expression assays. Each included case was required to have one unique merged tumor and one unique merged normal sample. The main cohort additionally required RET or BRAF classification, membership in the dose-zero or High-AS group, both tissues passing the outlier screen, and relative purity at least 0.6.
 
-The REO training set comprised the RET subset of the main cohort. The evaluation set comprised RET tumors from the Low-AS and Mid-AS bands, whether or not a matched normal was available. Training outlier and purity exclusions were not applied to this evaluation set; corresponding metrics were reported as ancillary diagnostics and did not authorize exclusions.
+The REO construction set comprised the RET fusion-positive subset of the main cohort. The intermediate-band application set comprised RET fusion-positive PTCs from the Low-AS and Mid-AS bands, whether or not a matched normal was available. Construction-cohort outlier and purity exclusions were not applied to this set; corresponding metrics were reported as ancillary diagnostics and did not authorize exclusions.
 
 ## Analysis contrasts
 
@@ -38,11 +38,11 @@ p = P(X<Y) + 0.5 P(X=Y).
 
 Thus, p>0.5 indicated higher expression in High-AS cases. The signed effect used in Figure 2 was 2p−1. The RET-tumor Higher Criticism test was the single primary contrast-level test. The other three contrasts addressed separate secondary questions. Their p-values were not combined into a study-level decision, so no across-contrast adjustment was applied; all contrasts were reported, and no study-wide FDR or across-contrast family-wise error claim was made.
 
-## Candidate confounders
+## Covariate disclosure and estimand
 
-The difference in age at surgery was summarized in each driver stratum with the Hodges–Lehmann median difference and the Brunner–Munzel relative effect P(Sporadic<High). Each estimate received a 95% percentile bootstrap interval from 9,999 within-group resamples using seed 19450809. No p-value was calculated. Age at exposure was undefined for the dose-zero group and was not compared between groups.
+Age at exposure was intentionally incorporated into AS as a modifier of radiation risk. It was undefined for the dose-zero group and was not compared between groups. The difference in age at surgery was summarized in each driver stratum with the Hodges–Lehmann median difference and the Brunner–Munzel relative effect P(Sporadic<High). Each estimate received a 95% percentile bootstrap interval from 9,999 within-group resamples using seed 19450809. No p-value was calculated; these summaries characterized group structure rather than testing confounding or demonstrating balance.
 
-Sex was reported by group because sex-chromosome genes can differ with group composition. All selected genes were annotated for chromosome membership against GENCODE v36. RET fusion-partner counts were reported by band; the BRAF stratum contained BRAF V600E by construction. These summaries disclose possible covariate structure but do not test or remove confounding.
+Sex was reported by group because sex-chromosome genes can differ with group composition. All selected genes were annotated for chromosome membership against GENCODE v36. RET fusion-partner counts were reported by band; the BRAF stratum contained BRAF V600E by construction. No common covariate-adjusted model was fitted: conditioning on the age inputs used to construct AS would change the marginal AS-band estimand, relative purity was expression-derived and used for eligibility, and fusion partner may be part of the biological pathway under study. Treating them collectively as nuisance terms would not, by itself, identify a radiation-specific effect.
 
 The finalized analysis objects contained no sequencing-batch, processing-batch, centre, or collection-period field suitable for a group-balance calculation. This unavailable information is treated as an unassessed source of technical confounding. Available relative-purity, age, sex, and fusion-partner variables were reported descriptively without an additional hypothesis test.
 
@@ -88,19 +88,21 @@ This assessment informed selection of per-set permutation p-values with within-c
 
 For each tissue, signed Brunner–Munzel profiles were intersected by gene and compared between RET and BRAF with Spearman correlation. Labels were shuffled independently within each contrast 9,999 times, using contrast-specific seeds derived from 19450809, and the shuffled profiles were correlated to form the null reference interval. This interval represents the case in which neither stratum carries label-aligned structure. An observed correlation outside the interval does not distinguish exposure from a covariate shared across strata.
 
-## REO panel construction and evaluation
+## REO panel construction and intermediate-band application
 
 TPM was recalculated from the selected assay and exon-union lengths. The candidate pool was the 500 genes with greatest absolute distance of the Brunner–Munzel effect from 0.5. The q<0.10 list was not used to define the pool.
 
 For a gene pair, r was the within-sample log2-TPM difference. The dead zone was |r|<log2(1.2). A pair qualified when its sign was stable in dose-zero samples, with at most one exception among samples outside the dead zone; the 10th percentile of |r| was at least log2(1.5); and the pair reversed in more than 50% but fewer than 100% of High samples. Qualified pairs were ranked by the shift in median r. Greedy selection prohibited gene reuse and excluded a pair whose r profile had Spearman correlation at least 0.75 with a retained pair. The target was 10 pairs.
 
-The reversal score counted pairs outside the dead zone that opposed the dose-zero reference sign. The classification boundary was above the maximum score observed among dose-zero training samples. Neither the panel nor its boundary was changed after construction.
+The reversal score counted pairs outside the dead zone that opposed the dose-zero reference sign. The classification boundary was above the maximum score observed among dose-zero construction samples. Neither the panel nor its boundary was changed after construction.
 
-The only prespecified independent comparison was Mid over Low by a one-sided Monte Carlo Brunner–Munzel test, using seed 19860426. Scores for the dose-zero and High training bands were descriptive and were not estimates of out-of-sample performance.
+The REO panel had binary and graded readouts. For the binary readout, the construction-derived boundary classified the dose-zero and High construction cases. This in-sample result documented whether the selected pairs and boundary represented the contrast from which they were derived. Establishing this construction fit was required before the fixed panel was applied beyond those bands, but it was not an unbiased performance estimate because the construction cases determined pair selection and the dose-zero cases set the boundary. The boundary was then applied unchanged to Low and Mid tumors, and their classifications were retained as descriptive application results.
+
+For the graded readout, score distributions were summarized across all four bands, with the dose-zero and High bands identified as the construction anchors and the Low and Mid bands showing the fixed score's behaviour between the AS-band extremes. The prespecified one-sided Monte Carlo Brunner–Munzel comparison of Mid over Low, using seed 19860426, used only the bands not used in construction and assessed directional stochastic ordering between those two bands. It did not test linearity, four-band monotonicity, or a dose–response form. Neither this comparison nor the four-band display constituted independent validation because the panel and score direction had been defined from the construction bands.
 
 ## REO diagnostics
 
-The PC-OD screen used for training was mirrored on Low and Mid tumors, but its output was a count only and could not exclude evaluation cases. Relative purity was estimated on a common scale by pooling paired RET cases across all bands in one contamDE-lm proportion run. Purity was available for 31 of the 36 evaluation tumors. The remaining two Low and three Mid cases had a tumor assay but no matched normal assay, which the pair-based purity estimator requires; they remained in the REO evaluation.
+The PC-OD screen used for the construction cohort was mirrored on Low- and Mid-AS RET fusion-positive PTCs, but its output was a count only and could not exclude intermediate-band cases. Relative purity was estimated on a common scale by pooling paired RET fusion-positive cases across all bands in one contamDE-lm proportion run. Purity was available for 31 of the 36 intermediate-band tumors. The remaining two Low and three Mid cases had a tumor assay but no matched normal assay, which the pair-based purity estimator requires; they remained in the REO analysis.
 
 Band and score were compared conditional on purity with a partial Spearman correlation and a one-sided permutation reference. Mid and Low were also compared within two strata split at median purity. These analyses were diagnostics and did not establish independence from purity.
 
