@@ -6,7 +6,7 @@
 
 ### Background
 
-Radiation dose is associated with fusion rather than point-mutation drivers in post-Chernobyl papillary thyroid carcinoma, while driver composition structures expression. We tested expression differences by radiation-attributability band after driver stratification.
+Radiation dose is associated with fusion rather than point-mutation drivers in post-Chernobyl papillary thyroid carcinoma, while driver composition structures expression. We therefore asked whether expression differed between cases with high estimated radiation attribution and dose-zero cases within driver-defined groups.
 
 ### Methods
 
