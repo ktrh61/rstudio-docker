@@ -14,6 +14,10 @@
 
 ASは症例を順序づけて帯に分けるモデル由来指標として扱い、個々の腫瘍がradiogenicかsporadicかを観測した変数として扱いません。したがって、中心結論は “AS-band-associated expression difference within RET fusion-positive PTCs” の範囲に置きます。radiation-specific trace、radiation marker、probability of radiogenic originといった病因的表現には進めません。
 
+acuteのexposure-rate設定は主解析で維持しますが、post-Chernobylの内部ヨウ素131被曝の時間経過を物理的に表すとは主張しません。本文では事前に固定した計算規約として定義し、33.3と66.6をその数値尺度上の操作的境界として扱います。Zurnadzhy et al. 2022とBogdanova et al. 2022はacuteの妥当性を独立に検証する根拠ではなく、同じ研究プログラム内での計算規約の来歴としてSupplementary Methodsでのみ位置づけます。
+
+既存の簡易的な入力規約監査では、chronic算定は被曝症例の順序を保存し、ペアごとの順位逆転はありませんでした。これはASの順序構造が安定していることを示しますが、acuteの物理的妥当性や、同一の数値境界で帯所属が不変であることまでは示しません。したがって、本稿はacute尺度で固定した帯を報告し、chronicで同じ発現結果が得られるという未確認の主張は行いません。
+
 NCOA4-RETとCCDC6-RETについては、過去の名称との対応をIntroductionで一度示す現在の方針が適切です。RET/PTC3はNCOA4-RET、RET/PTC1はCCDC6-RETに対応し、その後はgene-partner表記に統一します。
 
 ## 2. 4対比と多重性
