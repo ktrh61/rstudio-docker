@@ -5,8 +5,8 @@
 ## Revised review and manuscript
 
 - `review.md`: user feedback 1–9を受けた再評価。多重性、PC-OD、純度差の評価を訂正し、後に不適切と判明した共変量調整案も明示的に撤回。
-- `draft_manuscript_5000_words.md`: 修正版の英語本文試案。ファイル全体4,300語、IntroductionからDiscussionまで3,736語、Abstract 243語（空白区切り）。
-- `supplementary_methods_for_5000_word_version.md`: 修正版 Supplemental Methods 試案、2,895語。
+- `draft_manuscript_5000_words.md`: 修正版の英語本文試案。BJCの計数対象に相当するIntroductionからDiscussionまでは約4,753語、structured Abstractは見出し込み約190語（Markdown記号を除く空白区切り）。Abstractは本文5,000語とは別枠の200語上限に合わせた。
+- `supplementary_methods_for_5000_word_version.md`: 修正版 Supplemental Methods 試案、2,918語。
 - `proposed_record_corrections.md`: 開発時の出力確認を過大評価した内部記録の訂正案。正本ファイルには未適用。
 
 ## Additional descriptive audit

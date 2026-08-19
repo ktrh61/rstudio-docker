@@ -22,21 +22,21 @@ Dose was entered as a point value, and dosimetric or risk-model uncertainty was 
 
 ## Quality control and analysis cohorts
 
-The outlier procedure operated separately within each observed group-by-tissue submatrix after filterByExpr. It used unnormalized log counts per million with prior count 2. The most extreme sample on the first principal component was removed iteratively using the two-sided PC-OD rule at alpha=0.05 until no further sample was rejected (Nakayama et al. 2024). PC-OD was a QC and cohort-definition step, not a gene-level hypothesis test, and its finalized flags were held fixed in downstream inference. It flagged no RET tumor or normal sample; its only flag among the four main target groups was one B_High tumor. Thus, it did not alter the realized R_Tumor cohort.
+The outlier procedure operated separately within each observed group-by-tissue submatrix after filterByExpr. It used unnormalized log counts per million with prior count 2. The most extreme sample on the first principal component was removed iteratively using the two-sided PC-OD rule at alpha=0.05 until no further sample was rejected (Nakayama et al. 2024). PC-OD was a QC and cohort-definition step, not a gene-level hypothesis test, and its finalized flags were held fixed in downstream inference. It flagged no RET tumor or normal sample; its only flag among the four main target groups was one High-AS BRAF tumor. Thus, it did not alter the primary RET-tumor cohort.
 
-Relative tumor purity used the maximum-one proportion estimator from contamDE-lm, implemented in house for the proportion step only, without its differential-expression model (Shen et al. 2016; Ji et al. 2020). Protein-coding, filterByExpr-reduced paired counts were MUREN-normalized before estimation. Both dose-zero and High samples were estimated jointly within each driver cohort, producing a common relative scale. Purity was treated as a relative score within the jointly estimated cases, not an absolute cellular fraction.
+Relative tumor purity used the maximum-one proportion estimator from contamDE-lm, implemented in house for the proportion step only, without its differential-expression model (Shen et al. 2016; Ji et al. 2020). Protein-coding, filterByExpr-reduced paired counts were MUREN-normalized before estimation. Both dose-zero and High-AS samples were estimated jointly within each driver cohort, producing a common relative scale. Purity was treated as a relative score within the jointly estimated cases, not an absolute cellular fraction.
 
-Case pairing used the GDC merged-aliquot expression assays. Each included case was required to have one unique merged tumor and one unique merged normal sample. The main cohort additionally required RET or BRAF classification, membership in the dose-zero or High group, both tissues passing the outlier screen, and relative purity at least 0.6.
+Case pairing used the GDC merged-aliquot expression assays. Each included case was required to have one unique merged tumor and one unique merged normal sample. The main cohort additionally required RET or BRAF classification, membership in the dose-zero or High-AS group, both tissues passing the outlier screen, and relative purity at least 0.6.
 
-The REO training set comprised the RET subset of the main cohort. The evaluation set comprised RET tumors from the Low and Mid bands, whether or not a matched normal was available. Training outlier and purity exclusions were not applied to this evaluation set; corresponding metrics were reported as ancillary diagnostics and did not authorize exclusions.
+The REO training set comprised the RET subset of the main cohort. The evaluation set comprised RET tumors from the Low-AS and Mid-AS bands, whether or not a matched normal was available. Training outlier and purity exclusions were not applied to this evaluation set; corresponding metrics were reported as ancillary diagnostics and did not authorize exclusions.
 
 ## Analysis contrasts
 
-The four contrasts were R_Tumor, R_Normal, B_Tumor, and B_Normal. In each contrast, group x was dose-zero and group y was High. The Brunner–Munzel relative effect was
+The four High-AS versus dose-zero contrasts were RET-tumor (`R_Tumor` in the analysis files), RET-normal (`R_Normal`), BRAF-tumor (`B_Tumor`), and BRAF-normal (`B_Normal`). These labels refer to contrasts, not sample groups. In each contrast, group x was dose-zero and group y was High-AS. The Brunner–Munzel relative effect was
 
 p = P(X<Y) + 0.5 P(X=Y).
 
-Thus, p>0.5 indicated higher expression in High. The signed effect used in Figure 2 was 2p−1. The R_Tumor Higher Criticism test was the single primary contrast-level test. The other three contrasts addressed separate secondary questions. Their p-values were not combined into a study-level decision, so no across-contrast adjustment was applied; all contrasts were reported, and no study-wide FDR or across-contrast family-wise error claim was made.
+Thus, p>0.5 indicated higher expression in High-AS cases. The signed effect used in Figure 2 was 2p−1. The RET-tumor Higher Criticism test was the single primary contrast-level test. The other three contrasts addressed separate secondary questions. Their p-values were not combined into a study-level decision, so no across-contrast adjustment was applied; all contrasts were reported, and no study-wide FDR or across-contrast family-wise error claim was made.
 
 ## Candidate confounders
 
@@ -44,7 +44,7 @@ The difference in age at surgery was summarized in each driver stratum with the 
 
 Sex was reported by group because sex-chromosome genes can differ with group composition. All selected genes were annotated for chromosome membership against GENCODE v36. RET fusion-partner counts were reported by band; the BRAF stratum contained BRAF V600E by construction. These summaries disclose possible covariate structure but do not test or remove confounding.
 
-The finalized analysis objects contained no sequencing-batch, processing-batch, centre, or collection-period field suitable for a group-balance calculation. This unavailable information is treated as an unassessed source of technical confounding. The added R_Tumor audit reports the available relative-purity, age, sex, and fusion-partner variables without a second hypothesis test.
+The finalized analysis objects contained no sequencing-batch, processing-batch, centre, or collection-period field suitable for a group-balance calculation. This unavailable information is treated as an unassessed source of technical confounding. The added primary RET-tumor audit reports the available relative-purity, age, sex, and fusion-partner variables without a second hypothesis test.
 
 ## Normalization
 
@@ -60,15 +60,15 @@ Gene-level p-values were converted to Storey q-values with the plug-in estimate 
 
 ## Descriptive magnitude and covariate audit
 
-The additional audit read the finalized R_Tumor DGEList, gene-level result table, cohort table, and clinical table. It did not rerun QC, normalization, the Brunner–Munzel tests, Storey adjustment, or gene-set analysis. For the existing q<0.10 list, it summarized |2p−1| and the absolute mean log2 fold change. The latter was calculated for display only from DEGES-normalized log2 CPM with prior count 1 as the High-group mean minus the dose-zero-group mean.
+The additional audit read the finalized RET-tumor DGEList, gene-level result table, cohort table, and clinical table. It did not rerun QC, normalization, the Brunner–Munzel tests, Storey adjustment, or gene-set analysis. For the existing q<0.10 list, it summarized |2p−1| and the absolute mean log2 fold change. The latter was calculated for display only from DEGES-normalized log2 CPM with prior count 1 as the High-AS-group mean minus the dose-zero-group mean.
 
-For sample-level context, principal components were calculated from all 15,621 tested genes and all 27 R_Tumor samples. Log2 CPM values were centered gene by gene and were not variance-scaled; no gene was selected by q-value or group difference for this plot. The same PC1–PC2 coordinates were displayed by group and sex, relative tumor-purity score, age at surgery, and RET fusion partner. Spearman correlations of PC1 and PC2 with age and purity were reported without p-values. A model matrix containing group, standardized age at surgery, standardized purity, sex, and three-level RET fusion partner was checked only for rank and residual degrees of freedom; no adjusted gene model was fitted.
+For sample-level context, principal components were calculated from all 15,621 tested genes and all 27 RET-tumor samples. Log2 CPM values were centered gene by gene and were not variance-scaled; no gene was selected by q-value or group difference for this plot. The same PC1–PC2 coordinates were displayed by group and sex, relative tumor-purity score, age at surgery, and RET fusion partner. Spearman correlations of PC1 and PC2 with age and purity were reported without p-values. No adjusted gene model was fitted; the available variables were reported descriptively because combining AS components, expression-derived purity, and potential biological intermediates as nuisance terms would define a different conditional estimand.
 
 For contrast-level diagnostics, 9,999 label shuffles were generated with seed 19860426 and stored. Applying the plug-in estimator to each shuffle gave a null reference distribution for pi0. These same shuffles supplied the omnibus and gene-set references.
 
 ## Contrast-level omnibus inference
 
-Higher Criticism was the pre-specified primary omnibus statistic, with scan range alpha0=0.1 (Donoho and Jin 2004). Its p-value was calculated against the contrast's own label-shuffle distribution, so the analytic independence and sparsity assumptions of the original Higher Criticism null were not used. The R_Tumor Higher Criticism test was the single primary contrast-level test; the corresponding statistics in the other contrasts answered separate secondary questions. Count statistics at fixed cutoffs and the maximum statistic were retained as descriptive rows. The full rejection curve R(alpha) was retained to show how the displayed gene count varied across q thresholds.
+Higher Criticism was the prespecified primary omnibus statistic, with scan range alpha0=0.1 (Donoho and Jin 2004). Its p-value was calculated against the contrast's own label-shuffle distribution, so the analytic independence and sparsity assumptions of the original Higher Criticism null were not used. The RET-tumor Higher Criticism test was the single primary contrast-level test; the corresponding statistics in the other contrasts answered separate secondary questions. Count statistics at fixed cutoffs and the maximum statistic were retained as descriptive rows. The full rejection curve R(alpha) was retained to show how the displayed gene count varied across q thresholds.
 
 Because no binary contrast label was defined, the omnibus p-values, per-gene q-values, and rejection curves should be reported as continuous evidence. “Support” and “no support” wording should not imply an undeclared cutoff.
 
@@ -78,9 +78,9 @@ Genes were ranked by tie-averaged normal scores of the signed Brunner–Munzel s
 
 The null comprised the 9,999 saved label shuffles per contrast. For each set, a sign-conditional permutation p-value was calculated and adjusted by Benjamini–Hochberg within collection. pi0 was fixed at 1 for the set-level analysis. The four families were Hallmark; C2 canonical pathways restricted to Reactome, WikiPathways, KEGG MEDICUS, BioCarta, and PID; C5 GO Biological Process; and a radiation-curated subset of C2:CGP. The radiation curation rule was fixed before the reported set-level run. Sets outside 15–500 genes were excluded.
 
-The spike-in multiplied the 195 genes present from HALLMARK_ADIPOGENESIS by 1.15 in the nine B_Tumor High samples. This is a single coherent-signal check and not a general power analysis.
+The spike-in multiplied the 195 genes present from HALLMARK_ADIPOGENESIS by 1.15 in the nine High-AS BRAF-tumor samples. This is a single coherent-signal check and not a general power analysis.
 
-For over-representation analysis, R_Tumor genes meeting Storey q<0.10 were split into higher, lower, and combined lists. One-sided hypergeometric tests used the R_Tumor tested genes as the universe and BH adjustment within family-by-list. In the terminology of Goeman and Bühlmann (2007), the statistic is competitive, but its gene-sampling p-value does not refer to subject-level label randomization.
+For over-representation analysis, RET-tumor genes meeting Storey q<0.10 were split into higher, lower, and combined lists. One-sided hypergeometric tests used all genes tested in the RET-tumor contrast as the universe and BH adjustment within family-by-list. In the terminology of Goeman and Bühlmann (2007), the statistic is competitive, but its gene-sampling p-value does not refer to subject-level label randomization.
 
 ## Complete-null assessment of the set-level procedure
 
@@ -102,7 +102,7 @@ For a gene pair, r was the within-sample log2-TPM difference. The dead zone was 
 
 The reversal score counted pairs outside the dead zone that opposed the dose-zero reference sign. The classification boundary was above the maximum score observed among dose-zero training samples. Neither the panel nor its boundary was changed after construction.
 
-The only pre-specified independent comparison was Mid over Low by a one-sided Monte Carlo Brunner–Munzel test, using seed 19860426. Scores for the dose-zero and High training bands were descriptive and were not estimates of out-of-sample performance.
+The only prespecified independent comparison was Mid over Low by a one-sided Monte Carlo Brunner–Munzel test, using seed 19860426. Scores for the dose-zero and High training bands were descriptive and were not estimates of out-of-sample performance.
 
 ## REO diagnostics
 
