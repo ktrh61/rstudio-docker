@@ -1,5 +1,7 @@
 # 追加記述解析の実行記録
 
+> **本番不採用:** 本記録中の選択後の効果量要約と `stats::prcomp` PCAは投稿原稿から撤去した。PCAはHDLSS専用法でもPC-ODでもなく、解析法として承認されていない。ファイルは実行履歴としてのみ保全し、本番解析の根拠に用いない。CrossDataMatrixによる置換解析は実行していない。
+
 実行日: 2026-08-19（Asia/Tokyo）
 
 ## 目的と解析境界
@@ -50,4 +52,4 @@ e2a6db87454086ccbfaf8f2b1a01039f3af758dff91744707f3e30db23362786  processed/thyr
 - 共変量入り候補モデル行列: n=27、7列、rank 7、残差自由度20。これは代数的なrank確認の記録に限られ、科学的に妥当な調整モデルの実現可能性を示さない。遺伝子モデルは未実行。
 - 既存 PC-OD flag: RET tumor 0、RET normal 0。4主対象群中のflagは B_High tumor 1件のみ。
 
-各数値の完全な表は `additional_*.csv`、簡潔な要約は `additional_descriptive_audit.md` に保存した。PCAのバイナリ図は保全対象外としたが、座標と要約はCSVにあり、上記スクリプトで再生成できる。
+各数値の完全な表は `additional_*.csv`、簡潔な要約は `additional_descriptive_audit.md` に保存した。PCAのバイナリ図は保全対象外とした。座標と要約は履歴用CSVに残るが、上記スクリプトとともに本番用途では再利用しない。

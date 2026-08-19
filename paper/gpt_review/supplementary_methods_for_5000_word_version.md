@@ -1,6 +1,6 @@
 # Supplementary Methods for the revised 5,000-word editorial trial
 
-> Prepared on 2026-08-19 from the Supplementary Methods and method details in paper/draft_manuscript.md. This file is an editorial reallocation. A separate descriptive audit of finalized outputs is identified explicitly below; it did not rerun the inferential pipeline.
+> Prepared on 2026-08-19 from the Supplementary Methods and method details in paper/draft_manuscript.md. This file is an editorial reallocation and does not supersede the canonical files in paper/.
 
 ## Data sources and expression matrix
 
@@ -44,7 +44,7 @@ The difference in age at surgery was summarized in each driver stratum with the 
 
 Sex was reported by group because sex-chromosome genes can differ with group composition. All selected genes were annotated for chromosome membership against GENCODE v36. RET fusion-partner counts were reported by band; the BRAF stratum contained BRAF V600E by construction. These summaries disclose possible covariate structure but do not test or remove confounding.
 
-The finalized analysis objects contained no sequencing-batch, processing-batch, centre, or collection-period field suitable for a group-balance calculation. This unavailable information is treated as an unassessed source of technical confounding. The added primary RET-tumor audit reports the available relative-purity, age, sex, and fusion-partner variables without a second hypothesis test.
+The finalized analysis objects contained no sequencing-batch, processing-batch, centre, or collection-period field suitable for a group-balance calculation. This unavailable information is treated as an unassessed source of technical confounding. Available relative-purity, age, sex, and fusion-partner variables were reported descriptively without an additional hypothesis test.
 
 ## Normalization
 
@@ -58,17 +58,11 @@ For each gene, the studentized Brunner–Munzel statistic was evaluated for ever
 
 Gene-level p-values were converted to Storey q-values with the plug-in estimate of pi0 at fixed lambda=0.5 and threshold q<0.10 (Storey 2002). The fixed value avoided adaptive tuning. This definition specifies how the ranked gene list was constructed; it is not presented as a proof of FDR control under arbitrary gene dependence. We therefore refer to “genes meeting the prespecified Storey q rule” and reserve the contrast-level existence statement for the Higher Criticism label-permutation result.
 
-## Descriptive magnitude and covariate audit
-
-The additional audit read the finalized RET-tumor DGEList, gene-level result table, cohort table, and clinical table. It did not rerun QC, normalization, the Brunner–Munzel tests, Storey adjustment, or gene-set analysis. For the existing q<0.10 list, it summarized |2p−1| and the absolute mean log2 fold change. The latter was calculated for display only from DEGES-normalized log2 CPM with prior count 1 as the High-AS-group mean minus the dose-zero-group mean.
-
-For sample-level context, principal components were calculated from all 15,621 tested genes and all 27 RET-tumor samples. Log2 CPM values were centered gene by gene and were not variance-scaled; no gene was selected by q-value or group difference for this plot. The same PC1–PC2 coordinates were displayed by group and sex, relative tumor-purity score, age at surgery, and RET fusion partner. Spearman correlations of PC1 and PC2 with age and purity were reported without p-values. No adjusted gene model was fitted; the available variables were reported descriptively because combining AS components, expression-derived purity, and potential biological intermediates as nuisance terms would define a different conditional estimand.
-
-For contrast-level diagnostics, 9,999 label shuffles were generated with seed 19860426 and stored. Applying the plug-in estimator to each shuffle gave a null reference distribution for pi0. These same shuffles supplied the omnibus and gene-set references.
-
 ## Contrast-level omnibus inference
 
 Higher Criticism was the prespecified primary omnibus statistic, with scan range alpha0=0.1 (Donoho and Jin 2004). Its p-value was calculated against the contrast's own label-shuffle distribution, so the analytic independence and sparsity assumptions of the original Higher Criticism null were not used. The RET-tumor Higher Criticism test was the single primary contrast-level test; the corresponding statistics in the other contrasts answered separate secondary questions. Count statistics at fixed cutoffs and the maximum statistic were retained as descriptive rows. The full rejection curve R(alpha) was retained to show how the displayed gene count varied across q thresholds.
+
+For contrast-level diagnostics, 9,999 label shuffles were generated with seed 19860426 and stored. Applying the plug-in estimator to each shuffle gave a null reference distribution for pi0. These same shuffles supplied the omnibus and gene-set references.
 
 Because no binary contrast label was defined, the omnibus p-values, per-gene q-values, and rejection curves should be reported as continuous evidence. “Support” and “no support” wording should not imply an undeclared cutoff.
 

@@ -1,5 +1,7 @@
 # Additional descriptive audit of R_Tumor
 
+> Historical non-production record. The selection-conditioned effect summaries and the `stats::prcomp` PCA below were withdrawn from the manuscript. The PCA was not an HDLSS-specific method, was not PC-OD, and was not approved for production use. No replacement analysis was performed.
+
 This audit reads finalized analysis artifacts. It does not rerun QC, normalization, hypothesis testing, or multiple-testing adjustment. It creates no new p-values and no alternative gene list.
 
 - Existing q<0.10 list: 1765 genes (971 higher and 794 lower in High).

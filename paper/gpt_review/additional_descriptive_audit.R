@@ -2,10 +2,16 @@
 
 # Descriptive audit for the R_Tumor result.
 #
+# HISTORICAL NON-PRODUCTION SCRIPT. The selection-conditioned effect summaries
+# and stats::prcomp PCA produced here were withdrawn from the manuscript. The
+# PCA is not an HDLSS-specific method, is not PC-OD, and is not approved for
+# production use. Retain this script only to document what was run.
+#
 # This script reads the finalized pipeline artifacts but does not rerun QC,
 # normalization, differential-expression testing, or multiple-testing
 # adjustment. It creates no new p-values and no alternative DEG list. Its
-# purpose is to add magnitude and covariate context to the existing result.
+# original purpose was to add magnitude and covariate context to the existing
+# result; that use was subsequently withdrawn.
 #
 # Run in the canonical container with the repository mounted at /workspace
 # and a writable output directory mounted at /review:

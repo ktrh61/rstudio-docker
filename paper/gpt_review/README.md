@@ -4,14 +4,16 @@
 
 ## Revised review and manuscript
 
-- `review.md`: user feedback 1–9を受けた再評価。多重性、PC-OD、純度差の評価を訂正し、後に不適切と判明した共変量調整案も明示的に撤回。
-- `draft_manuscript_5000_words.md`: 修正版の英語本文試案。BJCの計数対象に相当するIntroductionからDiscussionまでは約4,753語、structured Abstractは見出し込み約190語（Markdown記号を除く空白区切り）。Abstractは本文5,000語とは別枠の200語上限に合わせた。
-- `supplementary_methods_for_5000_word_version.md`: 修正版 Supplemental Methods 試案、2,918語。
+- `review.md`: user feedback 1–9を受けた再評価。多重性、PC-OD、純度差の評価を訂正し、後に不適切と判明した共変量調整案、選択後の効果量要約、通常の `prcomp` PCAも明示的に撤回。
+- `draft_manuscript_5000_words.md`: 修正版の英語本文試案。BJCの計数対象に相当するIntroductionからDiscussionまでは約4,587語、structured Abstractは見出し込み約190語（Markdown記号を除く空白区切り）。Abstractは本文5,000語とは別枠の200語上限に合わせた。
+- `supplementary_methods_for_5000_word_version.md`: 修正版 Supplemental Methods 試案、2,725語。
 - `proposed_record_corrections.md`: 開発時の出力確認を過大評価した内部記録の訂正案。正本ファイルには未適用。
 
 ## Additional descriptive audit
 
-- `additional_descriptive_audit.R`: 今回作成・実行したRスクリプト。
+**Status:** この節の `additional_*` ファイルは実行履歴の保全資料であり、主推論パイプラインの一部ではない。選択済み遺伝子の効果量中央値と `stats::prcomp` によるPCAは原稿から撤去済みである。後者はHDLSS専用法でもPC-ODでもなく、解析法として承認されていない。CrossDataMatrixによる置換解析は、現時点では科学的必要性がないため実行していない。主解析群の単純な群別記述は、確定済み解析オブジェクトから確認可能な範囲に限って原稿へ残した。
+
+- `additional_descriptive_audit.R`: 今回作成・実行した履歴用Rスクリプト。本番使用不可。
 - `additional_analysis_execution.md`: コンテナ、コマンド、入力ハッシュ、解析境界、主要結果の記録。
 - `additional_descriptive_audit.md`: 主要結果の短い要約。
 - `additional_effect_size_summary.csv`: 全検定遺伝子と既存 q<0.10 リストの効果量要約。
@@ -23,7 +25,7 @@
 - `additional_adjusted_design_feasibility.csv`: 共変量入り候補モデル行列のrankを確認した監査記録。代数的な推定可能性だけを示し、科学的妥当性または調整効果の識別可能性を示さない。
 - `additional_pcod_flag_counts.csv`: 既存PC-OD出力の群別flag件数。
 
-バイナリである `additional_rtumor_pca.png` はこの保全ディレクトリには含めていません。PCA座標と要約はCSVに保存され、図は保存済みスクリプトから再生成できます。
+バイナリである `additional_rtumor_pca.png` はこの保全ディレクトリには含めていません。PCA座標と要約は履歴用CSVに残すが、投稿用図として再生成しません。
 
 語数は空白区切りの `wc`/`awk` で算出したため、投稿システムの計数とは多少異なる場合があります。引用文献は最終投稿書式へ展開していません。
 
