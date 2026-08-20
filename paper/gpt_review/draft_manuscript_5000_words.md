@@ -92,13 +92,15 @@ We defined binary and graded readouts for the panel. In the dose-zero and High-A
 
 We summarized graded scores across all four bands, with dose-zero and High-AS serving as construction anchors and the panel applied without refitting to Low-AS and Mid-AS. Within the two intermediate bands, the prespecified one-sided Monte Carlo Brunner–Munzel comparison of Mid-AS with Low-AS (seed 19860426) assessed whether scores tended to be higher in Mid-AS than in Low-AS. It did not test linearity, four-band monotonicity, or a dose–response form. Neither this comparison nor the four-band display constituted independent validation because the panel and score direction came from the construction bands. We also applied the previously described PC-OD procedure to the intermediate bands as a non-exclusion diagnostic. For intermediate-band tumors with matched normal tissue, we estimated relative purity on a common scale across all RET fusion-positive bands and summarized the association between band and score conditional on purity using partial Spearman correlation with a one-sided permutation reference. We did not use either diagnostic to exclude cases or modify the panel.
 
-### External anchors and reproducibility
+### External gene-list comparison
 
-Quantitative reverse-transcription PCR (qRT-PCR)-validated gene lists from Abend et al. (2012, 2013), Dom et al. (2012), and CLIP2 were cross-referenced against each contrast's q<0.10 list as descriptive membership counts, without an enrichment test.
+We cross-referenced quantitative reverse-transcription PCR (qRT-PCR)-validated gene lists from Abend et al. (2012, 2013) and Dom et al. (2012), together with CLIP2 as a single-gene reference, against each contrast's q<0.10 list. We reported descriptive membership counts without performing an enrichment test.
 
-The publication run used R 4.5.3 on Ubuntu 24.04 with reference BLAS/LAPACK 3.12.0, four workers, and fixed seeds in a date-pinned container. Two x86-64 machines used md5-identical raw inputs, passed 415 tests with no failures, and produced identical primary artifacts. Analysis code, versioned inputs, and the container recipe accompany the paper; package versions are listed in Table S5.
+### Reproducibility and AI use
 
-Generative AI assistants were used under author direction for code debugging and refactoring and for drafting and editing text. The authors specified and reviewed the scientific content, checked quantitative statements against versioned outputs and citations against the source ledger, made all scientific decisions, and accept responsibility for the manuscript.
+We ran the publication analysis in a date-pinned container with R 4.5.3 on Ubuntu 24.04, reference BLAS/LAPACK 3.12.0, four workers, and fixed seeds. We executed the full pipeline independently on two x86-64 machines using MD5-identical raw inputs; both runs passed 415 tests with no failures and produced identical primary artifacts. We provide the analysis code, versioned inputs, and container recipe with the paper; Table S5 lists package versions.
+
+The authors directed the use of generative AI assistants for code debugging and refactoring and for drafting and editing text. They specified and reviewed the scientific content, checked quantitative statements against versioned outputs and citations against the source ledger, and made all scientific decisions; the authors accept responsibility for the manuscript.
 
 ## Results
 
