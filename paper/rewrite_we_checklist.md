@@ -79,9 +79,9 @@ npj PO(Nature 系)は能動推奨、BJC/ERC は能動可。
 - [ ] ★ "this is a disclosure of magnitude and uncertainty, not a confounding test, and no p-value is computed" — 開示であって検定でないという宣言(リント(7))。例: We disclose magnitude and uncertainty and compute no p-value...
 - [ ] ★ "Age is not entered as a covariate, because..." — 共変量非投入の判断(Q-03 の受け; QC 節から本節へ移設済み)。例: We did not enter age as a covariate because...
 
-### External anchor cross-reference
+### External gene-list comparison
 
-- [ ] ★ "...the reading was fixed symmetrically in advance — any count is reported as description and no claim moves with the outcome" — 対称読みの事前固定(C-13)。例: We fixed the reading symmetrically in advance...
+- [ ] "We cross-referenced two classes... We kept the two classes distinct..." — qRT-PCR検証済みアンカーとOry多変量署名を区別し、員数を記述として報告する(C-13)。濃縮・分類器検証として扱わない。
 
 ### Software, seeds and reproducibility
 

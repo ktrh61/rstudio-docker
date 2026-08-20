@@ -151,12 +151,14 @@
 | N-51 | [FAIL 0 \| WARN 0 \| SKIP 0 \| PASS 415](両機) | テストスイート結果 | run/xeon_results/logs/tests.log:48; run/i9canon/tests.log:28 | Methods(再現性) | verified |
 | N-52 | raw 1819 ファイル md5 全一致(唯一の差分は Xeon 側のみの logs/*.parcel 1件で発現データ本体ではない) | 二機の入力同一性 | run/xeon_provenance/i9_raw_md5.txt(1819行) vs xeon_raw_md5.txt(1820行)、差分は raw_diff.txt:1-2 | Methods(再現性) | verified |
 
-### L. 外部アンカー照合(追補計算 2026-08-12、claim_map C-13)
+### L. 外部遺伝子リスト照合(claim_map C-13)
 
 | N-ID | 値 | 定義 | 出典 | 使用箇所 | 状態 |
 |---|---|---|---|---|---|
-| N-53 | 20 セル中 19 で k=0(層A 5 リスト × 4 対比。全 33 entries が現行注釈に 1:1 解決、全遺伝子が全対比の検定対象に存在) | 外部放射線関連遺伝子リスト(Abend 2013 正常8/腫瘍6、Abend 2012 ペア差11、Dom 2012 正常7、CLIP2)と DEG 集合(q<0.10)の員数照合 | diagnostics/output/external_gene_anchors.log:2「All symbols resolved」・:5-24(Membership summary); rds は diagnostics/output/external_gene_anchors.rds `$summary` | Disc / Supp | verified |
-| N-54 | S100A10: R_Tumor で effect 0.167(High 群で低発現)、p_exact 0.00208、q_storey 0.079、rank 233 | 唯一の非ゼロセル(dom2012_normal × R_Tumor = **組織対応外セル**: 正常組織由来リストを腫瘍対比で照合したもの)。Dom 2012 では被曝側正常組織で上方制御であり、組織側・方向のいずれも原報告と一致しない | 同 log:17「dom2012_normal R_Tumor [cross-tissue] k=1」・:102(per-gene detail); rds `$detail` | Disc / Supp | verified |
+| N-53 | 検証済みアンカー20セル中19で k=0(5リスト × 4対比。全33 entries が現行注釈に1:1解決し、全遺伝子が全対比の検定対象) | qRT-PCR検証済みリスト(Abend 2013 正常8/腫瘍6、Abend 2012 ペア差11、Dom 2012 正常7)および CLIP2 と DEG 集合(q<0.10)の員数照合 | `diagnostics/external_gene_anchors.{csv,R}`; `diagnostics/output/external_gene_anchors.rds` の `$summary` | Results / Disc / Supp | verified |
+| N-54 | S100A10: R_Tumor で effect 0.167(High 群で低発現)、p_exact 0.00208、q_storey 0.079、rank 233 | 検証済みアンカーで唯一の非ゼロセル(dom2012_normal × R_Tumor = 組織横断)。Dom 2012では被曝側正常組織で上方制御であり、組織側・方向とも原報告と一致しない | `diagnostics/output/external_gene_anchors.rds` の `$summary`, `$detail` | Results / Disc / Supp | verified |
+| N-85 | Ory 2026 多変量署名12セル中9で k=0。非ゼロは全て R_Tumor: 組織共有署名 5/39、正常組織署名 3/40(組織横断)、腫瘍署名 3/46(組織対応)。元リストは50/45/64遺伝子。SPEN-AS1・MCTS2・SNORD47はGENCODE v36に対応せず、他の分母差は対比別検定集合への残存差による | Ory 2026 Supplementary Tables S2/S4/S6 と各対比 DEG 集合(q<0.10)の記述的員数照合。濃縮検定ではない | `diagnostics/ory2026_gene_signatures.csv`; `diagnostics/external_gene_anchors.R`; `diagnostics/output/external_gene_anchors.rds` の `$resolution`, `$summary` | Methods / Results / Disc / Supp | verified |
+| N-86 | R_Tumor との重なり: 組織共有 = ATP5MF, MRPL52, NTHL1, URM1, USE1; 正常組織 = PXDN, S100A10, TESC; 腫瘍 = P2RY1, PLK2, EHD4 | N-85の遺伝子別内訳。正常組織署名の3件は組織横断、腫瘍署名の3件は組織対応。Ory署名は正常組織対比およびBRAF対比では k=0 | `diagnostics/output/external_gene_anchors.rds` の `$detail` | Results / Disc / Supp | verified |
 
 ### M. D6 較正の派生値・採用時測定(執筆用、2026-08-12 追加)
 
