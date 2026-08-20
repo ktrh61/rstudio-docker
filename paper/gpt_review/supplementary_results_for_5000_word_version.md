@@ -26,9 +26,9 @@ The 500-gene construction pool comprised 317 genes expressed more highly and 182
 
 The construction-band classifications and intermediate-band results are reported in the main text. Their interpretation remains asymmetric: construction-band separation establishes that the selected panel represents its source contrast but is not an unbiased estimate of classification performance; application to Low-AS and Mid-AS cases did not constitute independent external validation.
 
-## REO quality and purity diagnostics
+## Ancillary REO quality and purity diagnostics
 
-The mirrored PC-OD screen flagged no intermediate-band tumor (0 of 17 Low-AS and 0 of 19 Mid-AS), so all 36 eligible tumors remained in the REO application. Relative purity could be estimated for 15 Low-AS and 16 Mid-AS tumors; two Low-AS and three Mid-AS tumors lacked the matched normal assay required by the pair-based estimator and remained in the REO analysis without a purity score.
+The ancillary PC-OD screen flagged no intermediate-band tumor (0 of 17 Low-AS and 0 of 19 Mid-AS), so all 36 eligible tumors remained in the REO application. Relative purity could be estimated for 15 Low-AS and 16 Mid-AS tumors; two Low-AS and three Mid-AS tumors lacked the matched normal assay required by the pair-based estimator and remained in the REO analysis without a purity score.
 
 In the pooled paired RET purity run, median relative-purity scores were 0.690, 0.704, 0.739, and 0.814 in the dose-zero, Low-AS, Mid-AS, and High-AS bands, respectively. This diagnostic refitted the relative scale across all paired RET bands and is therefore not numerically interchangeable with the main-cohort purity scale. Among the intermediate bands, Spearman correlations between purity and REO score were 0.684 in Low-AS cases, 0.345 in Mid-AS cases, and 0.538 when pooled. The unadjusted band–score correlation was 0.142, the band–purity correlation was 0.036, and the partial Spearman coefficient after adjustment for purity rank was 0.146 (descriptive one-sided permutation p=0.2162).
 
