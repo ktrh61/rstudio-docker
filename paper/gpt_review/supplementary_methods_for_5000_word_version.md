@@ -32,11 +32,11 @@ The REO construction set comprised the RET fusion-positive subset of the main co
 
 ## Analysis contrasts
 
-The four High-AS versus dose-zero contrasts were RET-tumor (`R_Tumor` in the analysis files), RET-normal (`R_Normal`), BRAF-tumor (`B_Tumor`), and BRAF-normal (`B_Normal`). These labels refer to contrasts, not sample groups. In each contrast, group X was dose-zero and group Y was High-AS. The Brunner–Munzel relative effect was
+The four High-AS versus dose-zero contrasts were RET-tumor (`R_Tumor` in the analysis files), RET-normal (`R_Normal`), BRAF-tumor (`B_Tumor`), and BRAF-normal (`B_Normal`). These labels refer to contrasts, not sample groups. In each contrast, group X was dose-zero and group Y was High-AS. The Brunner–Munzel relative effect (probabilistic index) was denoted θ:
 
-p = P(X<Y) + 0.5 P(X=Y).
+θ = Pr(X<Y) + 0.5 Pr(X=Y).
 
-Thus, p>0.5 indicated higher expression in High-AS cases. The signed effect used in Figure 2 was 2p−1. The RET-tumor Higher Criticism test was the single primary contrast-level test. The other three contrasts addressed separate secondary questions. Their p-values were not combined into a study-level decision, so no across-contrast adjustment was applied; all contrasts were reported, and no study-wide FDR or across-contrast family-wise error claim was made.
+Values of θ>0.5 indicated that expression tended to be higher in High-AS cases. The signed effect shown in Figure 2 was 2θ−1. The RET-tumor Higher Criticism test was the single primary contrast-level test. The corresponding tests in the other three contrasts addressed distinct secondary questions. We reported all four omnibus p-values separately and did not combine them into a study-level decision. Accordingly, no across-contrast multiplicity adjustment was applied, and we made no claim of study-wide FDR or across-contrast family-wise error control.
 
 ## Covariate disclosure and estimand
 

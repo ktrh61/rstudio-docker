@@ -32,7 +32,7 @@ The mirrored PC-OD screen flagged no intermediate-band tumor (0 of 17 Low-AS and
 
 In the pooled paired RET purity run, median relative-purity scores were 0.690, 0.704, 0.739, and 0.814 in the dose-zero, Low-AS, Mid-AS, and High-AS bands, respectively. This diagnostic refitted the relative scale across all paired RET bands and is therefore not numerically interchangeable with the main-cohort purity scale. Among the intermediate bands, Spearman correlations between purity and REO score were 0.684 in Low-AS cases, 0.345 in Mid-AS cases, and 0.538 when pooled. The unadjusted band-score correlation was 0.142, the band-purity correlation was 0.036, and the partial band-score correlation conditional on purity was 0.146 (one-sided permutation p=0.2162).
 
-After splitting the intermediate-band cases at median purity, the one-sided Mid-AS-over-Low-AS comparison gave P(Low<Mid)=0.580 and p=0.3069 in the lower-purity stratum and P(Low<Mid)=0.532 and p=0.4197 in the higher-purity stratum. These were diagnostics, not additional confirmatory tests, and they did not establish an AS-band association independent of purity.
+After splitting the intermediate-band cases at median purity, the one-sided Mid-AS-over-Low-AS comparison gave Pr(Low<Mid)=0.580 and p=0.3069 in the lower-purity stratum and Pr(Low<Mid)=0.532 and p=0.4197 in the higher-purity stratum. These were diagnostics, not additional confirmatory tests, and they did not establish an AS-band association independent of purity.
 
 ## External gene-list cross-reference
 

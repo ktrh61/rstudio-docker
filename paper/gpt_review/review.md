@@ -66,7 +66,7 @@ REOにはbinary readoutとgraded readoutがあります。dose-zeroとHigh-ASは
 
 固定した境界をLow-ASとMid-ASへ変更なく適用すると、Lowはnegative 9／positive 8、Midはnegative 8／positive 11でした。graded scoreの帯別中央値はdose-zero／Low／Mid／Highで0／1／4／6でした。これは固定スコアで観察された4帯の記述的プロファイルです。
 
-事前に定めた片側Brunner–Munzel比較はMidとLowだけを用い、P(Low<Mid)=0.616、p=0.1127でした。この検定は2帯間の方向的な確率順序を評価するもので、4帯の線形性、単調性、dose-response formを検定しません。したがって、p=0.1127だけでconstruction fitや4帯表示を無効とすることも、0／1／4／6の中央値だけで線形性を主張することも不適切です。また、パネルとスコア方向が構築帯から定義されているため、Mid–Low比較や4帯表示を“independent validation”とは呼びません。
+事前に定めた片側Brunner–Munzel比較はMidとLowだけを用い、Pr(Low<Mid)=0.616、p=0.1127でした。この検定は2帯間の方向的な確率順序を評価するもので、4帯の線形性、単調性、dose-response formを検定しません。したがって、p=0.1127だけでconstruction fitや4帯表示を無効とすることも、0／1／4／6の中央値だけで線形性を主張することも不適切です。また、パネルとスコア方向が構築帯から定義されているため、Mid–Low比較や4帯表示を“independent validation”とは呼びません。
 
 純度推定が得られたのは中間帯36例中31例です。残るLow 2例とMid 3例にはtumor assayがある一方、ペア型純度推定に必要なmatched normal assayがありません。REOはtumorのみで計算できるため36例全てを含みます。純度との関連解析は除外権限を持たない診断であり、純度から独立したband effectを証明しません。
 
