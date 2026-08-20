@@ -1,6 +1,6 @@
 # 520_finalize_reo_panel.R
 # Build the final REO panel from the candidate pairs (510) by greedy, non-
-# redundant selection, then set a data-driven boundary zone and classification.
+# redundant selection, then set a dose-zero-anchored classification boundary.
 # Input : processed/thyr_reo_candidate_pairs.rds  (from 510)
 #         processed/thyr_normalized_counts.rds     (from 310; R_Tumor sample set)
 #         processed/thyr_se_raw.rds                (from 120; single count assay)
@@ -13,9 +13,9 @@
 # vector correlates (Spearman) below CORRELATION_THRESHOLD with every kept pair,
 # stopping at TARGET_PANEL_SIZE. A sample's panel score is the number of pairs
 # that reverse (|r| >= dead zone and opposite sign to the R0 reference). The
-# boundary zone is data-driven from the training arms: negative <= max(R0
-# scores), positive >= min(R1 scores), the interior undetermined. Classification
-# thresholds are set on R0/R1 only; 530 applies them to R_Low/R_Mid untouched.
+# classification cutoff is the maximum R0 score, and scores above that cutoff
+# are positive. R1 scores describe construction fit but do not determine the
+# cutoff. Script 530 applies the resulting rule to R_Low/R_Mid unchanged.
 
 source("setup.R")
 
