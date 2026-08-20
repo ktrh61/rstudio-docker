@@ -7,7 +7,8 @@
 - `review.md`: 現行原稿に対する事実ベースの再レビュー。多重性、PC-OD、追加解析、REO、gene-set/ORA、解釈フレームワークの射程を整理し、撤回済みのGPT提案を本番根拠から分離。
 - `draft_manuscript_5000_words.md`: 修正版の英語本文試案。BJCの計数対象に相当するIntroductionからDiscussionまでは見出し込み4,833語、structured Abstractは本文200語（小見出し込み210語、Markdown記号を除く空白区切り）。Abstractは本文5,000語とは別枠の200語上限に合わせた。
 - `supplementary_methods_for_5000_word_version.md`: 修正版 Supplementary Methods 試案、4,322語。
-- `supplementary_results_for_5000_word_version.md`: 本文圧縮時に省略されていた較正、ORA、性染色体注釈、REO構築・診断、外部遺伝子リスト照合などを保全する Supplementary Results 試案、1,033語。
+- `supplementary_results_for_5000_word_version.md`: 本文圧縮時に省略されていた較正、ORA、性染色体注釈、REO構築・診断、外部遺伝子リスト照合などを保全し、補足図表の凡例をまとめた Supplementary Results 試案、1,575語。
+- `supplementary_files/`: Supplementary Results と対応づけた投稿組版用ソース。Fig. S1–S2、Tables S1–S2/S4–S8、Supplementary Data 1、および対応表を収載。Table S3は確定済み全ORA表オブジェクトが保存されていないため、本文参照と凡例のみ整備し、実体作成を保留した。
 - `gdc_manifest_rebc_thyr_star_counts.tsv`: REBC-THYRのopen-access STAR-Counts 906ファイルを固定するGDC manifest。2026年7月23日と2026年8月9日の照会でbyte-identical、MD5 `7defb0c5574453474c67dfac8367a589`。
 - `proposed_record_corrections.md`: 開発時の出力確認を過大評価した内部記録の訂正案。正本ファイルには未適用。
 

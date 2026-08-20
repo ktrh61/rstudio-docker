@@ -6,11 +6,13 @@ FigS1,figures/fig_ma_gene_bm.R,output/figures/fig_ma_gene_bm.png,provisional,thy
 FigS2,figures/fig_d6_calibration.R,output/figures/fig_d6_calibration.png,provisional,gsea_null_calibration.rds,Results 3; Supp Methods
 Tab1,tables/tab_case_characteristics.R,output/tables/tab_case_characteristics.csv,provisional,thyr_analysis_cohorts.rds;thyr_clinical.rds,Methods; Results 1; Discussion
 Tab2,(正本 = draft_manuscript.md「Figure legends and table captions」節・表2キャプション直下の表+規則段落(2026-08-18 移設。Methods は参照文のみ)。投稿整形時に一方向切り出し — 編集可能な第2コピーは作らない),,provisional,批准済み文言(データ由来でない),Methods Analysis contrasts(解釈マップ — 参照文); Figure legends and table captions(実体)
-TabS2,(未作成 — 310 ログ/N-15 から作表),,pending,310_normalize_counts.log,Methods Normalization
-TabS4,(未作成 — thyr_reo_panel.rds/N-39 から作表),,pending,thyr_reo_panel.rds,Methods REO; Results 6
+TabS2,tables/supp_tab_normalization_diagnostics.R,output/tables/supp_tab_normalization_diagnostics.csv,provisional,thyr_normalized_counts.rds,Methods Normalization
+TabS3,(確定済み全ORA表オブジェクトが未保存のため未作成),,pending,paper/numbers_ledger.md;paper/draft_manuscript.md,Results 4; Supp Results
+TabS4,scripts/510_select_reo_pairs.R,output/reo_panel.csv,provisional,thyr_reo_panel.rds,Methods REO; Results 6
 Tab3,tables/tab_gene_level_summary.R,output/tables/tab_gene_level_summary.csv,provisional,thyr_expression_test.rds,Results 2
-TabS1,tables/tab_cohort_composition.R,,provisional,thyr_clinical.rds;thyr_case_assigned_share.rds;thyr_se_raw.rds,Methods Exposure metric; Results 1
-TabS5,tables/supp_tab_package_versions.R,output/tables/,provisional,docker/versions.tsv,Methods Software
-TabS6-S7,tables/tab_set_level_summary.R,output/tables/,provisional,thyr_enrichment_test.rds;gsea_null_calibration.rds,Results 3
-TabS8,tables/supp_tab_concordance.R,output/tables/,provisional,signature_agreement.rds,Results 5; Discussion
-Data1,tables/supp_data_420_full.R,output/tables/,provisional,thyr_enrichment_test.rds,Results 3
+TabS1,tables/tab_cohort_composition.R,output/tables/supp_tab_cohort_composition.csv,provisional,thyr_clinical.rds;thyr_case_assigned_share.rds;thyr_se_raw.rds,Methods Exposure metric; Results 1
+TabS5,tables/supp_tab_package_versions.R,output/tables/supp_tab_package_versions.csv,provisional,docker/versions.tsv,Methods Software
+TabS6,tables/tab_set_level_summary.R,output/tables/tab_set_level_summary.csv,provisional,thyr_enrichment_test.rds,Results 3
+TabS7,tables/tab_set_level_summary.R,output/tables/tab_set_level_calibration.csv,provisional,gsea_null_calibration.rds,Results 3; Supp Methods
+TabS8,tables/supp_tab_concordance.R,output/tables/supp_tab_concordance.csv,provisional,signature_agreement.rds,Results 5; Discussion
+Data1,tables/supp_data_420_full.R,output/tables/supp_data_420_full.csv,provisional,thyr_enrichment_test.rds,Results 3

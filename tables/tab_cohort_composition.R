@@ -3,7 +3,8 @@
 # (AS) band and sample-pair status. This is a summary only: it does not select
 # analysis targets or define analysis groups; driver classification is taken
 # verbatim from the Designated_* columns. Not part of the analysis pipeline; no
-# files are written (results are printed).
+# inference is performed. The observed composition is written as a
+# publication-formatting CSV as well as printed.
 #
 # Input : processed/thyr_clinical.rds               (from 030; key REBC_ID)
 #         processed/thyr_case_assigned_share.rds     (from 130; AS per case)
@@ -166,6 +167,32 @@ message(
   nrow(clinical), ")"
 )
 
-# --- Print the summary (no file output) --------------------------------------
+# --- Print and save the summary ----------------------------------------------
 message("Driver x AS band x pair summary (", nrow(summary_long), " rows):")
 print(summary_long, nrow = nrow(summary_long))
+
+# Complete the category-by-band grid so that absent combinations are shown as
+# zero rather than omitted, then write one row per classification and AS band.
+categories <- unique(summary_long[, .(level, category)])
+grid <- categories[, .(band = factor(band_levels, levels = band_levels)),
+  by = .(level, category)
+]
+summary_wide <- dcast(summary_long, level + category + band ~ pair_class,
+  value.var = "n", fill = 0
+)
+summary_wide <- merge(grid, summary_wide,
+  by = c("level", "category", "band"), all.x = TRUE
+)
+for (nm in c("all", "paired", "unpaired")) {
+  set(summary_wide, which(is.na(summary_wide[[nm]])), nm, 0L)
+}
+setcolorder(summary_wide,
+  c("level", "category", "band", "all", "paired", "unpaired")
+)
+setorder(summary_wide, level, category, band)
+
+out_dir <- file.path(paths$output, "tables")
+dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
+out_path <- file.path(out_dir, "supp_tab_cohort_composition.csv")
+utils::write.csv(summary_wide, out_path, row.names = FALSE)
+message("Saved: ", out_path)

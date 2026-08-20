@@ -1,0 +1,17 @@
+"unit","collection","n_sets","min_q_bh"
+"R_Tumor","H",50,0.179
+"R_Tumor","C2:CP",2262,0.928
+"R_Tumor","C5:GO:BP",3856,0.936
+"R_Tumor","C2:CGP:radiation",24,0.302
+"R_Normal","H",50,0.38
+"R_Normal","C2:CP",2248,1
+"R_Normal","C5:GO:BP",3819,1
+"R_Normal","C2:CGP:radiation",24,0.98
+"B_Tumor","H",50,0.52
+"B_Tumor","C2:CP",2280,0.892
+"B_Tumor","C5:GO:BP",3888,0.262
+"B_Tumor","C2:CGP:radiation",24,0.114
+"B_Normal","H",50,0.284
+"B_Normal","C2:CP",2267,0.283
+"B_Normal","C5:GO:BP",3882,0.467
+"B_Normal","C2:CGP:radiation",24,0.137

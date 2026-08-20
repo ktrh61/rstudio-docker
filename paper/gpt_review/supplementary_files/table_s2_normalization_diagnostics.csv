@@ -1,0 +1,5 @@
+"contrast","reference_group","high_group","n_reference","n_high","protein_coding_genes","genes_after_filterByExpr","deges_iterations","final_screen_pi0","final_jaccard","norm_factor_min","norm_factor_max"
+"R_Tumor","R_Sporadic","R_High",12,15,19540,15621,3,0.593,0.962,0.9058,1.1095
+"R_Normal","R_Sporadic","R_High",12,15,19540,15466,3,0.956,0.967,0.9106,1.0665
+"B_Tumor","B_Sporadic","B_High",27,9,19540,16002,3,0.943,0.993,0.8772,1.0947
+"B_Normal","B_Sporadic","B_High",27,9,19540,15863,3,0.727,0.987,0.8988,1.0873
