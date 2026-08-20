@@ -168,6 +168,8 @@ In conclusion, High-AS and dose-zero RET fusion-positive PTCs differed broadly i
 
 **Table 1 | Case characteristics.** Group size, sex, age at surgery and exposure, relative purity, and RET fusion-partner composition, with age-difference estimates and confidence intervals.
 
+*Table 1 footnote.* Age-at-surgery differences compare High-AS with dose-zero cases. In the RET stratum, the Hodges–Lehmann difference was +2.5 years (95% percentile bootstrap CI, −1.0 to 6.0) and the Brunner–Munzel relative effect was θ=0.625 (0.400 to 0.828). In the BRAF stratum, the corresponding estimates were +8.0 years (3.0 to 12.0) and θ=0.850 (0.681 to 0.973). Here, θ=Pr(X<Y)+0.5Pr(X=Y), with X denoting dose-zero and Y High-AS. Intervals were obtained from 9,999 resamples drawn separately within each group (seed 19450809); no p-values were calculated.
+
 **Table 2 | Interpretation map.** Roles and interpretation assigned to the four contrasts before the finalized analysis produced the reported results.
 
 | Contrast | Prespecified standing | Basis |
