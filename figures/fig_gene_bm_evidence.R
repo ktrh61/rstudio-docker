@@ -1,7 +1,7 @@
 # fig_gene_bm_evidence.R
 # Gene-level Brunner-Munzel evidence plot, one facet per analysis unit (not a
 # volcano: a rank test has no fold change). The x axis is the signed BM effect
-# 2*effect - 1 = P(X<Y) - P(X>Y) (Cliff's delta; > 0 = higher in the High
+# 2*theta - 1 = Pr(X<Y) - Pr(X>Y) (Cliff's delta; > 0 = higher in the High
 # arm) and the y axis is -log10(exact permutation p). Points are coloured by
 # the Storey q inference (q_storey < FDR_CUT) and the strongest genes per unit
 # are labelled. Status is tracked in figures/manifest.csv.
@@ -63,8 +63,7 @@ p <- ggplot(df, aes(x = x, y = y)) +
   scale_colour_manual(values = pal, name = NULL, drop = FALSE) +
   facet_wrap(~unit, ncol = 2) +
   labs(
-    x = expression("signed Brunner–Munzel effect  " * (P(X < Y) - P(X > Y))
-      * "   " %->% "  higher in exposed"),
+    x = "signed Brunner–Munzel effect  2θ−1 = Pr(X<Y)−Pr(X>Y)  → higher in High-AS",
     y = expression(-log[10] * "(exact permutation p)"),
     title = "Gene-level Brunner–Munzel evidence, per analysis contrast",
     subtitle = sprintf(paste0(

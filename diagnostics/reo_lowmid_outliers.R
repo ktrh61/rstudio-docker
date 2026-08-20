@@ -63,7 +63,7 @@ report <- function(keep, label) {
   lo <- d$score[d$band == "R_Low"]; mi <- d$score[d$band == "R_Mid"]
   bm <- brunnermunzel_mc_test(lo, mi, alternative = "less", method = "auto", seed = SEED)
   message(sprintf(
-    "  %-16s Low median %.1f (n=%d) | Mid median %.1f (n=%d) | Mid>Low BM p=%.4f, P(Low<Mid)=%.3f",
+    "  %-16s Low median %.1f (n=%d) | Mid median %.1f (n=%d) | Mid>Low BM p=%.4f, Pr(Low<Mid)=%.3f",
     label, stats::median(lo), length(lo), stats::median(mi), length(mi),
     bm$p.value, unname(bm$estimate)))
 }

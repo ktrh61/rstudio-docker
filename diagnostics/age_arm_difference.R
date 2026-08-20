@@ -13,7 +13,7 @@
 # Estimators, per stratum (R: 12 Sporadic vs 15 High; B: 27 vs 9):
 #   - Hodges-Lehmann shift: median over all pairwise differences
 #     High_i - Sporadic_j, in years.
-#   - Rank effect P(Sporadic < High) + 0.5 P(=): the same Brunner-Munzel
+#   - Rank effect Pr(Sporadic < High) + 0.5 Pr(=): the same Brunner-Munzel
 #     effect estimator as 410 (.bm_effect from lib/stat_brunnermunzel.R;
 #     only the estimator is called -- no test is invoked, so nothing here
 #     produces a p-value).
@@ -92,7 +92,7 @@ for (drv in c("RET", "BRAF")) {
     obs_hl, ci_hl[1], ci_hl[2]
   ))
   cat(sprintf(
-    "  P(Sporadic<High) (BM)  %.3f  [%.3f, %.3f]\n",
+    "  Pr(Sporadic<High) (BM) %.3f  [%.3f, %.3f]\n",
     obs_eff, ci_eff[1], ci_eff[2]
   ))
 

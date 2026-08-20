@@ -78,7 +78,7 @@ bm_low_mid <- brunnermunzel_mc_test(
   low_score, mid_score, alternative = "less", method = "auto", seed = SEED
 )
 message(sprintf(
-  "\nRead B (out-of-sample): Mid > Low reversal score, one-sided BM p = %.4f (%s), effect P(Low<Mid)=%.3f",
+  "\nRead B (out-of-sample): Mid > Low reversal score, one-sided BM p = %.4f (%s), effect Pr(Low<Mid)=%.3f",
   bm_low_mid$p.value, attr(bm_low_mid, "mc")$method, unname(bm_low_mid$estimate)
 ))
 

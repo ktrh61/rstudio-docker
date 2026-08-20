@@ -66,7 +66,7 @@ strata <- lapply(c("lo_purity", "hi_purity"), function(s) {
   }
   bm <- brunnermunzel_mc_test(lo, mi, alternative = "less", method = "auto", seed = SEED)
   message(sprintf(
-    "  %-9s Low median %.1f (n=%d) | Mid median %.1f (n=%d) | Mid>Low p=%.4f, P(Low<Mid)=%.3f",
+    "  %-9s Low median %.1f (n=%d) | Mid median %.1f (n=%d) | Mid>Low p=%.4f, Pr(Low<Mid)=%.3f",
     s, stats::median(lo), length(lo), stats::median(mi), length(mi),
     bm$p.value, unname(bm$estimate)))
   data.frame(stratum = s, low_median = stats::median(lo), mid_median = stats::median(mi),
