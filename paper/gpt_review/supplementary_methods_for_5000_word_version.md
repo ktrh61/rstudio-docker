@@ -62,7 +62,7 @@ Gene-level p-values were converted to Storey q-values with the plug-in estimate 
 
 Higher Criticism was the prespecified primary omnibus statistic, with scan range α0=0.1. It was selected to aggregate moderately small ordered p-values rather than make the contrast-level conclusion depend on one extreme gene or a fixed gene-count cutoff. Its p-value was calculated against the contrast's own label-shuffle distribution, so the analytic independence and sparsity assumptions of the original Higher Criticism null were not used. The RET-tumor Higher Criticism test was the single primary contrast-level test; the corresponding statistics in the other contrasts answered separate secondary questions. Count statistics at fixed cutoffs and the maximum statistic were retained as descriptive rows. The full rejection curve R(α) was retained to show how the displayed gene count varied across q thresholds.
 
-For contrast-level diagnostics, 9,999 label shuffles were generated with seed 19860426 and stored. Applying the plug-in estimator to each shuffle gave a null reference distribution for π0. These same shuffles supplied the omnibus and gene-set references.
+For each contrast, we generated and stored 9,999 label shuffles using seed 19860426. These shuffles provided the null distributions for the omnibus statistics and the plug-in π0 estimator and were reused unchanged for gene-set inference.
 
 Because we defined no binary contrast label, we report the omnibus p-values, per-gene q-values, and rejection curves as continuous evidence. We do not use “support” or “no support” wording to imply an undeclared cutoff.
 
@@ -70,7 +70,7 @@ Because we defined no binary contrast label, we report the omnibus p-values, per
 
 We used the complete gene ranking without a DEG-list threshold. We ranked genes by tie-averaged normal scores of the signed Brunner–Munzel statistic and evaluated the in-house weighted running sum with gseaParam=1 only at tie-block boundaries. Automated tests verified equality to the standard GSEA statistic for tie-free input (Subramanian et al. 2005).
 
-The null comprised the 9,999 saved label shuffles per contrast. For each set, a sign-conditional permutation p-value was calculated and adjusted within collection using the Benjamini–Hochberg procedure (Benjamini and Hochberg 1995). We applied q<0.10 within each collection without making a cross-collection claim. Unlike the gene-level procedure, π0 was fixed at 1 because overlapping sets and shared expression structure made a plug-in set-level estimate unstable and potentially anticonservative.
+The gene-set null comprised these 9,999 saved label shuffles for each contrast. For each set, a sign-conditional permutation p-value was calculated and adjusted within collection using the Benjamini–Hochberg procedure (Benjamini and Hochberg 1995). We applied q<0.10 within each collection without making a cross-collection claim. Unlike the gene-level procedure, π0 was fixed at 1 because overlapping sets and shared expression structure made a plug-in set-level estimate unstable and potentially anticonservative.
 
 We used msigdbr 26.1.0. Before the 15–500-gene size filter, the four families were Hallmark (50 sets; Liberzon et al. 2015); C2 canonical pathways restricted to Reactome, WikiPathways, KEGG MEDICUS, BioCarta, and PID (3,910 sets; the legacy KEGG subcollection was excluded); C5 GO Biological Process (7,538 sets); and a radiation-curated subset of C2:CGP (28 sets). The radiation curation rule was fixed before the reported set-level run.
 
