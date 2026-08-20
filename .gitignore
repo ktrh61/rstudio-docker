@@ -5,6 +5,7 @@
 *.rda
 *.xlsx
 *.tsv
+!paper/gpt_review/gdc_manifest_rebc_thyr_star_counts.tsv
 *.txt
 *.gtf
 *.sqlite

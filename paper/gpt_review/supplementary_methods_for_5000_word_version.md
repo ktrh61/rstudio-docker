@@ -4,7 +4,9 @@
 
 ## Data sources and expression matrix
 
-We downloaded open-access gene-level STAR count files for the REBC-THYR project from the National Cancer Institute (NCI) Genomic Data Commons (GDC) and verified each file against the download manifest using MD5 checksums. Clinical data came from Data S1 of Morton et al. (2021), which we read with all columns retained and without editing any values. We converted missing markers to NA and typed a column as numeric only when every non-missing value parsed as numeric.
+On 9 August 2026, we queried the National Cancer Institute (NCI) Genomic Data Commons (GDC) API for open-access files in project REBC-THYR with data category Transcriptome Profiling, experimental strategy RNA-Seq, data type Gene Expression Quantification, and workflow type STAR - Counts. The query returned 906 released files. Its manifest was byte-identical to one generated on 23 July 2026 (manifest MD5, 7defb0c5574453474c67dfac8367a589). The complete query manifest contained the file UUIDs, names, sizes, and GDC-provided MD5 checksums; we verified every downloaded file against its recorded checksum.
+
+Clinical data came from Data S1 of Morton et al. (2021), which we read with all columns retained and without editing any values. We converted missing markers to NA and typed a column as numeric only when every non-missing value parsed as numeric.
 
 We mapped files to cases and biospecimens through the GDC API using GenomicDataCommons (Morgan and Davis 2025) and assembled one count assay per sample in a SummarizedExperiment container (Morgan et al. 2025). Removing all-zero genes yielded 58,448 genes and 906 samples. We derived exon-union gene lengths from the GDC GENCODE v36 reference annotation using rtracklayer (Lawrence et al. 2009).
 

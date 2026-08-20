@@ -1,6 +1,6 @@
 # Driver-conditioned transcriptomic differences across radiation-attributability bands in papillary thyroid carcinoma
 
-> Revised editorial trial prepared on 2026-08-19 from paper/draft_manuscript.md and the canonical ledgers in paper/. It does not supersede those files. Before submission, add the exact GDC accession/data release, ethics statement, and declarations.
+> Revised editorial trial prepared on 2026-08-19 from paper/draft_manuscript.md and the canonical ledgers in paper/. It does not supersede those files. Before submission, add the ethics statement, Data and Code Availability statements, and declarations.
 
 ## Abstract
 
@@ -34,7 +34,7 @@ Only the RET fusion-positive and BRAF V600E-positive strata contained enough dos
 
 ### Data sources
 
-Gene-level STAR count files for REBC-THYR were downloaded from the National Cancer Institute (NCI) Genomic Data Commons (GDC) and verified against the download manifest. The clinical source was Data S1 of Morton et al. (2021), containing 440 cases. GDC files were mapped to cases and biospecimens through the GDC API and assembled into a matrix of 58,448 nonzero genes and 906 samples. Strandedness, gene-length derivation, file-selection rules, and the required accession and release identifiers are described in Supplementary Methods.
+Gene-level STAR count files for REBC-THYR were downloaded from the National Cancer Institute (NCI) Genomic Data Commons (GDC) and verified against the download manifest. The clinical source was Data S1 of Morton et al. (2021), containing 440 cases. GDC files were mapped to cases and biospecimens through the GDC API and assembled into a matrix of 58,448 nonzero genes and 906 samples. Strandedness, gene-length derivation, file-selection, query, and manifest-verification procedures are described in Supplementary Methods.
 
 ### Assigned Share
 

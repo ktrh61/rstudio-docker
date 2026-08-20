@@ -88,4 +88,4 @@ REOにはbinary readoutとgraded readoutがあります。dose-zeroとHigh-ASは
 
 ## 10. 残る投稿前作業
 
-新規の必須統計解析は提案しません。残る主要作業は、GDC accession/data release、倫理・同意と二次利用、Data/Code availability、Funding、Competing interests、Author contributions、Acknowledgements、完全な引用文献、本文と図表・Supplementary Dataの数値および名称の照合です。利用可能なtechnical batch metadataがないことはlimitationとして明記します。
+新規の必須統計解析は提案しません。GDC入力については、project ID、照会条件・日付、906ファイルのmanifest、およびmanifest MD5をSupplementary Methodsと再現資料に保全しました。残る主要作業は、倫理・同意と二次利用、Data/Code availability、Funding、Competing interests、Author contributions、Acknowledgements、完全な引用文献、本文と図表・Supplementary Dataの数値および名称の照合です。利用可能なtechnical batch metadataがないことはlimitationとして明記します。
