@@ -22,7 +22,7 @@ Among the 1,765 RET-tumor genes meeting the prespecified Storey q<0.10 rule, 57 
 
 ## REO pair construction
 
-The 500-gene construction pool comprised 317 genes expressed more highly and 182 expressed less highly in High-AS RET fusion-positive PTCs. From 57,694 candidate pairs, 153 met all prespecified stability, separation, and reversal criteria. Across these qualifying pairs, the shift in median within-sample log2-TPM difference ranged from 1.159 to 4.700, and the High-AS reversal rate ranged from 0.53 to 0.87. Greedy selection with the prespecified gene-reuse and redundancy restrictions produced the final 10-pair panel and the construction-derived positive boundary of score >2.
+The 500-gene construction pool comprised 317 genes expressed more highly and 182 expressed less highly in High-AS RET fusion-positive PTCs. From 57,694 candidate pairs, 153 met all prespecified stability, separation, and reversal criteria. Across these qualifying pairs, the shift in median within-sample log2-TPM difference ranged from 1.159 to 4.700, and the High-AS reversal rate ranged from 0.53 to 0.87. Greedy selection with the prespecified gene-reuse and redundancy restrictions produced the final 10-pair panel. The maximum reversal score among dose-zero construction cases was 2; consequently, scores greater than 2 were classified as positive.
 
 The construction-band classifications and intermediate-band results are reported in the main text. Their interpretation remains asymmetric: construction-band separation establishes that the selected panel represents its source contrast but is not an unbiased estimate of classification performance; application to Low-AS and Mid-AS cases did not constitute independent external validation.
 
