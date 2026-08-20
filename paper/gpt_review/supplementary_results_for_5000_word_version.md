@@ -28,7 +28,7 @@ The construction-band classifications and intermediate-band results are reported
 
 ## Ancillary REO quality and purity diagnostics
 
-The ancillary PC-OD screen flagged no intermediate-band tumor (0 of 17 Low-AS and 0 of 19 Mid-AS). All 36 eligible tumors remained in the REO application by design.
+The ancillary PC-OD screen identified no outliers among the intermediate-band tumors (Low-AS, 0/17; Mid-AS, 0/19). Independently of this result, the screen was non-exclusionary, and all 36 tumors remained in the REO application.
 
 Relative purity could be estimated for 15 Low-AS and 16 Mid-AS tumors; two Low-AS and three Mid-AS tumors lacked the matched normal assay required by the pair-based estimator and remained in the REO analysis without a purity score. In the pooled paired RET purity run, median relative-purity scores were 0.690, 0.704, 0.739, and 0.814 in the dose-zero, Low-AS, Mid-AS, and High-AS bands, respectively. This diagnostic refitted the relative scale across all paired RET bands and is therefore not numerically interchangeable with the main-cohort purity scale.
 
