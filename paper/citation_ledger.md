@@ -130,6 +130,14 @@
 | 引用 | 本文の使用箇所 | 出典が実際に述べること(逐語の要点) | 射程・但し書き | 照合日・方法 | 状態 |
 | --- | --- | --- | --- | --- | --- |
 | R Core Team (2026). R: A Language and Environment for Statistical Computing. R Foundation for Statistical Computing, Vienna, Austria. https://www.R-project.org/ | Methods: Software, seeds and reproducibility | `citation()` の出力どおり(正準イメージ rebc-r453:refblas 内の R 4.5.3 (2026-03-11)) | 版数の書式は投稿誌指定に合わせて後工程で調整する | 2026-08-16 / コンテナ内 `Rscript -e 'cat(format(citation(), style="text"))'` の出力 | verified |
+| Chen Y, Chen L, Lun ATL, Baldoni PL, Smyth GK. Nucleic Acids Res 2025;53:gkaf018. doi:10.1093/nar/gkaf018 | Methods: Quality control and analysis cohorts(edgeR)/ Supplementary Methods: Quality control and analysis cohorts; Normalization | edgeR 4.8.2 の `citation("edgeR")` が指定する edgeR v4 の正式引用 | Chen et al. 2016 は filterByExpr の発現フィルタ規則、Chen et al. 2025 は使用パッケージ自体の引用として併記する。旧版の代表引用 Robinson et al. 2010 への置換ではない | 2026-08-20 / 正準イメージ rebc-r453:refblas 内の `citation("edgeR")` | verified |
+| Ritchie ME, Phipson B, Wu D, Hu Y, Law CW, Shi W, Smyth GK. Nucleic Acids Res 2015;43:e47. doi:10.1093/nar/gkv007 | Supplementary Methods: Quality control and analysis cohorts(相対純度スコア用の作業遺伝子選択) | limma 3.66.0 の `citation("limma")` が指定する正式引用 | paired limma-voom と robust empirical Bayes は純度推定工程だけに使用し、報告対象の遺伝子別 Brunner–Munzel 推論には使用していない | 2026-08-20 / 正準イメージ rebc-r453:refblas 内の `citation("limma")` | verified |
+| Morgan M, Obenchain V, Hester J, Pagès H (2025). SummarizedExperiment: A container (S4 class) for matrix-like assays. R package version 1.40.0. https://bioconductor.org/packages/SummarizedExperiment | Supplementary Methods: Data sources and expression matrix | SummarizedExperiment 1.40.0 の `citation("SummarizedExperiment")` が指定するパッケージマニュアル | 行列と標本情報を保持するデータ容器の引用であり、解析法の根拠ではない。Huber et al. 2015 を当該パッケージ固有の論文として扱わない | 2026-08-20 / 正準イメージ rebc-r453:refblas 内の `citation("SummarizedExperiment")` | verified |
+| Morgan M, Davis S (2025). GenomicDataCommons: NIH / NCI Genomic Data Commons Access. R package version 1.34.1. https://bioconductor.org/packages/GenomicDataCommons | Supplementary Methods: Data sources and expression matrix | GenomicDataCommons 1.34.1 の `citation("GenomicDataCommons")` が指定するパッケージマニュアル | GDC API へのプログラム上のアクセス手段の引用であり、GDC リソース自体の科学的記述を担う引用ではない | 2026-08-20 / 正準イメージ rebc-r453:refblas 内の `citation("GenomicDataCommons")` | verified |
+| Lawrence M, Gentleman R, Carey V. Bioinformatics 2009;25:1841-1842. doi:10.1093/bioinformatics/btp328 | Supplementary Methods: Data sources and expression matrix(GENCODE v36 GTF の取込み) | rtracklayer 1.70.1 の `citation("rtracklayer")` が指定する正式引用 | 本研究では exon-union gene length 作成時のアノテーション取込みに使用した | 2026-08-20 / 正準イメージ rebc-r453:refblas 内の `citation("rtracklayer")` | verified |
+| Dolgalev I (2026). msigdbr: MSigDB Gene Sets for Multiple Organisms in a Tidy Data Format. R package version 26.1.0. https://igordot.github.io/msigdbr/ | Supplementary Methods: Gene-set inference | msigdbr 26.1.0 の `citation("msigdbr")` が指定するパッケージマニュアル | 遺伝子セット定義の取得手段の引用。Hallmark など各 collection の科学的典拠は別に引用する | 2026-08-20 / 正準イメージ rebc-r453:refblas 内の `citation("msigdbr")` | verified |
+| Eddelbuettel D, François R. J Stat Softw 2011;40:1-18. doi:10.18637/jss.v040.i08 | Supplementary Methods: Software, seeds, and reproducibility | Rcpp 1.1.1 の `citation("Rcpp")` が提示する査読付きソフトウェア論文の一つ | C++ 実装との接続基盤の引用。パッケージが提示する複数候補のうち、基本機能を記述する原著論文を採用した | 2026-08-20 / 正準イメージ rebc-r453:refblas 内の `citation("Rcpp")` | verified |
+| Venables WN, Ripley BD (2002). Modern Applied Statistics with S. 4th ed. Springer, New York. ISBN 0-387-95457-0 | Supplementary Methods: Normalization(MUREN の least-trimmed-squares 実装) | MASS 7.3-65 の `citation("MASS")` が指定する書籍 | `MASS::ltsreg` の実装引用であり、MUREN 法自体の典拠は Feng and Li 2021 として別に保持する | 2026-08-20 / 正準イメージ rebc-r453:refblas 内の `citation("MASS")` | verified |
 
 ## I. 本文未使用の候補(driver と線量の背景。セッション内で要旨照合済み)
 
@@ -178,15 +186,14 @@
 
 - Dobin A, et al. Bioinformatics 2013;29:15-21(STAR。GDC パイプラインの来歴)
 - Grossman RL, et al. N Engl J Med 2016;375:1109-1112(GDC)
-- Robinson MD, McCarthy DJ, Smyth GK. Bioinformatics 2010;26:139-140(edgeR。使用パッケージ)
 - Hodges JL, Lehmann EL. Ann Math Stat 1963;34:598-611(HL 推定量。本文は推定量名のみで、慣用のため省略可という判断が文献リストに記録されている)
-- Huber W, et al. Nat Methods 2015;12:115-121(SummarizedExperiment)/ Ritchie ME, et al. Nucleic Acids Res 2015;43:e47(limma)/ Lawrence M, et al. Bioinformatics 2009;25:1841-1842(rtracklayer)
 - Selmansberger M, et al. doi:10.1038/onc.2014.311(CLIP2 の追加検証。diagnostics/external_gene_anchors.csv の注記としてのみ存在し、本文にも監査対象にも入っていない)
 
 ### 調査で候補として挙がったが採用しなかった文献
 
 `research_4questions.json` に候補として記録されているが、本文にもこの台帳の本体にも入れていないもの。**査読で持ち出され得るため、理由とともに残す。**
 
+- **Robinson MD, McCarthy DJ, Smyth GK. Bioinformatics 2010;26:139-140** — edgeR の旧来の代表引用。今回の固定環境に入る edgeR 4.8.2 の `citation()` は Chen et al. 2025 を正式引用として指定するため採用せず、filterByExpr の規則には Chen et al. 2016 を別途維持した。
 - **Saad AG, et al. J Clin Endocrinol Metab 2006;91:2672-2677**(Ki-67 の年齢勾配) — Coclet の差し替え先として提案されたが、年齢バウンドの論証ごと撤去したため不要。増殖動態から発現への橋渡しの問題は差し替えでは解決しない。
 - **Liu C-L, et al. Front Nutr 2022;9:859702 / Cho BA, et al.(GTEx 甲状腺の加齢発現)** — 正常甲状腺の年齢関連発現の候補。本文の B_Normal 段落を軽量化したため使用箇所が消えた。
 - **Stosic A, et al. Cancer Res 2021;81:5625-5637** — **本研究に不利な方向の唯一の文献**。要旨は "Among RET-CCDC6-driven tumors, gene expression in pediatric tumors was distinguishable from that in adults." すなわち driver 条件付きの年齢対比で**陽性**。全文が取得できず(HTTP 403、PMC 非収載)、DE の判定基準・FDR・fold change 扱い・症例数が検証できないため収載しない。年齢差は約 30 年で本研究の +2.5 年とは桁が違う。**査読で出得る文献として記録する。**
@@ -207,3 +214,4 @@
 
 - 2026-08-16: 起草(作業指示書 E-1)。入力は `~/rebc_audit_20260816/` の監査 JSON 3本と Land 2003 全文テキスト、および当セッションの PubMed 照合。収載 47 引用 + 撤回記録 2 件。本文の使用箇所は draft_manuscript.md の grep で節名に落とし、引用文献リスト自体の行は使用箇所に数えていない。
 - 2026-08-16: レビュー後に paper/citation_ledger.md として収載(修正2件: Chatsirisupachai 行の内部推計に未検証の限定句を追記、Cho の頭文字を BA に訂正)。
+- 2026-08-20: 固定コンテナ内の各パッケージの `citation()` と実装上の直接利用箇所を照合し、ソフトウェア引用 8 件を追加。解析法の典拠と実装パッケージの引用を分けて記録した。
