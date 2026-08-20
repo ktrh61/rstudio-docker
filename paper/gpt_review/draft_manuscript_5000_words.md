@@ -82,7 +82,7 @@ As a descriptive complement, the primary RET-tumor q<0.10 list was tested for on
 
 ### Between-stratum concordance
 
-For each tissue, signed gene-level Brunner–Munzel statistics from the RET and BRAF contrasts were compared over shared genes by Spearman correlation. Independently shuffled labels within each stratum supplied a reference interval. The normal-tissue comparison was hypothesis-bearing; the tumor comparison was a descriptive completion. A correlation outside the interval indicated shared label-aligned structure but could not distinguish exposure from a shared covariate.
+For each tissue, we compared signed gene-level Brunner–Munzel statistics from the RET and BRAF contrasts across shared genes using Spearman correlation. We generated a reference interval by independently shuffling labels within each stratum. The normal-tissue comparison was hypothesis-bearing, whereas the tumor comparison was a descriptive completion. A correlation outside this interval indicated shared label-aligned structure but could not distinguish exposure from a shared covariate.
 
 ### REO panel
 
