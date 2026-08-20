@@ -22,9 +22,9 @@ filter_pc_expr_mask <- function(counts, protein_coding, normal_ids, tumor_ids) {
 
 # Unnormalized log-CPM for sample-outlier detection (PC-OD input). Raw library
 # sizes preserve composition outliers that normalization would mask.
-# keep_lib_sizes is a caller decision: 210 uses TRUE, the Low/Mid diagnostic
-# has historically used FALSE (changes the CPM denominator after subsetting);
-# the divergence is preserved and its unification is a recorded open item.
+# keep_lib_sizes exposes the edgeR subsetting choice to callers. The Low/Mid
+# PC-OD diagnostic uses TRUE, matching the inline main-cohort recipe in 210 and
+# retaining the pre-filter library sizes as the CPM denominators.
 logcpm_for_qc <- function(counts, ids, keep_lib_sizes) {
   y <- edgeR::DGEList(counts = counts[, ids, drop = FALSE])
   keep <- edgeR::filterByExpr(y)

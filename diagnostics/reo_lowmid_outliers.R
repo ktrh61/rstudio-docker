@@ -3,8 +3,7 @@
 # procedure to R_Low / R_Mid tumours, record any flags without excluding cases,
 # and descriptively recompute the graded comparison after removing flagged
 # samples. This diagnostic does not redefine the application cohort. It uses
-# the same PC-OD algorithm as 210_detect_outliers.R, with the historical input
-# convention documented below.
+# the same PC-OD algorithm and input construction as 210_detect_outliers.R.
 # Input : processed/thyr_case_design.rds (from 140),
 #         thyr_se_raw.rds, thyr_reo_evaluation.rds
 #         lib/qc_pc_od.R, lib/stat_brunnermunzel.R
@@ -42,9 +41,9 @@ message("R_Low/Mid tumours: ",
 # --- PC-OD per band on tumour log-CPM --------------------------------------
 counts_all <- se_single_assay(se)
 run_pcod <- function(ids) {
-  # This diagnostic historically recomputes library sizes after filterByExpr
-  # (keep_lib_sizes = FALSE); 210 retains the pre-filter library sizes.
-  PC_OD(logcpm_for_qc(counts_all, ids, keep_lib_sizes = FALSE))
+  # Retain pre-filter library sizes to preserve the original CPM denominator,
+  # matching the main-cohort PC-OD implementation in 210.
+  PC_OD(logcpm_for_qc(counts_all, ids, keep_lib_sizes = TRUE))
 }
 cases$is_outlier <- 0L
 for (b in c("R_Low", "R_Mid")) {
