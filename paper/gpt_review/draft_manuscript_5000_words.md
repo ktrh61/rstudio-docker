@@ -74,7 +74,7 @@ Contrast-level evidence was summarized with a prespecified Higher Criticism stat
 
 ### Gene-set inference
 
-Genes were ranked by tie-averaged normal scores of the signed Brunner–Munzel statistic. An in-house weighted running-sum statistic was evaluated only at tie-block boundaries and equalled the standard gene set enrichment analysis (GSEA) statistic on tie-free input (Subramanian et al. 2005). The same 9,999 label shuffles used at gene level formed the set-level reference. Sign-conditional permutation p-values were adjusted by Benjamini–Hochberg (BH) within each collection, with q<0.10 and no cross-collection claim.
+We ranked genes by tie-averaged normal scores of the signed Brunner–Munzel statistic and evaluated an in-house weighted running-sum statistic only at tie-block boundaries. On tie-free input, this statistic equalled the standard gene set enrichment analysis (GSEA) statistic (Subramanian et al. 2005). We used the 9,999 saved contrast-specific label shuffles to form the set-level reference distribution and adjusted sign-conditional permutation p-values using Benjamini–Hochberg (BH) within each collection, applying q<0.10 without making a cross-collection claim.
 
 We tested Hallmark, selected C2 canonical-pathway subcollections (Reactome, WikiPathways, KEGG MEDICUS, BioCarta, and PID), C5 GO Biological Process, and a radiation-curated C2:CGP family; sets outside 15–500 genes were excluded. Complete-null operating characteristics were assessed with held-out label shuffles before the reported real-data run, and a one-set 1.15-fold spike-in provided a single-scenario positive-control check. These exercises did not establish FDR control under every partial-alternative configuration. Full procedures are in Supplementary Methods.
 
