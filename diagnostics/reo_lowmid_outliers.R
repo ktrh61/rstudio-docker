@@ -1,10 +1,10 @@
 # reo_lowmid_outliers.R
-# Layer-1 QC for the REO out-of-sample validation: run PC-OD outlier detection
-# on the R_Low / R_Mid tumours (which 530 currently uses unfiltered), then check
-# whether the graded reversal-score relationship and the Mid > Low test survive
-# removing any flagged sample. A diagnostic outside the numbered stream
-# (reorg plan v2 s2.6); mirrors 210_detect_outliers.R's PC-OD but on the
-# intermediate-exposure bands. Run after the main chain.
+# Ancillary QC for the REO intermediate-band application: apply the PC-OD
+# procedure to R_Low / R_Mid tumours, record any flags without excluding cases,
+# and descriptively recompute the graded comparison after removing flagged
+# samples. This diagnostic does not redefine the application cohort. It runs
+# outside the numbered stream and mirrors 210_detect_outliers.R's PC-OD on the
+# intermediate-exposure bands.
 # Input : processed/thyr_case_design.rds (from 140),
 #         thyr_se_raw.rds, thyr_reo_evaluation.rds
 #         lib/qc_pc_od.R, lib/stat_brunnermunzel.R
@@ -55,7 +55,7 @@ for (b in c("R_Low", "R_Mid")) {
     if (length(out)) paste0(" (", paste(cases$case_submitter_id[idx[out]], collapse = ", "), ")") else "")
 }
 
-# --- Robustness: gradient and Mid > Low with vs without outliers -----------
+# --- Descriptive comparison with and without flagged samples ---------------
 score_of <- setNames(eval$samples$score, eval$samples$case_submitter_id)
 cases$score <- unname(score_of[cases$case_submitter_id])
 report <- function(keep, label) {
@@ -67,7 +67,7 @@ report <- function(keep, label) {
     label, stats::median(lo), length(lo), stats::median(mi), length(mi),
     bm$p.value, unname(bm$estimate)))
 }
-message("Gradient robustness (out-of-sample Low vs Mid):")
+message("Diagnostic Low vs Mid comparison with and without flagged samples:")
 report(rep(TRUE, nrow(cases)), "all samples")
 report(cases$is_outlier == 0, "outliers removed")
 

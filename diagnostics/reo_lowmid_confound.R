@@ -1,15 +1,13 @@
 # reo_lowmid_confound.R
-# Layer-2 QC for the REO out-of-sample validation: reo_lowmid_purity.R showed the reversal score
-# correlates with tumour purity within R_Low/Mid, and purity itself grades with
-# assigned share (AS). So the graded Low<Mid score increase could be AS-driven
-# (radiation) OR purity-driven. This script separates them:
-#   (D) Partial Spearman: association of band (Low/Mid) with score, controlling
-#       for purity. If it survives, the gradient is not merely purity.
-#   (A) Purity-stratified ordered test: within each purity stratum, is Mid > Low
-#       score (one-sided BM)? Purity does not vary within a stratum, so a
-#       surviving Mid>Low is AS-attributable.
-# A diagnostic outside the numbered stream (reorg plan v2 s2.6); reads the
-# purity diagnostic's output. Run after reo_lowmid_purity.R.
+# Ancillary QC for the REO intermediate-band application. This script provides
+# two descriptive views of the band-score pattern in cases with relative-purity
+# estimates:
+#   (D) partial Spearman coefficient after rank-scale adjustment for purity;
+#   (A) one-sided Mid-vs-Low Brunner-Munzel comparisons within two strata formed
+#       at median purity.
+# Neither analysis establishes an AS-band association independent of purity.
+# This diagnostic runs outside the numbered stream and reads the output from
+# reo_lowmid_purity.R.
 # Input : diagnostics/output/reo_lowmid_purity.rds
 #         lib/stat_brunnermunzel.R
 # Output: diagnostics/output/reo_confound.rds
@@ -23,9 +21,9 @@ d$band_num <- ifelse(d$band == "R_Mid", 1L, 0L) # ordered: Mid higher AS
 message("R_Low/Mid with score+purity: ",
   paste(names(table(d$band)), table(d$band), sep = "=", collapse = " "))
 
-# --- (D) Partial Spearman correlation, controlling for purity ---------------
-# Partial rho of (band, score) given purity = correlation of the residuals of
-# each on purity, using rank (Spearman) variables.
+# --- (D) Partial Spearman after rank-scale adjustment for purity ------------
+# The coefficient is the correlation between residuals from separate linear
+# projections of band rank and score rank on purity rank.
 partial_spearman <- function(x, y, z) {
   rx <- rank(x); ry <- rank(y); rz <- rank(z)
   ex <- residuals(lm(rx ~ rz))
@@ -37,8 +35,9 @@ raw_bp <- cor(d$band_num, d$tumor_purity, method = "spearman")
 raw_sp <- cor(d$score, d$tumor_purity, method = "spearman")
 par_bs <- partial_spearman(d$band_num, d$score, d$tumor_purity)
 
-# Permutation p for the partial correlation: permute band labels, keep score &
-# purity paired, so the null is "band unrelated to score given purity".
+# Descriptive permutation reference: permute band labels while retaining each
+# score-purity pair. This breaks the associations of band with both variables;
+# it is not conditional randomization at fixed purity.
 set.seed(SEED)
 perm <- replicate(9999, {
   b <- sample(d$band_num)
@@ -49,11 +48,11 @@ p_partial <- (sum(perm >= par_bs) + 1) / (length(perm) + 1) # one-sided (Mid hig
 message("\n(D) Rank correlations:")
 message(sprintf("  band-score  %+.3f | band-purity %+.3f | score-purity %+.3f",
   raw_bs, raw_bp, raw_sp))
-message(sprintf("  PARTIAL band-score | purity = %+.3f ; permutation p(one-sided) = %.4f",
+message(sprintf("  partial band-score after purity-rank adjustment = %+.3f ; descriptive permutation p(one-sided) = %.4f",
   par_bs, p_partial))
-message("  (survives = gradient not merely purity ; collapses = purity-confounded)")
+message("  (diagnostic only; not conditional inference at fixed purity)")
 
-# --- (A) Purity-stratified ordered test (Mid > Low within stratum) ----------
+# --- (A) Descriptive Mid > Low comparisons within median-purity strata ------
 message("\n(A) Purity-stratified Mid > Low reversal score (one-sided BM):")
 cut <- stats::median(d$tumor_purity)
 d$stratum <- ifelse(d$tumor_purity >= cut, "hi_purity", "lo_purity")

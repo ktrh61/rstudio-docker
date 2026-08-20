@@ -1,10 +1,9 @@
 # reo_lowmid_purity.R
-# Layer-1 QC for the REO out-of-sample validation: estimate R_Low / R_Mid tumour
-# purity on the SAME common scale as the training arms by pooling the whole RET
-# cohort (Sporadic + Low + Mid + High) in one ContamDE run, then check whether
-# the REO reversal score is driven by purity within a band. If score is
-# independent of purity, purity filtering the validation set would not change the
-# conclusion; if correlated, a full re-filter (deferred layer 2) is warranted.
+# Ancillary QC for the REO intermediate-band application: estimate relative
+# tumour purity on one common scale by pooling paired RET cases from all four
+# groups (Sporadic + Low + Mid + High) in one ContamDE run, then describe its
+# association with the REO reversal score. This diagnostic does not authorize
+# exclusions or establish that the band-score association is purity-independent.
 # A diagnostic outside the numbered stream (reorg plan v2 s2.6); mirrors 220
 # pooled ContamDE. Run after the main chain.
 # Input : processed/thyr_case_design.rds (from 140),
@@ -67,11 +66,11 @@ for (b in c("R_Sporadic", "R_Low", "R_Mid", "R_High")) {
     b, length(w), stats::median(w), min(w), max(w)))
 }
 
-# --- Diagnostic: does purity drive the REO reversal score within Low/Mid? --
+# --- Descriptive association of purity with the REO score in Low/Mid -------
 score_of <- setNames(eval$samples$score, eval$samples$case_submitter_id)
 cases$score <- unname(score_of[cases$case_submitter_id])
 lm <- cases[cases$band %in% c("R_Low", "R_Mid") & !is.na(cases$score), , drop = FALSE]
-message("\nScore vs purity within R_Low/Mid (if ~0, purity does not drive the validation):")
+message("\nDescriptive score-purity correlations within R_Low/Mid:")
 for (b in c("R_Low", "R_Mid")) {
   d <- lm[lm$band == b, ]
   if (nrow(d) >= 4) {

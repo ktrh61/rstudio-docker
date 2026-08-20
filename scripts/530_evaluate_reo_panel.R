@@ -1,10 +1,9 @@
 # 530_evaluate_reo_panel.R
-# Apply the finalized REO panel (520) to the intermediate-exposure RET tumours
-# it was never trained on -- R_Low (assigned share 0-33.3%) and R_Mid (33.3-
-# 66.6%) -- as a graded, out-of-sample check. If the panel captures a radiation-
-# attributable signal, reversal scores should grade with assigned share:
-# Sporadic (train R0) < R_Low < R_Mid < High (train R1). This is exploratory and
-# descriptive; it does not alter the panel or its boundary.
+# Apply the finalized REO panel (520), without refitting, to the intermediate-
+# exposure RET tumours not used in its construction: R_Low (assigned share
+# 0-33.3%) and R_Mid (33.3-66.6%). The graded scores are examined against the
+# hypothesized band ordering. This application is descriptive, does not alter
+# the panel or its cutoff, and is not independent external validation.
 # Input : processed/thyr_reo_panel.rds             (from 520; panel + boundary)
 #         processed/thyr_analysis_cohorts.rds      (from 230; include_reo_evaluation)
 #         processed/thyr_se_raw.rds                (from 120; single count assay)
@@ -12,10 +11,9 @@
 #         lib/reo.R
 # Output: processed/thyr_reo_evaluation.rds, output/reo_evaluation_samples.csv
 #
-# DESIGN NOTES (deferred, revisit): the R_Low/R_Mid tumours here are NOT filtered
-# by ContamDE purity nor by PC-OD outlier detection; all paired RET tumours in
-# the two AS bands are used. Whether to purity-match them to the training set is
-# an open decision flagged for later.
+# The R_Low/R_Mid tumours are not filtered by ContamDE purity or PC-OD. These
+# quantities are examined separately as non-exclusion diagnostics and do not
+# alter the intermediate-band application set.
 
 source("setup.R")
 
@@ -66,7 +64,7 @@ as_tbl$score <- reversal_score(log2_tpm, as_tbl$tumor_id, panel, dead_zone)
 # --- Read A: classification vs the R0-based threshold -----------------------
 as_tbl$class <- classify_reversal(as_tbl$score, boundary)
 
-# --- Read B: graded increase Low -> Mid (out-of-sample, permutation BM) -----
+# --- Read B: graded Mid vs Low application (permutation BM) -----------------
 # Two ordered bands, so the ordered-alternative (Jonckheere-Terpstra) test is a
 # one-sided Brunner-Munzel: is the R_Mid reversal score stochastically greater
 # than R_Low? BM is used (not Wilcoxon) for the same reason as the main
@@ -78,11 +76,11 @@ bm_low_mid <- brunnermunzel_mc_test(
   low_score, mid_score, alternative = "less", method = "auto", seed = SEED
 )
 message(sprintf(
-  "\nRead B (out-of-sample): Mid > Low reversal score, one-sided BM p = %.4f (%s), effect Pr(Low<Mid)=%.3f",
+  "\nRead B (intermediate-band application): Mid > Low reversal score, one-sided BM p = %.4f (%s), effect Pr(Low<Mid)=%.3f",
   bm_low_mid$p.value, attr(bm_low_mid, "mc")$method, unname(bm_low_mid$estimate)
 ))
 
-# --- Report: graded validation ---------------------------------------------
+# --- Report: graded band summary -------------------------------------------
 n_pairs <- nrow(panel)
 message(sprintf("\nPanel size %d ; R0-based positive threshold: score > %d",
   n_pairs, boundary$negative_max))
@@ -113,9 +111,9 @@ thyr_reo_evaluation <- list(
   samples = as_tbl[, c("case_submitter_id", "band", "assigned_share",
     "dose_mgy", "tumor_id", "score", "class")],
   summary = summary_tbl,
-  # Read A: R0-based threshold classification. Read B: out-of-sample ordered
-  # test on Low vs Mid only (training arms excluded). Sporadic/High are for the
-  # graded figure, not the inference.
+  # Read A: R0-based threshold classification. Read B: intermediate-band
+  # ordered test on Low vs Mid only (construction arms excluded).
+  # Sporadic/High are shown in the graded figure but do not enter this test.
   read_A_threshold = boundary$negative_max,
   read_B = list(
     test = "one-sided Brunner-Munzel, Mid > Low reversal score",
