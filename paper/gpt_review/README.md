@@ -5,9 +5,9 @@
 ## Revised review and manuscript
 
 - `review.md`: 現行原稿に対する事実ベースの再レビュー。多重性、PC-OD、追加解析、REO、gene-set/ORA、解釈フレームワークの射程を整理し、撤回済みのGPT提案を本番根拠から分離。
-- `draft_manuscript_5000_words.md`: 修正版の英語本文試案。BJCの計数対象に相当するIntroductionからDiscussionまでは見出し込み約4,925語、structured Abstractは本文200語（小見出し込み208語、Markdown記号を除く空白区切り）。Abstractは本文5,000語とは別枠の200語上限に合わせた。
+- `draft_manuscript_5000_words.md`: 修正版の英語本文試案。BJCの計数対象に相当するIntroductionからDiscussionまでは見出し込み約4,895語、structured Abstractは本文200語（小見出し込み208語、Markdown記号を除く空白区切り）。Abstractは本文5,000語とは別枠の200語上限に合わせた。
 - `supplementary_methods_for_5000_word_version.md`: 修正版 Supplementary Methods 試案、3,343語。
-- `supplementary_results_for_5000_word_version.md`: 本文圧縮時に省略されていた較正、ORA、REO構築・診断などを保全する Supplementary Results 試案、842語。
+- `supplementary_results_for_5000_word_version.md`: 本文圧縮時に省略されていた較正、ORA、性染色体注釈、REO構築・診断などを保全する Supplementary Results 試案、912語。
 - `proposed_record_corrections.md`: 開発時の出力確認を過大評価した内部記録の訂正案。正本ファイルには未適用。
 
 ## Additional descriptive audit

@@ -16,6 +16,10 @@ The over-representation analysis was a descriptive annotation under a gene-sampl
 
 The lower-expression list was concentrated in a single correlated theme involving proliferation, cell cycle, and DNA repair. Illustrative counts were 46 of 199 genes for E2F targets, 41 of 198 for G2M checkpoint, and 68 of 322 for Reactome DNA repair. The leading radiation-curated set contained 46 of 126 genes in the lower-expression list, compared with 6.4 expected under the gene-sampling reference. The radiation-curated findings therefore reflected the same cell-cycle theme rather than an independent line of evidence. These annotations remained hypothesis-generating and did not alter the absence of a q<0.10 result in the label-permutation gene-set analysis.
 
+## Sex-chromosome annotation of the RET-tumor list
+
+Among the 1,765 RET-tumor genes meeting the prespecified Storey q<0.10 rule, 57 were X-linked: 36 were expressed more highly and 21 less highly in High-AS cases. No Y-linked gene met the rule. The 15,621 genes tested in the contrast included 572 X-linked and two Y-linked genes. These counts were descriptive; no enrichment test was performed, and they do not exclude sex-related expression structure.
+
 ## REO pair construction
 
 The 500-gene construction pool comprised 317 genes expressed more highly and 182 expressed less highly in High-AS RET fusion-positive PTCs. From 57,694 candidate pairs, 153 met all prespecified stability, separation, and reversal criteria. Across these qualifying pairs, the shift in median within-sample log2-TPM difference ranged from 1.159 to 4.700, and the High-AS reversal rate ranged from 0.53 to 0.87. Greedy selection with the prespecified gene-reuse and redundancy restrictions produced the final 10-pair panel and the construction-derived positive boundary of score >2.
