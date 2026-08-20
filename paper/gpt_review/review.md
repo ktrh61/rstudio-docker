@@ -1,4 +1,4 @@
-# 論文下書き再レビュー（現状反映版、2026-08-19）
+# 論文下書き再レビュー（現状反映版、2026-08-20）
 
 ## この文書の位置づけ
 
@@ -60,7 +60,13 @@ RET-tumorのHigher Criticism p=0.0112は、対比全体にラベルと整列し�
 
 complete-null評価のpooled rate 0.064とcell-specific maximum 0.18は、実行したcomplete-null入力における挙動です。あらゆるpartial-alternative設定でのFDR保証または一般的なcalibrationとは表現しません。1.15-fold spike-inも単一条件のpositive-control checkに限ります。
 
-## 7. REOの正しい位置づけ
+## 7. 外部遺伝子リスト照合
+
+外部照合では、qRT-PCR検証済みアンカーと、Ory et al. (2026)がsPLS-DA／DIABLOで選択した多変量署名を別区分として扱います。前者は20のリスト×対比セル中19セルで重なりがなく、唯一の重なりはDom正常組織リストのS100A10とRET-tumorの組織横断的かつ逆方向の重なりでした。後者では、Oryの組織共有署名、正常組織署名、腫瘍署名から、それぞれ検定対象39遺伝子中5、40遺伝子中3、46遺伝子中3がRET-tumorリストに含まれました。正常組織署名の重なりは組織横断的、腫瘍署名の重なりは組織対応であり、正常組織対比とBRAF対比では重なりがありませんでした。
+
+これは記述的な包含関係であって濃縮検定ではなく、driver非層別群から得られたOryの特徴選択解析を再現するものでも、署名を検証するものでもありません。ただし、一次RET-tumor所見の一部が近年報告されたpost-Chornobylトランスクリプトーム署名にも含まれる、という限定した肯定的材料としてDiscussionに置くことは適切です。
+
+## 8. REOの正しい位置づけ
 
 REOにはbinary readoutとgraded readoutがあります。dose-zeroとHigh-ASはパネルの構築帯であり、境界はdose-zero例の最大スコアから設定されました。この2帯で全12 dose-zero例がnegative、15 High-AS例中13例がpositiveとなったことは、固定パネルを他帯へ適用する前提となるconstruction fitを示します。構築例がpair selectionに使われ、dose-zero例が境界設定にも使われているため、不偏な分類性能ではありませんが、結果として不要という意味でもありません。
 
@@ -70,7 +76,7 @@ REOにはbinary readoutとgraded readoutがあります。dose-zeroとHigh-ASは
 
 純度推定が得られたのは中間帯36例中31例です。残るLow 2例とMid 3例にはtumor assayがある一方、ペア型純度推定に必要なmatched normal assayがありません。REOはtumorのみで計算できるため36例全てを含みます。純度との関連解析は除外権限を持たない診断であり、純度から独立したband effectを証明しません。
 
-## 8. 解釈フレームワークの時制
+## 9. 解釈フレームワークの時制
 
 確認できるのは、現在報告する確定解析が結果を生成する前に解釈フレームワークを定めたことです。開発中には実データを用いた通常の出力確認がありました。したがって、“prospectively registered”、“before any analysis”、“before any results were seen”、“blinded”とは書きません。
 
@@ -80,6 +86,6 @@ REOにはbinary readoutとgraded readoutがあります。dose-zeroとHigh-ASは
 
 開発時の通常の出力閲覧を「旧4対比パターンを体系的に確認してからマップを選んだ」と記録した過去の説明は過大でした。詳細な訂正案は `proposed_record_corrections.md` に分離されています。
 
-## 9. 残る投稿前作業
+## 10. 残る投稿前作業
 
 新規の必須統計解析は提案しません。残る主要作業は、GDC accession/data release、倫理・同意と二次利用、Data/Code availability、Funding、Competing interests、Author contributions、Acknowledgements、完全な引用文献、本文と図表・Supplementary Dataの数値および名称の照合です。利用可能なtechnical batch metadataがないことはlimitationとして明記します。

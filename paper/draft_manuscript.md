@@ -150,14 +150,14 @@ Because the evaluation cohort is deliberately unfiltered, its QC is reported as 
 
 【訳】評価コホートは意図的に未濾過のため、その QC は除外権限を持たない診断として報告する <!-- C-09 -->: 訓練側の外れ値スクリーンの評価腫瘍への鏡映(件数の報告のみ)、訓練と共通の尺度での腫瘍純度、そして <!-- C-12 --> — 逆転スコアは評価帯内で純度と相関するため、帯の段階的プロファイルは原理的には帯でなく純度駆動であり得る — 偏相関と純度層別比較による帯と純度の分離である(手続きは Supplementary Methods)。
 
-### External anchor cross-reference
+### External gene-list comparison
 
 <!-- 写像元: diagnostics/external_gene_anchors.R -->
 
 <!-- C-13 -->
-Externally validated radiation-associated gene lists (qRT-PCR-validated cores of Abend 2013 and Abend 2012, Dom 2012, and CLIP2 <!-- N-53 -->; list characteristics in Supplementary Methods) were cross-referenced against each contrast's q < 0.10 gene set as a descriptive membership count, with no enrichment statistic: the lists are small, platforms and contrasts differ across sources, and the reading was fixed symmetrically in advance — any count is reported as description and no claim moves with the outcome.
+We cross-referenced two classes of published radiation-associated gene lists against each contrast's q < 0.10 gene set: the qRT-PCR-validated lists from Abend et al. (2012, 2013) and Dom et al. (2012), with CLIP2 as a single-gene reference, and the shared-tissue, normal-tissue and tumor-tissue multivariate transcriptomic signatures from Ory et al. (2026) <!-- N-53, N-85 -->. We kept the two classes distinct and reported descriptive membership counts without performing an enrichment test.
 
-【訳】外部で検証済みの放射線関連遺伝子リスト(qRT-PCR 検証コア: Abend 2013・Abend 2012・Dom 2012・CLIP2 <!-- N-53 -->; リストの性格は Supplementary Methods)を、各対比の q < 0.10 遺伝子集合と員数照合した — 濃縮統計量は計算しない: リストは小さく、プラットフォームと対比は出典間で異なり、読みは事前に対称に固定した — どの員数も記述として報告し、どの主張も結果で動かない。<!-- C-13 -->
+【訳】公表済みの放射線関連遺伝子リストを2区分に分けて各対比の q < 0.10 遺伝子集合と照合した: Abend et al. (2012, 2013) と Dom et al. (2012) の qRT-PCR 検証済みリストおよび単一遺伝子参照としての CLIP2 と、Ory et al. (2026) の組織共有・正常組織・腫瘍組織の多変量トランスクリプトーム署名である <!-- N-53, N-85 -->。両区分は分けて扱い、濃縮検定を行わず、記述的な重なり数を報告した。<!-- C-13 -->
 
 ### Software, seeds and reproducibility
 
@@ -242,12 +242,12 @@ Within the evaluation bands the reversal score correlated with tumor purity (poo
 Methods 参照)は片側 Brunner–Munzel p = 0.1127、効果 P(Low<Mid) = 0.616 だった
 <!-- N-40 -->。この段階的プロファイルは記述的観察として報告し、線量反応の形は仮定も主張もしない。訓練側から鏡映した外れ値スクリーンはどちらの評価帯でも該当例を出さなかった(17 例中 0・19 例中 0 <!-- N-43 -->)— スクリーンは除外権限を持たず、評価は適格全例で一度だけ実施した。評価帯内では逆転スコアは腫瘍純度と相関し(pooled Spearman +0.538 <!-- N-45 -->)、帯–スコア相関は +0.142、純度を条件付けると +0.146(偏 Spearman; 片側置換 p = 0.2162)<!-- N-48, N-46 -->、帯と純度自体はほぼ無相関だった(+0.036 <!-- N-48 -->)。純度層別の比較は Supplementary に示す <!-- N-47 -->。
 
-### 7. External anchor cross-reference(C-13)
+### 7. External gene-list cross-reference(C-13)
 
 <!-- C-13(事実側 — 読みは Discussion) -->
-Cross-referencing the externally validated radiation-associated gene lists (Methods) against each contrast's discovered genes returned zero overlap in 19 of 20 cells, including every tissue-matched cell <!-- N-53 -->. The single non-zero cell was cross-tissue: S100A10, from the Dom normal-tissue list, appeared among the R_Tumor discoveries, with direction opposite to the original report <!-- N-54 -->.
+Among the 20 validated-anchor-by-contrast cells, 19 had no overlap <!-- N-53 -->. The sole overlap was cross-tissue: S100A10 from the Dom normal-tissue list occurred in the R_Tumor list with the direction opposite to the original report <!-- N-54 -->. Among the multivariate Ory signatures, five of 39 tested shared-tissue genes and three of 46 tested tumor-tissue genes occurred in R_Tumor <!-- N-85, N-86 -->. The Ory normal-tissue signature had no overlap with either normal-tissue contrast, but three of its 40 tested genes occurred in R_Tumor. No Ory signature overlapped a BRAF q < 0.10 list. These membership counts were descriptive and were not enrichment tests.
 
-【訳】外部で検証済みの放射線関連遺伝子リスト(Methods)を各対比の発見遺伝子と照合した結果、20 セル中 19 で重なりはゼロであり、組織対応のセルは全てゼロだった <!-- N-53 -->。唯一の非ゼロセルは組織対応外だった: Dom の正常組織リスト由来の S100A10 が R_Tumor の発見遺伝子に現れ、方向は原報告と逆であった <!-- N-54 -->。
+【訳】検証済みアンカー×対比の20セルでは19セルに重なりがなかった <!-- N-53 -->。唯一の重なりは組織横断的であり、Dom の正常組織リスト由来の S100A10 が R_Tumor リストに原報告と逆方向で現れた <!-- N-54 -->。Ory の多変量署名では、組織共有署名と腫瘍署名が R_Tumor とそれぞれ検定対象39遺伝子中5、46遺伝子中3で重なった <!-- N-85, N-86 -->。Ory の正常組織署名は正常組織のいずれの対比とも重ならなかったが、R_Tumor とは検定対象40遺伝子中3で重なった。Ory 署名はいずれも BRAF の q < 0.10 リストと重ならなかった。これらは記述的員数であり、濃縮検定ではない。
 
 ## Discussion
 
@@ -293,13 +293,13 @@ The two cross-stratum comparisons carry different weights and return different v
 
 【訳】二つの層間比較は異なる重みを持ち、異なる判定を返した。腫瘍ペアは設計上の補完として計算されたもので、ラベル交換の偶然を超えて互いに似ている: 共有 15,560 遺伝子で Spearman rho +0.459、ラベルシャッフルの参照区間([−0.39, +0.39])の外側、両側 p = 0.0197 <!-- N-33 -->(補足表S8)<!-- C-17 -->。仮説生成としてのみ: これは driver 背景を越えて見える曝露関連成分 — oncogene 非依存の痕跡 — が示すはずの姿であり、B_Tumor の対比内の静けさとも矛盾しない(R_Tumor の対比と向きの揃った閾値下構造があれば足りる)。同時に、共有された共変量構造 — 筆頭は純度(少なくとも RET 側で被曝群は高純度 <!-- N-44 -->)— とも等しく整合し、本設計は両者を分離できない。隣接する断片 — 較正済みセットレベルの全セルで発見に最も近づいた B_Tumor × radiation(q = 0.114 <!-- N-28 -->)— も、どの閾値も越えないまま同じ方向を指す。この比較は共有腺記憶仮説を検定せず、本研究のどの主張もこれに依存しない。対照的に、正常組織ペアは仮説を担った比較である: 被曝の長期分子記憶の報告(Abend et al. 2013)と、driver 非層別で報告された正常組織の共有署名(Ory et al. 2026)は、driver で条件付けた二つの正常対比が互いに似ることを予測し、この比較はその予測を driver 条件付けの下で検定可能にする装置である。結果は不確定に終わった: rho +0.376 は参照区間の内側 <!-- N-34 -->、R_Normal に対比内シグナルなし <!-- N-16 -->。各対比が単独では検出可能な対比内シグナルを持たないとき、層間相関の帰無は「共有の不在」と「検出には弱すぎる共有」を区別できない。したがって二つの層が正常組織の曝露痕跡を共有するか否かは、本コホートでは不在と示されたのではなく識別できない <!-- C-07 -->。この比較は共有記憶の報告を支持も否定もしない — そして、より大きなコホートがこの問いを決められる設計として残る。
 
-### External anchors(C-13)
+### External gene lists(C-13)
 
 <!-- C-13(読み側 — 事実は Results §7)。対称読みの事前固定 -->
 
-The external anchor counts (Results) are read as description under the symmetric rule fixed in advance. Zero overlap with the qRT-PCR-validated cores is the norm rather than the exception among the prior studies themselves — Dom et al. (2012) tested four earlier tumor-derived signatures, as gene sets, against their own exposed-versus-non-exposed normal-tissue contrast and found none enriched — and the single cross-tissue overlap (S100A10, direction reversed <!-- N-54 --> — Dom's reported list being wholly upregulated in exposed normal tissue, any down-in-exposed overlap from it reverses by construction) is noted without weight. No claim of this study moves with these counts <!-- C-13 -->.
+The external gene-list counts are descriptive. The validated anchors contributed only the cross-tissue S100A10 overlap, whereas the Ory shared-tissue and tumor signatures contained five and three R_Tumor genes, respectively <!-- N-54, N-85, N-86 -->. Because Ory et al. selected these signatures through multivariate discrimination in driver-unstratified exposure groups, the membership counts neither reproduce the feature-selection analyses nor validate the signatures. They nevertheless place a subset of the primary R_Tumor result within the recently reported post-Chornobyl transcriptomic signatures. Differences in tissue, platform, contrast, driver control and list construction, together with the absence of enrichment testing, preclude a universal radiation-signature claim <!-- C-13 -->.
 
-【訳】外部アンカーの員数(Results)は、事前に固定した対称規則の下で記述として読む。qRT-PCR 検証済みコアとの重なりゼロは、先行研究どうしの間でも例外でなく通例であり — Dom et al. (2012) 自身が、先行4署名(いずれも腫瘍由来)をセットとして自らの被曝対非被曝の正常組織対比にかけ、いずれの濃縮も検出していない — 唯一の組織対応外の重なり(S100A10、方向逆転 <!-- N-54 --> — Dom の報告リストは全て被曝正常組織で上昇方向なので、被曝群低発現側の重なりは構成上必ず逆転になる)は重みを付けずに記す。本研究のどの主張もこの員数では動かない <!-- C-13 -->。
+【訳】外部遺伝子リストとの重なり数は記述的所見である。検証済みアンカーで得られたのは組織横断的な S100A10 の重なりだけだった一方、Ory の組織共有署名と腫瘍署名には、それぞれ R_Tumor の5遺伝子と3遺伝子が含まれた <!-- N-54, N-85, N-86 -->。Ory et al. は driver 非層別の曝露群を多変量判別して署名を選択しているため、この包含関係は特徴選択解析の再現でも署名の検証でもない。それでも、一次 R_Tumor 所見の一部が近年報告された post-Chornobyl トランスクリプトーム署名にも含まれることを示す。組織・プラットフォーム・対比・driver 統制・リスト構築法の差と、濃縮検定を行っていないことから、普遍的な放射線署名を主張することはできない <!-- C-13 -->。
 
 ### Limitations(C-11)
 
@@ -389,11 +389,11 @@ TPM was recomputed from the selected count assay and the exon-union gene lengths
 
 【訳】(i) 訓練側の外れ値スクリーン(PC-OD)を R_Low/R_Mid 腫瘍に鏡映し、評価は適格全例で一度だけ実行 — スクリーンは件数の報告のみ <!-- N-43 -->。(ii) 評価帯の腫瘍純度は、RET コホート全体を1回の contamDE-lm にプールして訓練と同一の共通尺度で推定 <!-- N-44 -->。(iii) 帯と純度は、純度を条件付けた帯–スコアの偏 Spearman 相関(置換参照)と、純度層別(腫瘍純度の中央値で2層)の Mid over Low 片側 Brunner–Munzel 比較で分離する <!-- N-46, N-47 -->。
 
-### Supplementary Methods — External anchor cross-reference
+### Supplementary Methods — External gene-list comparison
 
-The membership count is k of n list genes among the contrast's tested genes. Abend 2013 contributes per-tissue lists; Abend 2012 contributes a list defined on the tumor-minus-normal paired difference — an estimand with no counterpart contrast here; Dom 2012 is a normal-tissue list.
+We treated the qRT-PCR-validated lists from Abend et al. (2012, 2013) and Dom et al. (2012), with CLIP2 as a single-gene reference, separately from the 50-gene shared-tissue, 45-gene normal-tissue and 64-gene tumor-tissue multivariate signatures in Ory et al. (2026). The membership count was k of n source-list genes present among the contrast's tested genes, where k also occurred in its q < 0.10 list. Abend et al. (2012) defined its list on a tumor-minus-normal paired difference, an estimand with no counterpart contrast here. Symbols absent from GENCODE v36 or not retained in a contrast-specific tested set did not contribute to n. We compared the Ory shared-tissue list with both tissues and labelled the normal- and tumor-tissue comparisons as tissue-matched or cross-tissue. No enrichment statistic was calculated.
 
-【訳】員数照合は、対比の検定遺伝子中のリスト遺伝子 n のうち k を数える。Abend 2013 は組織別リスト、Abend 2012 は腫瘍−正常のペア差で定義されたリスト — 本研究に対応する対比を持たない推定対象 — であり、Dom 2012 は正常組織のリストである。
+【訳】Abend et al. (2012, 2013) と Dom et al. (2012) の qRT-PCR 検証済みリストおよび単一遺伝子参照としての CLIP2 は、Ory et al. (2026) の50遺伝子の組織共有署名、45遺伝子の正常組織署名、64遺伝子の腫瘍組織署名とは分けて扱った。員数は、各対比の検定対象に存在する出典リスト遺伝子 n のうち、q < 0.10 リストにも含まれる k として数えた。Abend et al. (2012) のリストは、本研究に対応する対比のない腫瘍−正常ペア差で定義される。GENCODE v36 に存在しない記号または対比別検定集合に残らない遺伝子は n に含めなかった。Ory の組織共有署名は両組織と照合し、正常・腫瘍署名の照合は組織対応または組織横断として分類した。濃縮統計量は計算しなかった。
 
 ### Supplementary Methods — Software, seeds and reproducibility
 
@@ -506,7 +506,7 @@ Pattern rules, fixed with the map: signal in R_Tumor is read as agreement with p
 
 ### C. Intro / Discussion で必要になる見込み
 
-外部アンカー(C-13。DOI は diagnostics/external_gene_anchors.csv の curation 由来):
+外部遺伝子リスト(C-13。検証済みアンカーの DOI は diagnostics/external_gene_anchors.csv、多変量署名は diagnostics/ory2026_gene_signatures.csv の curation 由来):
 
 - Abend M, et al. PLoS One 2012;7:e39103. doi:10.1371/journal.pone.0039103(PubMed 照合済み)— ペア差リスト(11 遺伝子)
 - Abend M, et al. Iodine-131 dose-dependent gene expression. Br J Cancer 2013;109:2286–2294. doi:10.1038/bjc.2013.574(PubMed 照合済み)— 正常8/腫瘍6
@@ -515,7 +515,7 @@ Pattern rules, fixed with the map: signal in R_Tumor is read as agreement with p
 
 正常組織・対照・仮説:
 
-- Ory C, et al. Post-Chornobyl thyroid papillary carcinomas display distinct past exposure and radiation-associated carcinogenesis molecular signatures at low and high thyroid doses. Sci Rep 2026;16. doi:10.1038/s41598-026-53030-4(PubMed 照合済み)— 正常組織対照・driver 非層別の隙間(Intro 予告 / Discussion C-07)
+- Ory C, et al. Post-Chornobyl thyroid papillary carcinomas display distinct past exposure and radiation-associated carcinogenesis molecular signatures at low and high thyroid doses. Sci Rep 2026;16. doi:10.1038/s41598-026-53030-4(PubMed・公式補足表照合済み)— 正常組織対照・driver 非層別の隙間(Intro / Discussion C-07)および組織共有50・正常45・腫瘍64遺伝子の多変量署名との記述的照合(C-13)
 - Efanov AA, et al. Investigation of the relationship between radiation dose and gene mutations and fusions in post-Chernobyl thyroid cancer. J Natl Cancer Inst 2018;110:371–378. doi:10.1093/jnci/djx209(PubMed 照合済み)— driver 組成と線量の共変(Intro の層別根拠。Q-01)
 
 ---
