@@ -14,7 +14,7 @@ In the single positive-control scenario, 195 genes from HALLMARK_ADIPOGENESIS we
 
 The over-representation analysis was a descriptive annotation under a gene-sampling reference, distinct from the subject-label permutation analysis above. Across Hallmark, C2 canonical pathways, C5 GO Biological Process, and the radiation-curated family, respectively, the numbers of sets meeting the family-by-list q<0.10 rule were 0/0/0/0 for genes expressed more highly in High-AS cases, 12/105/205/7 for genes expressed less highly in High-AS cases, and 6/37/71/2 for the combined list.
 
-The lower-expression list was concentrated in a single correlated theme involving proliferation, cell cycle, and DNA repair. Illustrative counts were 46 of 199 genes for E2F targets, 41 of 198 for G2M checkpoint, and 68 of 322 for Reactome DNA repair. The radiation-curated set with the smallest raw hypergeometric p-value contained 46 of 126 genes in the lower-expression list, compared with 6.4 expected under the gene-sampling reference. The radiation-curated findings therefore reflected the same cell-cycle theme rather than an independent line of evidence. These annotations remained hypothesis-generating and did not alter the absence of a q<0.10 result in the label-permutation gene-set analysis.
+The lower-expression list was concentrated in a recurring, overlapping theme involving proliferation, cell cycle, and DNA repair. Illustrative counts were 46 of 199 genes for E2F targets, 41 of 198 for G2M checkpoint, and 68 of 322 for Reactome DNA repair. The radiation-curated set with the smallest raw hypergeometric p-value contained 46 of 126 genes in the lower-expression list, compared with 6.4 expected under the gene-sampling reference. The radiation-curated findings therefore reflected the same cell-cycle theme rather than an independent line of evidence. These annotations remained hypothesis-generating and did not alter the absence of a q<0.10 result in the label-permutation gene-set analysis.
 
 ## Sex-chromosome annotation of the RET-tumor list
 
@@ -33,8 +33,6 @@ The ancillary PC-OD screen identified no outliers among the intermediate-band tu
 Relative purity could be estimated for 15 Low-AS and 16 Mid-AS tumors; two Low-AS and three Mid-AS tumors lacked the matched normal assay required by the pair-based estimator and remained in the REO analysis without a purity score. In the pooled paired RET purity run, median relative-purity scores were 0.690, 0.704, 0.739, and 0.814 in the dose-zero, Low-AS, Mid-AS, and High-AS bands, respectively. This diagnostic refitted the relative scale across all paired RET bands and is therefore not numerically interchangeable with the main-cohort purity scale.
 
 Among the intermediate bands, Spearman correlations between purity and REO score were 0.684 in Low-AS cases, 0.345 in Mid-AS cases, and 0.538 when pooled. The unadjusted band–score correlation was 0.142, the band–purity correlation was 0.036, and the partial Spearman coefficient after adjustment for purity rank was 0.146 (descriptive one-sided permutation p=0.2162).
-
-After splitting the intermediate-band cases at median purity, the one-sided Mid-AS-over-Low-AS comparison gave Pr(Low<Mid)=0.580 and p=0.3069 in the lower-purity stratum and Pr(Low<Mid)=0.532 and p=0.4197 in the higher-purity stratum. These were diagnostics, not additional confirmatory tests, and they did not establish an AS-band association independent of purity.
 
 ## External gene-list cross-reference
 
