@@ -88,7 +88,7 @@ Before the reported gene-set analysis, an earlier development assessment using a
 
 ## Between-stratum concordance
 
-For each tissue, we intersected the RET and BRAF profiles of signed gene-level Brunner–Munzel statistics by gene and compared them using Spearman correlation. We shuffled labels independently within each contrast 9,999 times, using contrast-specific seeds derived from 19450809, and correlated the shuffled profiles to form the null reference interval. This interval represents the case in which neither stratum carries label-aligned structure. An observed correlation outside the interval does not distinguish exposure from a covariate shared across strata.
+For each tissue, we intersected the RET and BRAF profiles of signed gene-level Brunner–Munzel statistics and compared them using Spearman correlation. To construct the null reference, we generated 9,999 label shuffles separately from those used for omnibus and gene-set inference, using a distinct seed for each contrast derived from the base seed 19450809. At each iteration, labels were shuffled independently in the RET and BRAF contrasts before their signed-statistic profiles were correlated. The 2.5th and 97.5th percentiles formed the empirical reference interval, and a two-sided Monte Carlo p-value was calculated with plus-one counting. The normal-tissue comparison was prespecified, whereas the tumor-tissue comparison was descriptive. This null represents the case in which neither stratum carries label-aligned structure; a correlation outside the reference interval does not distinguish exposure-associated structure from a covariate shared across strata.
 
 ## REO panel construction and intermediate-band application
 
