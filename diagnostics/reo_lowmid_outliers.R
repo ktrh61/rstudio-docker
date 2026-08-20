@@ -2,9 +2,9 @@
 # Ancillary QC for the REO intermediate-band application: apply the PC-OD
 # procedure to R_Low / R_Mid tumours, record any flags without excluding cases,
 # and descriptively recompute the graded comparison after removing flagged
-# samples. This diagnostic does not redefine the application cohort. It runs
-# outside the numbered stream and mirrors 210_detect_outliers.R's PC-OD on the
-# intermediate-exposure bands.
+# samples. This diagnostic does not redefine the application cohort. It uses
+# the same PC-OD algorithm as 210_detect_outliers.R, with the historical input
+# convention documented below.
 # Input : processed/thyr_case_design.rds (from 140),
 #         thyr_se_raw.rds, thyr_reo_evaluation.rds
 #         lib/qc_pc_od.R, lib/stat_brunnermunzel.R
@@ -39,11 +39,11 @@ cases <- cases[cases$band %in% c("R_Low", "R_Mid") & !is.na(cases$tumor_id), , d
 message("R_Low/Mid tumours: ",
   paste(names(table(cases$band)), table(cases$band), sep = "=", collapse = " "))
 
-# --- PC-OD per band on tumour log-CPM (same scale as 210) ------------------
+# --- PC-OD per band on tumour log-CPM --------------------------------------
 counts_all <- se_single_assay(se)
 run_pcod <- function(ids) {
-  # keep_lib_sizes = FALSE is this diagnostic's historical behaviour (210 uses
-  # TRUE); the divergence is preserved, unification is a recorded open item.
+  # This diagnostic historically recomputes library sizes after filterByExpr
+  # (keep_lib_sizes = FALSE); 210 retains the pre-filter library sizes.
   PC_OD(logcpm_for_qc(counts_all, ids, keep_lib_sizes = FALSE))
 }
 cases$is_outlier <- 0L
