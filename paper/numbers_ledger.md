@@ -224,6 +224,10 @@
 
 番号(Fig.1 等)は仮置き。図表構成の確定時に振り直す。C-ID は主張マップ記入後に対応付ける。
 
+**注記(2026-08-21)**: 図表の正式番号・生成スクリプト・出力の正は figures/manifest.csv
+(全17行が実体を指す完備状態)。本節の F-ID(表5(仮)等)は旧仮置きのまま — 本台帳は
+足場につき行の振り直しは行わず、参照は manifest とキャプション節に従うこと。
+
 | F-ID | 生成 | キャプション内の主張/数値 | 状態 |
 | --- | --- | --- | --- |
 | Fig.1(仮)遺伝子別 BM 証拠 | figures/fig_gene_bm_evidence.R ← processed/thyr_expression_test.rds + thyr_se_raw.rds。正準 repo/output/figures/fig_gene_bm_evidence.png(二機バイト一致) | C-未、N-16・N-18(付随ログ fig_gene_bm_evidence.log:2-5) | draft |
