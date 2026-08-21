@@ -41,8 +41,8 @@ df <- do.call(rbind, lapply(unit_order, function(u) {
   )
 }))
 df$unit <- factor(df$unit, levels = unit_order)
-lab_up <- sprintf("higher in exposed (q<%.2f)", FDR_CUT)
-lab_down <- sprintf("lower in exposed (q<%.2f)", FDR_CUT)
+lab_up <- sprintf("higher in High-AS (q<%.2f)", FDR_CUT)
+lab_down <- sprintf("lower in High-AS (q<%.2f)", FDR_CUT)
 df$sig <- ifelse(df$q < FDR_CUT,
   ifelse(df$x >= 0, lab_up, lab_down),
   "n.s.")
@@ -66,10 +66,9 @@ p <- ggplot(df, aes(x = x, y = y)) +
     x = "signed Brunner–Munzel effect  2θ−1 = Pr(X<Y)−Pr(X>Y)  → higher in High-AS",
     y = expression(-log[10] * "(exact permutation p)"),
     title = "Gene-level Brunner–Munzel evidence, per analysis contrast",
-    subtitle = sprintf(paste0(
-      "Rank-based effect (no fold change); colored by Storey q < %.2f.\n",
-      "Contrast readings follow the interpretation map fixed before the reported results existed."
-    ), FDR_CUT)
+    subtitle = sprintf(
+      "Rank-based effect (no fold change); colored by Storey q < %.2f.",
+      FDR_CUT)
   ) +
   theme_thyr()
 

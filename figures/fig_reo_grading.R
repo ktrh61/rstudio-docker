@@ -52,11 +52,15 @@ spo <- do.call(rbind, lapply(split(spo_scores, spo_scores), function(v)
     y = STRIP_BASE + (seq_along(v) - 1) * STRIP_STEP, stringsAsFactors = FALSE)))
 
 d <- rbind(spo, hi, mid)
-d$band <- factor(d$band, levels = c("R_Sporadic", "R_Low", "R_Mid", "R_High"))
-d$set <- ifelse(d$band %in% c("R_Sporadic", "R_High"), "training", "evaluation")
+# display labels follow the manuscript nomenclature (2026-08-21):
+# analysis-file bands R_Sporadic/R_Low/R_Mid/R_High -> dose-zero/Low-AS/Mid-AS/High-AS
+band_labels <- c(R_Sporadic = "dose-zero", R_Low = "Low-AS",
+                 R_Mid = "Mid-AS", R_High = "High-AS")
+d$set <- ifelse(d$band %in% c("R_Sporadic", "R_High"), "construction", "application")
+d$band <- factor(unname(band_labels[d$band]), levels = unname(band_labels))
 
 thr <- reo$boundary$negative_max # A: positive if score > thr
-pal <- PAL_BANDS # lib/plot_theme.R
+pal <- setNames(PAL_BANDS[names(band_labels)], unname(band_labels)) # lib/plot_theme.R
 n_pairs <- nrow(reo$panel)
 y_min <- min(d$y) - 4
 
@@ -70,23 +74,23 @@ p <- ggplot(d, aes(x = score, y = y)) +
     hjust = -0.03, vjust = 1, size = 3, colour = "grey30") +
   annotate("text", x = n_pairs + 0.5, y = STRIP_BASE, hjust = 1, vjust = 1, size = 2.9,
     colour = "grey30",
-    label = "R_Sporadic strip: AS undefined (unexposed);\nstacked points count cases") +
+    label = "dose-zero strip: AS undefined (unexposed);\nstacked points count cases") +
   geom_point(aes(colour = band, shape = set), size = 2.6, alpha = 0.9, stroke = 0.8) +
-  scale_colour_manual(values = pal, name = "Exposure band") +
-  scale_shape_manual(values = c(training = 1L, evaluation = 16L), name = "Set") +
+  scale_colour_manual(values = pal, name = "AS band") +
+  scale_shape_manual(values = c(construction = 1L, application = 16L), name = "Set") +
   scale_x_continuous(breaks = 0:n_pairs, limits = c(-0.5, n_pairs + 0.5)) +
   scale_y_continuous(breaks = c(0, 33.3, 66.6, 100), limits = c(y_min, 105)) +
   labs(x = paste0("REO reversal score (panel of ", n_pairs, " pairs)"),
     y = "Assigned share  (radiation attributability, %)",
-    title = "REO reversal scores and assigned share (RET tumors)",
-    subtitle = "Out-of-sample R_Low / R_Mid (filled) vs training R_Sporadic / R_High (open); descriptive grading") +
+    title = "REO reversal scores and assigned share (RET fusion-positive PTCs)",
+    subtitle = "Out-of-sample Low-AS / Mid-AS (filled) vs construction dose-zero / High-AS (open); descriptive grading") +
   theme_thyr(base_size = 12, subtitle_size = 9.5, legend_position = "right")
 
 save_figure(p, "fig_reo_grading.png", width = 8.2, height = 5.6)
 
 for (b in levels(d$band)) {
   s <- d$score[d$band == b]
-  as_msg <- if (b == "R_Sporadic") "AS undefined (strip)" else
+  as_msg <- if (b == "dose-zero") "AS undefined (strip)" else
     sprintf("AS median %.1f", stats::median(d$y[d$band == b]))
   message(sprintf("  %-11s n=%2d score median %.1f | %s", b, length(s),
     stats::median(s), as_msg))

@@ -30,14 +30,14 @@ cat(sprintf("REO evaluation set: %d (Low %d | Mid %d)\n",
 labels <- c(
   all_cases = "All cases",
   driver_classified = "Driver classified (RET / BRAF)",
-  band_sporadic_or_high = "Sporadic or High band",
+  band_sporadic_or_high = "Dose-zero or High-AS band",
   paired = "Tumor/normal pair available",
   pcod_clean = "Outlier screen passed (both tissues)",
   purity_pass = "Relative purity >= 0.6"
 )
 reasons <- c(
   driver_classified = "no single classified driver",
-  band_sporadic_or_high = "Low / Mid band or no reference",
+  band_sporadic_or_high = "Low-AS / Mid-AS band or no reference",
   paired = "no tumor/normal pair",
   pcod_clean = "outlier-flagged tissue",
   purity_pass = "relative purity < 0.6"
@@ -64,7 +64,7 @@ for (i in seq_len(n)) {
     text(xc, y - 0.02, sprintf("total %d   (RET %d | BRAF %d)",
          flow$n_total[i], flow$n_RET[i], flow$n_BRAF[i]), cex = 0.9)
     text(xc, y - 0.36, sprintf(
-      "R_Sporadic %d | R_High %d | B_Sporadic %d | B_High %d",
+      "RET: dose-zero %d | High-AS %d    BRAF: dose-zero %d | High-AS %d",
       grp["R_Sporadic"], grp["R_High"], grp["B_Sporadic"], grp["B_High"]),
       cex = 0.75)
   } else {
@@ -96,12 +96,12 @@ for (i in seq_len(n)) {
 y2 <- (n - 2) * 2 + 1 # y of the driver_classified box centre
 n_lowmid_ret <- flow$n_RET[2] - flow$n_RET[3] # RET cases leaving at the band step
 rect(9.0, y2 - 2.45, 13.3, y2 - 0.45)
-text(11.15, y2 - 0.75, "REO evaluation set", cex = 0.95, font = 2)
-text(11.15, y2 - 1.12, sprintf("of %d RET Low / Mid cases,", n_lowmid_ret),
+text(11.15, y2 - 0.75, "REO application set", cex = 0.95, font = 2)
+text(11.15, y2 - 1.12, sprintf("of %d RET Low-/Mid-AS cases,", n_lowmid_ret),
      cex = 0.85)
 text(11.15, y2 - 1.44, sprintf("%d with tumor/normal pairs", nrow(ev)),
      cex = 0.85)
-text(11.15, y2 - 1.76, sprintf("(R_Low %d | R_Mid %d)", n_low, n_mid),
+text(11.15, y2 - 1.76, sprintf("(Low-AS %d | Mid-AS %d)", n_low, n_mid),
      cex = 0.85)
 text(11.15, y2 - 2.12, "unfiltered by outlier / purity screens", cex = 0.75)
 arrows(xc, y2 - 1.25, 8.95, y2 - 1.25, length = 0.08)

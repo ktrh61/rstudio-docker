@@ -508,3 +508,10 @@
   キャプションから削除(純度中央値は本文 N-88 が担う)。表に純度列を足す再作表は
   研究者オプションとして残す。**表S3 をスクリプト化**(tables/supp_tab_ora_annotation.R —
   出力は組版コピーと diff 同一)、manifest の TabS3 行を実体へ更新
+- 2026-08-21: **図内ラベルの用語同期(案1・研究者 Go)**: 図1・図2・図3 のスクリプトの表示
+  ラベルを本文用語へ差し替え再生成(整形のみ・データ不変。ログ値は台帳一致を再確認 —
+  63・15,621/1,765・36 = 17/19 等): R_Sporadic 等 → dose-zero / Low-AS / Mid-AS / High-AS、
+  training/evaluation → construction/application、"in exposed" → "in High-AS"、
+  図1 の枝は「REO application set」へ。**図2サブタイトルに残存していた旧凍結文言
+  ("fixed before the reported results existed")を図から除去**(事前固定の主張は
+  キャプション・本文が担う — 図内に凍結文を持たせない方針)。3図とも目視検証済み
