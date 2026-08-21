@@ -11,6 +11,14 @@ npj PO(Nature 系)は能動推奨、BJC/ERC は能動可。
 凡例: ★ = 批准済みリント/claim_map が文言まで保護している文(言い回しを変える場合は検査を通すこと)。
 アンカーは現行文の冒頭数語(行番号は書き直しで動くため使わない)。
 
+**2026-08-21 状態更新(C2 ポート後)**: 本文は gpt_review 試案系の新文面に全面置換され、以下の
+アンカーは旧文面のもの(照合は実体基準で行う)。★実体は移植検査で全数存続を確認済み。
+ただし3件は本文→Supp へ移設: (1) 閾値フリー宣言「no DEG-list cut decides what is tested」
+(Supp Gene-set)、(2) 放射線 family キュレーション規則の事前固定文(Supp Gene-set)、
+(3) C-13 の対称事前固定句(実体 = 記述限定+「主張は員数で動かない」は本文+Supp に存続、
+"in advance" の字句は Supp 側)。凍結項目(全域)は新正準文言に更新済み。本リストの消し込みは
+トリガー2(投稿前一括検査)で行い、通過後に削除する。
+
 ## 全域: 事前固定文言の凍結(2026-08-18 研究者決定 — 閲覧歴札の決着に伴う。トリガー2と Abstract 起草時に照合)
 
 - [ ] ★ "before the finalized analysis produced the results reported here"(2026-08-21 更改 — 旧 "before the reported results existed")の4箇所(Intro 設計段落・Methods: Analysis contrasts のマップ文・Disc §1 の一括宣言・表2キャプション)は**このスコープのまま凍結**。圧縮・言い換え・Abstract 起草で "prospectively specified" / "prior to any (data) analysis" / "blinded" / "before any results were seen" 系へ**強化しない**(§0.6 の開発史と矛盾を作る)。スコープを曖昧にする弱化も不可。根拠: numbers_ledger 改訂メモ 2026-08-18・Q-18。
