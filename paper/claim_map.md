@@ -266,3 +266,9 @@
   実体(非2値化・事前割当・マップ参照)は不変。スコープ主張はマップ段落の正準文 "before the
   reported results existed" に集約(2026-08-15 統一の取りこぼし解消 — 凍結対象は4箇所で確定。
   背景の閲覧歴札決着と凍結検査は numbers_ledger 改訂メモ 2026-08-18・Q-18)
+- 2026-08-21: 凍結文言を更改: "before the reported results existed" → "before the finalized
+  analysis produced the results reported here"(4箇所+対訳同期)。旧「旧パイプライン暫定結果の
+  閲覧歴」性格づけ(2026-08-15 メモ内の記述を含む)は過大として訂正 — 実態は開発中の通常の
+  出力確認。正規記録 = numbers_ledger 改訂メモ 2026-08-21・Q-18(全面改訂)。
+  同日 C1 裁定: 多重性 family 構成(R_Tumor primary+3 secondary)の採用は D5 予測マップ
+  方式への追補であり、マップの位置づけ列・水準列は不変(ポート時に C 行の節割当を同期)
