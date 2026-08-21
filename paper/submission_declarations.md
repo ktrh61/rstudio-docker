@@ -54,5 +54,5 @@ to regenerate the reported analyses are available at 【リポジトリ URL/DOI 
 
 ## AI 開示の転記先メモ
 
-- BJC: Methods(Software 節)に批准長文を記載済み — 追加転記は不要(GTA は Methods 文書化を要求)。
+- BJC: Methods(Reproducibility and AI use 節)に短文開示、Supp Methods(Scope and verification of AI use 小節)に機構詳細を記載済み — 追加転記は不要(GTA は Methods 文書化を要求)。
 - ERC 転送時: Declarations 欄へ短縮形(numbers_ledger 改訂メモ 2026-08-18 に確定文あり)。

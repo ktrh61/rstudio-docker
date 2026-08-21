@@ -530,3 +530,14 @@
   REO 文の "medians" を括弧外主語へ移動/Background 対比を "high estimated radiation-attribution
   ... cases" の複合修飾へ。限定句差分検査 = 脱落なし(estimated・radiation・descriptive・
   unchanged・"ordinal banding only"・construction anchors 全維持)。N タグ(N-15/16/20/41)不変
+- 2026-08-21: **AI 開示の二層化**(研究者裁定 — C1-a「批准長文を Methods 末尾に維持」を更改。
+  契機 = 利害関係のない専門読者(専門医・学位)の読解反応「過剰な AI 代筆と読まれ得る」+
+  規範・先行例の確認: Nature Portfolio AI 方針は段階制で本稿の用途(起草・編集)は開示必須層、
+  ただし詳細度は著者裁量/短文ジャンルの範 = Elsevier 指定2文型。裁定原則 = 批准事項でも
+  目的に対し客観的により合理的な方法と矛盾すればリトラクトする): Methods は3文(設計・判断の
+  著者帰属/ツール名・用途・細粒度指揮/委譲否定+著者管理検証への Supp ポインタ+全責任)へ
+  短縮し、目的文・機構列挙(台帳3系照合・各段階承認)・データ範囲・コード検証は Supp Methods
+  新設小節 Scope and verification of AI use へ逐語移設(欠落ゼロ、"described above" は
+  Software 小節名参照へ付替、Software 小節末尾の open-access 重複文は新小節へ統合)。
+  批准内容の全要素は紙面に存続 — 変更は本文/Supp の配分のみ。ERC Declarations 短縮形
+  (2026-08-18)は不変、submission_declarations の転記先メモを同期
