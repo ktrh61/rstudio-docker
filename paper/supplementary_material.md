@@ -62,7 +62,7 @@ Because the DEGES exclusion screen used the observed group labels, the gene-leve
 
 For each gene, we evaluated the studentized Brunner–Munzel statistic (two-sided) for every allocation of nx labels among n samples on the finalized normalized matrix. No count-distribution model or asymptotic p-value approximation was used. Exhaustive enumeration removed Monte Carlo error and the 1/(B+1) resolution floor; inference remained conditional on exchangeability of the retained samples. Ties were retained in the effect estimate and statistic.
 
-Gene-level p-values were converted to Storey q-values with the plug-in estimate of π0 at fixed λ=0.5 and threshold q<0.10 <!-- N-05 -->. We fixed λ before analysis rather than selecting it adaptively from strongly dependent, co-expressed tests; 0.5 was also the fixed value used throughout the calculations in Storey (2002). This choice was compatible with the working hypothesis of weak expression differences distributed across many genes, but it was not treated as proof of FDR control under arbitrary gene dependence. We therefore refer to “genes meeting the prespecified Storey q rule” and reserve the contrast-level existence statement for the Higher Criticism label-permutation result.
+Gene-level p-values were converted to Storey q-values with the plug-in estimate of π0 at fixed λ=0.5 and threshold q<0.10 <!-- N-05 -->. We fixed λ before analysis rather than selecting it adaptively from strongly dependent, co-expressed tests; 0.5 was also the fixed value used throughout the calculations in Storey (2002). This choice was compatible with the working hypothesis of weak expression differences distributed across many genes, but it was not treated as proof of FDR control under arbitrary gene dependence. We therefore refer to “genes meeting the prespecified Storey q rule” and reserve the contrast-level existence statement for the Higher Criticism label-permutation result. Complete per-gene results for every tested gene in each contrast are provided in Supplementary Data 2.
 
 ### Contrast-level omnibus inference
 
@@ -150,7 +150,7 @@ The lower-expression list was concentrated in a recurring, overlapping theme inv
 
 ### Sex-chromosome annotation of the RET-tumor list
 
-Among the 1,765 RET-tumor genes meeting the prespecified Storey q<0.10 rule, 57 were X-linked: 36 were expressed more highly and 21 less highly in High-AS cases; no Y-linked gene met the rule <!-- N-82 -->. The 15,621 genes tested in the contrast included 572 X-linked and two Y-linked genes <!-- N-82 -->. These counts were descriptive; no enrichment test was performed, and they do not exclude sex-related expression structure.
+Among the 1,765 RET-tumor genes meeting the prespecified Storey q<0.10 rule (Supplementary Data 2), 57 were X-linked: 36 were expressed more highly and 21 less highly in High-AS cases; no Y-linked gene met the rule <!-- N-82 -->. The 15,621 genes tested in the contrast included 572 X-linked and two Y-linked genes <!-- N-82 -->. These counts were descriptive; no enrichment test was performed, and they do not exclude sex-related expression structure.
 
 ### REO pair construction
 
