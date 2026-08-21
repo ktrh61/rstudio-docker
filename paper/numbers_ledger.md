@@ -493,3 +493,14 @@
   processed/thyr_deg_ora_annotation.rds の $table(18,576 行)は全セット×3リストを保持して
   おり(GPT レビューの「未保存」評価は誤り)、table_s3_ora_annotation.csv を出力、
   family×list の q<0.10 員数は N-59 と全一致。gpt_review/supplementary_files が全品目完備に
+- 2026-08-21: **図表出力の整合検査(全品目)**: S1 = 両分類とも合計 440 ✓/S2 = 群構成
+  12/15・27/9 ✓/S4 = 10 行(表の shift 範囲 2.641–4.700 は最終10ペアのもの — 本文の
+  1.159–4.700 は適格153ペア = N-36 で別物・無矛盾)/S5 = edgeR 4.8.2・limma 3.66.0・
+  msigdbr 26.1.0 ✓/S6 = 16 セル・min q 0.114・セット数 6,141–6,242 ✓/S7 = Σ発見 102・
+  B_Normal/H 0.18 [0.110–0.270] 等セル値一致 ✓/S8 = N-33/N-34 と完全一致 ✓/Data1 =
+  24,798 行 = 4対比セット数の総和 ✓/図 S1/S2 は output/figures と md5 同一 ✓/S4 凍結
+  ソース(output/reo_panel.csv)実在 ✓。**発見・修正1件**: 表1キャプションが relative
+  purity を約束していたが凍結済み表体(tab_case_characteristics.csv)に純度列がない —
+  キャプションから削除(純度中央値は本文 N-88 が担う)。表に純度列を足す再作表は
+  研究者オプションとして残す。**表S3 をスクリプト化**(tables/supp_tab_ora_annotation.R —
+  出力は組版コピーと diff 同一)、manifest の TabS3 行を実体へ更新

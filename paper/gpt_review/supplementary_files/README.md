@@ -8,7 +8,7 @@ This directory contains submission-assembly copies made from frozen analysis out
 | Figure S2 | `figure_s2_set_level_null_calibration.png` | `figures/fig_d6_calibration.R` | Available |
 | Table S1 | `table_s1_cohort_composition.csv` | `tables/tab_cohort_composition.R` | Available |
 | Table S2 | `table_s2_normalization_diagnostics.csv` | `tables/supp_tab_normalization_diagnostics.R` | Available |
-| Table S3 | table_s3_ora_annotation.csv | processed/thyr_deg_ora_annotation.rds(`$table`、18,576 行 = 6,192 セット × 3 リスト) | 2026-08-21 作表。family×list の q<0.10 員数は N-59(0/0/0/0・12/105/205/7・6/37/71/2)と全一致を確認済み |
+| Table S3 | `table_s3_ora_annotation.csv` | `tables/supp_tab_ora_annotation.R`(processed/thyr_deg_ora_annotation.rds の $table、18,576 行) | 2026-08-21 作表・スクリプト化。q<0.10 員数は N-59 と全一致、スクリプト出力と本ファイルは diff 同一 |
 | Table S4 | `table_s4_reo_panel.csv` | Frozen `output/reo_panel.csv` from `scripts/510_select_reo_pairs.R` | Available |
 | Table S5 | `table_s5_software_versions.csv` | `tables/supp_tab_package_versions.R` | Available |
 | Table S6 | `table_s6_gene_set_summary.csv` | `tables/tab_set_level_summary.R` | Available |
