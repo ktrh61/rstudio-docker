@@ -161,6 +161,9 @@
 | N-86 | R_Tumor との重なり: 組織共有 = ATP5MF, MRPL52, NTHL1, URM1, USE1; 正常組織 = PXDN, S100A10, TESC; 腫瘍 = P2RY1, PLK2, EHD4 | N-85の遺伝子別内訳。正常組織署名の3件は組織横断、腫瘍署名の3件は組織対応。Ory署名は正常組織対比およびBRAF対比では k=0 | `diagnostics/output/external_gene_anchors.rds` の `$detail` | Results / Disc / Supp | verified |
 | N-87 | PC-OD flag(主4群): R_Sporadic/R_High/B_Sporadic は tumor・normal とも 0、B_High tumor 1(RET 層の主解析集合は不変) | 主コホート QC フラグの群別員数(Results 記述) | processed/thyr_case_outliers.rds(集計 = paper/gpt_review/additional_pcod_flag_counts.csv、追加監査 2026-08-19 実行記録つき)| Results 1 | draft(C3 で rds 直読照合) |
 | N-88 | 主解析 R 系の相対純度中央値: R_Sporadic 0.783 / R_High 0.822(主コホート解析オブジェクト由来 — REO 全帯プール尺度 N-44 とは別尺度で互換しない) | 主コホートの純度記述(Results 記述) | processed/thyr_analysis_cohorts.rds(集計 = paper/gpt_review/additional_covariate_summary.csv、追加監査 2026-08-19)| Results 1 | draft(C3 で rds 直読照合) |
+| N-89 | GDC 入力の固定: open-access STAR-Counts 906 ファイル、照会 2026-07-23 と 2026-08-09 で byte-identical、manifest md5 7defb0c5574453474c67dfac8367a589 | GDC manifest の保全(Supp Methods) | paper/gpt_review/gdc_manifest_rebc_thyr_star_counts.tsv(コミット 095699b。md5 と 906 行は 2026-08-21 に実測照合済み)| Supp Methods | verified |
+| N-90 | 開発期 complete-null 評価(999-shuffle 池): pooled tail-ratio 0.140 / 再標準化 0.221・最悪セル 0.44、per-set BH 0.045(採用) | セットレベル手続き選定の来歴(Supp Methods) | 計画v2 B.1(0.140/0.221/0.045)。0.44 の一次出典は開発期 D6 記録 — 要照合 | Supp Methods | draft(0.44 照合を C3 で) |
+| N-91 | REO Mid-Low 検定の MC 規模: 完全枚挙 C(36,17)=8,597,496,600 のため 999,999 回モンテカルロ(シード 19860426、plus-one) | REO 検定の実装定数(Supp Methods) | lib/stat_brunnermunzel.R:411(B=999999L)+ 530 実行記録(要照合)。組合せ数は算術確認済み | Supp Methods | draft(530 実効値照合を C3 で) |
 
 ### M. D6 較正の派生値・採用時測定(執筆用、2026-08-12 追加)
 
