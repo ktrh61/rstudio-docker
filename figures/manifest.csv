@@ -16,3 +16,4 @@ TabS6,tables/tab_set_level_summary.R,output/tables/tab_set_level_summary.csv,pro
 TabS7,tables/tab_set_level_summary.R,output/tables/tab_set_level_calibration.csv,provisional,gsea_null_calibration.rds,Results 3; Supp Methods
 TabS8,tables/supp_tab_concordance.R,output/tables/supp_tab_concordance.csv,provisional,signature_agreement.rds,Results 5; Discussion
 Data1,tables/supp_data_420_full.R,output/tables/supp_data_420_full.csv,provisional,thyr_enrichment_test.rds,Results 3
+Data2,tables/supp_data_gene_level_full.R,output/tables/supp_data_gene_level_full.csv,provisional,thyr_expression_test.rds;thyr_se_raw.rds,Results 2

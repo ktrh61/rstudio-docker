@@ -195,3 +195,5 @@ Five of the 39 Ory shared-tissue signature genes tested in each contrast occurre
 **Table S8 | Between-stratum concordance of signed gene-level statistics.** Normal-tissue and tumor-tissue comparisons are shown separately with the paired contrasts, number of shared genes, Spearman correlation, central 95% label-shuffle interval, two-sided shuffle p-value, and number of shuffles.
 
 **Supplementary Data 1 | Complete label-permutation gene-set results.** All tested sets are provided for each contrast and collection with set size, enrichment score, normalized enrichment score, permutation p-value, within-collection Benjamini–Hochberg q-value, redundancy annotation, and leading-edge genes.
+
+**Supplementary Data 2 | Complete gene-level results.** For every tested gene in each of the four contrasts, the file provides the Ensembl identifier, gene symbol, Brunner–Munzel relative effect θ, exact permutation p-value, and Storey q-value <!-- N-15, N-16 -->. The complete listing supports cross-referencing by later studies and reanalysis at thresholds other than the reported q<0.10 rule.

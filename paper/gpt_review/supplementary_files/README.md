@@ -15,5 +15,6 @@ This directory contains submission-assembly copies made from frozen analysis out
 | Table S7 | `table_s7_complete_null_calibration.csv` | `tables/tab_set_level_summary.R` | Available |
 | Table S8 | `table_s8_between_stratum_concordance.csv` | `tables/supp_tab_concordance.R` | Available |
 | Supplementary Data 1 | `supplementary_data_1_set_level_results.csv` | `tables/supp_data_420_full.R` | Available |
+| Supplementary Data 2 | `supplementary_data_2_gene_level_results.csv` | `tables/supp_data_gene_level_full.R`(62,952 行 = 全検定遺伝子×4対比) | 2026-08-21 作表。行数 = N-15・q<0.10 員数 = N-16・BHLHB9 = N-22 と全一致 |
 
 The legends are collected in `../supplementary_results_for_5000_word_version.md`. Table S3 was exported from the final ORA result object on 2026-08-21 and checked against the reported family-by-list counts. The image and table files in this directory are not a journal-formatted combined supplement; they are the mapped source files for that assembly step.
