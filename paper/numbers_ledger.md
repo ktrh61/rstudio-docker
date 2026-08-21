@@ -525,3 +525,8 @@
   データ1(セットレベル全開示)の遺伝子レベル対応物 — 非2値化・R(α) 保持の方針と整合し、
   後続研究の照合(本研究が Abend/Dom/Ory に行った形)を可能にする。manifest Data2 行・
   Supp 凡例・Results §2 参照・組版コピーを追加
+- 2026-08-21: Abstract を 200→194 語へ短縮(研究者 Go — BJC 計数器の揺らぎに対する余裕確保):
+  4 修正 = IREP 文の語順統合("with NIH IREP" を前置修飾へ)/panel 並列の "and"→カンマ/
+  REO 文の "medians" を括弧外主語へ移動/Background 対比を "high estimated radiation-attribution
+  ... cases" の複合修飾へ。限定句差分検査 = 脱落なし(estimated・radiation・descriptive・
+  unchanged・"ordinal banding only"・construction anchors 全維持)。N タグ(N-15/16/20/41)不変

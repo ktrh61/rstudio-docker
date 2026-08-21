@@ -11,15 +11,15 @@
 
 ### Background
 
-Radiation dose is associated with fusion rather than point-mutation drivers in post-Chernobyl papillary thyroid carcinoma, while driver composition structures expression. We asked whether expression differed between cases with high estimated radiation attribution and dose-zero cases within driver-defined groups.
+Radiation dose is associated with fusion rather than point-mutation drivers in post-Chernobyl papillary thyroid carcinoma, while driver composition structures expression. We asked whether expression differed between high estimated radiation-attribution and dose-zero cases within driver-defined groups.
 
 ### Methods
 
-We calculated Assigned Share (AS) with NIH IREP for ordinal banding only. We stratified by tumor driver (RET fusion or BRAF V600E) and compared expression between High-AS and dose-zero cases in tumor and matched normal tissue; the RET fusion-positive tumor comparison was primary. We used permutation Brunner–Munzel tests, Higher Criticism, label-permutation gene-set inference, and a relative-expression-ordering (REO) panel constructed on extreme bands and applied unchanged to intermediate bands.
+We calculated NIH IREP Assigned Share (AS) for ordinal banding only. We stratified by tumor driver (RET fusion or BRAF V600E) and compared expression between High-AS and dose-zero cases in tumor and matched normal tissue; the RET fusion-positive tumor comparison was primary. We used permutation Brunner–Munzel tests, Higher Criticism, label-permutation gene-set inference, and a relative-expression-ordering (REO) panel constructed on extreme bands, applied unchanged to intermediate bands.
 
 ### Results
 
-In RET fusion-positive PTCs, 1,765 of 15,621 genes met Storey q<0.10 <!-- N-16, N-15 -->, with omnibus p=0.0112 <!-- N-20 -->; other contrasts lacked concordant gene- and contrast-level evidence. No permutation gene set met q<0.10, whereas over-representation analysis highlighted cell-cycle and DNA-repair annotations among genes expressed less in High-AS cases. The REO score showed an ordered descriptive profile across bands (dose-zero/Low-AS/Mid-AS/High-AS medians, 0/1/4/6 <!-- N-41 -->), with the extremes as construction anchors.
+In RET fusion-positive PTCs, 1,765 of 15,621 genes met Storey q<0.10 <!-- N-16, N-15 -->, with omnibus p=0.0112 <!-- N-20 -->; other contrasts lacked concordant gene- and contrast-level evidence. No permutation gene set met q<0.10, whereas over-representation analysis highlighted cell-cycle and DNA-repair annotations among genes expressed less in High-AS cases. REO score medians showed an ordered descriptive profile across bands (dose-zero/Low-AS/Mid-AS/High-AS, 0/1/4/6 <!-- N-41 -->), with the extremes as construction anchors.
 
 ### Conclusions
 
