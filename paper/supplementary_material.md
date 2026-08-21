@@ -8,7 +8,7 @@
 
 ### Data sources and expression matrix
 
-On 9 August 2026, we queried the National Cancer Institute (NCI) Genomic Data Commons (GDC) API for open-access files in project REBC-THYR with data category Transcriptome Profiling, experimental strategy RNA-Seq, data type Gene Expression Quantification, and workflow type STAR - Counts. The query returned 906 released files. Its manifest was byte-identical to one generated on 23 July 2026 (manifest MD5, 7defb0c5574453474c67dfac8367a589) <!-- N-89 -->. The complete query manifest contained the file UUIDs, names, sizes, and GDC-provided MD5 checksums; we verified every downloaded file against its recorded checksum.
+On 9 August 2026, we queried the National Cancer Institute (NCI) Genomic Data Commons (GDC) API for open-access files in project REBC-THYR with data category Transcriptome Profiling, experimental strategy RNA-Seq, data type Gene Expression Quantification, and workflow type STAR - Counts. The query returned 906 released files <!-- N-89 -->. Its manifest was byte-identical to one generated on 23 July 2026 (manifest MD5, 7defb0c5574453474c67dfac8367a589) <!-- N-89 -->. The complete query manifest contained the file UUIDs, names, sizes, and GDC-provided MD5 checksums; we verified every downloaded file against its recorded checksum.
 
 Clinical data came from Data S1 of Morton et al. (2021), which we read with all columns retained and without editing any values. We converted missing markers to NA and typed a column as numeric only when every non-missing value parsed as numeric.
 
@@ -154,13 +154,13 @@ Among the 1,765 RET-tumor genes meeting the prespecified Storey q<0.10 rule, 57 
 
 ### REO pair construction
 
-The top-500 construction ranking contained 318 genes expressed more highly and 182 expressed less highly in High-AS RET fusion-positive PTCs. One higher-expression gene had zero TPM in at least one construction sample and therefore failed the finite-log2-TPM requirement, leaving 317 higher- and 182 lower-expression genes eligible for pairing. Of their 57,694 cross-direction pairs, 153 met all prespecified stability, separation, and reversal criteria <!-- N-35 -->. Across these qualifying pairs, the absolute shift in median within-sample log2-TPM difference ranged from 1.159 to 4.700, and the High-AS reversal rate ranged from 0.53 to 0.87 <!-- N-36 -->. Greedy selection with the prespecified gene-reuse and redundancy restrictions produced the final 10-pair panel. The maximum reversal score among dose-zero construction cases was 2; consequently, scores greater than 2 were classified as positive (Table S4) <!-- N-38 -->.
+The top-500 construction ranking contained 318 genes expressed more highly and 182 expressed less highly in High-AS RET fusion-positive PTCs <!-- N-35 -->. One higher-expression gene had zero TPM in at least one construction sample and therefore failed the finite-log2-TPM requirement, leaving 317 higher- and 182 lower-expression genes eligible for pairing. Of their 57,694 cross-direction pairs, 153 met all prespecified stability, separation, and reversal criteria <!-- N-35 -->. Across these qualifying pairs, the absolute shift in median within-sample log2-TPM difference ranged from 1.159 to 4.700, and the High-AS reversal rate ranged from 0.53 to 0.87 <!-- N-36 -->. Greedy selection with the prespecified gene-reuse and redundancy restrictions produced the final 10-pair panel. The maximum reversal score among dose-zero construction cases was 2; consequently, scores greater than 2 were classified as positive (Table S4) <!-- N-38 -->.
 
 The construction-band classifications and intermediate-band results are reported in the main text. Their interpretation remains asymmetric: construction-band separation establishes that the selected panel represents its source contrast but is not an unbiased estimate of classification performance; application to Low-AS and Mid-AS cases did not constitute independent external validation.
 
 ### Ancillary REO quality and purity diagnostics
 
-The ancillary PC-OD screen identified no outliers among the intermediate-band tumors (Low-AS, 0/17; Mid-AS, 0/19) <!-- N-43 -->. Independently of this result, the screen was non-exclusionary, and all 36 tumors remained in the REO application.
+The ancillary PC-OD screen identified no outliers among the intermediate-band tumors (Low-AS, 0/17; Mid-AS, 0/19) <!-- N-43 -->. Independently of this result, the screen was non-exclusionary, and all 36 tumors remained in the REO application <!-- N-10 -->.
 
 Relative purity could be estimated for 15 Low-AS and 16 Mid-AS tumors <!-- N-44 -->; two Low-AS and three Mid-AS tumors lacked the matched normal assay required by the pair-based estimator and remained in the REO analysis without a purity score. In the pooled paired RET purity run, median relative-purity scores were 0.690, 0.704, 0.739, and 0.814 in the dose-zero, Low-AS, Mid-AS, and High-AS bands, respectively <!-- N-44 -->. This diagnostic refitted the relative scale across all paired RET bands and is therefore not numerically interchangeable with the main-cohort purity scale.
 
@@ -178,7 +178,7 @@ Five of the 39 Ory shared-tissue signature genes tested in each contrast occurre
 
 **Figure S2 | Held-out complete-null calibration of the gene-set procedure.** Each row shows, for one contrast-by-collection cell, the proportion of 100 held-out label-shuffle pseudo-observations that produced at least one discovery at q<0.10. Error bars are descriptive 95% Clopper–Pearson intervals, and the dashed line marks the nominal 0.10 level. Because pseudo-observations within a cell shared the same null pool, the intervals do not account for their dependence.
 
-**Table S1 | Cohort composition by molecular classification, AS band, and sample pairing.** Counts are shown for all 440 cases using both the detailed driver classification and the broader driver-group classification. For each AS band, the table gives total, paired, and unpaired counts; absent combinations are displayed as zero.
+**Table S1 | Cohort composition by molecular classification, AS band, and sample pairing.** Counts are shown for all 440 <!-- N-11 --> cases using both the detailed driver classification and the broader driver-group classification. For each AS band, the table gives total, paired, and unpaired counts; absent combinations are displayed as zero.
 
 **Table S2 | Expression filtering and DEGES-MUREN normalization diagnostics by contrast.** The table reports group sizes, the number of protein-coding genes before and after `filterByExpr`, the number of DEGES iterations, the third-iteration screening π0 estimate and Jaccard index, and the range of final normalization factors.
 
