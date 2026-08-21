@@ -160,7 +160,7 @@
 | N-85 | Ory 2026 多変量署名12セル中9で k=0。非ゼロは全て R_Tumor: 組織共有署名 5/39、正常組織署名 3/40(組織横断)、腫瘍署名 3/46(組織対応)。元リストは50/45/64遺伝子。SPEN-AS1・MCTS2・SNORD47はGENCODE v36に対応せず、他の分母差は対比別検定集合への残存差による | Ory 2026 Supplementary Tables S2/S4/S6 と各対比 DEG 集合(q<0.10)の記述的員数照合。濃縮検定ではない | `diagnostics/ory2026_gene_signatures.csv`; `diagnostics/external_gene_anchors.R`; `diagnostics/output/external_gene_anchors.rds` の `$resolution`, `$summary` | Methods / Results / Disc / Supp | verified |
 | N-86 | R_Tumor との重なり: 組織共有 = ATP5MF, MRPL52, NTHL1, URM1, USE1; 正常組織 = PXDN, S100A10, TESC; 腫瘍 = P2RY1, PLK2, EHD4 | N-85の遺伝子別内訳。正常組織署名の3件は組織横断、腫瘍署名の3件は組織対応。Ory署名は正常組織対比およびBRAF対比では k=0 | `diagnostics/output/external_gene_anchors.rds` の `$detail` | Results / Disc / Supp | verified |
 | N-87 | PC-OD flag(主4群): R_Sporadic/R_High/B_Sporadic は tumor・normal とも 0、B_High tumor 1(RET 層の主解析集合は不変) | 主コホート QC フラグの群別員数(Results 記述) | processed/thyr_case_outliers.rds(集計 = paper/gpt_review/additional_pcod_flag_counts.csv、追加監査 2026-08-19 実行記録つき)| Results 1 | verified(2026-08-21 rds 直読: B_High tumor 1・他は3群×2組織すべて0) |
-| N-88 | 主解析 R 系の相対純度中央値: R_Sporadic 0.783 / R_High 0.822(主コホート解析オブジェクト由来 — REO 全帯プール尺度 N-44 とは別尺度で互換しない) | 主コホートの純度記述(Results 記述) | processed/thyr_analysis_cohorts.rds(集計 = paper/gpt_review/additional_covariate_summary.csv、追加監査 2026-08-19)| Results 1 | verified(2026-08-21 rds 直読: Sporadic 0.783 (n=12)・High 0.822 (n=15)) |
+| N-88 | 主解析の相対純度中央値(driver コホート別の相対尺度・層内でのみ比較可能): R_Sporadic 0.783 (n=12) / R_High 0.822 (n=15) / B_Sporadic 0.836 (n=27) / B_High 0.922 (n=9)(主コホート解析オブジェクト由来 — REO 全帯プール尺度 N-44 とは別尺度で互換しない) | 主コホート4群の純度開示(表1脚注) | processed/thyr_analysis_cohorts.rds(R 系集計 = paper/gpt_review/additional_covariate_summary.csv とも一致)| Table 1 footnote | verified(2026-08-21 rds 直読: 4群全て) |
 | N-89 | GDC 入力の固定: open-access STAR-Counts 906 ファイル、照会 2026-07-23 と 2026-08-09 で byte-identical、manifest md5 7defb0c5574453474c67dfac8367a589 | GDC manifest の保全(Supp Methods) | paper/gpt_review/gdc_manifest_rebc_thyr_star_counts.tsv(コミット 095699b。md5 と 906 行は 2026-08-21 に実測照合済み)| Supp Methods | verified |
 | N-91 | REO Mid-Low 検定の MC 規模: 完全枚挙 C(36,17)=8,597,496,600 のため 999,999 回モンテカルロ(シード 19860426、plus-one) | REO 検定の実装定数(Supp Methods) | lib/stat_brunnermunzel.R:411(B=999999L 既定)+ scripts/530:75-77(method="auto"・B 未指定 → 既定適用。auto は C(36,17) 枚挙不能で MC 選択)。組合せ数は算術確認済み | Supp Methods | verified(コード水準。実行ログ照合は run 記録に委ねる) |
 
@@ -515,3 +515,7 @@
   図1 の枝は「REO application set」へ。**図2サブタイトルに残存していた旧凍結文言
   ("fixed before the reported results existed")を図から除去**(事前固定の主張は
   キャプション・本文が担う — 図内に凍結文を持たせない方針)。3図とも目視検証済み
+- 2026-08-21: 表1の純度開示を脚注方式で完成(研究者 Go — 列追加は尺度混在のため不採用):
+  B 系の主コホート純度中央値を rds 直読で算出(B_Sporadic 0.836 (n=27)・B_High 0.922 (n=9))し
+  N-88 を4群へ拡張。表1脚注に「driver コホート別相対尺度・層内でのみ比較可能」の注記つきで
+  4群中央値を記載、Results の純度文は脚注へ移動(本文 −16語)、キャプションに脚注参照を復帰
