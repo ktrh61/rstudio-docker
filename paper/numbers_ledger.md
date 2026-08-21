@@ -163,6 +163,7 @@
 | N-88 | 主解析の相対純度中央値(driver コホート別の相対尺度・層内でのみ比較可能): R_Sporadic 0.783 (n=12) / R_High 0.822 (n=15) / B_Sporadic 0.836 (n=27) / B_High 0.922 (n=9)(主コホート解析オブジェクト由来 — REO 全帯プール尺度 N-44 とは別尺度で互換しない) | 主コホート4群の純度開示(表1脚注) | processed/thyr_analysis_cohorts.rds(R 系集計 = paper/gpt_review/additional_covariate_summary.csv とも一致)| Table 1 footnote | verified(2026-08-21 rds 直読: 4群全て) |
 | N-89 | GDC 入力の固定: open-access STAR-Counts 906 ファイル、照会 2026-07-23 と 2026-08-09 で byte-identical、manifest md5 7defb0c5574453474c67dfac8367a589 | GDC manifest の保全(Supp Methods) | paper/gpt_review/gdc_manifest_rebc_thyr_star_counts.tsv(コミット 095699b。md5 と 906 行は 2026-08-21 に実測照合済み)| Supp Methods | verified |
 | N-91 | REO Mid-Low 検定の MC 規模: 完全枚挙 C(36,17)=8,597,496,600 のため 999,999 回モンテカルロ(シード 19860426、plus-one) | REO 検定の実装定数(Supp Methods) | lib/stat_brunnermunzel.R:411(B=999999L 既定)+ scripts/530:75-77(method="auto"・B 未指定 → 既定適用。auto は C(36,17) 枚挙不能で MC 選択)。組合せ数は算術確認済み | Supp Methods | verified(コード水準。実行ログ照合は run 記録に委ねる) |
+| N-92 | 取得照会日(2026-07-23・2026-08-09)はいずれも GDC Data Release 45.0(2025-12-04 公開)の期間内。次リリース 46.0 は 2026-08-10 公開で、45.0 と 46.0 の間に中間リリースなし。取得時にリリース番号のログはなく、帰属はリリースノートの日付照合による(計算なしの文書事実) | GDC データ状態の版明示(Supp Methods) | https://docs.gdc.cancer.gov/Data/Release_Notes/Data_Release_Notes/(照合 2026-08-21)。版固定原典 = NCI-GDC/gdc-docs コミット 6d9a957fd50d5c349e5b94201874837de0a75939 の docs/Data/Release_Notes/Data_Release_Notes.md(45.0/46.0/44.0 の Release Date を逐語確認) | Supp Methods | verified(2026-08-21 原文照合) |
 
 ### M. D6 較正の派生値・採用時測定(執筆用、2026-08-12 追加)
 
@@ -541,3 +542,10 @@
   Software 小節名参照へ付替、Software 小節末尾の open-access 重複文は新小節へ統合)。
   批准内容の全要素は紙面に存続 — 変更は本文/Supp の配分のみ。ERC Declarations 短縮形
   (2026-08-18)は不変、submission_declarations の転記先メモを同期
+- 2026-08-21: N-92 新設+Supp Methods(Data sources)へ GDC Data Release 45.0 の1文追記
+  (研究者 Go — 身内指摘を受けた版明示。取得日だけでは後年の再照会が別リリースに当たるため):
+  紙面は最小形(45.0 と公開日のみ)、検証装置(46.0 の日付・中間リリース不在・帰属根拠 =
+  日付照合)は N-92 が保持。46.0 での再照会は不実施(結果がどの決定にも影響しないため —
+  sensitivity-column 試金石)。私的保存(PDF 等)は不採用 — 原典が版固定で公開されている
+  (gdc-docs コミット固定パーマリンク、出典列に記載)。凍結 manifest md5 との役割分担 =
+  リリース番号は状態識別子、md5 は内容固定

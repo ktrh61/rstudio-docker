@@ -8,7 +8,7 @@
 
 ### Data sources and expression matrix
 
-On 9 August 2026, we queried the National Cancer Institute (NCI) Genomic Data Commons (GDC) API for open-access files in project REBC-THYR with data category Transcriptome Profiling, experimental strategy RNA-Seq, data type Gene Expression Quantification, and workflow type STAR - Counts. The query returned 906 released files <!-- N-89 -->. Its manifest was byte-identical to one generated on 23 July 2026 (manifest MD5, 7defb0c5574453474c67dfac8367a589) <!-- N-89 -->. The complete query manifest contained the file UUIDs, names, sizes, and GDC-provided MD5 checksums; we verified every downloaded file against its recorded checksum.
+On 9 August 2026, we queried the National Cancer Institute (NCI) Genomic Data Commons (GDC) API for open-access files in project REBC-THYR with data category Transcriptome Profiling, experimental strategy RNA-Seq, data type Gene Expression Quantification, and workflow type STAR - Counts. The query returned 906 released files <!-- N-89 -->. Its manifest was byte-identical to one generated on 23 July 2026 (manifest MD5, 7defb0c5574453474c67dfac8367a589) <!-- N-89 -->. Both query dates fell within GDC Data Release 45.0 (released 4 December 2025) <!-- N-92 -->. The complete query manifest contained the file UUIDs, names, sizes, and GDC-provided MD5 checksums; we verified every downloaded file against its recorded checksum.
 
 Clinical data came from Data S1 of Morton et al. (2021), which we read with all columns retained and without editing any values. We converted missing markers to NA and typed a column as numeric only when every non-missing value parsed as numeric.
 
