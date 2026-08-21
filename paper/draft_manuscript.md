@@ -115,83 +115,42 @@ Pipeline design, the prototype scripts and all analytical and interpretive decis
 
 ## Results
 
-### 1. Cohort(C-10, C-15)
+<!-- 2026-08-21 C2 ポート: gpt_review 試案 Results を移植(タグ移植込み。N-87/N-88 は新設 draft 行 — C3 で照合)。写像検査同期は C4 -->
+### Cohort
 
-<!-- C-10 -->
-Of the 440 cases of the REBC-THYR cohort (Morton et al. 2021) <!-- N-11 -->, the main analysis cohort comprised 63 paired, driver-stratified cases — 9 B_High, 27 B_Sporadic, 15 R_High and 12 R_Sporadic <!-- N-09 --> — reached through the pre-specified flow of driver classification, band eligibility, pairing, outlier screening and purity thresholding (Table 1; Supplementary Table S1). Most of the reduction reflects the pre-specified eligibility restrictions — driver classification and the restriction to the extreme bands — rather than technical losses to pairing, outlier screening or purity; the full flow, stratified by driver, is shown in the Fig. 1 <!-- N-08 -->. The REO evaluation set added 36 paired RET tumors of the intermediate bands (17 R_Low, 19 R_Mid
-<!-- N-10 -->). In both driver strata the High group sat somewhat older at surgery than the Sporadic group <!-- N-12, N-13 -->.
-<!-- C-15 -->
-The three disclosed candidate confounders (Methods) are reported in Table 1: the per-group age distributions, with interval estimates of the between-group age difference as table footnotes (disclosed, not tested <!-- N-64, N-65 -->), and the per-group sex and fusion-partner compositions. Age at exposure exists only for exposed cases and admits no between-group comparison <!-- N-63 -->.
+<!-- C-10 --> Of 440 <!-- N-11 --> REBC-THYR cases, 63 <!-- N-08 --> met the main cohort definition (Fig. 1; Table 1; Table S1). The RET fusion-positive stratum contained 12 dose-zero cases (`R_Sporadic`) and 15 High-AS cases (`R_High`); the BRAF V600E-positive stratum contained 27 dose-zero cases (`B_Sporadic`) and nine High-AS cases (`B_High`) <!-- N-09 -->. Each contributed one tumor and one matched normal sample. Females comprised 10 of 12 dose-zero and 11 of 15 High-AS RET fusion-positive cases, compared with 23 of 27 and four of nine BRAF V600E-positive cases <!-- N-12, N-13 -->. RET fusion partners were CCDC6-RET in six and seven cases, NCOA4-RET in two and four, and other partners in four and four, respectively <!-- N-12 -->. Most attrition resulted from driver classification and restriction to the extreme bands rather than pairing, outlier screening, or purity filtering. PC-OD flagged no tumor or normal sample in the RET fusion-positive stratum and therefore did not alter the primary RET fusion-positive cohort. Its only flag among the four target groups was one High-AS BRAF V600E-positive tumor <!-- N-87 -->. The separate REO intermediate-band application set comprised 17 Low-AS and 19 Mid-AS RET fusion-positive PTCs <!-- N-10 -->.
 
-【訳】REBC-THYR コホート(Morton et al. 2021)の 440 症例 <!-- N-11 --> のうち、主解析コホートは、driver 分類・帯適格性・ペア有無・外れ値スクリーン・純度閾値という事前指定のフロー(表1; 補足表S1)を経た 63 のペア付き driver 層別症例 — B_High 9・B_Sporadic 27・R_High 15・R_Sporadic 12
-<!-- N-09 --> — である。削減の大半は事前指定の適格性制限 — driver 分類と両端帯への制限 — によるもので、ペア・外れ値スクリーン・純度による技術的損失ではない。フローの全体は driver 層別で図1に示す <!-- N-08 -->。REO 評価セットとして中間帯のペア付き RET 腫瘍 36 例(R_Low 17・R_Mid 19 <!-- N-10 -->)を加えた。いずれの driver 層でも High 群は Sporadic 群よりやや高い手術時年齢に分布した <!-- N-12, N-13 -->。開示対象の候補交絡因子3つ(Methods)は表1に報告する: 群別の年齢分布(群間年齢差の区間推定は表脚注 — 開示であって検定ではない <!-- N-64, N-65 -->)、および群別の性構成と融合パートナー構成。被曝時年齢は被曝症例にのみ定義され、群間比較は成立しない <!-- N-63 -->。
+High-AS cases were older at surgery than dose-zero cases by a Hodges–Lehmann estimate of 2.5 years in the RET stratum (95% confidence interval [CI], −1.0 to 6.0) and 8.0 years in the BRAF stratum (3.0 to 12.0) <!-- N-64, N-65, C-15 -->. Relative-purity medians in the RET stratum were 0.783 in dose-zero cases and 0.822 in High-AS cases <!-- N-88 -->. Sex and fusion-partner distributions are shown in Table 1. These descriptive estimates neither establish nor exclude confounding.
 
-### 2. Gene-level differential expression(C-01〜C-04, C-16, 410)
+### Gene-level and contrast-level results
 
-<!-- C-01 -->
-In R_Tumor — the contrast where the pre-specified interpretation map expects the signal — 1,765 of 15,621 tested genes differed between the High and Sporadic groups at Storey q < 0.10 <!-- N-16, N-15 -->, and the pre-specified contrast-level omnibus supported the presence of signal (Higher Criticism p = 0.0112
-<!-- N-20 -->) (Fig. 2, Supplementary Fig. S1, Table 3). <!-- C-02 --> The discovered genes ran in both directions: 971 higher and 794 lower in the exposed group <!-- N-17 -->. The sex-chromosome annotation of the discovered list (Methods) counted 57 X-linked genes among the 1,765 (36 higher, 21 lower in the exposed group) and no Y-linked gene; the contrast's tested genes include 572 X-linked and 2 Y-linked <!-- N-82 -->. <!-- C-03 --> In R_Normal no gene reached q < 0.10 and the
-omnibus lent no support (HC p = 0.3199) <!-- N-16, N-20 -->. <!-- C-04 --> B_Tumor likewise yielded no discovery (0 genes at q < 0.10; HC p = 0.1815)
-<!-- N-16, N-20 -->; under the pre-fixed reading this cell is direction-agnostic, and its quiet is not read as a specificity control. <!-- C-16 -->
-In B_Normal the evidence is reported as it stands, without a binary label: one gene crossed the gene-level threshold (BHLHB9 — an X-linked gene <!-- N-80 --> — effect 0.967, q = 0.013
-<!-- N-22 -->); the pre-specified primary omnibus gave HC p = 0.0773 <!-- N-20 --> while the descriptive max-statistic row reached p = 0.0125
-<!-- N-23 -->, and the contrast's π0 estimate (0.727) sat below those of the other two quiet contrasts (0.955, 0.943) <!-- N-19 -->. The reading pre-assigned
-to this pattern is taken up in Discussion.
+In the primary RET-tumor contrast, 1,765 of 15,621 tested genes met the prespecified Storey q<0.10 rule <!-- N-16, N-15 -->; 971 were expressed more highly and 794 less highly in the High-AS group <!-- N-17, C-02 -->. The prespecified Higher Criticism omnibus p-value was 0.0112 <!-- N-20 -->, providing contrast-level evidence of label-aligned expression structure rather than relying only on the size of the gene list (Fig. 2; Table 3; Fig. S1).
 
-【訳】事前指定の解釈マップがシグナルを期待する対比である R_Tumor では、検定対象 15,621 遺伝子のうち 1,765 が Storey q < 0.10 で High 群と Sporadic 群の間で発現差を示し <!-- N-16, N-15 -->、事前指定の対比レベル・オムニバスがシグナルの存在を支持した(Higher Criticism p = 0.0112 <!-- N-20 -->)(図2・補足図S1・表3)。発見遺伝子は双方向に分布した: 被曝群で高発現 971・低発現 794 <!-- N-17 -->。発見リストの性染色体注釈(Methods)では、1,765 遺伝子中 57 が X 連鎖(被曝群で高発現 36・低発現 21)、Y 連鎖は 0 だった。当該対比の検定遺伝子には X 連鎖 572・Y 連鎖 2 が含まれる <!-- N-82 -->。R_Normal では q < 0.10 の遺伝子はなく、オムニバスの支持もなかった(HC p = 0.3199)<!-- N-16, N-20 -->。B_Tumor も同様に発見なし(q < 0.10 は 0 遺伝子; HC p = 0.1815)<!-- N-16, N-20 --> — 事前固定の読みに従い、このセルは方向不可知であり、その静けさを特異性の対照とは読まない。B_Normal の証拠は2値ラベルなしにそのまま報告する: 1遺伝子が遺伝子レベル閾値を越え(BHLHB9 — X 連鎖遺伝子 <!-- N-80 --> — effect 0.967、q = 0.013 <!-- N-22 -->)、事前指定の主オムニバスは HC p = 0.0773
-<!-- N-20 -->、記述的な max 統計量行は p = 0.0125 <!-- N-23 -->、この対比の π0 推定値(0.727)は他の2つの静かな対比(0.955・0.943)より低かった <!-- N-19 -->。このパターンに
-事前割当された読みは Discussion で扱う。
+The three secondary contrasts gave different forms of limited evidence. RET-normal had no gene at q<0.10 and HC p=0.3199 <!-- N-16, N-20, C-03 -->. The BRAF-tumor contrast asked whether AS-band-associated tumor-expression structure was also detectable within BRAF V600E-positive PTCs; its direction was not prespecified, and it was not designed as a negative control. No gene met q<0.10, and the HC p-value was 0.1815 <!-- N-16, N-20 -->. These results established neither equivalence between the BRAF bands nor specificity of the RET-tumor finding <!-- C-04 -->. BRAF-normal had one gene at q<0.10, the X-linked BHLHB9 (relative effect 0.967, q=0.013) <!-- N-22 -->, while its contrast-level HC p-value was 0.0773 <!-- N-20 -->. A descriptive maximum-statistic p-value was 0.0125 <!-- N-23 -->. Its π0 estimate was 0.727, compared with 0.955 in RET-normal and 0.943 in BRAF-tumor <!-- N-19 -->. We report this divergence between gene-level and contrast-level evidence without assigning the contrast a binary label <!-- C-16 -->. Chromosome-level annotation of the reported gene lists is provided in Supplementary Results.
 
-### 3. Gene-set level(C-05, C-06, 420 + D6)
+### Gene sets and list annotation
 
-<!-- C-05 -->
-At the gene-set level, the calibrated test declared no set at q_bh < 0.10 in any of the 16 contrast × collection cells <!-- N-27 --> (four MSigDB collections, Methods; 6,141–6,242 sets per contrast after filtering <!-- N-28 -->). The smallest adjusted value anywhere was q = 0.114, in the B_Tumor × radiation cell <!-- N-28 --> (complete listing in Supplementary Data 1; Supplementary Table S6).
-<!-- C-06 -->
-Under signal-free inputs — label permutations pushed through the identical procedure (Methods) — the set-level machinery produced at least one discovery in 102 of 1,600 replicates pooled across the 16 contrast × collection cells (0.064; nominal 0.10 <!-- N-56 -->), with a single disclosed excess (B_Normal/Hallmark: 0.18, 95% CI 0.110–0.270 <!-- N-25 -->). Under the synthetic positive control — one Hallmark set inflated 1.15-fold in one group (Methods) — the planted set was recovered at rank 1 of 50 (q = 0.0101 <!-- N-31 -->), with no other set at q < 0.10 <!-- N-32 --> (per-cell calibration in Supplementary Fig. S2 and Supplementary Table S7).
+No set met q<0.10 in any of the 16 contrast-by-collection cells <!-- N-27, C-05 -->; the smallest adjusted value was 0.114 in the BRAF-tumor radiation-curated family <!-- N-28 --> (Table S6; Supplementary Data 1). In the complete-null assessment, at least one set was selected in 102 of 1,600 held-out contrast-by-collection replicates (descriptive pooled rate, 0.064) <!-- N-24, C-06 -->, while BRAF-normal/Hallmark had a cell-specific rate of 0.18 (descriptive 95% interval, 0.110–0.270 <!-- N-25 -->; Fig. S2; Table S7). These complete-null rates do not guarantee FDR control under partial alternatives. In the single positive-control scenario, the planted set ranked first among 50 Hallmark sets (q=0.0101) <!-- N-31 -->, and no other set met q<0.10 <!-- N-32 --> (Supplementary Results).
 
-【訳】遺伝子セットレベルでは、較正済み検定は 16 の対比 × collection セルのいずれでも q_bh < 0.10 のセットを宣言しなかった <!-- N-27 -->(MSigDB 4 コレクション、Methods 参照; フィルタ後は対比あたり 6,141–6,242 セット <!-- N-28 -->)。全セルで最小の調整値は B_Tumor × radiation セルの q = 0.114 だった <!-- N-28 -->(全結果は補足データ1・補足表S6)。シグナルなしの入力 — 同一手続きに通したラベル置換(Methods)— の下では、セットレベル機構は 16 の対比 × collection セル合算 1,600 レプリケート中 102 で1つ以上の発見を生じ(0.064; 名目 0.10 <!-- N-56 -->)、開示済みの超過は1セルのみだった(B_Normal/Hallmark: 0.18、95% CI 0.110–0.270 <!-- N-25 -->)。合成陽性対照 — 1つの Hallmark セットを一方の群で 1.15 倍(Methods)— の下では、埋め込んだセットが 50 中 rank 1(q = 0.0101
-<!-- N-31 -->)で回収され、それ以外に q < 0.10 のセットはなかった <!-- N-32 -->
-(セル別較正は補足図S2・補足表S7)。
+Under the separate gene-sampling reference, genes expressed less highly in High-AS RET fusion-positive PTCs were over-represented in proliferation, cell-cycle, and DNA-repair annotations, including E2F targets (46/199), G2M checkpoint (41/198) <!-- N-61 -->, and Reactome DNA repair (68/322) <!-- N-62 -->. Radiation-curated flags reflected the same cell-cycle theme rather than an independent theme <!-- N-60 -->. No family met the over-representation threshold among genes expressed more highly in High-AS RET fusion-positive PTCs (Table S3) <!-- N-59, C-14 -->. These annotations were hypothesis-generating and did not change the null result of the label-permutation gene-set analysis.
 
-### 4. Composition of the discovered list(C-14, 430)
+### Between-stratum concordance
 
-<!-- C-14 -->
-In the descriptive annotation of the discovered list (hypothesis-generating; Methods), the 794 genes lower in the exposed group were strongly concentrated in proliferation, cell-cycle and DNA-repair programs (E2F targets 46/199, G2M checkpoint 41/198, Reactome DNA repair 68/322 <!-- N-61, N-62 -->), a single theme that extends into the radiation-curated family, whose leading flagged sets are themselves cell-cycle genes responding to irradiation (46 of 126 in the down list, expected 6.4 <!-- N-60 -->). The 971 genes higher in the exposed group showed no such concentration in any curated family <!-- N-59 --> (full results in Supplementary Table S3).
+The RET-normal and BRAF-normal contrast profiles had Spearman rho=0.376 across 15,459 shared genes, within the shuffled reference interval of −0.46 to 0.46 (two-sided p=0.1199) <!-- N-34, C-07 -->. Because the RET-normal contrast itself showed no detectable structure, this prespecified comparison could not distinguish absence of a shared normal-tissue pattern from a shared pattern below the study's detection limit.
 
-【訳】発見済みリストの記述的注釈(仮説生成; Methods)では、被曝群で低発現の 794 遺伝子は増殖・細胞周期・DNA 修復プログラムに強く集中し(E2F targets 46/199・G2M checkpoint 41/198・Reactome DNA repair 68/322 <!-- N-61, N-62 -->)、この単一テーマは放射線キュレーション・ファミリーにも及ぶ — そこでフラグが立った上位セット自体が照射に応答する細胞周期遺伝子である(down リストで 126 中 46、期待 6.4 <!-- N-60 -->)。被曝群で高発現の 971 遺伝子には、どのファミリーにもそのような集中はなかった
-<!-- N-59 -->(全結果は補足表S3)。
+The corresponding tumor-profile comparison, included as a descriptive completion rather than a prespecified hypothesis test, gave rho=0.459 across 15,560 genes, outside its shuffled interval of −0.39 to 0.39 (p=0.0197; Table S8) <!-- N-33, C-17 -->. This pattern was compatible with either expression structure shared across driver backgrounds or covariates aligned with both exposure labels; it was therefore treated as hypothesis-generating.
 
-### 5. Between-stratum concordance of the exposure contrast(C-07, C-17)
+### REO construction and intermediate-band application
 
-<!-- C-07 -->
-The pre-specified between-stratum comparison in normal tissue — Spearman correlation, across strata, of the per-gene signed statistics of the exposure contrast — gave rho = +0.376 over 15,459 shared genes, inside its label-shuffle reference interval ([−0.46, +0.46]; two-sided p = 0.1199)
-<!-- N-34 -->. With no within-contrast signal in R_Normal <!-- N-16 -->, the pre-fixed reading applies: whether the two normal-tissue contrasts share an exposure trace is not identifiable here. <!-- C-17 --> The symmetric
-tumor-pair comparison, computed as a design completion, is reported in Supplementary Table S8 <!-- N-33 --> and taken up as hypothesis-generating in Discussion.
+<!-- C-08 --> Of 57,694 candidate pairs, 153 met the selection criteria <!-- N-35 --> and 10 formed the final panel <!-- N-37 --> (Table S4; Supplementary Results). The maximum reversal score among dose-zero construction cases was 2. At the resulting cutoff, all 12 dose-zero RET fusion-positive cases scored at or below it and 13 of 15 High-AS RET fusion-positive cases scored above it <!-- N-38 -->. This separation was expected because both extreme bands informed pair selection and the dose-zero cases set the cutoff; it was not treated as an estimate of classification performance.
 
-【訳】正常組織における事前指定の層間比較 — 曝露対比の遺伝子別符号付き統計量を層間で Spearman 相関 — は、共有 15,459 遺伝子で rho = +0.376 となり、ラベルシャッフルの参照区間([−0.46, +0.46]; 両側 p = 0.1199)の内側だった <!-- N-34 -->。R_Normal に対比内シグナルがない <!-- N-16 --> ため、事前固定の読みが適用される: 2つの正常組織対比が曝露痕跡を共有するか否かは、ここでは識別できない。対称補完として計算した腫瘍ペアの比較は補足表S8に報告し <!-- N-33 -->、Discussion で仮説生成として扱う。
+Applied unchanged, the construction-derived cutoff classified the Low-AS cases as nine negative and eight positive and the Mid-AS cases as eight negative and 11 positive <!-- N-42 -->. Graded-score medians were 0, 1, 4, and 6 across the dose-zero, Low-AS, Mid-AS, and High-AS bands (Fig. 3) <!-- N-41 -->. The prespecified Mid–Low comparison gave Pr(Low<Mid)=0.616 and one-sided p=0.1127 <!-- N-40 -->. This test left the directional difference between those bands uncertain; it did not test the shape of the four-band profile.
 
-### 6. REO grading(C-08, C-09, C-12, 510–530)
+No intermediate-band tumor was flagged by the ancillary PC-OD screen <!-- N-43, C-09 -->. The matched-pair purity estimator was available for 15 of 17 Low-AS and 16 of 19 Mid-AS cases <!-- N-44, N-10 -->; the other five cases had a tumor but no matched normal sample. Among the 31 tumors with purity scores, score and purity correlated at rho=0.538 <!-- N-45 -->; band–score rho was 0.142, and the partial Spearman coefficient after adjustment for purity rank was 0.146 (descriptive one-sided permutation p=0.2162) <!-- N-46, N-48, C-12 -->. Band and purity correlated at rho=0.036 <!-- N-48 -->. These ancillary diagnostics did not establish an AS-band effect independent of purity (Supplementary Results).
 
-<!-- C-08 -->
-Panel construction evaluated 57,694 candidate pairs from the training pool's 317 up- and 182 down-genes; 153 passed all criteria, with median r shifts of 1.159–4.700 and reversal rates 0.53–0.87 <!-- N-35, N-36 -->. The 10-pair REO panel separated its training groups as designed (all 12 R_Sporadic negative, 13 of 15 R_High positive; boundary at score > 2
-<!-- N-38, N-37 -->; panel composition in Supplementary Table S4 <!-- N-39 -->). Applied unchanged to the intermediate bands, the per-case reversal score rose in band order — medians 0 / 1 / 4 / 6 for Sporadic / Low / Mid / High <!-- N-41 --> (Fig. 3) — with R_Low classified 9 negative / 8 positive
-and R_Mid 8 / 11 <!-- N-42 -->. The one comparison available out of sample (Mid vs Low; direction pre-specified, Methods) gave one-sided Brunner–Munzel p = 0.1127, effect P(Low<Mid) = 0.616 <!-- N-40 -->. The graded profile is reported as a descriptive observation; no dose–response form is assumed or claimed.
-<!-- C-09 -->
-The outlier screen mirrored from training flagged no case in either evaluation band (0 of 17 and 0 of 19 <!-- N-43 -->); the screen carries no exclusion authority, and the evaluation was run once on all eligible cases.
-<!-- C-12 -->
-Within the evaluation bands the reversal score correlated with tumor purity (pooled Spearman +0.538 <!-- N-45 -->), while the band–score correlation was +0.142 and, conditioned on purity, +0.146 (partial Spearman; one-sided permutation p = 0.2162) <!-- N-48, N-46 -->; band and purity themselves were nearly uncorrelated (+0.036 <!-- N-48 -->). Purity-stratified comparisons are given in Supplementary <!-- N-47 -->.
+### External gene lists
 
-【訳】パネル構築では、訓練プールの up 317・down 182 遺伝子から 57,694 候補ペアを評価し、153 が全基準を通過した(中央値 r シフト 1.159–4.700、逆転率 0.53–0.87)<!-- N-35, N-36 -->。10 ペアの REO パネルは訓練群を設計どおり分離した(R_Sporadic は 12 例全て negative、R_High は 15 例中 13 が positive; 境界は score > 2 <!-- N-38, N-37 -->;パネル構成は補足表S4<!-- N-39 -->)。パネルを変更せず中間帯に適用すると、症例別の逆転スコアは帯順に上昇した — 中央値は Sporadic / Low / Mid / High で 0 / 1 / 4 / 6
-<!-- N-41 -->(図3)— 分類は R_Low が negative 9 / positive 8、R_Mid が 8 / 11 <!-- N-42 -->。out-of-sample で検査可能な唯一の比較(Mid 対 Low; 方向は事前指定、
-Methods 参照)は片側 Brunner–Munzel p = 0.1127、効果 P(Low<Mid) = 0.616 だった
-<!-- N-40 -->。この段階的プロファイルは記述的観察として報告し、線量反応の形は仮定も主張もしない。訓練側から鏡映した外れ値スクリーンはどちらの評価帯でも該当例を出さなかった(17 例中 0・19 例中 0 <!-- N-43 -->)— スクリーンは除外権限を持たず、評価は適格全例で一度だけ実施した。評価帯内では逆転スコアは腫瘍純度と相関し(pooled Spearman +0.538 <!-- N-45 -->)、帯–スコア相関は +0.142、純度を条件付けると +0.146(偏 Spearman; 片側置換 p = 0.2162)<!-- N-48, N-46 -->、帯と純度自体はほぼ無相関だった(+0.036 <!-- N-48 -->)。純度層別の比較は Supplementary に示す <!-- N-47 -->。
-
-### 7. External anchor cross-reference(C-13)
-
-<!-- C-13(事実側 — 読みは Discussion) -->
-Cross-referencing the externally validated radiation-associated gene lists (Methods) against each contrast's discovered genes returned zero overlap in 19 of 20 cells, including every tissue-matched cell <!-- N-53 -->. The single non-zero cell was cross-tissue: S100A10, from the Dom normal-tissue list, appeared among the R_Tumor discoveries, with direction opposite to the original report <!-- N-54 -->.
-
-【訳】外部で検証済みの放射線関連遺伝子リスト(Methods)を各対比の発見遺伝子と照合した結果、20 セル中 19 で重なりはゼロであり、組織対応のセルは全てゼロだった <!-- N-53 -->。唯一の非ゼロセルは組織対応外だった: Dom の正常組織リスト由来の S100A10 が R_Tumor の発見遺伝子に現れ、方向は原報告と逆であった <!-- N-54 -->。
+Among the 20 validated-anchor-by-contrast cells, 19 had no overlap. The sole overlap was cross-tissue: S100A10 from the Dom normal-tissue list occurred in the RET-tumor list with the direction opposite to the original report <!-- N-53, N-54, C-13 -->. Among the multivariate Ory signatures, five of 39 tested shared-tissue genes and three of 46 tested tumor-tissue genes occurred in the RET-tumor list. The Ory normal-tissue signature had no overlap with either normal-tissue contrast, but three of its 40 tested genes occurred in RET-tumor. No Ory signature overlapped a BRAF q<0.10 list <!-- N-85 -->. These membership counts were descriptive and were not enrichment tests (Supplementary Results).
 
 ## Discussion
 

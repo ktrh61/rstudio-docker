@@ -159,6 +159,8 @@
 | N-54 | S100A10: R_Tumor で effect 0.167(High 群で低発現)、p_exact 0.00208、q_storey 0.079、rank 233 | 検証済みアンカーで唯一の非ゼロセル(dom2012_normal × R_Tumor = 組織横断)。Dom 2012では被曝側正常組織で上方制御であり、組織側・方向とも原報告と一致しない | `diagnostics/output/external_gene_anchors.rds` の `$summary`, `$detail` | Results / Disc / Supp | verified |
 | N-85 | Ory 2026 多変量署名12セル中9で k=0。非ゼロは全て R_Tumor: 組織共有署名 5/39、正常組織署名 3/40(組織横断)、腫瘍署名 3/46(組織対応)。元リストは50/45/64遺伝子。SPEN-AS1・MCTS2・SNORD47はGENCODE v36に対応せず、他の分母差は対比別検定集合への残存差による | Ory 2026 Supplementary Tables S2/S4/S6 と各対比 DEG 集合(q<0.10)の記述的員数照合。濃縮検定ではない | `diagnostics/ory2026_gene_signatures.csv`; `diagnostics/external_gene_anchors.R`; `diagnostics/output/external_gene_anchors.rds` の `$resolution`, `$summary` | Methods / Results / Disc / Supp | verified |
 | N-86 | R_Tumor との重なり: 組織共有 = ATP5MF, MRPL52, NTHL1, URM1, USE1; 正常組織 = PXDN, S100A10, TESC; 腫瘍 = P2RY1, PLK2, EHD4 | N-85の遺伝子別内訳。正常組織署名の3件は組織横断、腫瘍署名の3件は組織対応。Ory署名は正常組織対比およびBRAF対比では k=0 | `diagnostics/output/external_gene_anchors.rds` の `$detail` | Results / Disc / Supp | verified |
+| N-87 | PC-OD flag(主4群): R_Sporadic/R_High/B_Sporadic は tumor・normal とも 0、B_High tumor 1(RET 層の主解析集合は不変) | 主コホート QC フラグの群別員数(Results 記述) | processed/thyr_case_outliers.rds(集計 = paper/gpt_review/additional_pcod_flag_counts.csv、追加監査 2026-08-19 実行記録つき)| Results 1 | draft(C3 で rds 直読照合) |
+| N-88 | 主解析 R 系の相対純度中央値: R_Sporadic 0.783 / R_High 0.822(主コホート解析オブジェクト由来 — REO 全帯プール尺度 N-44 とは別尺度で互換しない) | 主コホートの純度記述(Results 記述) | processed/thyr_analysis_cohorts.rds(集計 = paper/gpt_review/additional_covariate_summary.csv、追加監査 2026-08-19)| Results 1 | draft(C3 で rds 直読照合) |
 
 ### M. D6 較正の派生値・採用時測定(執筆用、2026-08-12 追加)
 
