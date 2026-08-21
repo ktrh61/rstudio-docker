@@ -107,7 +107,7 @@
 
 | N-ID | 値 | 定義 | 出典 | 使用箇所 | 状態 |
 | --- | --- | --- | --- | --- | --- |
-| N-30 | HALLMARK_ADIPOGENESIS 195 遺伝子 × 1.15 倍、B_Tumor High 群 9 検体 | spike-in の設計 | run/xeon_results/logs/spikein.log:1 キー「Spiked HALLMARK_ADIPOGENESIS (195 genes present) by 1.15x」 | Methods | verified |
+| N-30 | HALLMARK_ADIPOGENESIS 195 遺伝子 × 1.15 倍、B_Tumor High 群 9 検体 | spike-in の設計 | run/xeon_results/logs/spikein.log:1 キー「Spiked HALLMARK_ADIPOGENESIS (195 genes present) by 1.15x」 | Methods / Supp Methods | verified |
 | N-31 | NES 2.28、p 0.0002、q_bh 0.0101(H 50 セット中 rank 1)、q<0.10 で回収 TRUE | spike-in の回収 | 同 log:2 | Results / Supp | verified |
 | N-32 | 0 | spike 以外の Hallmark セットで q<0.10(偽陽性の余剰なし) | 同 log:3 キー「besides the spike at q<0.10: 0」 | Results / Supp | verified |
 
@@ -122,8 +122,8 @@
 
 | N-ID | 値 | 定義 | 出典 | 使用箇所 | 状態 |
 | --- | --- | --- | --- | --- | --- |
-| N-35 | \|effect−0.5\| 上位500は up 318 / down 182、全構築標本で finite log2 TPM を要求後は up 317 / down 182、全 cross-direction 57694 ペア中153ペアが全基準通過 | 510 候補選定 | `processed/thyr_expression_test.rds` の上位500直接照合 + scripts/510 の finite-gene screen + `processed/thyr_reo_candidate_pairs.rds`(153行); 旧 run/xeon_results/logs/510_select_reo_pairs.log:4-6 | Results | verified |
-| N-36 | median_diff [1.159, 4.700]、reversal_rate [0.53, 0.87] | 通過 153 ペアの範囲 | 同 log:7 | Results / Supp | verified |
+| N-35 | \|effect−0.5\| 上位500は up 318 / down 182、全構築標本で finite log2 TPM を要求後は up 317 / down 182、全 cross-direction 57694 ペア中153ペアが全基準通過 | 510 候補選定 | `processed/thyr_expression_test.rds` の上位500直接照合 + scripts/510 の finite-gene screen + `processed/thyr_reo_candidate_pairs.rds`(153行); 旧 run/xeon_results/logs/510_select_reo_pairs.log:4-6 | Results / Supp Results | verified |
+| N-36 | median_diff [1.159, 4.700]、reversal_rate [0.53, 0.87] | 通過 153 ペアの範囲 | 同 log:7 | Supp Results | verified |
 | N-37 | パネル 10 ペア、境界 = score > 2 を positive(閾値 = 訓練 Sporadic の最大逆転スコア; ログ表記 R0-based)| 520 パネル確定 | run/xeon_results/logs/520_finalize_reo_panel.log:7 「Selected panel pairs: 10」・log:9 「Boundary (R0-based)」 | Methods / Results | verified |
 | N-38 | 訓練分類: R0 12/12 negative、R1 13/15 positive(2 negative); score 範囲 R0 [0,2] / R1 [0,10] | 520 訓練成績 | 同 log:3-6(分類表)・log:8(score 範囲) | Results | verified |
 | N-39 | P1 DBH/PROM1、P2 ZNF560/CSTA、P3 CA4/CTHRC1、P4 ADRA2B/FCGR2B、P5 DNASE1L2/LOX、P6 PNMA8B/FCER1A、P7 CASKIN1/CD1C、P8 GPR62/IL13RA2、P9 NPAS1/PBK、P10 ICAM4/S100A8(up/down、median_diff 降順) | パネル 10 ペアの構成 | run/xeon_results/output/reo_panel.csv 全10行(二機バイト一致; Ensembl ID・median_diff・reversal_rate も同 CSV) | Tab(パネル構成) | verified |
@@ -159,18 +159,17 @@
 | N-54 | S100A10: R_Tumor で effect 0.167(High 群で低発現)、p_exact 0.00208、q_storey 0.079、rank 233 | 検証済みアンカーで唯一の非ゼロセル(dom2012_normal × R_Tumor = 組織横断)。Dom 2012では被曝側正常組織で上方制御であり、組織側・方向とも原報告と一致しない | `diagnostics/output/external_gene_anchors.rds` の `$summary`, `$detail` | Results / Disc / Supp | verified |
 | N-85 | Ory 2026 多変量署名12セル中9で k=0。非ゼロは全て R_Tumor: 組織共有署名 5/39、正常組織署名 3/40(組織横断)、腫瘍署名 3/46(組織対応)。元リストは50/45/64遺伝子。SPEN-AS1・MCTS2・SNORD47はGENCODE v36に対応せず、他の分母差は対比別検定集合への残存差による | Ory 2026 Supplementary Tables S2/S4/S6 と各対比 DEG 集合(q<0.10)の記述的員数照合。濃縮検定ではない | `diagnostics/ory2026_gene_signatures.csv`; `diagnostics/external_gene_anchors.R`; `diagnostics/output/external_gene_anchors.rds` の `$resolution`, `$summary` | Methods / Results / Disc / Supp | verified |
 | N-86 | R_Tumor との重なり: 組織共有 = ATP5MF, MRPL52, NTHL1, URM1, USE1; 正常組織 = PXDN, S100A10, TESC; 腫瘍 = P2RY1, PLK2, EHD4 | N-85の遺伝子別内訳。正常組織署名の3件は組織横断、腫瘍署名の3件は組織対応。Ory署名は正常組織対比およびBRAF対比では k=0 | `diagnostics/output/external_gene_anchors.rds` の `$detail` | Results / Disc / Supp | verified |
-| N-87 | PC-OD flag(主4群): R_Sporadic/R_High/B_Sporadic は tumor・normal とも 0、B_High tumor 1(RET 層の主解析集合は不変) | 主コホート QC フラグの群別員数(Results 記述) | processed/thyr_case_outliers.rds(集計 = paper/gpt_review/additional_pcod_flag_counts.csv、追加監査 2026-08-19 実行記録つき)| Results 1 | draft(C3 で rds 直読照合) |
-| N-88 | 主解析 R 系の相対純度中央値: R_Sporadic 0.783 / R_High 0.822(主コホート解析オブジェクト由来 — REO 全帯プール尺度 N-44 とは別尺度で互換しない) | 主コホートの純度記述(Results 記述) | processed/thyr_analysis_cohorts.rds(集計 = paper/gpt_review/additional_covariate_summary.csv、追加監査 2026-08-19)| Results 1 | draft(C3 で rds 直読照合) |
+| N-87 | PC-OD flag(主4群): R_Sporadic/R_High/B_Sporadic は tumor・normal とも 0、B_High tumor 1(RET 層の主解析集合は不変) | 主コホート QC フラグの群別員数(Results 記述) | processed/thyr_case_outliers.rds(集計 = paper/gpt_review/additional_pcod_flag_counts.csv、追加監査 2026-08-19 実行記録つき)| Results 1 | verified(2026-08-21 rds 直読: B_High tumor 1・他は3群×2組織すべて0) |
+| N-88 | 主解析 R 系の相対純度中央値: R_Sporadic 0.783 / R_High 0.822(主コホート解析オブジェクト由来 — REO 全帯プール尺度 N-44 とは別尺度で互換しない) | 主コホートの純度記述(Results 記述) | processed/thyr_analysis_cohorts.rds(集計 = paper/gpt_review/additional_covariate_summary.csv、追加監査 2026-08-19)| Results 1 | verified(2026-08-21 rds 直読: Sporadic 0.783 (n=12)・High 0.822 (n=15)) |
 | N-89 | GDC 入力の固定: open-access STAR-Counts 906 ファイル、照会 2026-07-23 と 2026-08-09 で byte-identical、manifest md5 7defb0c5574453474c67dfac8367a589 | GDC manifest の保全(Supp Methods) | paper/gpt_review/gdc_manifest_rebc_thyr_star_counts.tsv(コミット 095699b。md5 と 906 行は 2026-08-21 に実測照合済み)| Supp Methods | verified |
-| N-90 | 開発期 complete-null 評価(999-shuffle 池): pooled tail-ratio 0.140 / 再標準化 0.221・最悪セル 0.44、per-set BH 0.045(採用) | セットレベル手続き選定の来歴(Supp Methods) | 計画v2 B.1(0.140/0.221/0.045)。0.44 の一次出典は開発期 D6 記録 — 要照合 | Supp Methods | draft(0.44 照合を C3 で) |
-| N-91 | REO Mid-Low 検定の MC 規模: 完全枚挙 C(36,17)=8,597,496,600 のため 999,999 回モンテカルロ(シード 19860426、plus-one) | REO 検定の実装定数(Supp Methods) | lib/stat_brunnermunzel.R:411(B=999999L)+ 530 実行記録(要照合)。組合せ数は算術確認済み | Supp Methods | draft(530 実効値照合を C3 で) |
+| N-91 | REO Mid-Low 検定の MC 規模: 完全枚挙 C(36,17)=8,597,496,600 のため 999,999 回モンテカルロ(シード 19860426、plus-one) | REO 検定の実装定数(Supp Methods) | lib/stat_brunnermunzel.R:411(B=999999L 既定)+ scripts/530:75-77(method="auto"・B 未指定 → 既定適用。auto は C(36,17) 枚挙不能で MC 選択)。組合せ数は算術確認済み | Supp Methods | verified(コード水準。実行ログ照合は run 記録に委ねる) |
 
 ### M. D6 較正の派生値・採用時測定(執筆用、2026-08-12 追加)
 
 | N-ID | 値 | 定義 | 出典 | 使用箇所 | 状態 |
 |---|---|---|---|---|---|
 | N-56 | 0.064(102/1,600) | 本番 D6 の pooled global-null 超過率: 16セル合算で「q<0.10 の発見が1つ以上出た」帰無レプリケートの割合(名目上限 0.10)。13/16 セルが 0.10 以下 | N-24 の表(run/xeon_final_20260811/logs/d6_calibration.log:7-22 の n_any_discovery 列)の算術和 12+1+1+9+7+3+2+6+8+1+4+10+18+3+5+12=102、102/(16×100)=0.06375 | Methods / Results / Q-10 | verified |
-| N-57 | per-set p + BH: pooled P(≥1) = 0.045(参考: WY-FWER 0.112) | **採用時測定**(2026-08-08、実データ走行前・開発 B=999): 採用された推論の held-out 較正値 | repo/diagnostics/output/gsea_null_calibration_alternatives_20260808.log:40 キー「Pooled P(>=1): BH 0.045」 | Methods(選定経緯) | verified |
+| N-57 | per-set p + BH: pooled P(≥1) = 0.045(参考: WY-FWER 0.112) | **採用時測定**(2026-08-08、実データ走行前・開発 B=999): 採用された推論の held-out 較正値 | repo/diagnostics/output/gsea_null_calibration_alternatives_20260808.log:40 キー「Pooled P(>=1): BH 0.045」 | Supp Methods(選定経緯) | verified |
 | N-58 | pooled tail-ratio 0.140 / 再標準化 0.221(最悪セル 0.44 = B_Normal/radiation) | **棄却測定**(2026-08-08、実データ走行前): 旧 D2 の tail-ratio 系 FDR の較正破綻(名目 0.10) | repo/diagnostics/output/gsea_null_calibration_restd_20260808.log:40 キー「plain 0.140 ; restandardized 0.221」・:22(0.44) | Methods(選定経緯)/ Q-10, Q-12 | verified |
 
 ### N. R_Tumor DEG の ORA 注釈(claim_map C-14 — 水準は仮説生成。初回実行 2026-08-12 は追補計算 = diagnostics/、2026-08-13 に scripts/430 へ編入し正準再実行 — 旧版と table/config identical・log 1-466 行バイト同一を確認済み)
@@ -196,13 +195,13 @@
 |---|---|---|---|---|---|
 | N-66 | GENCODE v36(GDC 参照 GTF)の exon-union 遺伝子長; 発現は STAR - Counts(open access) | 参照アノテーションとデータ種別 | scripts/020 ヘッダ(GENCODE v36)・scripts/010 ヘッダ(STAR - Counts) | Supp Methods | verified |
 | N-67 | stranded 列合計の小/大比 ≤ 0.5 なら stranded(大きい列を採用)、それ以外は unstranded 列 | ライブラリ strand 判定規則(検体別) | scripts/120 ヘッダ(Dobin's general rule, ratio form) | Supp Methods | verified |
-| N-68 | NIH IREP(v5.7.3 引用)甲状腺モデル「AS associated with the expected value of ERR」; 電子 E>15keV、**曝露率 acute**(既定値なしの必須選択 — 研究者確認 2026-08-16。公表済み Chernobyl POC 論文2本も acute)、**臓器線量は定数(Constant (value))として入力**(既定値なしの必須選択 — 研究者確認 2026-08-16。それ以上の線量情報を持たないため択一)、性別は記録値のまま、線量 cSv=mGy/10、被曝年 1986、出生年=1986−被曝時年齢、手術年=出生年+手術時年齢; 残りの IREP 設定は既定値(ユーザー定義不確かさ分布 Lognormal(1,1)・反復 10,000・乱数シード 99)。値は研究者計算の正準 CSV | IREP 入力規約 | scripts/130 ヘッダ; 来歴・入力同一性監査は計画v2 B.11 | Methods | verified |
+| N-68 | NIH IREP(v5.7.3 引用)甲状腺モデル「AS associated with the expected value of ERR」; 電子 E>15keV、**曝露率 acute**(既定値なしの必須選択 — 研究者確認 2026-08-16。公表済み Chernobyl POC 論文2本も acute)、**臓器線量は定数(Constant (value))として入力**(既定値なしの必須選択 — 研究者確認 2026-08-16。それ以上の線量情報を持たないため択一)、性別は記録値のまま、線量 cSv=mGy/10、被曝年 1986、出生年=1986−被曝時年齢、手術年=出生年+手術時年齢; 残りの IREP 設定は既定値(ユーザー定義不確かさ分布 Lognormal(1,1)・反復 10,000・乱数シード 99)。値は研究者計算の正準 CSV | IREP 入力規約 | scripts/130 ヘッダ; 来歴・入力同一性監査は計画v2 B.11 | Supp Methods | verified |
 | N-69 | dose 0 → Sporadic; 0<AS<33.3 Low; 33.3≤AS<66.6 Mid; AS≥66.6 High(境界例なし、2026-07-28 検証) | AS 帯規則 | config.R:36-43(AS_LOW_MAX 33.3・AS_HIGH_MIN 66.6)・lib/cohort_design.R:71-73(境界の帰属: 33.3 は Mid 側 — 2026-08-16 照合で本行の旧記載を訂正、本文は実装と一致していた) | Methods | verified |
 | N-70 | 0.6 | pooled 共通尺度の相対純度閾値(main BM 採用条件) | config.R:45-46(PURITY_THRESHOLD) | Methods | verified |
 | N-71 | iDEGES 3 反復; スクリーン = 置換 BM(exact)→ Storey q<0.10(plug-in λ=0.5、DEGES_FDR)+ floorPDEG 0.05(q 閾値集合と生 p 上位 5% の大きい方を採用); スケーリングは MUREN(lts); 前処理 protein_coding → filterByExpr | 310 正規化の設定(2026-08-14 訂正: 従前の「BH q<0.10」は誤記 — 実装は storey_q) | lib/norm_deges.R:137-153(storey_q・floorPDEG 採用規則)・scripts/310:37-46(ITERATION 3L・FLOOR_PDEG 0.05・MUREN_METHOD lts・BM_METHOD exact)・config.R:57(DEGES_FDR 0.10) | Methods | verified |
 | N-72 | ランキング = 符号付き BM 統計量の tie-averaged normal scores; ES = gseaParam=1 の block 評価(tie-free 入力で標準 GSEA と一致); 推論 = per-set 符号条件付き置換 p + family 内 BH、q_bh<0.10; size 窓 15–500 | 420 セットレベル推論の設定 | scripts/420 ヘッダ; lib/gsea_collections.R:27-28(15L/500L); config.R:51-53(FDR_CUT 0.10) | Methods | verified |
 | N-73 | 対比内独立ラベルシャッフル 9,999 回、対比別 seed(基底 19450809)で shuffle プロファイル同士を相関(410 の perm_index は意図的に不使用 — 等 n 対比で同一 index となるため) | 署名一致の帰無参照区間の設定 | diagnostics/signature_agreement.R:57(AGREEMENT_SEED_BASE)・:84,97(N_PERM 使用)・ヘッダ | Supp Methods | verified |
-| N-74 | 候補順位 = \|effect−0.5\| 上位500、effect方向に分割後に全構築標本で finite log2 TPM の遺伝子だけを残し全 up×down ペアを評価; dead zone \|r\|<log2(1.2); R0 = 非 dead-zone 検体の多数符号(逆符号例外≤1)かつ q10(\|r\|)≥log2(1.5); R1 reversal rate = 逆符号かつ非 dead-zone の件数 / R1全例、>50%かつ<100%; 順位は群間median r差の絶対値 | REO 候補ペア選定規則 | scripts/510:44(N_CANDIDATES 500L)・:110-151(方向分割、finite-gene screen、全cross-directionペア、規則、順位); config.R:48-49(DEAD_ZONE log2(1.2)) | Methods | verified |
+| N-74 | 候補順位 = \|effect−0.5\| 上位500、effect方向に分割後に全構築標本で finite log2 TPM の遺伝子だけを残し全 up×down ペアを評価; dead zone \|r\|<log2(1.2); R0 = 非 dead-zone 検体の多数符号(逆符号例外≤1)かつ q10(\|r\|)≥log2(1.5); R1 reversal rate = 逆符号かつ非 dead-zone の件数 / R1全例、>50%かつ<100%; 順位は群間median r差の絶対値 | REO 候補ペア選定規則 | scripts/510:44(N_CANDIDATES 500L)・:110-151(方向分割、finite-gene screen、全cross-directionペア、規則、順位); config.R:48-49(DEAD_ZONE log2(1.2)) | Supp Methods | verified |
 | N-75 | 貪欲選定: 遺伝子再使用禁止 + 既採用ペアとの Spearman <0.75、目標 10 ペア; 530 の Mid>Low 片側 BM は mc・seed 19860426(正準シード) | REO パネル確定と評価検定の設定 | scripts/520:30-31(TARGET_PANEL_SIZE 10L・CORRELATION_THRESHOLD 0.75); scripts/530:78(seed = SEED); config.R:5-8 | Methods | verified |
 | N-76 | 群内純度順位保存 0.93–0.99(群別推定との比較)、High vs Sporadic 腫瘍プロファイル相関 0.99 | 220 の両群プーリング妥当性の**来歴実測値**(設計時測定。一次ログではない — 証拠階層は設計選択の来歴)。二重統計に当たるためライセンスには使わない(研究者決定 2026-08-13)— プーリングの記述は理論構造(相対尺度の共通化・driver 支配前提・軸の別・役割の限定)で立てる | `git show 8eed384:scripts/220_estimate_tumor_purity.R` ヘッダ行8-10(run 時点の凍結版。現行ヘッダは 2026-08-13 に理論ライセンスへ書き換え、実測値の記録はこの行と run コミットに保存) | **不使用**(査読応答の受けとして保存) | verified |
 | N-77 | 906/906 ライブラリが stranded_second(reverse)判定、比 0.056–0.110(生値 min 0.0558948828・max 0.1095053129、閾値 0.5) | strand 判定の実測結果 — 閾値の恣意性が実務上不活性であることの開示 | meta/strand_selection_20260722_073758.tsv の selected・ratio 列の全数集計(906 行) | Supp Methods | verified |
@@ -488,3 +487,9 @@
   Supp 5,714。インライン対訳は全廃(f 方針)。**構造基準値の改訂: 本文 H2 8、【訳】検査は廃止**。
   残作業 = C3(N-87/88/90/91 の一次照合・表S3 実体)+ C4(横断検査・−86語・Abstract −3語・
   足場退役)
+- 2026-08-21: **C3 完了**: N-87/N-88 をコンテナ(rebc-r453:refblas、read-only)の rds 直読で
+  verified 化(PC-OD フラグ = B_High tumor 1 のみ/RET 主コホート純度中央値 0.783/0.822)。
+  0.44 の出典探索の結果、既存 N-58 が同一事実(0.140/0.221/0.44 = B_Normal/radiation)を保持と判明 — 新設した N-90 は重複のため行を削除し Supp のタグを N-58 へ付替(N-90 は欠番)。N-91 は 530 のコード水準で verified(auto→MC・B=999999 既定)。Supp の D6 セル別 CI は N-26 へ付替、N-01(クリーンリポジトリ状態)と N-47(純度層別比較の結果文)を Supp に補完。**表S3 を作表**:
+  processed/thyr_deg_ora_annotation.rds の $table(18,576 行)は全セット×3リストを保持して
+  おり(GPT レビューの「未保存」評価は誤り)、table_s3_ora_annotation.csv を出力、
+  family×list の q<0.10 員数は N-59 と全一致。gpt_review/supplementary_files が全品目完備に
