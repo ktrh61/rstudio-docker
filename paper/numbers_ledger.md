@@ -568,3 +568,10 @@
   pre-specified→prespecified(キャプション文+表ヘッダ Prespecified standing — 原稿全体の
   優勢形 23:1 へ統一)。英綴り変異はこれで全文ゼロ。B10/B11 の言い換え(not excludable・
   not identifiable)は別途裁定(通し読み時)
+- 2026-08-23: **B11 適用・B10 不採用**(研究者裁定): パターン規則の "as not identifiable
+  between attenuated sharing and a driver-linked type" → "as unable to distinguish attenuated
+  sharing from a driver-linked type"(±0語)。根拠 = identifiable は原稿全体で孤立語、C-11
+  Limitations・C-07 隣接文の確立語彙は distinguish X from Y。当初推奨の since 節形は省略並列
+  "[is read] as 〈読み〉" の読みスロットを消すため撤回し、as スロット保持+house 構文の
+  ハイブリッド形を採用。B10(not excludable)は位置づけ列4セルの動詞なし電報体レジスターに
+  適合しているため現状維持(cannot be excluded は列内唯一の定形動詞句になり整合を壊す)
