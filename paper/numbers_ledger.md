@@ -575,3 +575,11 @@
   "[is read] as 〈読み〉" の読みスロットを消すため撤回し、as スロット保持+house 構文の
   ハイブリッド形を採用。B10(not excludable)は位置づけ列4セルの動詞なし電報体レジスターに
   適合しているため現状維持(cannot be excluded は列内唯一の定形動詞句になり整合を壊す)
+- 2026-08-23: **群③ Abstract を P2 パッケージで改稿**(研究者裁定 — Codex 再提案の捻出源
+  「asked whether→compared」は Background の疑問文フレーミング喪失+Methods 文との重複の
+  ため不採用、代替捻出で構成): (1) parse 修正 "radiation-attribution cases and dose-zero
+  cases"(+1)/(2) 捻出 "stratified by driver"(−1 — 直後の括弧 RET fusion/BRAF V600E が
+  曖昧性を排除)/(3) "constructed from extreme bands"(0 — Intro の from 構文と統一)/
+  (4) "expressed less highly"(+1 — Results の確立形と統一)。Abstract 194→195(余裕5)。
+  限定句差分 = estimated・radiation・unchanged・descriptive 等すべて維持、"tumor driver" の
+  tumor のみ削除(括弧内駆動遺伝子名で自明)。B1 のフレーミングは不変更で解決
