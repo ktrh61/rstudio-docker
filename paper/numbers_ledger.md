@@ -583,3 +583,13 @@
   (4) "expressed less highly"(+1 — Results の確立形と統一)。Abstract 194→195(余裕5)。
   限定句差分 = estimated・radiation・unchanged・descriptive 等すべて維持、"tumor driver" の
   tumor のみ削除(括弧内駆動遺伝子名で自明)。B1 のフレーミングは不変更で解決
+- 2026-08-23: **群④ 意味・事実系8件を適用**(研究者 Go — 全件事前検証済み): B17 "46 of
+  **its** 126 genes"(N-60 照合: 126=セット員数、リスト側との誤読を解消)/B15 "the values
+  of the 195 HALLMARK_ADIPOGENESIS genes present in the matrix"(N-30 照合: 乗算対象は CPM 値)/
+  B20 "higher- and lower-expression genes"(表S4 — 構築節の higher/lower-expression 群定義と
+  統一)/B8 表1キャプション "age at surgery and age at exposure"(実体列 age_surgery・
+  age_exposure と照合)/B14 "the factor approaches 1"(DDREF の先行詞曖昧性解消)/B12
+  "determined library strandedness"(推定であることの明確化)/B13 "an example of the
+  electrons E>15 keV route"/B18 "comparisons of Mid-AS with Low-AS"(本文 Methods の既出形と
+  統一、方向は one-sided+Pr 表記が保持)。数値・N タグ(N-30/47/60/82/83 等)不変、
+  本文語数への影響は B8 のみでキャプション節(枠外)

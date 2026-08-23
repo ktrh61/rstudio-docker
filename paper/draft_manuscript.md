@@ -181,7 +181,7 @@ In conclusion, High-AS and dose-zero RET fusion-positive PTCs differed broadly i
 
 **Figure 3 | REO reversal scores by AS band.** Scores from 0 to 10 for the 10-pair panel <!-- N-37 -->. Dose-zero and High-AS defined the panel; it was applied without refitting to Low-AS and Mid-AS. The four-band pattern is descriptive and is not a test of a linear dose response.
 
-**Table 1 | Case characteristics.** Group size, sex, age at surgery and exposure, and RET fusion-partner composition; footnotes give the age-difference estimates with confidence intervals and the group medians of relative tumor purity.
+**Table 1 | Case characteristics.** Group size, sex, age at surgery and age at exposure, and RET fusion-partner composition; footnotes give the age-difference estimates with confidence intervals and the group medians of relative tumor purity.
 
 *Table 1 footnote.* Age-at-surgery differences compare High-AS with dose-zero cases. In the RET stratum, the Hodges–Lehmann difference was +2.5 years (95% percentile bootstrap CI, −1.0 to 6.0) and the Brunner–Munzel relative effect was θ=0.625 (0.400 to 0.828) <!-- N-64 -->. In the BRAF stratum, the corresponding estimates were +8.0 years (3.0 to 12.0) and θ=0.850 (0.681 to 0.973) <!-- N-65 -->. Here, θ=Pr(X<Y)+0.5Pr(X=Y), with X denoting dose-zero and Y High-AS. Intervals were obtained from 9,999 resamples drawn separately within each group (seed 19450809) <!-- N-63 -->; no p-values were calculated. Relative tumor purity is a within-cohort relative score (cohort maximum = 1) estimated separately per driver cohort and comparable within a stratum only; group medians were 0.783 (RET dose-zero), 0.822 (RET High-AS), 0.836 (BRAF dose-zero), and 0.922 (BRAF High-AS) <!-- N-88 -->.
 
