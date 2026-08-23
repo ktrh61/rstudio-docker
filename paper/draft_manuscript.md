@@ -185,17 +185,17 @@ In conclusion, High-AS and dose-zero RET fusion-positive PTCs differed broadly i
 
 *Table 1 footnote.* Age-at-surgery differences compare High-AS with dose-zero cases. In the RET stratum, the Hodges–Lehmann difference was +2.5 years (95% percentile bootstrap CI, −1.0 to 6.0) and the Brunner–Munzel relative effect was θ=0.625 (0.400 to 0.828) <!-- N-64 -->. In the BRAF stratum, the corresponding estimates were +8.0 years (3.0 to 12.0) and θ=0.850 (0.681 to 0.973) <!-- N-65 -->. Here, θ=Pr(X<Y)+0.5Pr(X=Y), with X denoting dose-zero and Y High-AS. Intervals were obtained from 9,999 resamples drawn separately within each group (seed 19450809) <!-- N-63 -->; no p-values were calculated. Relative tumor purity is a within-cohort relative score (cohort maximum = 1) estimated separately per driver cohort and comparable within a stratum only; group medians were 0.783 (RET dose-zero), 0.822 (RET High-AS), 0.836 (BRAF dose-zero), and 0.922 (BRAF High-AS) <!-- N-88 -->.
 
-**Table 2 | Interpretation map for the four exposure contrasts, fixed before the finalized analysis produced the results reported here.** Each contrast carries a pre-specified standing and its basis; the pattern rules fixed together with the map are given as table footnotes. No outcome pattern requires post-hoc labelling.
+**Table 2 | Interpretation map for the four exposure contrasts, fixed before the finalized analysis produced the results reported here.** Each contrast carries a prespecified standing and its basis; the pattern rules fixed together with the map are given as table footnotes. No outcome pattern requires post-hoc labeling.
 
 <!-- 表2 本体+脚注規則(正本。Methods: Analysis contrasts から 2026-08-18 移設 — 投稿整形時に一方向切り出し、編集可能な第2コピーは作らない。規則の (a)-(f) 脚注化は研究者の書き直し待ち) -->
-| Contrast | Pre-specified standing | Basis |
+| Contrast | Prespecified standing | Basis |
 | --- | --- | --- |
 | R_Tumor | Hypothesis-bearing; signal expected | primary expectation of the working hypothesis (Introduction); the driver-conditioned gap left by Morton et al. (2021) |
 | R_Normal | Hypothesis-bearing; signal possible | long-term molecular memory of exposure — dose-dependent expression within exposed normal tissue (Abend et al. 2013); exposed-versus-unexposed normal-tissue signatures (Ory et al. 2026) |
 | B_Normal | Test cell for a shared trace | counterpart of the cross-stratum normal comparison; the shared signatures of Ory et al. (2026) were reported without driver stratification |
 | B_Tumor | Direction-agnostic; not excludable | point-mutation drivers become less likely as dose rises in the source cohort (Morton et al. 2021) |
 
-Pattern rules, fixed with the map: signal in R_Tumor is read as agreement with prior expectation; tumor signal confined to the BRAF stratum would be hypothesis-discordant and read with non-aetiological explanations first; concordant signal in both normal contrasts is read as consistent with a shared glandular trace, discordant signal as suggesting a driver-linked trace type; normal-tissue signal confined to the BRAF stratum is read as confounding first; confined to the RET stratum, as not identifiable between attenuated sharing and a driver-linked type; and an all-null outcome is reported as a bounded null. No outcome pattern requires post-hoc labelling.
+Pattern rules, fixed with the map: signal in R_Tumor is read as agreement with prior expectation; tumor signal confined to the BRAF stratum would be hypothesis-discordant and read with non-etiological explanations first; concordant signal in both normal contrasts is read as consistent with a shared glandular trace, discordant signal as suggesting a driver-linked trace type; normal-tissue signal confined to the BRAF stratum is read as confounding first; confined to the RET stratum, as not identifiable between attenuated sharing and a driver-linked type; and an all-null outcome is reported as a bounded null. No outcome pattern requires post-hoc labeling.
 
 **Table 3 | Gene-level results.** Tested genes, π0, q<0.10 counts and directions, minimum permutation p, and Higher Criticism p by contrast.
 

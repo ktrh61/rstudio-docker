@@ -562,3 +562,9 @@
   Codex 見落としを語境界スイープで補完、英綴り残は表2ブロック内の3件のみ)/Supp REO の
   分母表現("divided by the total number of")と冠詞("a Spearman correlation of at least")。
   いずれも意味・数値不変、凍結4箇所・タグ非接触、本文語数不変(4,910/Abstract 194)
+- 2026-08-23: **群②表2ブロック内の綴り正規化5箇所を適用**(研究者採択 — 意味不変の
+  正書法統一であり位置づけ・規則の内容は不変更): labelling→labeling ×2(キャプション末と
+  パターン規則末の同型文)・non-aetiological→non-etiological(パターン規則)・
+  pre-specified→prespecified(キャプション文+表ヘッダ Prespecified standing — 原稿全体の
+  優勢形 23:1 へ統一)。英綴り変異はこれで全文ゼロ。B10/B11 の言い換え(not excludable・
+  not identifiable)は別途裁定(通し読み時)
