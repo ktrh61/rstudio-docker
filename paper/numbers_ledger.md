@@ -593,3 +593,12 @@
   electrons E>15 keV route"/B18 "comparisons of Mid-AS with Low-AS"(本文 Methods の既出形と
   統一、方向は one-sided+Pr 表記が保持)。数値・N タグ(N-30/47/60/82/83 等)不変、
   本文語数への影響は B8 のみでキャプション節(枠外)
+- 2026-08-23: **群⑤の最終処分**(研究者採択 → Codex 敵対再検証 → 確定): B4(paired tumor
+  and normal)・B5(comprised)・B6(HL 推定文)・B16(holding … consistent — 重症度
+  awkward・誤りでない)・B19(axis is 並列)= **現状維持で確定**(Codex 全件 AGREE)。
+  B7 のみ Codex が逆提案(normal→non-tumor 統一)したが棄却: 原稿語彙は normal 系 53 回
+  対 non-tumor 1 回、R_Normal/B_Normal は事前規定識別子、matched normal は分野標準の来歴
+  呼称(GDC Solid Tissue Normal)で引用文献とも整合 — 唯一の non-tumor こそ意図的区別を
+  推測させる変異。**B7 = "matched non-tumor"→"matched normal" 方向で確定、適用は C-03
+  ratified 化と同時**(Disc の C-03 タグ文のため)。以上で Codex 校正(2026-08-23、
+  指摘26+補完1)の処理完了 — 適用21箇所・不採用/維持6件・保留1件(B7)
