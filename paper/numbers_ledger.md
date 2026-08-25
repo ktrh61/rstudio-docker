@@ -635,3 +635,13 @@
   一致。バッチ B 文の方向欠落は正当な再オープン)/(2) C-14 タグ文の語順調整 — 条件を文頭へ
   "Among genes expressed more highly …, no set in any family met the over-representation
   threshold"(±0語・意味/限定句/タグ不変)。本文 4,924・Abstract 195 不変
+- 2026-08-25: **再レビュー第2ラウンド(16:49 版)の A 群 9 件を適用**(研究者 Go — B 群
+  = Abstract 2 件の語数裁定・C 群 = C タグ文 4 件は保留): AI 列挙の括弧化(±0)/
+  Disc「radiation-attributability bands」(裸単数の解消 — タイトルの複数形と照応、
+  レビュー案 AS-band membership でなく最小修正を採用)/ORA 並列の zeugma 解消
+  (", with BH adjustment")/Table S5 文(Packages are cited …, their full version
+  numbers)/高純度層の Pr(Low<Mid)= 明示(N-47 整合)/strandedness 文(ranged from
+  0.056 to 0.110, well below — N-77 事実の範囲内)/PC-OD 反復の明確化(At each
+  iteration … — N-78 タグ・Nakayama 引用位置維持)/λ・閾値の冠詞(a fixed λ=0.5 and
+  a threshold of q<0.10)/make_submission.py に行末スペース除去を追加(行頭除去と対)。
+  本文 4,924・Abstract 195 不変

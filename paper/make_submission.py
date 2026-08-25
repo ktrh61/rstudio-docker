@@ -156,6 +156,7 @@ def strip_meta(text, drop_sections):
     text = re.sub(r"  +", " ", text)          # タグ除去痕の連続スペース
     text = re.sub(r" ([.,;)])", r"\1", text)  # 句読点前の孤立スペース
     text = re.sub(r"^[ \t]+", "", text, flags=re.M)  # タグ除去痕の行頭スペース
+    text = re.sub(r"[ \t]+$", "", text, flags=re.M)  # タグ除去痕の行末スペース
     return text
 
 
