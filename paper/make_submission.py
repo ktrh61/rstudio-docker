@@ -155,6 +155,7 @@ def strip_meta(text, drop_sections):
     text = re.sub(r"\n{3,}", "\n\n", text)
     text = re.sub(r"  +", " ", text)          # タグ除去痕の連続スペース
     text = re.sub(r" ([.,;)])", r"\1", text)  # 句読点前の孤立スペース
+    text = re.sub(r"^[ \t]+", "", text, flags=re.M)  # タグ除去痕の行頭スペース
     return text
 
 
@@ -167,7 +168,8 @@ def main():
     body = convert(body, index, order, warnings, do_convert=True)
 
     refs = ["## References", ""]
-    refs += [f"{i+1}. {b}" for i, b in enumerate(order)]
+    # 台帳の管理注記(「、DOI なし」)は投稿用表示から除去する
+    refs += [f"{i+1}. {b.replace('、DOI なし', '')}" for i, b in enumerate(order)]
     submission = body.rstrip("\n") + "\n\n" + "\n".join(refs) + "\n"
     (OUT / "manuscript_submission.md").write_text(submission, encoding="utf-8")
 

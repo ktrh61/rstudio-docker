@@ -622,3 +622,10 @@
   method="auto")+ diagnostics/output/reo_confound.rds 直読で N-46/N-47 全値一致。
   既存の非確認的地位文(None of these purity analyses …)が新文を包含する位置に挿入。
   これで Supp Results の N-47 結果文と Methods が一対一対応
+- 2026-08-25: **バッチ C: 生成系の修正**(レビュー §2 生成物2件+§5、研究者 Go):
+  make_submission.py に (1) タグ除去痕の行頭スペース除去(re.M)、(2) References 生成時の
+  台帳管理注記「、DOI なし」除去、を追加。正本側は Supp の em dash 2 箇所(TESC/EHD4)の
+  タグ前スペースを詰めて生成後 "TESC—but"/"EHD4—whereas" を実現。scratchpad 再生成で検証:
+  行頭空白ゼロ・em ダッシュ異常ゼロ・DOI なしゼロ・References の CJK 残ゼロ・警告 0・
+  生成物 diff は意図変更のみ。PMID 併記や書式全体の投稿規定整形はフェーズ2(References
+  仕上げ)の担当のまま
