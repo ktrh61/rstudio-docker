@@ -652,3 +652,14 @@
   という検査側所見は誤り(全文で Abstract の1箇所のみ — Codex 再確認・研究者訂正)で、
   本文への波及修正なし。1-5 の名目水準も 0.05→0.10 に検査側誤記を訂正(Supp 明記の
   nominal 0.10、N-25 下限 0.110 との差 0.010)
+- 2026-08-25: **再レビュー B 群の裁定確定**(研究者): 1-1(Abstract Background の修飾密度)=
+  **現状維持+条件付き札** — 誤読不成立の密度問題であり余裕 2 語と交換しない。案1
+  ("cases with high estimated radiation attribution"、+2語)は恒久却下でなく、フェーズ2
+  最終照合までに Abstract 余裕が 4 語以上へ回復した場合に適用する順序付き保留(案2の
+  High-AS は Background で AS 未定義の前方参照のため不採用が確定)。捻出源なしは再走査で
+  確認済み。1-2 は適用済み(@b7f2063)。**C 群の ratified 化同時リスト(確定)**:
+  non-tumor→normal(C-03)/over→across(C-11)/1-5 後半 = 最小修正 "and **in** the only
+  calibration cell"(+1語、C-04 — 研究者採択。"entirely above" 形は N-25 下限 0.110 対
+  名目 0.100 の差 0.010 に賭けるため不採用)/absent sharing → "the absence of detectable
+  sharing … cannot be distinguished from"(C-07)。現況: 本文 4,924(余裕76)・Abstract 197
+  (余裕3)、機械検査全通過
