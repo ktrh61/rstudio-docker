@@ -111,7 +111,7 @@ We cross-referenced two classes of published radiation-associated gene lists aga
 
 We independently executed the full publication pipeline on two x86-64 machines using MD5-identical raw inputs <!-- N-52 --> and a date-pinned container with R 4.5.3 (R Core Team 2026) on Ubuntu 24.04 <!-- N-02 -->, reference BLAS/LAPACK 3.12.0 <!-- N-03 -->, four workers <!-- N-04 -->, and fixed seeds. Both runs passed 415 tests with no failures <!-- N-51 --> and produced identical primary artifacts. The analysis code, versioned inputs, and container recipe accompany the paper; Table S5 lists package versions.
 
-Pipeline design, the prototype scripts and all analytical and interpretive decisions are the authors'. Generative AI assistants (Claude Fable 5, Anthropic; GPT-5.6sol, OpenAI) were used for script debugging and refactoring, and for drafting and editing manuscript text under the authors' fine-grained direction. No scientific decision was delegated to these tools; all AI-assisted text and code passed the author-controlled verification detailed in the Supplementary Methods, and the authors take full responsibility for the entire content.
+The authors designed the study, specified the analysis and interpretation framework, and made the final scientific and editorial decisions. Under author supervision, Claude Code (Anthropic; Claude Fable 5) and Codex CLI (OpenAI; GPT-5.6 Sol) assisted with code development, principally debugging and refactoring, consistency checks, and drafting and editing manuscript text. The authors reviewed and approved all AI-assisted material retained in the reported analysis and manuscript and take full responsibility for the work; the scope and verification procedures are described in Supplementary Methods.
 
 ## Results
 
