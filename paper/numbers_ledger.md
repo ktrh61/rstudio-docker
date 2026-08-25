@@ -570,10 +570,14 @@
   解消、無命名・"lay above"・N-25 維持)。"establishes that" 裁定は対象文言の消滅(C2 ポートで
   軟化済み、残る establish は否定ガード2箇所のみ)により解消、attribution/attributability の
   表記差は性質名 vs 値記述として現状維持で閉鎖(いずれも研究者裁定)。通し読み前の未決文言論点はゼロ
+- 2026-08-25: 再走査レビュー(18:21版)の3件を適用: "one matched tumor–normal sample pair"
+  (−1語)・HC文の主体明確化("so the contrast-level evidence … did not rely"、+1語)・
+  "Relative purity could be estimated for"(−1語、Supp と統一)。2-1(Abstract Conclusions)は
+  不採用(標準的絶対構文・余裕3→2・within-driver 限定句の削除が見合わない — 研究者裁定)
 
 ## 現況(通常セッションはこの節と直近の改訂メモのみ読めば足りる — 2026-08-25 更新)
 
-- 語数: 本文 4,932(余裕 68)/Abstract 197(余裕 3)。機械検査(凍結4・N/C タグ・引用31/警告0)全通過。
+- 語数: 本文 4,931(余裕 69)/Abstract 197(余裕 3)。機械検査(凍結4・N/C タグ・引用31/警告0)全通過。
 - 開いている残件(文言の未決論点はゼロ — 残りは批准・記入・フェーズ2 のみ):
   1. 通し読み = C-01〜17 ratified 化(研究者。C-09 のみ済)
   2. 条件付き札: Abstract 余裕≥4 回復時に "cases with high estimated radiation attribution"(+2語)を適用
