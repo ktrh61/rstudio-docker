@@ -67,9 +67,16 @@ def patch_docx(path):
             "</w:style>", "<w:pPr>" + spacing + "</w:pPr></w:style>"
         )
     styles = styles.replace(normal, new_normal)
-    # 原稿慣例の書体へ: 本文 Times New Roman 12pt、見出しは同書体・黒・太字
+    # 原稿慣例の書体へ: 本文 Times New Roman 12pt、見出しは同書体・黒・太字。
+    # テーマ経由の解決(日本語環境では Aptos に落ちる)を全経路で遮断するため、
+    # eastAsia も含む明示指定を docDefaults・テーマにも適用する。
     tnr = ('<w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" '
-           'w:cs="Times New Roman"/>')
+           'w:eastAsia="Times New Roman" w:cs="Times New Roman"/>')
+    styles = re.sub(r"<w:rFonts [^/]*Theme[^/]*/>", tnr, styles)
+    # 派生スタイル(BodyText 等)の spacing が Normal の行間を要素ごと上書きする —
+    # w:line を持たない全 spacing に 1.5 行間を明示付与
+    styles = re.sub(r'<w:spacing (?![^/>]*w:line=)([^/>]*)/>',
+                    r'<w:spacing \1 w:line="360" w:lineRule="auto"/>', styles)
     normal2 = re.search(
         r'<w:style [^>]*w:styleId="Normal"[^>]*>.*?</w:style>', styles, re.S
     ).group(0)
@@ -147,6 +154,13 @@ def patch_docx(path):
         )
     parts["word/_rels/document.xml.rels"] = rels.encode("utf-8")
 
+    # テーマの既定書体も Times New Roman へ(テーマ参照の取り残し対策)
+    if "word/theme/theme1.xml" in parts:
+        theme = parts["word/theme/theme1.xml"].decode("utf-8")
+        theme = re.sub(r'(<a:latin typeface=")[^"]*(")',
+                       r"\1Times New Roman\2", theme)
+        parts["word/theme/theme1.xml"] = theme.encode("utf-8")
+
     zout = zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED)
     for name, data in parts.items():
         zout.writestr(name, data)
@@ -205,8 +219,12 @@ def main():
     dest = Path("/mnt/c/Users/kotaro/OneDrive/論文関連（説明用資料含）/word_check")
     if dest.parent.exists():
         dest.mkdir(exist_ok=True)
-        shutil.copy2(out, dest / out.name)
-        print(f"閲覧用コピー: {dest / out.name}")
+        # Word/OneDrive のキャッシュ・書き戻しを避けるため毎回新しいファイル名で渡す
+        import time
+        tag = time.strftime("%H%M")
+        view = dest / f"manuscript_submission_{tag}.docx"
+        shutil.copy2(out, view)
+        print(f"閲覧用コピー: {view}")
 
 
 if __name__ == "__main__":
