@@ -584,7 +584,13 @@
   1. 通し読み = C-01〜17 ratified 化(研究者。C-09 のみ済)
   2. 条件付き札: Abstract 余裕≥4 回復時に "cases with high estimated radiation attribution"(+2語)を適用
   3. submission_declarations の【記入】6箇所(研究者)
-  4. フェーズ2 送り: References 投稿規定整形(PMID 併記含む)・組版記号(C(n,nx)・n_X)
+  4. フェーズ2 送り(書式仕様は BJC GTA ライブ照合 2026-08-25 で確定):
+     References 投稿規定整形(Vancouver・6著者超は先頭6+et al.・上付き・PMID 併記整理)/
+     組版記号(C(n,nx)・n_X)/Word 化 = 1.5 行間・全ページ+全行番号・図凡例は References 後の
+     別ページ・Additional Information 7節を規定順/表1〜3 は個別ファイル+キャプション/
+     図は tiff・eps・jpg・bmp で 300 dpi 以上/Supp は可能なら一体 PDF+Data 1/2 に各 50 語要約/
+     タイトルページ(≤150字・非結論形 — 現115字適合・対応著者 ORCID)/カバーレター(重要性・
+     BJC 宣言・未発表言明・対応著者情報・COI 文)
 - ratified 行の変更 = 検査経由+改訂メモ1〜2行+研究者 accept(再批准を兼ねる)。
   別格 = 凍結4箇所・表2ブロック・事前固定に関する記述(紙面の事実主張が根拠)
 - 2026-08-25: BJC Guide to Authors をライブ再照合(公開ページ、保存 PDF は文字アウトライン化で
