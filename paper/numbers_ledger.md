@@ -554,112 +554,25 @@
   日付自体が識別子の場合のみ = CRAN snapshot・noble タグ)であり、released 型注釈は本箇所が
   全文で唯一の異質パターンだった。公開日は 45.0 から一意に復元可能な客観情報で識別力ゼロ。
   日付は N-92 出典側が保持(台帳不変)
-- 2026-08-23: Codex CLI(gpt-5.6-sol — ~/.codex/config.toml で実測確認。当初 GPT-5.4 と
-  誤記し研究者訂正)による正本2本の文法・文体チェックを実施(研究者依頼。
-  報告のみ・編集禁止・凍結/タグ/限定句の除外条件つき)。指摘26件+検査側補完1件を実文面・
-  台帳・保護領域と全件照合し5群に選別(検証記録はセッション内)。**群①客観エラー4件を適用**
-  (研究者 Go): 米綴り統一 labelled→labeled(Disc)・relabelling→relabeling(Supp QC —
-  Codex 見落としを語境界スイープで補完、英綴り残は表2ブロック内の3件のみ)/Supp REO の
-  分母表現("divided by the total number of")と冠詞("a Spearman correlation of at least")。
-  いずれも意味・数値不変、凍結4箇所・タグ非接触、本文語数不変(4,910/Abstract 194)
-- 2026-08-23: **群②表2ブロック内の綴り正規化5箇所を適用**(研究者採択 — 意味不変の
-  正書法統一であり位置づけ・規則の内容は不変更): labelling→labeling ×2(キャプション末と
-  パターン規則末の同型文)・non-aetiological→non-etiological(パターン規則)・
-  pre-specified→prespecified(キャプション文+表ヘッダ Prespecified standing — 原稿全体の
-  優勢形 23:1 へ統一)。英綴り変異はこれで全文ゼロ。B10/B11 の言い換え(not excludable・
-  not identifiable)は別途裁定(通し読み時)
-- 2026-08-23: **B11 適用・B10 不採用**(研究者裁定): パターン規則の "as not identifiable
-  between attenuated sharing and a driver-linked type" → "as unable to distinguish attenuated
-  sharing from a driver-linked type"(±0語)。根拠 = identifiable は原稿全体で孤立語、C-11
-  Limitations・C-07 隣接文の確立語彙は distinguish X from Y。当初推奨の since 節形は省略並列
-  "[is read] as 〈読み〉" の読みスロットを消すため撤回し、as スロット保持+house 構文の
-  ハイブリッド形を採用。B10(not excludable)は位置づけ列4セルの動詞なし電報体レジスターに
-  適合しているため現状維持(cannot be excluded は列内唯一の定形動詞句になり整合を壊す)
-- 2026-08-23: **群③ Abstract を P2 パッケージで改稿**(研究者裁定 — Codex 再提案の捻出源
-  「asked whether→compared」は Background の疑問文フレーミング喪失+Methods 文との重複の
-  ため不採用、代替捻出で構成): (1) parse 修正 "radiation-attribution cases and dose-zero
-  cases"(+1)/(2) 捻出 "stratified by driver"(−1 — 直後の括弧 RET fusion/BRAF V600E が
-  曖昧性を排除)/(3) "constructed from extreme bands"(0 — Intro の from 構文と統一)/
-  (4) "expressed less highly"(+1 — Results の確立形と統一)。Abstract 194→195(余裕5)。
-  限定句差分 = estimated・radiation・unchanged・descriptive 等すべて維持、"tumor driver" の
-  tumor のみ削除(括弧内駆動遺伝子名で自明)。B1 のフレーミングは不変更で解決
-- 2026-08-23: **群④ 意味・事実系8件を適用**(研究者 Go — 全件事前検証済み): B17 "46 of
-  **its** 126 genes"(N-60 照合: 126=セット員数、リスト側との誤読を解消)/B15 "the values
-  of the 195 HALLMARK_ADIPOGENESIS genes present in the matrix"(N-30 照合: 乗算対象は CPM 値)/
-  B20 "higher- and lower-expression genes"(表S4 — 構築節の higher/lower-expression 群定義と
-  統一)/B8 表1キャプション "age at surgery and age at exposure"(実体列 age_surgery・
-  age_exposure と照合)/B14 "the factor approaches 1"(DDREF の先行詞曖昧性解消)/B12
-  "determined library strandedness"(推定であることの明確化)/B13 "an example of the
-  electrons E>15 keV route"/B18 "comparisons of Mid-AS with Low-AS"(本文 Methods の既出形と
-  統一、方向は one-sided+Pr 表記が保持)。数値・N タグ(N-30/47/60/82/83 等)不変、
-  本文語数への影響は B8 のみでキャプション節(枠外)
-- 2026-08-23: **群⑤の最終処分**(研究者採択 → Codex 敵対再検証 → 確定): B4(paired tumor
-  and normal)・B5(comprised)・B6(HL 推定文)・B16(holding … consistent — 重症度
-  awkward・誤りでない)・B19(axis is 並列)= **現状維持で確定**(Codex 全件 AGREE)。
-  B7 のみ Codex が逆提案(normal→non-tumor 統一)したが棄却: 原稿語彙は normal 系 53 回
-  対 non-tumor 1 回、R_Normal/B_Normal は事前規定識別子、matched normal は分野標準の来歴
-  呼称(GDC Solid Tissue Normal)で引用文献とも整合 — 唯一の non-tumor こそ意図的区別を
-  推測させる変異。**B7 = "matched non-tumor"→"matched normal" 方向で確定、適用は C-03
-  ratified 化と同時**(Disc の C-03 タグ文のため)。以上で Codex 校正(2026-08-23、
-  指摘26+補完1)の処理完了 — 適用21箇所・不採用/維持6件・保留1件(B7)
-- 2026-08-25: **言語整合レビュー(研究者作成 2026-08-25 リスト、paper/ 内・未追跡)の
-  バッチ A を適用**(研究者 Go — 全件事前検証済み): §2 客観 = equalled→equaled・supp 時制
-  (placed…; this assumes)・NES 冠詞(a … score of 2.28)/§1-2 = N-52 文を「versioned
-  raw-input tree の 1,819 件が machine 間 MD5 一致」へ係留(実測: expression 1,812+
-  clinical/reference ほか = 1,819。906 GDC expression files との混同を解消)/§3 用語 =
-  estimation of relative tumor purity・relative purity distributions/scores(無ハイフン統一)・
-  weighted running-sum statistic・four collections(420 節、ORA の family-by-list は別概念で
-  維持)・**C-14 タグ文の精密化「No set met … in any family」(N-59 up 行 0/0/0/0 で厳密に
-  真 — 検定単位の誤読を解消、C-14 は draft 段階での改稿)**・matched-pair estimator・
-  expression of sex-chromosome genes。本文 +6 語 → 実測 4,924(余裕 76 — bee2899 の AI 開示
-  改稿 +8 語が基線に乗った分を含む)、Abstract 195 不変。
-  C-03/C-11 タグ文の 2 件(non-tumor→normal・over→across)は ratified 化と同時に実施
-- 2026-08-25: **バッチ B: 純度層別比較の Methods 記載を補完**(レビュー §1-1、研究者 Go):
-  Supp Methods「Ancillary REO quality and purity diagnostics」に層別比較の手続き1文を新設 —
-  プール Low+Mid の共通尺度純度中央値で2層化、各層内で片側 BM(Mid>Low)、群サイズ
-  (C(15,8)=6,435・C(16,7)=11,440 < 完全枚挙上限 1e8)により p は完全枚挙の exact。
-  実装照合 = diagnostics/reo_lowmid_confound.R:55-72(median split・alternative="less"・
-  method="auto")+ diagnostics/output/reo_confound.rds 直読で N-46/N-47 全値一致。
-  既存の非確認的地位文(None of these purity analyses …)が新文を包含する位置に挿入。
-  これで Supp Results の N-47 結果文と Methods が一対一対応
-- 2026-08-25: **バッチ C: 生成系の修正**(レビュー §2 生成物2件+§5、研究者 Go):
-  make_submission.py に (1) タグ除去痕の行頭スペース除去(re.M)、(2) References 生成時の
-  台帳管理注記「、DOI なし」除去、を追加。正本側は Supp の em dash 2 箇所(TESC/EHD4)の
-  タグ前スペースを詰めて生成後 "TESC—but"/"EHD4—whereas" を実現。scratchpad 再生成で検証:
-  行頭空白ゼロ・em ダッシュ異常ゼロ・DOI なしゼロ・References の CJK 残ゼロ・警告 0・
-  生成物 diff は意図変更のみ。PMID 併記や書式全体の投稿規定整形はフェーズ2(References
-  仕上げ)の担当のまま
-- 2026-08-25: **再レビュー2件を適用**(研究者 Go): (1) 層別 BM 文に片側の方向を明記 —
-  "used a one-sided Brunner–Munzel test to assess whether REO scores tended to be higher in
-  Mid-AS than in Low-AS cases"(実装 alternative="less" の Mid 高値方向・本線の house 形と
-  一致。バッチ B 文の方向欠落は正当な再オープン)/(2) C-14 タグ文の語順調整 — 条件を文頭へ
-  "Among genes expressed more highly …, no set in any family met the over-representation
-  threshold"(±0語・意味/限定句/タグ不変)。本文 4,924・Abstract 195 不変
-- 2026-08-25: **再レビュー第2ラウンド(16:49 版)の A 群 9 件を適用**(研究者 Go — B 群
-  = Abstract 2 件の語数裁定・C 群 = C タグ文 4 件は保留): AI 列挙の括弧化(±0)/
-  Disc「radiation-attributability bands」(裸単数の解消 — タイトルの複数形と照応、
-  レビュー案 AS-band membership でなく最小修正を採用)/ORA 並列の zeugma 解消
-  (", with BH adjustment")/Table S5 文(Packages are cited …, their full version
-  numbers)/高純度層の Pr(Low<Mid)= 明示(N-47 整合)/strandedness 文(ranged from
-  0.056 to 0.110, well below — N-77 事実の範囲内)/PC-OD 反復の明確化(At each
-  iteration … — N-78 タグ・Nakayama 引用位置維持)/λ・閾値の冠詞(a fixed λ=0.5 and
-  a threshold of q<0.10)/make_submission.py に行末スペース除去を追加(行頭除去と対)。
-  本文 4,924・Abstract 195 不変
-- 2026-08-25: **再レビュー B 群 1-2 を適用**(研究者裁定 — Abstract のみ、最小形):
-  "No permutation gene set met q<0.10" → "No gene set met q<0.10 under label permutation"
-  (+2語 — 「permutation という種類のセット」誤読を解消、Methods の label-permutation
-  gene-set inference と照応)。Abstract 195→197(余裕3)。当初の「本文 Results にも同型文」
-  という検査側所見は誤り(全文で Abstract の1箇所のみ — Codex 再確認・研究者訂正)で、
-  本文への波及修正なし。1-5 の名目水準も 0.05→0.10 に検査側誤記を訂正(Supp 明記の
-  nominal 0.10、N-25 下限 0.110 との差 0.010)
-- 2026-08-25: **再レビュー B 群の裁定確定**(研究者): 1-1(Abstract Background の修飾密度)=
-  **現状維持+条件付き札** — 誤読不成立の密度問題であり余裕 2 語と交換しない。案1
-  ("cases with high estimated radiation attribution"、+2語)は恒久却下でなく、フェーズ2
-  最終照合までに Abstract 余裕が 4 語以上へ回復した場合に適用する順序付き保留(案2の
-  High-AS は Background で AS 未定義の前方参照のため不採用が確定)。捻出源なしは再走査で
-  確認済み。1-2 は適用済み(@b7f2063)。**C 群の ratified 化同時リスト(確定)**:
-  non-tumor→normal(C-03)/over→across(C-11)/1-5 後半 = 最小修正 "and **in** the only
-  calibration cell"(+1語、C-04 — 研究者採択。"entirely above" 形は N-25 下限 0.110 対
-  名目 0.100 の差 0.010 に賭けるため不採用)/absent sharing → "the absence of detectable
-  sharing … cannot be distinguished from"(C-07)。現況: 本文 4,924(余裕76)・Abstract 197
-  (余裕3)、機械検査全通過
+- 2026-08-23: Codex CLI(gpt-5.6-sol)による正本2本の文法・文体チェックを全件処理 —
+  指摘26+補完1 → 適用21・維持/不採用6・保留1(C-03 同時)。コミット = 42803eb 5bef049
+  e56c56e 3b7166b a55043d 6535c50 809c56d(詳細は各コミット)
+- 2026-08-25: 言語整合レビュー2本(研究者作成・未追跡)を全件裁定・処理 — コミット =
+  6086d69 ecef30b 5409e13 40516d0 81a6919 b7f2063 67ea2cb(詳細は各コミットとレビューファイル)
+- 2026-08-25: **記録規約を批准**(研究者 — 過去2プロジェクトの amendment 文脈肥大による
+  破綻を受けた構造対策): 改訂メモは1エントリ1〜2行・詳細は git・閉流は圧縮・末尾の
+  「現況」節を維持し通常セッションはそこだけ読む。claim_map 運用規則も同期改訂。
+  本日の2閉流を上記2エントリへ圧縮(情報損失なし — 全文は git 履歴)
+
+## 現況(通常セッションはこの節と直近の改訂メモのみ読めば足りる — 2026-08-25 更新)
+
+- 語数: 本文 4,924(余裕 76)/Abstract 197(余裕 3)。機械検査(凍結4・N/C タグ・引用31/警告0)全通過。
+- 開いている残件:
+  1. C 行 ratified 化(通し読み)と同時の文言修正4件: non-tumor→normal(C-03)/over→across(C-11)/
+     "and in the only calibration cell"(+1語、C-04)/"the absence of detectable sharing …
+     cannot be distinguished from"(C-07)
+  2. 条件付き札: Abstract 余裕≥4 回復時に "cases with high estimated radiation attribution"(+2語)を適用
+  3. submission_declarations の【記入】6箇所(研究者)
+  4. フェーズ2 送り: References 投稿規定整形(PMID 併記含む)・組版記号(C(n,nx)・n_X)
+- ratified 行の変更 = 検査経由+改訂メモ1〜2行+研究者 accept(再批准を兼ねる)。
+  別格 = 凍結4箇所・表2ブロック・事前固定に関する記述(紙面の事実主張が根拠)
