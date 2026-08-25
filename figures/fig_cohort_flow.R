@@ -9,7 +9,7 @@
 # (iii) side branch at the band step for the REO evaluation set (counts from
 # include_reo_evaluation in thyr_analysis_cohorts.rds; must match N-10).
 # Input : processed/thyr_cohort_flow.rds, processed/thyr_analysis_cohorts.rds
-# Output: output/figures/fig_cohort_flow.png
+# Output: output/figures/fig_cohort_flow.png (+ .tif submission copy, 600 dpi)
 
 source("setup.R")
 
@@ -46,8 +46,7 @@ reasons <- c(
 n <- nrow(flow)
 out_dir <- file.path(paths$output, "figures")
 dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
-png(file.path(out_dir, "fig_cohort_flow.png"), type = "cairo",
-    width = 2200, height = 230 * n, res = 200)
+draw_flow <- function() {
 op <- par(mar = c(0.5, 0.5, 0.5, 0.5))
 plot(0, 0, type = "n", xlim = c(0, 13.5), ylim = c(0, n * 2), axes = FALSE,
      xlab = "", ylab = "")
@@ -106,5 +105,19 @@ text(11.15, y2 - 1.76, sprintf("(Low-AS %d | Mid-AS %d)", n_low, n_mid),
 text(11.15, y2 - 2.12, "unfiltered by outlier / purity screens", cex = 0.75)
 arrows(xc, y2 - 1.25, 8.95, y2 - 1.25, length = 0.08)
 par(op)
+}
+
+png(file.path(out_dir, "fig_cohort_flow.png"), type = "cairo",
+    width = 2200, height = 230 * n, res = 200)
+draw_flow()
 dev.off()
 cat("Saved:", file.path(out_dir, "fig_cohort_flow.png"), "\n")
+
+# Submission copy (BJC artwork: minimum 300 dpi) -- 600 dpi LZW TIFF,
+# same physical size as the PNG preview.
+tiff(file.path(out_dir, "fig_cohort_flow.tif"), type = "cairo",
+    width = 2200 / 200, height = 230 * n / 200, units = "in",
+    res = 600, compression = "lzw")
+draw_flow()
+dev.off()
+cat("Saved:", file.path(out_dir, "fig_cohort_flow.tif"), "\n")

@@ -40,5 +40,13 @@ save_figure <- function(plot, filename, width, height) {
     width = width, height = height, dpi = 160, type = "cairo"
   )
   message("Saved: ", out_png)
+  # Submission copy (BJC artwork: minimum 300 dpi) -- 600 dpi LZW TIFF,
+  # same physical size as the PNG preview.
+  out_tif <- file.path(out_dir, sub("\\.png$", ".tif", filename))
+  ggplot2::ggsave(out_tif, plot,
+    width = width, height = height, dpi = 600, device = "tiff",
+    type = "cairo", compression = "lzw"
+  )
+  message("Saved: ", out_tif)
   invisible(out_png)
 }
