@@ -563,14 +563,16 @@
   破綻を受けた構造対策): 改訂メモは1エントリ1〜2行・詳細は git・閉流は圧縮・末尾の
   「現況」節を維持し通常セッションはそこだけ読む。claim_map 運用規則も同期改訂。
   本日の2閉流を上記2エントリへ圧縮(情報損失なし — 全文は git 履歴)
+- 2026-08-25: ratified 化同時方針を解消(軽量運用で順序制約消滅 — 研究者裁定)し、裁定済み
+  3件を適用: C-03 matched normal 統一・C-11 across・C-07 absence of detectable sharing(+3語)。
+  C-04 文のみ (iv-a)/(iv-b) 再裁定待ち(候補 = レビュー 16:49 版 §1-5)
 
 ## 現況(通常セッションはこの節と直近の改訂メモのみ読めば足りる — 2026-08-25 更新)
 
-- 語数: 本文 4,924(余裕 76)/Abstract 197(余裕 3)。機械検査(凍結4・N/C タグ・引用31/警告0)全通過。
+- 語数: 本文 4,927(余裕 73)/Abstract 197(余裕 3)。機械検査(凍結4・N/C タグ・引用31/警告0)全通過。
 - 開いている残件:
-  1. C 行 ratified 化(通し読み)と同時の文言修正4件: non-tumor→normal(C-03)/over→across(C-11)/
-     "and in the only calibration cell"(+1語、C-04)/"the absence of detectable sharing …
-     cannot be distinguished from"(C-07)
+  1. C-04 文(BRAF-normal 乖離文)の再裁定のみ: (iv-a) 無命名で厳密/(iv-b) Hallmark 名指し
+     — 候補全文はレビュー 16:49 版 §1-5(C-03/C-07/C-11 の3件は適用済み・同時方針は解消)
   2. 条件付き札: Abstract 余裕≥4 回復時に "cases with high estimated radiation attribution"(+2語)を適用
   3. submission_declarations の【記入】6箇所(研究者)
   4. フェーズ2 送り: References 投稿規定整形(PMID 併記含む)・組版記号(C(n,nx)・n_X)
