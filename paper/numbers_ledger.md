@@ -629,3 +629,9 @@
   行頭空白ゼロ・em ダッシュ異常ゼロ・DOI なしゼロ・References の CJK 残ゼロ・警告 0・
   生成物 diff は意図変更のみ。PMID 併記や書式全体の投稿規定整形はフェーズ2(References
   仕上げ)の担当のまま
+- 2026-08-25: **再レビュー2件を適用**(研究者 Go): (1) 層別 BM 文に片側の方向を明記 —
+  "used a one-sided Brunner–Munzel test to assess whether REO scores tended to be higher in
+  Mid-AS than in Low-AS cases"(実装 alternative="less" の Mid 高値方向・本線の house 形と
+  一致。バッチ B 文の方向欠落は正当な再オープン)/(2) C-14 タグ文の語順調整 — 条件を文頭へ
+  "Among genes expressed more highly …, no set in any family met the over-representation
+  threshold"(±0語・意味/限定句/タグ不変)。本文 4,924・Abstract 195 不変
