@@ -574,6 +574,8 @@
   (−1語)・HC文の主体明確化("so the contrast-level evidence … did not rely"、+1語)・
   "Relative purity could be estimated for"(−1語、Supp と統一)。2-1(Abstract Conclusions)は
   不採用(標準的絶対構文・余裕3→2・within-driver 限定句の削除が見合わない — 研究者裁定)
+- 2026-08-25: 機械走査3層(誤字辞書・語彙照合・LanguageTool 6.6 ローカル)を実施 — 実質指摘は
+  Supp の独立節等位コンマ1件のみ(適用、研究者 Go)。他18件は誤検出として根拠つき棄却
 
 ## 現況(通常セッションはこの節と直近の改訂メモのみ読めば足りる — 2026-08-25 更新)
 
