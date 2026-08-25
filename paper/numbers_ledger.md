@@ -602,3 +602,14 @@
   推測させる変異。**B7 = "matched non-tumor"→"matched normal" 方向で確定、適用は C-03
   ratified 化と同時**(Disc の C-03 タグ文のため)。以上で Codex 校正(2026-08-23、
   指摘26+補完1)の処理完了 — 適用21箇所・不採用/維持6件・保留1件(B7)
+- 2026-08-25: **言語整合レビュー(研究者作成 2026-08-25 リスト、paper/ 内・未追跡)の
+  バッチ A を適用**(研究者 Go — 全件事前検証済み): §2 客観 = equalled→equaled・supp 時制
+  (placed…; this assumes)・NES 冠詞(a … score of 2.28)/§1-2 = N-52 文を「versioned
+  raw-input tree の 1,819 件が machine 間 MD5 一致」へ係留(実測: expression 1,812+
+  clinical/reference ほか = 1,819。906 GDC expression files との混同を解消)/§3 用語 =
+  estimation of relative tumor purity・relative purity distributions/scores(無ハイフン統一)・
+  weighted running-sum statistic・four collections(420 節、ORA の family-by-list は別概念で
+  維持)・**C-14 タグ文の精密化「No set met … in any family」(N-59 up 行 0/0/0/0 で厳密に
+  真 — 検定単位の誤読を解消、C-14 は draft 段階での改稿)**・matched-pair estimator・
+  expression of sex-chromosome genes。本文 +6 語(4,910→4,916、余裕 84)、Abstract 不変。
+  C-03/C-11 タグ文の 2 件(non-tumor→normal・over→across)は ratified 化と同時に実施
