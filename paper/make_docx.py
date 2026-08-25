@@ -39,12 +39,21 @@ def preprocess(text):
     legends = m.group(0)
     text = text.replace(legends, "")
     text = text.rstrip("\n") + "\n\n" + legends.rstrip("\n") + "\n"
-    # References の番号はリスト化させず静的テキストとして残す(番号の再採番事故を防ぐ)
+    # References の番号はリスト化させず静的テキストとして残し(再採番事故の予防)、
+    # 各文献を 1 件 1 段落にする(空行区切り — 連続行は 1 段落に融合してしまうため)
     refs = re.search(r"^## References$.*?(?=^## |\Z)", text, flags=re.S | re.M)
     fixed = re.sub(r"^(\d+)\. ", r"\1\\. ", refs.group(0), flags=re.M)
+    fixed = re.sub(r"\n(?=\d+\\\. )", "\n\n", fixed)
     text = text.replace(refs.group(0), fixed)
     # 本文中の [1] / [1,2] を上付き化
     text = re.sub(r"\[(\d+(?:,\d+)*)\]", r"^\1^", text)
+    # 変異表記は BJC 現行慣行(2024–25 掲載例)の上付き形へ(正本は不変 — 派生層の組版)
+    text = text.replace("BRAF V600E", "*BRAF*^V600E^")
+    # ヒト遺伝子記号のイタリック(解析ラベル中の RET/BRAF も含む — 研究者裁定 2026-08-25。
+    # PTC 単体は疾患略語のため対象外、既にイタリック化済みトークンは再包止め)
+    genes = ("RET|BRAF|CCDC6|NCOA4|CLIP2|BHLHB9|S100A10|TESC|EHD4|"
+             "ATP5MF|MRPL52|NTHL1|URM1|USE1|PTC1|PTC3")
+    text = re.sub(rf"(?<![\w*])({genes})(?![\w*])", r"*\1*", text)
     return text
 
 
@@ -173,7 +182,7 @@ def patch_docx(path):
 
 def tokens_md(text):
     text = re.sub(r"\^(\d[\d,]*)\^", r"\1", text)
-    text = re.sub(r"[#*|`]", " ", text)
+    text = re.sub(r"[#*|`^]", " ", text)
     return re.findall(r"[A-Za-z0-9]+", text)
 
 
