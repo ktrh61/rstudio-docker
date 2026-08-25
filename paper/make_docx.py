@@ -66,16 +66,52 @@ def patch_docx(path):
         new_normal = normal.replace(
             "</w:style>", "<w:pPr>" + spacing + "</w:pPr></w:style>"
         )
-    parts["word/styles.xml"] = styles.replace(normal, new_normal).encode("utf-8")
+    styles = styles.replace(normal, new_normal)
+    # 原稿慣例の書体へ: 本文 Times New Roman 12pt、見出しは同書体・黒・太字
+    tnr = ('<w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" '
+           'w:cs="Times New Roman"/>')
+    normal2 = re.search(
+        r'<w:style [^>]*w:styleId="Normal"[^>]*>.*?</w:style>', styles, re.S
+    ).group(0)
+    styles = styles.replace(
+        normal2,
+        normal2.replace(
+            "</w:style>",
+            "<w:rPr>" + tnr + '<w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr>'
+            "</w:style>",
+        ),
+    )
+    for hid, size in (("Heading1", "28"), ("Heading2", "26"), ("Heading3", "24")):
+        m2 = re.search(
+            rf'<w:style [^>]*w:styleId="{hid}"[^>]*>.*?</w:style>', styles, re.S
+        )
+        if not m2:
+            continue
+        h = m2.group(0)
+        h2 = re.sub(r"<w:rFonts[^/]*/>", "", h)
+        h2 = re.sub(r"<w:color[^/]*/>", "", h2)
+        h2 = re.sub(r"<w:sz[^/]*/>", "", h2)
+        h2 = re.sub(r"<w:szCs[^/]*/>", "", h2)
+        ins = (tnr + '<w:b/><w:color w:val="000000"/>'
+               f'<w:sz w:val="{size}"/><w:szCs w:val="{size}"/>')
+        if "<w:rPr>" in h2:
+            h2 = h2.replace("<w:rPr>", "<w:rPr>" + ins, 1)
+        else:
+            h2 = h2.replace("</w:style>", "<w:rPr>" + ins + "</w:rPr></w:style>")
+        styles = styles.replace(h, h2)
+    parts["word/styles.xml"] = styles.encode("utf-8")
 
     doc = parts["word/document.xml"].decode("utf-8")
     sect = re.search(r"<w:sectPr[^>]*>.*?</w:sectPr>", doc, re.S).group(0)
     new_sect = sect
     if "lnNumType" not in new_sect:
-        # pandoc の sectPr は最小構成(pgMar なし)— lnNumType の後続要素も
-        # 存在しないため閉じタグ直前への挿入がスキーマ順序を満たす
+        # pandoc の sectPr は最小構成 — A4・余白 2.5cm を明示してロケール依存を排し、
+        # 続けて lnNumType(スキーマ順: pgSz → pgMar → lnNumType)
         new_sect = new_sect.replace(
             "</w:sectPr>",
+            '<w:pgSz w:w="11906" w:h="16838"/>'
+            '<w:pgMar w:top="1417" w:right="1417" w:bottom="1417" w:left="1417" '
+            'w:header="709" w:footer="709" w:gutter="0"/>'
             '<w:lnNumType w:countBy="1" w:restart="continuous"/></w:sectPr>',
         )
     footer_ref = '<w:footerReference xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" w:type="default" r:id="rIdFooterPg"/>'
