@@ -19,7 +19,7 @@ We calculated NIH IREP Assigned Share (AS) for ordinal banding only. We stratifi
 
 ### Results
 
-In RET fusion-positive PTCs, 1,765 of 15,621 genes met Storey q<0.10 <!-- N-16, N-15 -->, with omnibus p=0.0112 <!-- N-20 -->; other contrasts lacked concordant gene- and contrast-level evidence. No permutation gene set met q<0.10, whereas over-representation analysis highlighted cell-cycle and DNA-repair annotations among genes expressed less highly in High-AS cases. REO score medians showed an ordered descriptive profile across bands (dose-zero/Low-AS/Mid-AS/High-AS, 0/1/4/6 <!-- N-41 -->), with the extremes as construction anchors.
+In RET fusion-positive PTCs, 1,765 of 15,621 genes met Storey q<0.10 <!-- N-16, N-15 -->, with omnibus p=0.0112 <!-- N-20 -->; other contrasts lacked concordant gene- and contrast-level evidence. No gene set met q<0.10 under label permutation, whereas over-representation analysis highlighted cell-cycle and DNA-repair annotations among genes expressed less highly in High-AS cases. REO score medians showed an ordered descriptive profile across bands (dose-zero/Low-AS/Mid-AS/High-AS, 0/1/4/6 <!-- N-41 -->), with the extremes as construction anchors.
 
 ### Conclusions
 

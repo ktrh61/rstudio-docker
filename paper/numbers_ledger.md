@@ -645,3 +645,10 @@
   iteration … — N-78 タグ・Nakayama 引用位置維持)/λ・閾値の冠詞(a fixed λ=0.5 and
   a threshold of q<0.10)/make_submission.py に行末スペース除去を追加(行頭除去と対)。
   本文 4,924・Abstract 195 不変
+- 2026-08-25: **再レビュー B 群 1-2 を適用**(研究者裁定 — Abstract のみ、最小形):
+  "No permutation gene set met q<0.10" → "No gene set met q<0.10 under label permutation"
+  (+2語 — 「permutation という種類のセット」誤読を解消、Methods の label-permutation
+  gene-set inference と照応)。Abstract 195→197(余裕3)。当初の「本文 Results にも同型文」
+  という検査側所見は誤り(全文で Abstract の1箇所のみ — Codex 再確認・研究者訂正)で、
+  本文への波及修正なし。1-5 の名目水準も 0.05→0.10 に検査側誤記を訂正(Supp 明記の
+  nominal 0.10、N-25 下限 0.110 との差 0.010)
