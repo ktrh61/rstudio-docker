@@ -32,6 +32,8 @@ W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 
 def preprocess(text):
     """凡例節を References 後へ移動し、引用 [n] を上付き記法へ。"""
+    # Markdown の区切り線(---)は原稿の可視要素ではない — 罫線化させない
+    text = re.sub(r"^-{3,}\s*$", "", text, flags=re.M)
     m = re.search(r"^## Figure legends and table captions$.*?(?=^## )", text,
                   flags=re.S | re.M)
     legends = m.group(0)
@@ -88,7 +90,8 @@ def patch_docx(path):
             "</w:style>",
         ),
     )
-    for hid, size in (("Heading1", "28"), ("Heading2", "26"), ("Heading3", "24")):
+    # 見出しは本文と同サイズの太字(節)/太字イタリック(小節)— 投稿原稿の慣例形
+    for hid, size in (("Heading1", "24"), ("Heading2", "24"), ("Heading3", "24")):
         m2 = re.search(
             rf'<w:style [^>]*w:styleId="{hid}"[^>]*>.*?</w:style>', styles, re.S
         )
@@ -99,7 +102,8 @@ def patch_docx(path):
         h2 = re.sub(r"<w:color[^/]*/>", "", h2)
         h2 = re.sub(r"<w:sz[^/]*/>", "", h2)
         h2 = re.sub(r"<w:szCs[^/]*/>", "", h2)
-        ins = (tnr + '<w:b/><w:color w:val="000000"/>'
+        ins = (tnr + '<w:b/>' + ('<w:i/>' if hid == "Heading3" else '')
+               + '<w:color w:val="000000"/>'
                f'<w:sz w:val="{size}"/><w:szCs w:val="{size}"/>')
         if "<w:rPr>" in h2:
             h2 = h2.replace("<w:rPr>", "<w:rPr>" + ins, 1)
