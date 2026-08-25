@@ -1,0 +1,177 @@
+#!/usr/bin/env python3
+# 投稿用 Word 生成(派生物 — 正本は不変)
+#
+# 入力 = output/submission/manuscript_submission.md(make_submission.py の出力)
+# 出力 = output/submission/manuscript_submission.docx
+#
+# BJC 書式(GTA ライブ照合 2026-08-25)を機械注入する:
+#   (1) 図表凡例節を References の後ろへ移動(BJC: legends は References 後の別ページ)
+#   (2) 引用番号 [n] を上付きへ(pandoc の ^…^ 記法へ前処理)
+#   (3) 1.5 行間(styles.xml の Normal に w:line=360)
+#   (4) 全行番号(sectPr に lnNumType)
+#   (5) 全ページ番号(PAGE フィールドのフッタを新設)
+# 変換後、docx 本文のトークン集合を入力 md と照合し内容同一性を検査する。
+#
+# pandoc は環境変数 PANDOC で指定(既定 pandoc 3.6.4 を想定。バイナリは
+# リポジトリ外に置く — コミットされるのは本スクリプトのみ)。
+
+import os
+import re
+import shutil
+import subprocess
+import sys
+import zipfile
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+SUB = ROOT / "output" / "submission"
+PANDOC = os.environ.get("PANDOC", "pandoc")
+
+W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+
+
+def preprocess(text):
+    """凡例節を References 後へ移動し、引用 [n] を上付き記法へ。"""
+    m = re.search(r"^## Figure legends and table captions$.*?(?=^## )", text,
+                  flags=re.S | re.M)
+    legends = m.group(0)
+    text = text.replace(legends, "")
+    text = text.rstrip("\n") + "\n\n" + legends.rstrip("\n") + "\n"
+    # References の番号はリスト化させず静的テキストとして残す(番号の再採番事故を防ぐ)
+    refs = re.search(r"^## References$.*?(?=^## |\Z)", text, flags=re.S | re.M)
+    fixed = re.sub(r"^(\d+)\. ", r"\1\\. ", refs.group(0), flags=re.M)
+    text = text.replace(refs.group(0), fixed)
+    # 本文中の [1] / [1,2] を上付き化
+    text = re.sub(r"\[(\d+(?:,\d+)*)\]", r"^\1^", text)
+    return text
+
+
+def patch_docx(path):
+    """styles.xml(1.5 行間)・document.xml(行番号・フッタ参照)・
+    footer1.xml(ページ番号)を注入する。"""
+    zin = zipfile.ZipFile(path)
+    parts = {n: zin.read(n) for n in zin.namelist()}
+    zin.close()
+
+    styles = parts["word/styles.xml"].decode("utf-8")
+    normal = re.search(
+        r'<w:style [^>]*w:styleId="Normal"[^>]*>.*?</w:style>', styles, re.S
+    ).group(0)
+    spacing = '<w:spacing w:after="160" w:line="360" w:lineRule="auto"/>'
+    if "<w:pPr>" in normal:
+        new_normal = re.sub(r"<w:spacing[^/]*/>", "", normal)
+        new_normal = new_normal.replace("<w:pPr>", "<w:pPr>" + spacing, 1)
+    else:
+        # スキーマ上 pPr は style 末尾側 — 閉じタグ直前に挿入
+        new_normal = normal.replace(
+            "</w:style>", "<w:pPr>" + spacing + "</w:pPr></w:style>"
+        )
+    parts["word/styles.xml"] = styles.replace(normal, new_normal).encode("utf-8")
+
+    doc = parts["word/document.xml"].decode("utf-8")
+    sect = re.search(r"<w:sectPr[^>]*>.*?</w:sectPr>", doc, re.S).group(0)
+    new_sect = sect
+    if "lnNumType" not in new_sect:
+        # pandoc の sectPr は最小構成(pgMar なし)— lnNumType の後続要素も
+        # 存在しないため閉じタグ直前への挿入がスキーマ順序を満たす
+        new_sect = new_sect.replace(
+            "</w:sectPr>",
+            '<w:lnNumType w:countBy="1" w:restart="continuous"/></w:sectPr>',
+        )
+    footer_ref = '<w:footerReference xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" w:type="default" r:id="rIdFooterPg"/>'
+    if "footerReference" not in new_sect:
+        new_sect = re.sub(r"(<w:sectPr[^>]*>)", r"\1" + footer_ref, new_sect)
+    parts["word/document.xml"] = doc.replace(sect, new_sect).encode("utf-8")
+
+    parts["word/footer1.xml"] = (
+        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+        f'<w:ftr xmlns:w="{W}"><w:p><w:pPr><w:jc w:val="center"/></w:pPr>'
+        '<w:r><w:fldChar w:fldCharType="begin"/></w:r>'
+        '<w:r><w:instrText xml:space="preserve"> PAGE </w:instrText></w:r>'
+        '<w:r><w:fldChar w:fldCharType="end"/></w:r></w:p></w:ftr>'
+    ).encode("utf-8")
+
+    ct = parts["[Content_Types].xml"].decode("utf-8")
+    if "footer1.xml" not in ct:
+        ct = ct.replace(
+            "</Types>",
+            '<Override PartName="/word/footer1.xml" ContentType="application/'
+            'vnd.openxmlformats-officedocument.wordprocessingml.footer+xml"/>'
+            "</Types>",
+        )
+    parts["[Content_Types].xml"] = ct.encode("utf-8")
+
+    rels = parts["word/_rels/document.xml.rels"].decode("utf-8")
+    if "rIdFooterPg" not in rels:
+        rels = rels.replace(
+            "</Relationships>",
+            '<Relationship Id="rIdFooterPg" Type="http://schemas.openxml'
+            'formats.org/officeDocument/2006/relationships/footer" '
+            'Target="footer1.xml"/></Relationships>',
+        )
+    parts["word/_rels/document.xml.rels"] = rels.encode("utf-8")
+
+    zout = zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED)
+    for name, data in parts.items():
+        zout.writestr(name, data)
+    zout.close()
+
+
+def tokens_md(text):
+    text = re.sub(r"\^(\d[\d,]*)\^", r"\1", text)
+    text = re.sub(r"[#*|`]", " ", text)
+    return re.findall(r"[A-Za-z0-9]+", text)
+
+
+def tokens_docx(path):
+    doc = zipfile.ZipFile(path).read("word/document.xml").decode("utf-8")
+    body = " ".join(re.findall(r"<w:t[^>]*>([^<]*)</w:t>", doc))
+    body = (body.replace("&lt;", "<").replace("&gt;", ">")
+            .replace("&amp;", "&").replace("&quot;", '"'))
+    return re.findall(r"[A-Za-z0-9]+", body)
+
+
+def main():
+    src = (SUB / "manuscript_submission.md").read_text(encoding="utf-8")
+    pre = preprocess(src)
+    md = SUB / "manuscript_docx_input.md"
+    md.write_text(pre, encoding="utf-8")
+
+    out = SUB / "manuscript_submission.docx"
+    ver = subprocess.run([PANDOC, "--version"], capture_output=True,
+                         text=True).stdout.splitlines()[0]
+    subprocess.run(
+        [PANDOC, str(md), "-f", "markdown+superscript", "-o", str(out)],
+        check=True,
+    )
+    patch_docx(out)
+
+    a, b = sorted(tokens_md(pre)), sorted(tokens_docx(out))
+    from collections import Counter
+    diff = Counter(a) - Counter(b) | Counter(b) - Counter(a)
+    doc = zipfile.ZipFile(out).read("word/document.xml").decode("utf-8")
+    checks = {
+        "lnNumType(行番号)": "lnNumType" in doc,
+        "footerReference(頁番号)": "rIdFooterPg" in doc,
+        "spacing360(1.5行間)": b'w:line="360"'
+        in zipfile.ZipFile(out).read("word/styles.xml"),
+        "上付き引用": "<w:vertAlign" in doc,
+    }
+    print(ver)
+    print(f"出力: {out}")
+    print(f"内容照合: token差 {sum(diff.values())} 件"
+          + (f" {dict(list(diff.items())[:5])}" if diff else ""))
+    for k, v in checks.items():
+        print(f"  {k}: {'OK' if v else 'NG'}")
+    if not all(checks.values()):
+        sys.exit(1)
+
+    dest = Path("/mnt/c/Users/kotaro/OneDrive/論文関連（説明用資料含）/word_check")
+    if dest.parent.exists():
+        dest.mkdir(exist_ok=True)
+        shutil.copy2(out, dest / out.name)
+        print(f"閲覧用コピー: {dest / out.name}")
+
+
+if __name__ == "__main__":
+    main()
