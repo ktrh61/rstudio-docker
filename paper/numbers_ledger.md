@@ -89,7 +89,7 @@
 | N-ID | 値 | 定義 | 出典 | 使用箇所 | 状態 |
 | --- | --- | --- | --- | --- | --- |
 | N-24 | 16セル全表(4対比×4コレクション: m_sets、p_any、95%CI、mean/max 発見数。p_any 範囲 0.01–0.18) | D6 較正の完全な表 | run/xeon_final_20260811/logs/d6_calibration.log:6-39(rds は repo/diagnostics/output/gsea_null_calibration.rds) | Supp | verified |
-| N-25 | 0.18(95%CI 0.110–0.270) | 唯一の名目 0.10 超過: B_Normal/H の p_any(CI 下限も 0.10 超) | 同 log:19 キー「13 B_Normal H 50 100 18 0.18 0.110311」・log:36(ci_hi 0.2695) | Results / Disc | verified |
+| N-25 | 0.18(95%CI 0.110–0.269 — rds 実値 ci_hi 0.26947709。旧記載 0.270 は転記時の丸め誤り、2026-08-25 訂正) | 唯一の名目 0.10 超過: B_Normal/H の p_any(CI 下限も 0.10 超) | 同 log:19 キー「13 B_Normal H 50 100 18 0.18 0.110311」・log:36(ci_hi 0.2695) | Results / Disc | verified |
 | N-26 | B_Tumor/radiation 0.10(CI 0.049–0.176)、B_Normal/radiation 0.12(CI 0.064–0.200) | CI が 0.10 を跨ぐ境界セル | 同 log:18・22(ci_hi は log:35・39) | Supp / Disc | verified |
 
 ### F. 420 遺伝子セット検定
@@ -599,3 +599,7 @@
   表は個別ファイル+キャプション/図凡例は References 後の別ページ/図 tiff・eps・jpg・bmp
   300dpi以上/Supp 可能なら1ファイル+各ファイル50語要約/カバーレター必須要素(BJC宣言・
   独自性・対応著者・COI文)。declarations の節順は規定と一致確認済み
+- 2026-08-25: 図5枚に 600dpi LZW TIFF 出力を追加・正準コンテナで再生成(@575f493 — 従来
+  PNG は dpi160/200 で BJC 最低300未達だった。N 照合ログ全一致・内容不変)。再生成ログ照合で
+  **N-25 の CI 上端の丸め誤りを発見・訂正**(0.270→0.269、rds 実値 0.26947709。本文・Supp・
+  N-25 行の3箇所、他セル表示は標準丸めで整合 — 外側丸め仮説は実値で棄却済み)
