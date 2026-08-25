@@ -116,7 +116,9 @@ For cases with matched normal tissue, we estimated relative purity on a common s
 
 We summarized associations between relative purity and REO score using Spearman correlations separately within Low-AS and Mid-AS cases and after pooling the two bands. In the pooled intermediate-band cases, we also calculated the band–score and band–purity Spearman correlations. To describe the band–score association after rank-scale adjustment for purity, we calculated the partial Spearman coefficient by correlating residuals from separate linear projections of band rank and score rank on purity rank.
 
-In a separate diagnostic permutation procedure, we permuted the Low-AS and Mid-AS labels 9,999 times using seed 19860426 while retaining each sample's observed score–purity pair. With Mid-AS coded above Low-AS, we calculated an upper-tail p-value for a positive partial coefficient using plus-one counting. Because this scheme also breaks the band–purity association, the resulting p-value was not interpreted as conditional inference at fixed purity. None of these purity analyses was designated as a confirmatory test of an AS-band association independent of purity.
+In a separate diagnostic permutation procedure, we permuted the Low-AS and Mid-AS labels 9,999 times using seed 19860426 while retaining each sample's observed score–purity pair. With Mid-AS coded above Low-AS, we calculated an upper-tail p-value for a positive partial coefficient using plus-one counting. Because this scheme also breaks the band–purity association, the resulting p-value was not interpreted as conditional inference at fixed purity.
+
+As a further descriptive comparison, we split the pooled Low-AS and Mid-AS cases into two strata at the median of the common-scale purity and, within each stratum, compared REO scores between Mid-AS and Low-AS cases with a one-sided Brunner–Munzel test; at these group sizes the permutation distribution was enumerated exactly. None of these purity analyses was designated as a confirmatory test of an AS-band association independent of purity.
 
 ### External gene-list comparison
 

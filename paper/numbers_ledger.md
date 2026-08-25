@@ -611,5 +611,14 @@
   weighted running-sum statistic・four collections(420 節、ORA の family-by-list は別概念で
   維持)・**C-14 タグ文の精密化「No set met … in any family」(N-59 up 行 0/0/0/0 で厳密に
   真 — 検定単位の誤読を解消、C-14 は draft 段階での改稿)**・matched-pair estimator・
-  expression of sex-chromosome genes。本文 +6 語(4,910→4,916、余裕 84)、Abstract 不変。
+  expression of sex-chromosome genes。本文 +6 語 → 実測 4,924(余裕 76 — bee2899 の AI 開示
+  改稿 +8 語が基線に乗った分を含む)、Abstract 195 不変。
   C-03/C-11 タグ文の 2 件(non-tumor→normal・over→across)は ratified 化と同時に実施
+- 2026-08-25: **バッチ B: 純度層別比較の Methods 記載を補完**(レビュー §1-1、研究者 Go):
+  Supp Methods「Ancillary REO quality and purity diagnostics」に層別比較の手続き1文を新設 —
+  プール Low+Mid の共通尺度純度中央値で2層化、各層内で片側 BM(Mid>Low)、群サイズ
+  (C(15,8)=6,435・C(16,7)=11,440 < 完全枚挙上限 1e8)により p は完全枚挙の exact。
+  実装照合 = diagnostics/reo_lowmid_confound.R:55-72(median split・alternative="less"・
+  method="auto")+ diagnostics/output/reo_confound.rds 直読で N-46/N-47 全値一致。
+  既存の非確認的地位文(None of these purity analyses …)が新文を包含する位置に挿入。
+  これで Supp Results の N-47 結果文と Methods が一対一対応
