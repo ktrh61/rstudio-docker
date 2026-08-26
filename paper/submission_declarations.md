@@ -33,7 +33,9 @@
 KH conceived the study, developed and executed the full analysis pipeline, performed all
 statistical analyses, and drafted the manuscript. VAS and NM contributed the driver-based
 stratification design and the Assigned Share banding approach, including the specification
-of the NIH IREP input parameters. All authors reviewed and approved the final manuscript.
+of the NIH IREP input parameters; VAS additionally proposed the initial concept of a
+per-case predictive classification, which motivated the relative-expression-ordering panel
+designed and implemented by KH. All authors reviewed and approved the final manuscript.
 
 (貢献実態の研究者指定 2026-08-26: oncogene 設定・AS 分割・IREP パラメータ = VAS/NM、
 他全て = KH。文言は共著者ラウンドで本人ら確認)

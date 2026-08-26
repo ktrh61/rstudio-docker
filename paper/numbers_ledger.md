@@ -642,3 +642,5 @@
   定型文/**Authors' contributions = 実態指定どおり**(driver 設定・AS 分割・IREP パラメータ =
   VAS/NM、他全て = KH — 共著者ラウンドで本人ら確認)。残【記入】= Acknowledgements(親族
   相談中)+公開リポジトリ URL/DOI 2箇所(公開時確定)
+- 2026-08-26: 貢献文に VAS の per-case 予測分類の初期構想(REO の動機)を追記し、REO の
+  設計・実装 = KH を同文で固定(研究者裁定 — 構図「構想 VAS/NM・組み立てと解決 KH」)
