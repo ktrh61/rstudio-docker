@@ -31,9 +31,10 @@ W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 
 
 def csv_md_table(path):
-    """凍結 CSV を Markdown 表へ(閲覧用の一方向レンダリング — 列名は素のまま)。"""
+    """凍結 CSV を Markdown 表へ(閲覧用の一方向レンダリング — 列名・値は素のまま)。"""
     import csv
-    rows = list(csv.reader(open(path, encoding="utf-8")))
+    rows = [[c.replace("|", "\\|") for c in r]
+            for r in csv.reader(open(path, encoding="utf-8"))]
     out = ["| " + " | ".join(rows[0]) + " |",
            "|" + "---|" * len(rows[0])]
     out += ["| " + " | ".join(r) + " |" for r in rows[1:]]
@@ -93,6 +94,22 @@ def supp_preprocess(text):
     cover = ("**Supplementary Material for:** " + title + "\n\n" + author_block()
              + "\n\n")
     text = re.sub(r"^-{3,}\s*$", "", text, flags=re.M)
+    # 小表(S1・S2・S4〜S8)は出荷用コピーの実体をキャプション直下へ埋め込む。
+    # S3(18,577 行)と Data 1/2 は物理的に埋め込み不能 — キャプションのみ(別ファイル参照)
+    supp_files = ROOT / "paper" / "gpt_review" / "supplementary_files"
+    for tag, fname in [
+        ("S1", "table_s1_cohort_composition.csv"),
+        ("S2", "table_s2_normalization_diagnostics.csv"),
+        ("S4", "table_s4_reo_panel.csv"),
+        ("S5", "table_s5_software_versions.csv"),
+        ("S6", "table_s6_gene_set_summary.csv"),
+        ("S7", "table_s7_complete_null_calibration.csv"),
+        ("S8", "table_s8_between_stratum_concordance.csv"),
+    ]:
+        tbl = csv_md_table(supp_files / fname)
+        text = re.sub(rf"(^\*\*Table {tag} \|[^\n]*\n)",
+                      lambda m, t=tbl: m.group(1) + "\n" + t + "\n\n",
+                      text, count=1, flags=re.M)
     text = text.replace("BRAF V600E", "*BRAF*^V600E^")
     genes = ("RET|BRAF|CCDC6|NCOA4|CLIP2|BHLHB9|S100A10|TESC|EHD4|"
              "ATP5MF|MRPL52|NTHL1|URM1|USE1|PTC1|PTC3")
