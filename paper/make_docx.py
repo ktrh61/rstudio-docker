@@ -234,7 +234,7 @@ def main():
         dest.mkdir(exist_ok=True)
         # Word/OneDrive のキャッシュ・書き戻しを避けるため毎回新しいファイル名で渡す
         import time
-        tag = time.strftime("%H%M")
+        tag = time.strftime("%Y%m%d_%H%M")
         view = dest / f"manuscript_submission_{tag}.docx"
         shutil.copy2(out, view)
         print(f"閲覧用コピー: {view}")
