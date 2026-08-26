@@ -160,7 +160,7 @@
 | N-85 | Ory 2026 多変量署名12セル中9で k=0。非ゼロは全て R_Tumor: 組織共有署名 5/39、正常組織署名 3/40(組織横断)、腫瘍署名 3/46(組織対応)。元リストは50/45/64遺伝子。SPEN-AS1・MCTS2・SNORD47はGENCODE v36に対応せず、他の分母差は対比別検定集合への残存差による | Ory 2026 Supplementary Tables S2/S4/S6 と各対比 DEG 集合(q<0.10)の記述的員数照合。濃縮検定ではない | `diagnostics/ory2026_gene_signatures.csv`; `diagnostics/external_gene_anchors.R`; `diagnostics/output/external_gene_anchors.rds` の `$resolution`, `$summary` | Methods / Results / Disc / Supp | verified |
 | N-86 | R_Tumor との重なり: 組織共有 = ATP5MF, MRPL52, NTHL1, URM1, USE1; 正常組織 = PXDN, S100A10, TESC; 腫瘍 = P2RY1, PLK2, EHD4 | N-85の遺伝子別内訳。正常組織署名の3件は組織横断、腫瘍署名の3件は組織対応。Ory署名は正常組織対比およびBRAF対比では k=0 | `diagnostics/output/external_gene_anchors.rds` の `$detail` | Results / Disc / Supp | verified |
 | N-87 | PC-OD flag(主4群): R_Sporadic/R_High/B_Sporadic は tumor・normal とも 0、B_High tumor 1(RET 層の主解析集合は不変) | 主コホート QC フラグの群別員数(Results 記述) | processed/thyr_case_outliers.rds(集計 = paper/gpt_review/additional_pcod_flag_counts.csv、追加監査 2026-08-19 実行記録つき)| Results 1 | verified(2026-08-21 rds 直読: B_High tumor 1・他は3群×2組織すべて0) |
-| N-88 | 主解析の相対純度中央値(driver コホート別の相対尺度・層内でのみ比較可能): R_Sporadic 0.783 (n=12) / R_High 0.822 (n=15) / B_Sporadic 0.836 (n=27) / B_High 0.922 (n=9)(主コホート解析オブジェクト由来 — REO 全帯プール尺度 N-44 とは別尺度で互換しない) | 主コホート4群の純度開示(表1脚注) | processed/thyr_analysis_cohorts.rds(R 系集計 = paper/gpt_review/additional_covariate_summary.csv とも一致)| Table 1 footnote | verified(2026-08-21 rds 直読: 4群全て) |
+| N-88 | 主解析の相対純度中央値(driver コホート別の相対尺度・層内でのみ比較可能): R_Sporadic 0.783 (n=12) / R_High 0.822 (n=15) / B_Sporadic 0.836 (n=27) / B_High 0.922 (n=9)(主コホート解析オブジェクト由来 — REO 全帯プール尺度 N-44 とは別尺度で互換しない) | 主コホート4群の純度開示(表2脚注) | processed/thyr_analysis_cohorts.rds(R 系集計 = paper/gpt_review/additional_covariate_summary.csv とも一致)| Table 2 footnote | verified(2026-08-21 rds 直読: 4群全て) |
 | N-89 | GDC 入力の固定: open-access STAR-Counts 906 ファイル、照会 2026-07-23 と 2026-08-09 で byte-identical、manifest md5 7defb0c5574453474c67dfac8367a589 | GDC manifest の保全(Supp Methods) | paper/gpt_review/gdc_manifest_rebc_thyr_star_counts.tsv(コミット 095699b。md5 と 906 行は 2026-08-21 に実測照合済み)| Supp Methods | verified |
 | N-91 | REO Mid-Low 検定の MC 規模: 完全枚挙 C(36,17)=8,597,496,600 のため 999,999 回モンテカルロ(シード 19860426、plus-one) | REO 検定の実装定数(Supp Methods) | lib/stat_brunnermunzel.R:411(B=999999L 既定)+ scripts/530:75-77(method="auto"・B 未指定 → 既定適用。auto は C(36,17) 枚挙不能で MC 選択)。組合せ数は算術確認済み | Supp Methods | verified(コード水準。実行ログ照合は run 記録に委ねる) |
 | N-92 | 取得照会日(2026-07-23・2026-08-09)はいずれも GDC Data Release 45.0(2025-12-04 公開)の期間内。次リリース 46.0 は 2026-08-10 公開で、45.0 と 46.0 の間に中間リリースなし。取得時にリリース番号のログはなく、帰属はリリースノートの日付照合による(計算なしの文書事実) | GDC データ状態の版明示(Supp Methods) | https://docs.gdc.cancer.gov/Data/Release_Notes/Data_Release_Notes/(照合 2026-08-21)。版固定原典 = NCI-GDC/gdc-docs コミット 6d9a957fd50d5c349e5b94201874837de0a75939 の docs/Data/Release_Notes/Data_Release_Notes.md(45.0/46.0/44.0 の Release Date を逐語確認) | Supp Methods | verified(2026-08-21 原文照合) |
@@ -233,7 +233,7 @@
 | --- | --- | --- | --- |
 | Fig.1(仮)遺伝子別 BM 証拠 | figures/fig_gene_bm_evidence.R ← processed/thyr_expression_test.rds + thyr_se_raw.rds。正準 repo/output/figures/fig_gene_bm_evidence.png(二機バイト一致) | C-未、N-16・N-18(付随ログ fig_gene_bm_evidence.log:2-5) | draft |
 | Fig.2(仮)MA プロット | figures/fig_ma_gene_bm.R ← processed/thyr_normalized_counts.rds + thyr_expression_test.rds + thyr_se_raw.rds。正準 repo/output/figures/fig_ma_gene_bm.png(2026-08-10 01:40 版。B.14 で二機 md5 一致) | C-未、N-16・N-49 | draft |
-| 表5(仮)事前指定の解釈マップ(4対比の位置づけ+パターン規則) | 実体 = 本文内表(「Figure legends and table captions」節・表2キャプション直下 — 2026-08-18 移設、Methods は参照文のみ)。出典 = 計画v2 §0.6 批准マップの転記(スクリプトなし・数値なし)。2026-08-15 掲載(判断点5 の置き場所決定) | C-01/C-04/C-05/C-07/C-16 の読みの参照先 | draft |
+| 表5(仮)事前指定の解釈マップ(4対比の位置づけ+パターン規則) | 実体 = 本文内表(「Figure legends and table captions」節・表1(旧表2)キャプション直下 — 2026-08-18 移設、Methods は参照文のみ)。出典 = 計画v2 §0.6 批准マップの転記(スクリプトなし・数値なし)。2026-08-15 掲載(判断点5 の置き場所決定) | C-01/C-04/C-05/C-07/C-16 の読みの参照先 | draft |
 | Fig.3(仮)REO グレーディング | figures/fig_reo_grading.R ← processed/thyr_reo_panel.rds + thyr_reo_evaluation.rds + thyr_se_raw.rds + thyr_case_assigned_share.rds。正準 repo/output/figures/fig_reo_grading.png(二機バイト一致) | C-未、N-41・N-50 | draft |
 | フロー図(仮)コホートフロー(6段、**両 driver 層並記** — 2026-08-14 研究者承諾: 層別途中経過は本文でなくこの図が担う) | figures/fig_cohort_flow.R ← thyr_cohort_flow.rds(230 出力)。数値は N-08(合算+RET/BRAF 別)。**実行済み 2026-08-15**(rebc-r453:refblas・N 照合一致) | C-10、N-08 | draft |
 | Tab.1(仮)臨床コホート構成(Driver × AS 帯 × pair) | tables/tab_cohort_composition.R ← thyr_clinical.rds + thyr_case_assigned_share.rds + SE | C-未、N-11 | draft |
@@ -592,7 +592,7 @@
      タイトルページ(≤150字・非結論形 — 現115字適合・対応著者 ORCID)/カバーレター(重要性・
      BJC 宣言・未発表言明・対応著者情報・COI 文)
 - ratified 行の変更 = 検査経由+改訂メモ1〜2行+研究者 accept(再批准を兼ねる)。
-  別格 = 凍結4箇所・表2ブロック・事前固定に関する記述(紙面の事実主張が根拠)
+  別格 = 凍結4箇所・表1ブロック(旧表2 — 2026-08-26 引用順へ番号交換)・事前固定に関する記述(紙面の事実主張が根拠)
 - 2026-08-25: BJC Guide to Authors をライブ再照合(公開ページ、保存 PDF は文字アウトライン化で
   抽出不能): 既知(5,000/200・品目≤6・文献≤60・Vancouver 6著者+et al.・LLM=Methods 文書化)を
   再確認+新規詳細 = タイトル≤150字・非結論形(現115字適合)/1.5行間+全頁・全行番号/
@@ -623,3 +623,8 @@
   他 3 出現は名詞修飾用法で不変更)
 - 2026-08-26: 通読指摘(研究者): 懸垂ハイフン形 "Low- and Mid-AS" 3箇所(本文2・Supp1)を
   原稿優勢の完全表記 "Low-AS and Mid-AS"(12回)へ統一(±0語)
+- 2026-08-26: **表番号を引用順へ交換**(通読指摘・研究者 Go — BJC 規定「表は本文引用順」に対し
+  旧 Table 2(解釈マップ)の初出が Intro で旧 Table 1(症例特性)より先だったため): マップ =
+  Table 1・症例特性 = Table 2 へ全ラベル交換(本文8箇所・±0語)、キャプション節を番号順に
+  並べ替え、manifest・N-88 使用箇所・ガード名(表2ブロック→表1ブロック)を同期。凍結断片は
+  ホスト文の番号のみ変更で不変。図は元から引用順適合
