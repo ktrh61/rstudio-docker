@@ -30,10 +30,29 @@ PANDOC = os.environ.get("PANDOC", "pandoc")
 W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 
 
+def csv_md_table(path):
+    """凍結 CSV を Markdown 表へ(閲覧用の一方向レンダリング — 列名は素のまま)。"""
+    import csv
+    rows = list(csv.reader(open(path, encoding="utf-8")))
+    out = ["| " + " | ".join(rows[0]) + " |",
+           "|" + "---|" * len(rows[0])]
+    out += ["| " + " | ".join(r) + " |" for r in rows[1:]]
+    return "\n".join(out)
+
+
 def preprocess(text):
     """凡例節を References 後へ移動し、引用 [n] を上付き記法へ。"""
     # Markdown の区切り線(---)は原稿の可視要素ではない — 罫線化させない
     text = re.sub(r"^-{3,}\s*$", "", text, flags=re.M)
+    # 閲覧用: Table 2・3 の実体(凍結 CSV)をキャプション直下へ埋め込む
+    # (研究者決定 2026-08-26: 共著者版は一体ファイル — 版ズレ回避・コメント集約。
+    #  投稿時は 3 表とも個別ファイルへ分離するため、この埋め込みは閲覧モード専用)
+    t2 = csv_md_table(ROOT / "output" / "tables" / "tab_case_characteristics.csv")
+    text = re.sub(r"(\*\*Table 2 \| Case characteristics\.\*\*[^\n]*\n)",
+                  r"\1\n" + t2.replace("\\", "\\\\") + "\n\n", text, count=1)
+    t3 = csv_md_table(ROOT / "output" / "tables" / "tab_gene_level_summary.csv")
+    text = re.sub(r"(\*\*Table 3 \| Gene-level results\.\*\*[^\n]*\n)",
+                  r"\1\n" + t3.replace("\\", "\\\\") + "\n\n", text, count=1)
     m = re.search(r"^## Figure legends and table captions$.*?(?=^## )", text,
                   flags=re.S | re.M)
     legends = m.group(0)
