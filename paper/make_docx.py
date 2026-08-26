@@ -59,6 +59,47 @@ def author_block():
     return "\n".join(lines)
 
 
+CJK = re.compile(r"[　-ヿ㐀-鿿＀-￯]")
+
+
+def additional_information():
+    """declarations の Additional Information を BJC 規定順で描画する。
+    日本語管理注記(CJK 行)は除去、未記入節(【記入】)は見出しごと省略、
+    URL/DOI の未確定括弧は明示プレースホルダへ置換。"""
+    d = (ROOT / "paper" / "submission_declarations.md").read_text(encoding="utf-8")
+    zone = d.split("## Additional Information", 1)[1].split("\n## ", 1)[0]
+    zone = zone.split("\n", 1)[1]
+    out = ["## Additional Information"]
+    for m in re.finditer(r"^### (.+?)$\n(.*?)(?=^### |\Z)", zone, re.S | re.M):
+        head, body = m.group(1).strip(), m.group(2)
+        body = re.sub(r"<!--.*?-->", "", body, flags=re.S)
+        body = re.sub(r"【リポジトリ URL/DOI[^】]*】", "[URL/DOI to be added at publication]", body)
+        body = re.sub(r"【公開リポジトリの URL/DOI[^】]*】", "", body)
+        lines = [l for l in body.split("\n") if not CJK.search(l)]
+        body = re.sub(r"\n{3,}", "\n\n", "\n".join(lines)).strip()
+        body = re.sub(r"^案: ", "", body)
+        if not body or "【記入】" in body:
+            continue  # 未確定節(Acknowledgements 等)は記入後の再生成で自動的に現れる
+        out += [f"### {head}", "", body, ""]
+    return "\n".join(out).rstrip()
+
+
+def supp_preprocess(text):
+    """Supplementary Material の閲覧用整形: 表紙情報を付与し、遺伝子イタリック・
+    V600E 上付き・区切り線除去を本文と同じ規則で適用する。追加情報が必要になったら
+    この表紙ブロックに足す。"""
+    d = (ROOT / "paper" / "submission_declarations.md").read_text(encoding="utf-8")
+    title = re.search(r"\*\*Title\*\*: ([^(\n]+)", d).group(1).strip()
+    cover = ("**Supplementary Material for:** " + title + "\n\n" + author_block()
+             + "\n\n")
+    text = re.sub(r"^-{3,}\s*$", "", text, flags=re.M)
+    text = text.replace("BRAF V600E", "*BRAF*^V600E^")
+    genes = ("RET|BRAF|CCDC6|NCOA4|CLIP2|BHLHB9|S100A10|TESC|EHD4|"
+             "ATP5MF|MRPL52|NTHL1|URM1|USE1|PTC1|PTC3")
+    text = re.sub(rf"(?<![\w*])({genes})(?![\w*])", r"*\1*", text)
+    return cover + text
+
+
 def preprocess(text):
     """凡例節を References 後へ移動し、引用 [n] を上付き記法へ。"""
     # Markdown の区切り線(---)は原稿の可視要素ではない — 罫線化させない
@@ -80,7 +121,9 @@ def preprocess(text):
                   flags=re.S | re.M)
     legends = m.group(0)
     text = text.replace(legends, "")
-    text = text.rstrip("\n") + "\n\n" + legends.rstrip("\n") + "\n"
+    # BJC 節順: 本文 → References → Additional Information → 凡例・表
+    text = (text.rstrip("\n") + "\n\n" + additional_information()
+            + "\n\n" + legends.rstrip("\n") + "\n")
     # References の番号はリスト化させず静的テキストとして残し(再採番事故の予防)、
     # 各文献を 1 件 1 段落にする(空行区切り — 連続行は 1 段落に融合してしまうため)
     refs = re.search(r"^## References$.*?(?=^## |\Z)", text, flags=re.S | re.M)
@@ -236,50 +279,53 @@ def tokens_docx(path):
     return re.findall(r"[A-Za-z0-9]+", body)
 
 
-def main():
-    src = (SUB / "manuscript_submission.md").read_text(encoding="utf-8")
-    pre = preprocess(src)
-    md = SUB / "manuscript_docx_input.md"
+def build(src_name, out_name, prep):
+    src = (SUB / src_name).read_text(encoding="utf-8")
+    pre = prep(src)
+    md = SUB / out_name.replace(".docx", "_input.md")
     md.write_text(pre, encoding="utf-8")
-
-    out = SUB / "manuscript_submission.docx"
-    ver = subprocess.run([PANDOC, "--version"], capture_output=True,
-                         text=True).stdout.splitlines()[0]
+    out = SUB / out_name
     subprocess.run(
         [PANDOC, str(md), "-f", "markdown+superscript", "-o", str(out)],
         check=True,
     )
     patch_docx(out)
-
     a, b = sorted(tokens_md(pre)), sorted(tokens_docx(out))
     from collections import Counter
     diff = Counter(a) - Counter(b) | Counter(b) - Counter(a)
     doc = zipfile.ZipFile(out).read("word/document.xml").decode("utf-8")
     checks = {
-        "lnNumType(行番号)": "lnNumType" in doc,
-        "footerReference(頁番号)": "rIdFooterPg" in doc,
-        "spacing360(1.5行間)": b'w:line="360"'
+        "行番号": "lnNumType" in doc,
+        "頁番号": "rIdFooterPg" in doc,
+        "1.5行間": b'w:line="360"'
         in zipfile.ZipFile(out).read("word/styles.xml"),
-        "上付き引用": "<w:vertAlign" in doc,
     }
-    print(ver)
-    print(f"出力: {out}")
-    print(f"内容照合: token差 {sum(diff.values())} 件"
-          + (f" {dict(list(diff.items())[:5])}" if diff else ""))
-    for k, v in checks.items():
-        print(f"  {k}: {'OK' if v else 'NG'}")
-    if not all(checks.values()):
+    print(f"{out_name}: token差 {sum(diff.values())} 件"
+          + (f" {dict(list(diff.items())[:5])} " if diff else " ")
+          + " ".join(f"{k}:{'OK' if v else 'NG'}" for k, v in checks.items()))
+    if diff or not all(checks.values()):
         sys.exit(1)
+    return out
 
+
+def main():
+    print(subprocess.run([PANDOC, "--version"], capture_output=True,
+                         text=True).stdout.splitlines()[0])
+    outs = [
+        build("manuscript_submission.md", "manuscript_submission.docx", preprocess),
+        build("supplementary_submission.md", "supplementary_submission.docx",
+              supp_preprocess),
+    ]
     dest = Path("/mnt/c/Users/kotaro/OneDrive/論文関連（説明用資料含）/word_check")
     if dest.parent.exists():
         dest.mkdir(exist_ok=True)
         # Word/OneDrive のキャッシュ・書き戻しを避けるため毎回新しいファイル名で渡す
         import time
         tag = time.strftime("%Y%m%d_%H%M")
-        view = dest / f"manuscript_submission_{tag}.docx"
-        shutil.copy2(out, view)
-        print(f"閲覧用コピー: {view}")
+        for out in outs:
+            view = dest / f"{out.stem}_{tag}.docx"
+            shutil.copy2(out, view)
+            print(f"閲覧用コピー: {view}")
 
 
 if __name__ == "__main__":
