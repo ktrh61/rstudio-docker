@@ -637,3 +637,8 @@
   Vladimir A. Saenko・Norisato Mitsutake。所属現名称の最終確認のみ研究者持ち)し、make_docx に
   タイトル直下の著者ブロック描画を実装(一方向 — 投稿時はタイトルページ別建て)。
   【記入】残 = Acknowledgements(親族相談中)・貢献・倫理・COI・資金の5箇所
+- 2026-08-26: declarations をほぼ完成(研究者裁定): 所属 = 2025-04 改称名 Molecular Oncology
+  and Diagnostic Medicine を採用(共著者検収で再確認)/倫理・Consent・COI・資金 = 承認済み
+  定型文/**Authors' contributions = 実態指定どおり**(driver 設定・AS 分割・IREP パラメータ =
+  VAS/NM、他全て = KH — 共著者ラウンドで本人ら確認)。残【記入】= Acknowledgements(親族
+  相談中)+公開リポジトリ URL/DOI 2箇所(公開時確定)
