@@ -40,10 +40,33 @@ def csv_md_table(path):
     return "\n".join(out)
 
 
+def author_block():
+    """submission_declarations.md の記入値から閲覧用の著者ブロックを描画する
+    (一方向レンダリング — タイトルページは投稿時に別ファイル化)。"""
+    d = (ROOT / "paper" / "submission_declarations.md").read_text(encoding="utf-8")
+    sec = d.split("- **Authors / Affiliations**:", 1)[1]
+    authors = re.findall(
+        r"^\s+\d+\. (.+?) \((\d+(?:,\s*\d+)*)\)( \*corresponding)?\s*$", sec, re.M)
+    aff_zone = sec.split("Affiliations:", 1)[1]
+    affs = re.findall(r"^\s+(\d+)\. ([A-Z][^\n]+)$", aff_zone, re.M)
+    corr = re.search(r"\*\*Corresponding author[^\n]*\n\s+([^\n]+)", d).group(1)
+    names = ", ".join(
+        n + "^" + a.replace(" ", "") + "^" + ("\\*" if c else "")
+        for n, a, c in authors)
+    lines = [names, ""]
+    lines += [f"^{n}^ {a}" for n, a in affs]
+    lines += ["", "\\* Correspondence: " + corr]
+    return "\n".join(lines)
+
+
 def preprocess(text):
     """凡例節を References 後へ移動し、引用 [n] を上付き記法へ。"""
     # Markdown の区切り線(---)は原稿の可視要素ではない — 罫線化させない
     text = re.sub(r"^-{3,}\s*$", "", text, flags=re.M)
+    # タイトル直下に著者ブロック(declarations 記入値の一方向描画)
+    blk = author_block()
+    text = re.sub(r"(\*\*Title:\*\*[^\n]*\n)",
+                  lambda m: m.group(1) + "\n" + blk + "\n\n", text, count=1)
     # 閲覧用: Table 2・3 の実体(凍結 CSV)をキャプション直下へ埋め込む
     # (研究者決定 2026-08-26: 共著者版は一体ファイル — 版ズレ回避・コメント集約。
     #  投稿時は 3 表とも個別ファイルへ分離するため、この埋め込みは閲覧モード専用)
@@ -200,7 +223,7 @@ def patch_docx(path):
 
 
 def tokens_md(text):
-    text = re.sub(r"\^(\d[\d,]*)\^", r"\1", text)
+    text = re.sub(r"\^(\d[\d,]*)\^", r" \1 ", text)
     text = re.sub(r"[#*|`^]", " ", text)
     return re.findall(r"[A-Za-z0-9]+", text)
 
