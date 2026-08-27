@@ -39,6 +39,27 @@ W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 GENES = ("RET|BRAF|CCDC6|NCOA4|CLIP2|BHLHB9|S100A10|TESC|EHD4|"
          "ATP5MF|MRPL52|NTHL1|URM1|USE1|PXDN|P2RY1|PLK2|PTC1|PTC3")
 
+# 閲覧用の図埋め込み(研究者裁定 2026-08-27 — 表と同じ一体ファイル方針の延長。
+# 投稿時は BJC 規定どおり図を個別 TIFF で分離するため閲覧モード専用の一方向変換)
+FIGS = [
+    ("Figure 1", "図 1", "fig_cohort_flow.png"),
+    ("Figure 2", "図 2", "fig_gene_bm_evidence.png"),
+    ("Figure 3", "図 3", "fig_reo_grading.png"),
+    ("Figure S1", "図 S1", "fig_ma_gene_bm.png"),
+    ("Figure S2", "図 S2", "fig_d6_calibration.png"),
+]
+
+
+def embed_figures(text):
+    """図凡例行の直下へ対応 PNG を幅 160mm(A4 余白内)で挿入する。"""
+    for en, ja, fname in FIGS:
+        img = f"![]({ROOT / 'output' / 'figures' / fname}){{width=160mm}}"
+        for label in (en, ja):
+            text = re.sub(rf"(^\*\*{label} \|[^\n]*\n)",
+                          lambda m, i=img: m.group(1) + "\n" + i + "\n\n",
+                          text, count=1, flags=re.M)
+    return text
+
 
 def csv_md_table(path):
     """凍結 CSV を Markdown 表へ(閲覧用の一方向レンダリング — 列名・値は素のまま)。"""
@@ -122,7 +143,7 @@ def supp_preprocess(text):
                       text, count=1, flags=re.M)
     text = text.replace("BRAF V600E", "*BRAF*^V600E^")
     text = re.sub(rf"(?<![\w*])({GENES})(?![\w*])", r"*\1*", text)
-    return cover + text
+    return cover + embed_figures(text)
 
 
 def preprocess(text):
@@ -162,7 +183,7 @@ def preprocess(text):
     # ヒト遺伝子記号のイタリック(解析ラベル中の RET/BRAF も含む — 研究者裁定 2026-08-25。
     # 既にイタリック化済みトークンは再包止め)
     text = re.sub(rf"(?<![\w*])({GENES})(?![\w*])", r"*\1*", text)
-    return text
+    return embed_figures(text)
 
 
 def ja_preprocess(text, en_stem, tag, commit, src_label):
@@ -176,7 +197,7 @@ def ja_preprocess(text, en_stem, tag, commit, src_label):
                   text, count=1)
     text = text.replace("BRAF V600E", "*BRAF*^V600E^")
     text = re.sub(rf"(?<![\w*])({GENES})(?![\w*])", r"*\1*", text)
-    return text
+    return embed_figures(text)
 
 
 def patch_docx(path, ja=False):
@@ -347,6 +368,7 @@ def patch_docx(path, ja=False):
 
 
 def tokens_md(text):
+    text = re.sub(r"!\[[^\]]*\]\([^)]*\)(\{[^}]*\})?", " ", text)  # 画像構文は非テキスト
     text = re.sub(r"\^(\d[\d,]*)\^", r" \1 ", text)
     text = re.sub(r"[#*|`^]", " ", text)
     return re.findall(r"[A-Za-z0-9]+", text)
@@ -377,7 +399,10 @@ def build(src_name, out_name, prep, ja=False):
     diff = Counter(a) - Counter(b) | Counter(b) - Counter(a)
     doc = zipfile.ZipFile(out).read("word/document.xml").decode("utf-8")
     styles = zipfile.ZipFile(out).read("word/styles.xml").decode("utf-8")
-    checks = {"頁番号": "rIdFooterPg" in doc}
+    media = len([n for n in zipfile.ZipFile(out).namelist()
+                 if n.startswith("word/media/")])
+    checks = {"頁番号": "rIdFooterPg" in doc,
+              "図埋め込み": media == pre.count("![](")}
     if ja:
         checks["行送り19pt"] = 'w:line="380" w:lineRule="atLeast"' in styles
         checks["行番号なし"] = "lnNumType" not in doc
