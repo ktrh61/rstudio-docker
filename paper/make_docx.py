@@ -14,8 +14,9 @@
 #
 # 日本語参考訳(paper/manuscript_ja.md / paper/supplementary_ja.md)も同時に
 # Word 化し、英語版と同一時刻タグで対応づける(冒頭に対応する英語版ファイル名を
-# 自動記載)。和文書体 = 本文 游明朝 10.5pt+Times New Roman、見出し 游ゴシック
-# 太字、両端揃え。行番号は付けない(BJC 要件は英語版のみ)。
+# 自動記載)。和文書体 = 本文 BIZ UD明朝 Medium 11pt+Times New Roman、見出し
+# BIZ UDゴシック太字(研究者裁定 2026-08-27 — 共有は PDF 前提でフォント埋め込み
+# されるため他環境の置換懸念なし、画面可読性を優先)。行番号は付けない。
 #
 # pandoc は環境変数 PANDOC で指定(既定 pandoc 3.6.4 を想定。バイナリは
 # リポジトリ外に置く — コミットされるのは本スクリプトのみ)。
@@ -169,8 +170,8 @@ def ja_preprocess(text, en_stem, tag, commit, src_label):
     (同一時刻タグで同時生成される対)、遺伝子イタリック・V600E 上付きを
     英語版と同じ規則で適用する。引用 [n] は素のまま(英語版 References 対応)。"""
     text = re.sub(r"^-{3,}\s*$", "", text, flags=re.M)
-    pair = (f"**対応版**: 英語版 {en_stem}_{tag}.docx(同時生成の対)/"
-            f"ソース {src_label} @{commit}")
+    pair = (f"**対応版**: 英語版 {en_stem}_{tag}.docx(同時生成の対)。"
+            f"ソース: {src_label} @{commit}")
     text = re.sub(r"^(# [^\n]+\n)", lambda m: m.group(1) + "\n" + pair + "\n",
                   text, count=1)
     text = text.replace("BRAF V600E", "*BRAF*^V600E^")
@@ -191,10 +192,10 @@ def patch_docx(path, ja=False):
     normal = re.search(
         r'<w:style [^>]*w:styleId="Normal"[^>]*>.*?</w:style>', styles, re.S
     ).group(0)
-    # 和文版は固定行送り 18pt(atLeast)にする — 游書体は縦メトリクスが大きく、
+    # 和文版は固定行送り 19pt(atLeast)にする — 和文書体は縦メトリクスが大きく、
     # 倍率指定(auto)では見かけの行間が過大になるため。揃えは左のまま
     # (両端揃えは長い英字トークンで文字間が間延びする)。
-    spacing = ('<w:spacing w:after="120" w:line="360" w:lineRule="atLeast"/>'
+    spacing = ('<w:spacing w:after="120" w:line="380" w:lineRule="atLeast"/>'
                if ja else
                '<w:spacing w:after="160" w:line="360" w:lineRule="auto"/>')
     if "<w:pPr>" in normal:
@@ -207,22 +208,22 @@ def patch_docx(path, ja=False):
         )
     styles = styles.replace(normal, new_normal)
     # 原稿慣例の書体へ: 英語版は本文 Times New Roman 12pt、和文版は
-    # 游明朝 10.5pt(欧文 Times New Roman — 英語版と同一の欧文見えを保つ)。
+    # BIZ UD明朝 Medium 11pt(欧文 Times New Roman — 英語版と同一の欧文見えを保つ)。
     # テーマ経由の解決(日本語環境では Aptos に落ちる)を全経路で遮断するため、
     # eastAsia も含む明示指定を docDefaults・テーマにも適用する。
-    ea = "游明朝" if ja else "Times New Roman"
+    ea = "BIZ UD明朝 Medium" if ja else "Times New Roman"
     tnr = ('<w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" '
            f'w:eastAsia="{ea}" w:cs="Times New Roman"/>')
     styles = re.sub(r"<w:rFonts [^/]*Theme[^/]*/>", tnr, styles)
     # 派生スタイル(BodyText 等)の spacing が Normal の行間を要素ごと上書きする —
     # w:line を持たない全 spacing に同じ行送りを明示付与
-    rule = "atLeast" if ja else "auto"
+    rule, pitch = ("atLeast", "380") if ja else ("auto", "360")
     styles = re.sub(r'<w:spacing (?![^/>]*w:line=)([^/>]*)/>',
-                    rf'<w:spacing \1 w:line="360" w:lineRule="{rule}"/>', styles)
+                    rf'<w:spacing \1 w:line="{pitch}" w:lineRule="{rule}"/>', styles)
     normal2 = re.search(
         r'<w:style [^>]*w:styleId="Normal"[^>]*>.*?</w:style>', styles, re.S
     ).group(0)
-    bsz = "21" if ja else "24"  # 和文 10.5pt / 英文 12pt
+    bsz = "22" if ja else "24"  # 和文 11pt / 英文 12pt
     styles = styles.replace(
         normal2,
         normal2.replace(
@@ -232,11 +233,11 @@ def patch_docx(path, ja=False):
         ),
     )
     # 見出し: 英語版は本文と同サイズの太字(節)/太字イタリック(小節)。
-    # 和文版は 明朝本文+ゴシック見出し の標準対(14/12/10.5pt 太字、イタリック不使用)
+    # 和文版は 明朝本文+ゴシック見出し の標準対(14/12.5/11pt 太字、イタリック不使用)
     if ja:
-        hfont = ('<w:rFonts w:ascii="游ゴシック" w:hAnsi="游ゴシック" '
-                 'w:eastAsia="游ゴシック" w:cs="游ゴシック"/>')
-        hsizes = (("Heading1", "28"), ("Heading2", "24"), ("Heading3", "21"))
+        hfont = ('<w:rFonts w:ascii="BIZ UDゴシック" w:hAnsi="BIZ UDゴシック" '
+                 'w:eastAsia="BIZ UDゴシック" w:cs="BIZ UDゴシック"/>')
+        hsizes = (("Heading1", "28"), ("Heading2", "25"), ("Heading3", "22"))
     else:
         hfont = tnr
         hsizes = (("Heading1", "24"), ("Heading2", "24"), ("Heading3", "24"))
@@ -268,7 +269,7 @@ def patch_docx(path, ja=False):
             r'<w:style [^>]*w:styleId="Compact"[^>]*>.*?</w:style>', styles, re.S)
         if m3:
             lp = m3.group(0)
-            lp2 = lp.replace('w:line="360" w:lineRule="atLeast"',
+            lp2 = lp.replace('w:line="380" w:lineRule="atLeast"',
                              'w:line="280" w:lineRule="atLeast"')
             lp2 = re.sub(r"<w:sz[^/]*/>", "", lp2)
             lp2 = re.sub(r"<w:szCs[^/]*/>", "", lp2)
@@ -335,7 +336,8 @@ def patch_docx(path, ja=False):
         theme = re.sub(r'(<a:latin typeface=")[^"]*(")',
                        r"\1Times New Roman\2", theme)
         if ja:
-            theme = re.sub(r'(<a:ea typeface=")[^"]*(")', r"\1游明朝\2", theme)
+            theme = re.sub(r'(<a:ea typeface=")[^"]*(")',
+                           r"\1BIZ UD明朝 Medium\2", theme)
         parts["word/theme/theme1.xml"] = theme.encode("utf-8")
 
     zout = zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED)
@@ -377,9 +379,10 @@ def build(src_name, out_name, prep, ja=False):
     styles = zipfile.ZipFile(out).read("word/styles.xml").decode("utf-8")
     checks = {"頁番号": "rIdFooterPg" in doc}
     if ja:
-        checks["行送り18pt"] = 'w:line="360" w:lineRule="atLeast"' in styles
+        checks["行送り19pt"] = 'w:line="380" w:lineRule="atLeast"' in styles
         checks["行番号なし"] = "lnNumType" not in doc
-        checks["和文書体"] = "游明朝" in styles and "游ゴシック" in styles
+        checks["和文書体"] = ("BIZ UD明朝 Medium" in styles
+                          and "BIZ UDゴシック" in styles)
     else:
         checks["1.5行間"] = 'w:line="360"' in styles
         checks["行番号"] = "lnNumType" in doc

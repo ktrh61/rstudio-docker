@@ -5,7 +5,7 @@
 - **同期規則**: 本文を修正するコミットは、本ファイルの該当段落の同期修正を同一コミットに含める。
 - **docx 対応規則**: 閲覧用 docx は英語版と同一時刻タグで同時生成され(make_docx.py)、冒頭に対応する英語版ファイル名が自動記載される。タグの一致 = 同一版の対。
 - 引用番号 [n] は英語版 References(31 件)を指す。翻訳では引用リストは再掲しない。
-- 用語固定表: contrast=対比/band=帯(帯名 Low-AS・Mid-AS・High-AS・dose-zero は英字のまま)/driver=ドライバー(遺伝子)/stratum=層/matched normal=対応正常組織/prespecified=事前規定の/descriptive=記述的/hypothesis-generating=仮説生成的/estimand=推定対象/purity=(相対腫瘍)純度/permutation=並べ替え/Assigned Share(AS)は英字のまま。
+- 用語固定表: contrast=対比 / band=帯(帯名 Low-AS・Mid-AS・High-AS・dose-zero は英字のまま) / driver=ドライバー(遺伝子) / stratum=層 / matched normal=対応正常組織 / prespecified=事前規定の / descriptive=記述的 / hypothesis-generating=仮説生成的 / estimand=推定対象 / purity=(相対腫瘍)純度 / permutation=並べ替え / Assigned Share(AS)は英字のまま。
 
 ---
 
