@@ -657,3 +657,7 @@
   手法帰属+小標本での選択根拠が未引用だった): 台帳 D 節に verified-abstract で収載、
   Supp Gene-level の手法文へ挿入(語数枠外)。Supp References に自動収載(38件)・警告 0・
   本文 31 件不変
+- 2026-08-27: **Phipson & Smyth 2010 を追加**(研究者指摘 — plus-one 計数と 1/(B+1) フロア
+  概念の出典が未引用だった): 台帳 D 節に verified-abstract で収載(9,999 という回数自体の
+  指定でない旨を射程に明記)、Supp Gene-level の概念初出文へ挿入。Supp References 39 件・
+  警告 0・本文 31 件不変
