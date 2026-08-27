@@ -88,7 +88,7 @@ We tested Hallmark, selected C2 canonical-pathway subcollections (Reactome, Wiki
 An earlier held-out complete-null assessment was used to select the set-level procedure before the reported real-data run, and the selected procedure's final operating characteristics were assessed with a 9,999-shuffle reference pool <!-- N-06 -->. A one-set 1.15-fold spike-in provided a single-scenario positive-control check <!-- N-30 -->. Full procedures are in Supplementary Methods.
 
 <!-- C-14 -->
-As a descriptive complement, the primary RET-tumor q<0.10 list was tested for one-sided hypergeometric over-representation in the same collections, using all genes tested in that contrast as the universe and BH adjustment within each family-by-list combination <!-- N-59 -->. These gene-sampling p-values do not represent subject-level randomization; experiment-level interpretation rests on the label-permutation analysis (Goeman and Bühlmann 2007).
+As a descriptive complement, the primary RET-tumor q<0.10 list was tested for one-sided hypergeometric over-representation in the same collections, using all genes tested in that contrast as the universe and Benjamini–Hochberg adjustment within each family-by-list combination <!-- N-59 -->. These gene-sampling p-values do not represent subject-level randomization; experiment-level interpretation rests on the label-permutation analysis (Goeman and Bühlmann 2007).
 
 ### Between-stratum concordance
 

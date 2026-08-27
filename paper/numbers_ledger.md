@@ -661,3 +661,9 @@
   概念の出典が未引用だった): 台帳 D 節に verified-abstract で収載(9,999 という回数自体の
   指定でない旨を射程に明記)、Supp Gene-level の概念初出文へ挿入。Supp References 39 件・
   警告 0・本文 31 件不変
+- 2026-08-27: 出典スイープ第2弾(研究者指示 — 名前付き手法の全数照合): 確定ギャップ3件を
+  追加 = Hodges–Lehmann 1963・Efron & Tibshirani 1993(percentile bootstrap)・Clopper &
+  Pearson 1934(いずれも CrossRef 書誌照合・Supp 挿入・Supp References 42件)。任意2件の裁定 =
+  partial Spearman は引用なし維持(自述+非推論宣言で自己完結 — 既製推定量への紐づけは解釈上の
+  負債を輸入)、main の BH は1回使用のため略語をやめ Benjamini–Hochberg と綴り出し(+1語)。
+  main 無引用の道具名(PC-OD 等)は圧縮パターン(引用は Supp 詳細側)整合を確認
