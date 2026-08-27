@@ -12,6 +12,11 @@
 #   (5) 全ページ番号(PAGE フィールドのフッタを新設)
 # 変換後、docx 本文のトークン集合を入力 md と照合し内容同一性を検査する。
 #
+# 日本語参考訳(paper/manuscript_ja.md / paper/supplementary_ja.md)も同時に
+# Word 化し、英語版と同一時刻タグで対応づける(冒頭に対応する英語版ファイル名を
+# 自動記載)。和文書体 = 本文 游明朝 10.5pt+Times New Roman、見出し 游ゴシック
+# 太字、両端揃え。行番号は付けない(BJC 要件は英語版のみ)。
+#
 # pandoc は環境変数 PANDOC で指定(既定 pandoc 3.6.4 を想定。バイナリは
 # リポジトリ外に置く — コミットされるのは本スクリプトのみ)。
 
@@ -28,6 +33,10 @@ SUB = ROOT / "output" / "submission"
 PANDOC = os.environ.get("PANDOC", "pandoc")
 
 W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
+
+# ヒト遺伝子記号のイタリック対象(研究者裁定 2026-08-25。PTC 単体は疾患略語で対象外)
+GENES = ("RET|BRAF|CCDC6|NCOA4|CLIP2|BHLHB9|S100A10|TESC|EHD4|"
+         "ATP5MF|MRPL52|NTHL1|URM1|USE1|PXDN|P2RY1|PLK2|PTC1|PTC3")
 
 
 def csv_md_table(path):
@@ -111,9 +120,7 @@ def supp_preprocess(text):
                       lambda m, t=tbl: m.group(1) + "\n" + t + "\n\n",
                       text, count=1, flags=re.M)
     text = text.replace("BRAF V600E", "*BRAF*^V600E^")
-    genes = ("RET|BRAF|CCDC6|NCOA4|CLIP2|BHLHB9|S100A10|TESC|EHD4|"
-             "ATP5MF|MRPL52|NTHL1|URM1|USE1|PTC1|PTC3")
-    text = re.sub(rf"(?<![\w*])({genes})(?![\w*])", r"*\1*", text)
+    text = re.sub(rf"(?<![\w*])({GENES})(?![\w*])", r"*\1*", text)
     return cover + text
 
 
@@ -152,16 +159,30 @@ def preprocess(text):
     # 変異表記は BJC 現行慣行(2024–25 掲載例)の上付き形へ(正本は不変 — 派生層の組版)
     text = text.replace("BRAF V600E", "*BRAF*^V600E^")
     # ヒト遺伝子記号のイタリック(解析ラベル中の RET/BRAF も含む — 研究者裁定 2026-08-25。
-    # PTC 単体は疾患略語のため対象外、既にイタリック化済みトークンは再包止め)
-    genes = ("RET|BRAF|CCDC6|NCOA4|CLIP2|BHLHB9|S100A10|TESC|EHD4|"
-             "ATP5MF|MRPL52|NTHL1|URM1|USE1|PTC1|PTC3")
-    text = re.sub(rf"(?<![\w*])({genes})(?![\w*])", r"*\1*", text)
+    # 既にイタリック化済みトークンは再包止め)
+    text = re.sub(rf"(?<![\w*])({GENES})(?![\w*])", r"*\1*", text)
     return text
 
 
-def patch_docx(path):
+def ja_preprocess(text, en_stem, tag, commit, src_label):
+    """日本語参考訳の閲覧用整形: 対応する英語版 docx の名前を冒頭に記載し
+    (同一時刻タグで同時生成される対)、遺伝子イタリック・V600E 上付きを
+    英語版と同じ規則で適用する。引用 [n] は素のまま(英語版 References 対応)。"""
+    text = re.sub(r"^-{3,}\s*$", "", text, flags=re.M)
+    pair = (f"**対応版**: 英語版 {en_stem}_{tag}.docx(同時生成の対)/"
+            f"ソース {src_label} @{commit}")
+    text = re.sub(r"^(# [^\n]+\n)", lambda m: m.group(1) + "\n" + pair + "\n",
+                  text, count=1)
+    text = text.replace("BRAF V600E", "*BRAF*^V600E^")
+    text = re.sub(rf"(?<![\w*])({GENES})(?![\w*])", r"*\1*", text)
+    return text
+
+
+def patch_docx(path, ja=False):
     """styles.xml(1.5 行間)・document.xml(行番号・フッタ参照)・
-    footer1.xml(ページ番号)を注入する。"""
+    footer1.xml(ページ番号)を注入する。ja=True では和文書体
+    (本文 游明朝+Times New Roman・見出し 游ゴシック・両端揃え)とし、
+    行番号は付けない。"""
     zin = zipfile.ZipFile(path)
     parts = {n: zin.read(n) for n in zin.namelist()}
     zin.close()
@@ -171,6 +192,9 @@ def patch_docx(path):
         r'<w:style [^>]*w:styleId="Normal"[^>]*>.*?</w:style>', styles, re.S
     ).group(0)
     spacing = '<w:spacing w:after="160" w:line="360" w:lineRule="auto"/>'
+    if ja:
+        # 和文標準の両端揃え(pPr スキーマ順: spacing → jc)
+        spacing += '<w:jc w:val="both"/>'
     if "<w:pPr>" in normal:
         new_normal = re.sub(r"<w:spacing[^/]*/>", "", normal)
         new_normal = new_normal.replace("<w:pPr>", "<w:pPr>" + spacing, 1)
@@ -180,11 +204,13 @@ def patch_docx(path):
             "</w:style>", "<w:pPr>" + spacing + "</w:pPr></w:style>"
         )
     styles = styles.replace(normal, new_normal)
-    # 原稿慣例の書体へ: 本文 Times New Roman 12pt、見出しは同書体・黒・太字。
+    # 原稿慣例の書体へ: 英語版は本文 Times New Roman 12pt、和文版は
+    # 游明朝 10.5pt(欧文 Times New Roman — 英語版と同一の欧文見えを保つ)。
     # テーマ経由の解決(日本語環境では Aptos に落ちる)を全経路で遮断するため、
     # eastAsia も含む明示指定を docDefaults・テーマにも適用する。
+    ea = "游明朝" if ja else "Times New Roman"
     tnr = ('<w:rFonts w:ascii="Times New Roman" w:hAnsi="Times New Roman" '
-           'w:eastAsia="Times New Roman" w:cs="Times New Roman"/>')
+           f'w:eastAsia="{ea}" w:cs="Times New Roman"/>')
     styles = re.sub(r"<w:rFonts [^/]*Theme[^/]*/>", tnr, styles)
     # 派生スタイル(BodyText 等)の spacing が Normal の行間を要素ごと上書きする —
     # w:line を持たない全 spacing に 1.5 行間を明示付与
@@ -193,16 +219,25 @@ def patch_docx(path):
     normal2 = re.search(
         r'<w:style [^>]*w:styleId="Normal"[^>]*>.*?</w:style>', styles, re.S
     ).group(0)
+    bsz = "21" if ja else "24"  # 和文 10.5pt / 英文 12pt
     styles = styles.replace(
         normal2,
         normal2.replace(
             "</w:style>",
-            "<w:rPr>" + tnr + '<w:sz w:val="24"/><w:szCs w:val="24"/></w:rPr>'
+            "<w:rPr>" + tnr + f'<w:sz w:val="{bsz}"/><w:szCs w:val="{bsz}"/></w:rPr>'
             "</w:style>",
         ),
     )
-    # 見出しは本文と同サイズの太字(節)/太字イタリック(小節)— 投稿原稿の慣例形
-    for hid, size in (("Heading1", "24"), ("Heading2", "24"), ("Heading3", "24")):
+    # 見出し: 英語版は本文と同サイズの太字(節)/太字イタリック(小節)。
+    # 和文版は 明朝本文+ゴシック見出し の標準対(14/12/10.5pt 太字、イタリック不使用)
+    if ja:
+        hfont = ('<w:rFonts w:ascii="游ゴシック" w:hAnsi="游ゴシック" '
+                 'w:eastAsia="游ゴシック" w:cs="游ゴシック"/>')
+        hsizes = (("Heading1", "28"), ("Heading2", "24"), ("Heading3", "21"))
+    else:
+        hfont = tnr
+        hsizes = (("Heading1", "24"), ("Heading2", "24"), ("Heading3", "24"))
+    for hid, size in hsizes:
         m2 = re.search(
             rf'<w:style [^>]*w:styleId="{hid}"[^>]*>.*?</w:style>', styles, re.S
         )
@@ -213,7 +248,8 @@ def patch_docx(path):
         h2 = re.sub(r"<w:color[^/]*/>", "", h2)
         h2 = re.sub(r"<w:sz[^/]*/>", "", h2)
         h2 = re.sub(r"<w:szCs[^/]*/>", "", h2)
-        ins = (tnr + '<w:b/>' + ('<w:i/>' if hid == "Heading3" else '')
+        ins = (hfont + '<w:b/>'
+               + ('<w:i/>' if hid == "Heading3" and not ja else '')
                + '<w:color w:val="000000"/>'
                f'<w:sz w:val="{size}"/><w:szCs w:val="{size}"/>')
         if "<w:rPr>" in h2:
@@ -226,15 +262,16 @@ def patch_docx(path):
     doc = parts["word/document.xml"].decode("utf-8")
     sect = re.search(r"<w:sectPr[^>]*>.*?</w:sectPr>", doc, re.S).group(0)
     new_sect = sect
-    if "lnNumType" not in new_sect:
+    if "pgSz" not in new_sect:
         # pandoc の sectPr は最小構成 — A4・余白 2.5cm を明示してロケール依存を排し、
-        # 続けて lnNumType(スキーマ順: pgSz → pgMar → lnNumType)
+        # 英語版のみ続けて lnNumType(スキーマ順: pgSz → pgMar → lnNumType)
+        ln = "" if ja else '<w:lnNumType w:countBy="1" w:restart="continuous"/>'
         new_sect = new_sect.replace(
             "</w:sectPr>",
             '<w:pgSz w:w="11906" w:h="16838"/>'
             '<w:pgMar w:top="1417" w:right="1417" w:bottom="1417" w:left="1417" '
             'w:header="709" w:footer="709" w:gutter="0"/>'
-            '<w:lnNumType w:countBy="1" w:restart="continuous"/></w:sectPr>',
+            + ln + '</w:sectPr>',
         )
     footer_ref = '<w:footerReference xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" w:type="default" r:id="rIdFooterPg"/>'
     if "footerReference" not in new_sect:
@@ -269,11 +306,13 @@ def patch_docx(path):
         )
     parts["word/_rels/document.xml.rels"] = rels.encode("utf-8")
 
-    # テーマの既定書体も Times New Roman へ(テーマ参照の取り残し対策)
+    # テーマの既定書体も明示書体へ(テーマ参照の取り残し対策)
     if "word/theme/theme1.xml" in parts:
         theme = parts["word/theme/theme1.xml"].decode("utf-8")
         theme = re.sub(r'(<a:latin typeface=")[^"]*(")',
                        r"\1Times New Roman\2", theme)
+        if ja:
+            theme = re.sub(r'(<a:ea typeface=")[^"]*(")', r"\1游明朝\2", theme)
         parts["word/theme/theme1.xml"] = theme.encode("utf-8")
 
     zout = zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED)
@@ -296,8 +335,9 @@ def tokens_docx(path):
     return re.findall(r"[A-Za-z0-9]+", body)
 
 
-def build(src_name, out_name, prep):
-    src = (SUB / src_name).read_text(encoding="utf-8")
+def build(src_name, out_name, prep, ja=False):
+    src_path = src_name if isinstance(src_name, Path) else SUB / src_name
+    src = src_path.read_text(encoding="utf-8")
     pre = prep(src)
     md = SUB / out_name.replace(".docx", "_input.md")
     md.write_text(pre, encoding="utf-8")
@@ -306,17 +346,21 @@ def build(src_name, out_name, prep):
         [PANDOC, str(md), "-f", "markdown+superscript", "-o", str(out)],
         check=True,
     )
-    patch_docx(out)
+    patch_docx(out, ja=ja)
     a, b = sorted(tokens_md(pre)), sorted(tokens_docx(out))
     from collections import Counter
     diff = Counter(a) - Counter(b) | Counter(b) - Counter(a)
     doc = zipfile.ZipFile(out).read("word/document.xml").decode("utf-8")
+    styles = zipfile.ZipFile(out).read("word/styles.xml").decode("utf-8")
     checks = {
-        "行番号": "lnNumType" in doc,
         "頁番号": "rIdFooterPg" in doc,
-        "1.5行間": b'w:line="360"'
-        in zipfile.ZipFile(out).read("word/styles.xml"),
+        "1.5行間": 'w:line="360"' in styles,
     }
+    if ja:
+        checks["行番号なし"] = "lnNumType" not in doc
+        checks["和文書体"] = "游明朝" in styles and "游ゴシック" in styles
+    else:
+        checks["行番号"] = "lnNumType" in doc
     print(f"{out_name}: token差 {sum(diff.values())} 件"
           + (f" {dict(list(diff.items())[:5])} " if diff else " ")
           + " ".join(f"{k}:{'OK' if v else 'NG'}" for k, v in checks.items()))
@@ -326,19 +370,28 @@ def build(src_name, out_name, prep):
 
 
 def main():
+    import time
     print(subprocess.run([PANDOC, "--version"], capture_output=True,
                          text=True).stdout.splitlines()[0])
+    # Word/OneDrive のキャッシュ・書き戻しを避けるため毎回新しいファイル名で渡す。
+    # 同一タグ = 同一実行の 4 ファイル(英語版と日本語訳の対応はタグ一致で判別)
+    tag = time.strftime("%Y%m%d_%H%M")
+    commit = subprocess.run(["git", "rev-parse", "--short", "HEAD"],
+                            capture_output=True, text=True, cwd=ROOT).stdout.strip()
     outs = [
         build("manuscript_submission.md", "manuscript_submission.docx", preprocess),
         build("supplementary_submission.md", "supplementary_submission.docx",
               supp_preprocess),
+        build(ROOT / "paper" / "manuscript_ja.md", "manuscript_ja.docx",
+              lambda t: ja_preprocess(t, "manuscript_submission", tag, commit,
+                                      "paper/manuscript_ja.md"), ja=True),
+        build(ROOT / "paper" / "supplementary_ja.md", "supplementary_ja.docx",
+              lambda t: ja_preprocess(t, "supplementary_submission", tag, commit,
+                                      "paper/supplementary_ja.md"), ja=True),
     ]
     dest = Path("/mnt/c/Users/kotaro/OneDrive/論文関連（説明用資料含）/word_check")
     if dest.parent.exists():
         dest.mkdir(exist_ok=True)
-        # Word/OneDrive のキャッシュ・書き戻しを避けるため毎回新しいファイル名で渡す
-        import time
-        tag = time.strftime("%Y%m%d_%H%M")
         for out in outs:
             view = dest / f"{out.stem}_{tag}.docx"
             shutil.copy2(out, view)

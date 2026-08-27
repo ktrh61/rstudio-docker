@@ -3,6 +3,7 @@
 - **正本は英語**(paper/supplementary_material.md)。本ファイルは関係者共有用の参考訳であり、投稿物ではない。
 - 対象版: 2026-08-27 時点の補足資料(コミット e163e8e 系列、Supplementary References 42 件)。
 - **同期規則**: 補足資料を修正するコミットは、本ファイルの該当段落の同期修正を同一コミットに含める(本文訳 paper/manuscript_ja.md と同じ規則)。
+- **docx 対応規則**: 閲覧用 docx は英語版と同一時刻タグで同時生成され(make_docx.py)、冒頭に対応する英語版ファイル名が自動記載される。タグの一致 = 同一版の対。
 - 引用は英語版と同じ著者-年形式のまま残す。書誌は英語版末尾の Supplementary References(42 件)を参照し、翻訳では再掲しない。
 - 用語固定表: 本文訳(paper/manuscript_ja.md)冒頭の表と共通。追加分: label shuffle=ラベルシャッフル/pseudo-observation=疑似観測/plus-one counting=plus-one 計数/exhaustive enumeration=全数枚挙/construction band=構築帯/reversal score=逆転スコア/dead zone=デッドゾーン/over-representation=過剰代表/normalized enrichment score=正規化濃縮スコア(NES)/held-out・gene-sampling・spike-in・acute・chronic は英字のまま。
 
