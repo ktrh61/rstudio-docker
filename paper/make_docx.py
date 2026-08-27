@@ -191,10 +191,12 @@ def patch_docx(path, ja=False):
     normal = re.search(
         r'<w:style [^>]*w:styleId="Normal"[^>]*>.*?</w:style>', styles, re.S
     ).group(0)
-    spacing = '<w:spacing w:after="160" w:line="360" w:lineRule="auto"/>'
-    if ja:
-        # 和文標準の両端揃え(pPr スキーマ順: spacing → jc)
-        spacing += '<w:jc w:val="both"/>'
+    # 和文版は固定行送り 18pt(atLeast)にする — 游書体は縦メトリクスが大きく、
+    # 倍率指定(auto)では見かけの行間が過大になるため。揃えは左のまま
+    # (両端揃えは長い英字トークンで文字間が間延びする)。
+    spacing = ('<w:spacing w:after="120" w:line="360" w:lineRule="atLeast"/>'
+               if ja else
+               '<w:spacing w:after="160" w:line="360" w:lineRule="auto"/>')
     if "<w:pPr>" in normal:
         new_normal = re.sub(r"<w:spacing[^/]*/>", "", normal)
         new_normal = new_normal.replace("<w:pPr>", "<w:pPr>" + spacing, 1)
@@ -213,9 +215,10 @@ def patch_docx(path, ja=False):
            f'w:eastAsia="{ea}" w:cs="Times New Roman"/>')
     styles = re.sub(r"<w:rFonts [^/]*Theme[^/]*/>", tnr, styles)
     # 派生スタイル(BodyText 等)の spacing が Normal の行間を要素ごと上書きする —
-    # w:line を持たない全 spacing に 1.5 行間を明示付与
+    # w:line を持たない全 spacing に同じ行送りを明示付与
+    rule = "atLeast" if ja else "auto"
     styles = re.sub(r'<w:spacing (?![^/>]*w:line=)([^/>]*)/>',
-                    r'<w:spacing \1 w:line="360" w:lineRule="auto"/>', styles)
+                    rf'<w:spacing \1 w:line="360" w:lineRule="{rule}"/>', styles)
     normal2 = re.search(
         r'<w:style [^>]*w:styleId="Normal"[^>]*>.*?</w:style>', styles, re.S
     ).group(0)
@@ -257,6 +260,26 @@ def patch_docx(path, ja=False):
         else:
             h2 = h2.replace("</w:style>", "<w:rPr>" + ins + "</w:rPr></w:style>")
         styles = styles.replace(h, h2)
+    if ja:
+        # 冒頭メタ情報(箇条書き = 両訳ともヘッダブロックのみが該当。pandoc は
+        # タイトなリストへ Compact を割り当てる)は 9pt 灰色・行送り 14pt に
+        # 圧縮し、本文より控えめに見せる
+        m3 = re.search(
+            r'<w:style [^>]*w:styleId="Compact"[^>]*>.*?</w:style>', styles, re.S)
+        if m3:
+            lp = m3.group(0)
+            lp2 = lp.replace('w:line="360" w:lineRule="atLeast"',
+                             'w:line="280" w:lineRule="atLeast"')
+            lp2 = re.sub(r"<w:sz[^/]*/>", "", lp2)
+            lp2 = re.sub(r"<w:szCs[^/]*/>", "", lp2)
+            ins = (tnr + '<w:color w:val="595959"/>'
+                   '<w:sz w:val="18"/><w:szCs w:val="18"/>')
+            if "<w:rPr>" in lp2:
+                lp2 = lp2.replace("<w:rPr>", "<w:rPr>" + ins, 1)
+            else:
+                lp2 = lp2.replace("</w:style>",
+                                  "<w:rPr>" + ins + "</w:rPr></w:style>")
+            styles = styles.replace(lp, lp2)
     parts["word/styles.xml"] = styles.encode("utf-8")
 
     doc = parts["word/document.xml"].decode("utf-8")
@@ -352,14 +375,13 @@ def build(src_name, out_name, prep, ja=False):
     diff = Counter(a) - Counter(b) | Counter(b) - Counter(a)
     doc = zipfile.ZipFile(out).read("word/document.xml").decode("utf-8")
     styles = zipfile.ZipFile(out).read("word/styles.xml").decode("utf-8")
-    checks = {
-        "頁番号": "rIdFooterPg" in doc,
-        "1.5行間": 'w:line="360"' in styles,
-    }
+    checks = {"頁番号": "rIdFooterPg" in doc}
     if ja:
+        checks["行送り18pt"] = 'w:line="360" w:lineRule="atLeast"' in styles
         checks["行番号なし"] = "lnNumType" not in doc
         checks["和文書体"] = "游明朝" in styles and "游ゴシック" in styles
     else:
+        checks["1.5行間"] = 'w:line="360"' in styles
         checks["行番号"] = "lnNumType" in doc
     print(f"{out_name}: token差 {sum(diff.values())} 件"
           + (f" {dict(list(diff.items())[:5])} " if diff else " ")
