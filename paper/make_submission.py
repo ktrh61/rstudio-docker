@@ -35,21 +35,29 @@ def load_ledger():
             continue
         biblio = line.split("|")[1].strip()
         m = re.match(r"([A-ZÀ-Þ][\w'’-]*)", biblio)
-        ym = re.search(r"\b(19|20)\d\d[a-z]?\b", biblio)
+        # 出版年の抽出は構造を優先する(表題中の年 — 例「1985 NIH Tables」— を拾わない):
+        # (1) 巻号の直前「2008;95」 (2) ソフトウェア型「(2025)」 (3) 「; 2003」型 (4) 最初の年
+        ym = (re.search(r"\b((?:19|20)\d\d[a-z]?)(?=;\d)", biblio)
+              or re.search(r"\(((?:19|20)\d\d[a-z]?)\)", biblio)
+              or re.search(r";\s((?:19|20)\d\d[a-z]?)\b", biblio)
+              or re.search(r"\b((?:19|20)\d\d[a-z]?)\b", biblio))
         if not m or not ym:
             continue
-        year = ym.group(0)
+        year = ym.group(1)
         for org in ORG_AUTHORS:
             if biblio.startswith(org):
-                index[(org, year)] = biblio
+                index.setdefault((org, year), biblio)
                 break
         else:
             surname = m.group(1)
             # 第2著者の姓(and 形式の照合用)
-            second = re.search(r"^[A-ZÀ-Þ][\w'’-]+ [A-Z]{1,3}, ([A-ZÀ-Þ][\w'’-]+) [A-Z]{1,3}[,.]", biblio)
-            index[(surname, year)] = biblio
+            # ジャーナル型「Davis S,」「Davis S.」に加えソフトウェア型「Davis S (2025)」も許容
+            second = re.search(r"^[A-ZÀ-Þ][\w'’-]+ [A-Z]{1,3}, ([A-ZÀ-Þ][\w'’-]+) [A-Z]{1,3}(?=[,.]| \()", biblio)
+            # 同姓同年の衝突は先勝ち(setdefault)— and 形式キーが後続行を区別する
+            # (例: Morgan et al. 2025 = SummarizedExperiment / Morgan and Davis 2025 = GDC)
+            index.setdefault((surname, year), biblio)
             if second:
-                index[(f"{surname}+{second.group(1)}", year)] = biblio
+                index.setdefault((f"{surname}+{second.group(1)}", year), biblio)
     return index
 
 
@@ -176,6 +184,15 @@ def main():
 
     supp_src = (ROOT / "paper" / "supplementary_material.md").read_text(encoding="utf-8")
     supp = strip_meta(supp_src, drop_sections=[])
+    # SI は独立文書として自己完結させる: 本文と同じ照合機構で Supp 内の author-year
+    # 引用を収集し(変換結果は捨てる)、書誌をアルファベット順で末尾に付す。
+    # 台帳に書誌のない引用は既存の「台帳不一致」警告に乗る。
+    supp_order = []
+    convert(supp, index, supp_order, warnings, do_convert=True)
+    if supp_order:
+        supp = (supp.rstrip("\n") + "\n\n## Supplementary References\n\n"
+                + "\n\n".join(b.replace("、DOI なし", "")
+                              for b in sorted(supp_order, key=str.lower)) + "\n")
     (OUT / "supplementary_submission.md").write_text(supp, encoding="utf-8")
 
     # 残存 author-year 候補(未変換の検出 — References 節より前の本文のみ)
