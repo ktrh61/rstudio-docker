@@ -6,6 +6,10 @@
 # inference is performed. The observed composition is written as a
 # publication-formatting CSV as well as printed.
 #
+# Output: output/tables/supp_tab_cohort_composition.csv (Table S1, wide:
+#         one row per category, one column per AS band, cell = all (paired);
+#         unevaluated band cells outside the IREP reference groups are shown as
+#         an em dash, never 0) and *_long.csv (provenance grid, 225 rows).
 # Input : processed/thyr_clinical.rds               (from 030; key REBC_ID)
 #         processed/thyr_case_assigned_share.rds     (from 130; AS per case)
 #         processed/thyr_se_raw.rds                  (from 120; for pair status)
@@ -167,12 +171,12 @@ message(
   nrow(clinical), ")"
 )
 
-# --- Print and save the summary ----------------------------------------------
+# --- Print the long summary (provenance log) ---------------------------------
 message("Driver x AS band x pair summary (", nrow(summary_long), " rows):")
 print(summary_long, nrow = nrow(summary_long))
 
-# Complete the category-by-band grid so that absent combinations are shown as
-# zero rather than omitted, then write one row per classification and AS band.
+# Complete the category-by-band grid so that absent combinations are counted
+# as zero rather than omitted (long form, kept for provenance).
 categories <- unique(summary_long[, .(level, category)])
 grid <- categories[, .(band = factor(band_levels, levels = band_levels)),
   by = .(level, category)
@@ -193,6 +197,61 @@ setorder(summary_wide, level, category, band)
 
 out_dir <- file.path(paths$output, "tables")
 dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
+long_path <- file.path(out_dir, "supp_tab_cohort_composition_long.csv")
+utils::write.csv(summary_wide, long_path, row.names = FALSE)
+message("Saved (long, provenance): ", long_path)
+
+# --- Publication table (wide; Table S1) --------------------------------------
+# One row per category, one column per AS band, cell = all cases (paired cases).
+# AS was calculated only for the IREP reference set: exposed cases in the
+# RET-fusion and BRAF-mutation designated driver groups. For categories outside
+# those groups the Low/Mid/High cells were never evaluated and are shown as
+# "—", not 0 -- a printed 0 is reserved for an evaluated band with no case
+# (researcher decision 2026-08-28: no cell may read as a count that was never
+# taken). Column labels follow the manuscript band names.
+ref_groups <- c("Fusion.RET", "Mut.BRAF")
+na_fill <- function(v) {
+  v <- as.character(v)
+  v[is.na(v) | v == ""] <- "na"
+  v
+}
+cat_ref <- unique(rbindlist(list(
+  dt[, .(level = "Group", category = na_fill(Designated_DriverGroup),
+         in_ref = Designated_DriverGroup %in% ref_groups)],
+  dt[, .(level = "Driver", category = na_fill(Designated_Driver),
+         in_ref = Designated_DriverGroup %in% ref_groups)]
+)))
+if (anyDuplicated(cat_ref[, .(level, category)]) > 0) {
+  stop("A category spans reference and non-reference driver groups.")
+}
+band_pub <- c(
+  non_exposed = "dose-zero", no_reference = "exposed, AS not calculated",
+  `(0,33.3)` = "Low-AS", `[33.3,66.6)` = "Mid-AS", `[66.6,100]` = "High-AS"
+)
+pub <- merge(summary_wide, cat_ref, by = c("level", "category"))
+pub[, evaluated := in_ref | band %in% c("non_exposed", "no_reference")]
+# Semantics check: an unevaluated cell must carry no case.
+if (any(pub[evaluated == FALSE, all] != 0)) {
+  print(pub[evaluated == FALSE & all != 0])
+  stop("A case carries an AS band outside the IREP reference groups.")
+}
+pub[, cell := fifelse(evaluated, sprintf("%d (%d)", all, paired), "—")]
+pub[, band_lab := factor(band_pub[as.character(band)], levels = unname(band_pub))]
+pub_wide <- dcast(pub, level + category ~ band_lab, value.var = "cell")
+tot <- summary_wide[, .(cat_n = sum(all),
+                        total = sprintf("%d (%d)", sum(all), sum(paired))),
+                    by = .(level, category)]
+pub_wide <- merge(pub_wide, tot, by = c("level", "category"))
+setorder(pub_wide, level, -cat_n, category)
+pub_wide[, cat_n := NULL]
+setcolorder(pub_wide, c("level", "category", unname(band_pub), "total"))
+message("Reference-set cases (AS calculated): ",
+        sum(dt$assigned_share_status == "irep"), " = ",
+        paste(sprintf("%s %d", ref_groups,
+          vapply(ref_groups, function(g)
+            sum(dt$assigned_share_status == "irep" & dt$Designated_DriverGroup == g),
+            integer(1))), collapse = " + "))
+
 out_path <- file.path(out_dir, "supp_tab_cohort_composition.csv")
-utils::write.csv(summary_wide, out_path, row.names = FALSE)
-message("Saved: ", out_path)
+utils::write.csv(pub_wide, out_path, row.names = FALSE)
+message("Saved (Table S1, wide): ", out_path)
