@@ -8,7 +8,10 @@
 # The single cell whose CI sits above the nominal level (B_Normal/Hallmark)
 # is emphasised; it is the disclosed calibration excess.
 # Input : diagnostics/output/gsea_null_calibration.rds
-# Output: output/figures/fig_d6_calibration.png
+# Output: output/figures/fig_d6_calibration.png (+ .tif 600 dpi, .pdf vector)
+# Drawn at final width 175 mm, text 5.6-7 pt, no in-figure title/subtitle;
+# key and axis wording follow the manuscript (Clopper-Pearson interval,
+# Benjamini-Hochberg q) -- artwork-guide alignment 2026-08-28.
 
 source("setup.R")
 suppressPackageStartupMessages({
@@ -34,30 +37,26 @@ s$row <- factor(paste(s$contrast, s$coll, sep = " · "),
                                    sep = " · ")))
 # The disclosed excess: the cell whose CI lower bound exceeds the nominal level.
 s$excess <- s$ci_lo > cal$config$nominal
-lab_ok <- "CI overlaps nominal"
-lab_ex <- "disclosed excess (CI above nominal)"
+lab_ok <- "interval overlaps nominal"
+lab_ex <- "interval entirely above nominal"
 s$flag <- factor(ifelse(s$excess, lab_ex, lab_ok), levels = c(lab_ex, lab_ok))
 
 p <- ggplot(s, aes(x = p_any, y = row)) +
   geom_vline(xintercept = cal$config$nominal, linetype = "dashed",
              colour = "grey40") +
   geom_errorbar(aes(xmin = ci_lo, xmax = ci_hi, colour = flag),
-                orientation = "y", width = 0.25, linewidth = 0.5) +
-  geom_point(aes(colour = flag), size = 1.8) +
+                orientation = "y", width = 0.25, linewidth = 0.4) +
+  geom_point(aes(colour = flag), size = 1.4) +
   scale_colour_manual(values = setNames(c(COL_UP, "grey30"),
                                         c(lab_ex, lab_ok)), name = NULL) +
   scale_x_continuous(limits = c(0, 0.30), breaks = seq(0, 0.3, 0.05)) +
   labs(
-    x = "share of null replicates with ≥ 1 discovery at q_bh < 0.10",
-    y = NULL,
-    title = "Held-out null calibration of the set-level inference",
-    subtitle = paste0("One row per contrast × collection cell; exact ",
-      "binomial 95% CI over ", s$replicates[1], " replicates\n",
-      "against a shared null pool. Dashed line = nominal 0.10.")
+    x = "proportion of held-out pseudo-observations with ≥1 discovery (Benjamini–Hochberg q<0.10)",
+    y = NULL
   ) +
   theme_thyr()
 
-save_figure(p, "fig_d6_calibration.png", width = 7.5, height = 5.5)
+save_figure(p, "fig_d6_calibration.png", width = 175, height = 120)
 
 # First-run verification against the frozen ledger values.
 message(sprintf("  p_any range %.2f-%.2f (N-24 expects 0.01-0.18)",

@@ -10,7 +10,10 @@
 # Input : processed/thyr_normalized_counts.rds  (from 310; per-unit DGEList)
 #         processed/thyr_expression_test.rds      (from 410; q_storey, effect)
 #         processed/thyr_se_raw.rds               (gene_id -> gene_name)
-# Output: output/figures/fig_ma_gene_bm.png
+# Output: output/figures/fig_ma_gene_bm.png (+ .tif 600 dpi, .pdf vector)
+# Drawn at final width 175 mm, text 5.5-7 pt, no in-figure title -- artwork-
+# guide alignment 2026-08-28. Colour-key wording follows the manuscript bands
+# (High-AS), not the code-era 'exposed'.
 
 source("setup.R")
 suppressPackageStartupMessages({
@@ -53,8 +56,8 @@ df <- do.call(rbind, lapply(unit_order, function(u) {
   )
 }))
 df$unit <- factor(df$unit, levels = unit_order)
-lab_up <- sprintf("higher in exposed (q<%.2f)", FDR_CUT)
-lab_down <- sprintf("lower in exposed (q<%.2f)", FDR_CUT)
+lab_up <- sprintf("higher in High-AS (q<%.2f)", FDR_CUT)
+lab_down <- sprintf("lower in High-AS (q<%.2f)", FDR_CUT)
 df$sig <- factor(ifelse(df$q < FDR_CUT,
   ifelse(df$M >= 0, lab_up, lab_down), "n.s."),
   levels = c(lab_up, lab_down, "n.s."))
@@ -64,23 +67,19 @@ pal <- setNames(c(COL_UP, COL_DOWN, COL_NS), c(lab_up, lab_down, "n.s."))
 
 p <- ggplot(df, aes(x = A, y = M)) +
   geom_hline(yintercept = 0, colour = "grey85") +
-  geom_point(aes(colour = sig), size = 0.9, alpha = 0.6) +
-  ggrepel::geom_text_repel(data = lab, aes(label = gene), size = 2.6,
+  geom_point(aes(colour = sig), size = 0.6, alpha = 0.6) +
+  ggrepel::geom_text_repel(data = lab, aes(label = gene), size = label_size(),
+    family = FONT_FAMILY, segment.size = 0.2,
     max.overlaps = 20, min.segment.length = 0, colour = "grey20", seed = 1L) +
   scale_colour_manual(values = pal, name = NULL, drop = FALSE) +
   facet_wrap(~unit, ncol = 2) +
   labs(
     x = expression("A:  average abundance  " * (log[2] * " CPM)")),
-    y = expression("M:  " * log[2] * " fold change  (High - Sporadic)"),
-    title = "Gene-level MA plot, per analysis contrast",
-    subtitle = sprintf(paste0(
-      "Fold change for display only (the DE call is the rank-based Brunner–Munzel test); colored by Storey q < %.2f.\n",
-      "Contrast readings follow the interpretation map fixed before the reported results existed."
-    ), FDR_CUT)
+    y = expression("M:  " * log[2] * " fold change  (High - Sporadic)")
   ) +
   theme_thyr()
 
-save_figure(p, "fig_ma_gene_bm.png", width = 9, height = 8)
+save_figure(p, "fig_ma_gene_bm.png", width = 175, height = 150)
 for (u in unit_order) {
   d <- df[df$unit == u, ]
   message(sprintf("  %-9s |M| median %.3f | M range [%.2f, %.2f] | q<%.2f %d",

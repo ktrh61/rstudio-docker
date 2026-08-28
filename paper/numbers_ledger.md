@@ -588,7 +588,8 @@
      References 投稿規定整形(Vancouver・6著者超は先頭6+et al.・上付き・PMID 併記整理)/
      組版記号(C(n,nx)・n_X)/Word 化 = 1.5 行間・全ページ+全行番号・図凡例は References 後の
      別ページ・Additional Information 7節を規定順/表1〜3 は個別ファイル+キャプション/
-     図は tiff・eps・jpg・bmp で 300 dpi 以上/Supp は可能なら一体 PDF+Data 1/2 に各 50 語要約/
+     図は最終幅 175 mm・文字 5–7 pt(Liberation Sans)・PDF ベクター+600 dpi TIFF で供給
+     (2026-08-28 実施済み — 下記メモ)/Supp は可能なら一体 PDF+Data 1/2 に各 50 語要約/
      タイトルページ(≤150字・非結論形 — 現115字適合・対応著者 ORCID)/カバーレター(重要性・
      BJC 宣言・未発表言明・対応著者情報・COI 文)
 - **日本語参考訳の同期規則(2026-08-27 批准)**: paper/manuscript_ja.md・paper/supplementary_ja.md
@@ -703,3 +704,12 @@
 - 2026-08-27: 閲覧用 docx に論文図 5 枚(図1〜3・S1・S2 PNG)を凡例直下へ埋め込み(研究者裁定 —
   表の一体ファイル方針の延長・親族への PDF 共有を自己完結化。模式図は不採用=本番準拠)。
   英日 4 ファイル・幅 160mm・投稿版 md 不変・media 数照合を検査に追加
+- 2026-08-28: **図 5 枚を BJC/Springer Nature 図規定へ整合**(親族指摘→研究者 Go・推奨ベース):
+  artwork guide(GTA リンク先、ライブ取得)= 文字 5–7 pt・Helvetica/Arial・最終幅で供給(他誌
+  85/175 mm)・線画はベクター。旧図は 190–349 mm 幅の画面設計で、列幅へ縮小すると題・見出しが
+  7 pt 超/1 段では 5 pt 未満だった。対処 = 全図 175 mm で直接描画・base 7 pt・図内題副題を撤去
+  (図 3 副題の "out-of-sample"・S2 の "exact binomial"/"q_bh"/"disclosed excess" 等の本文非整合
+  語彙も同時に解消、S1 の色キー "exposed"→High-AS)・Liberation Sans(Dockerfile の tini 層に
+  fonts-liberation 追加、既存イメージへ同スナップショットから派生適用 — 旧タグ refblas-20260809
+  保持)・save_figure に cairo_pdf を追加。正準コンテナで再生成、N-08/10/16/18/24/25/26/41/49/50
+  全一致・PDF に LiberationSans 埋め込み確認。閲覧用 docx の埋め込みも新図へ

@@ -10,7 +10,10 @@
 #         processed/thyr_reo_evaluation.rds   (from 530; R_Low/Mid scores)
 #         processed/thyr_se_raw.rds           (sample -> case for training AS)
 #         processed/thyr_case_assigned_share.rds (assigned share)
-# Output: output/figures/fig_reo_grading.png
+# Output: output/figures/fig_reo_grading.png (+ .tif 600 dpi, .pdf vector)
+# Drawn at final width 175 mm, text 5.5-7 pt, no in-figure title/subtitle --
+# artwork-guide alignment 2026-08-28 (the retired subtitle's 'out-of-sample'
+# wording also conflicted with the manuscript's non-validation stance).
 
 source("setup.R")
 source(file.path(paths$root, "lib", "plot_theme.R"))
@@ -71,22 +74,21 @@ p <- ggplot(d, aes(x = score, y = y)) +
   geom_hline(yintercept = -5, linetype = "dotted", colour = "grey60") +
   geom_vline(xintercept = thr + 0.5, linetype = "dashed", colour = "grey40") +
   annotate("text", x = thr + 0.5, y = 103, label = paste0("positive: score > ", thr),
-    hjust = -0.03, vjust = 1, size = 3, colour = "grey30") +
-  annotate("text", x = n_pairs + 0.5, y = STRIP_BASE, hjust = 1, vjust = 1, size = 2.9,
-    colour = "grey30",
+    hjust = -0.03, vjust = 1, size = label_size(), family = FONT_FAMILY,
+    colour = "grey30") +
+  annotate("text", x = n_pairs + 0.5, y = STRIP_BASE, hjust = 1, vjust = 1,
+    size = label_size(), family = FONT_FAMILY, colour = "grey30",
     label = "dose-zero strip: AS undefined (unexposed);\nstacked points count cases") +
-  geom_point(aes(colour = band, shape = set), size = 2.6, alpha = 0.9, stroke = 0.8) +
+  geom_point(aes(colour = band, shape = set), size = 1.8, alpha = 0.9, stroke = 0.6) +
   scale_colour_manual(values = pal, name = "AS band") +
   scale_shape_manual(values = c(construction = 1L, application = 16L), name = "Set") +
   scale_x_continuous(breaks = 0:n_pairs, limits = c(-0.5, n_pairs + 0.5)) +
   scale_y_continuous(breaks = c(0, 33.3, 66.6, 100), limits = c(y_min, 105)) +
   labs(x = paste0("REO reversal score (panel of ", n_pairs, " pairs)"),
-    y = "Assigned share  (radiation attributability, %)",
-    title = "REO reversal scores and assigned share (RET fusion-positive PTCs)",
-    subtitle = "Out-of-sample Low-AS / Mid-AS (filled) vs construction dose-zero / High-AS (open); descriptive grading") +
-  theme_thyr(base_size = 12, subtitle_size = 9.5, legend_position = "right")
+    y = "Assigned share  (radiation attributability, %)") +
+  theme_thyr(legend_position = "right")
 
-save_figure(p, "fig_reo_grading.png", width = 8.2, height = 5.6)
+save_figure(p, "fig_reo_grading.png", width = 175, height = 120)
 
 for (b in levels(d$band)) {
   s <- d$score[d$band == b]

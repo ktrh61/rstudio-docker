@@ -99,13 +99,16 @@ COPY docker/verify_environment.R docker/versions.tsv /tmp/docker-build/
 RUN Rscript /tmp/docker-build/verify_environment.R \
  && rm -rf /tmp/docker-build
 
-# --- PID-1 reaper ------------------------------------------------------------
+# --- PID-1 reaper + figure font ---------------------------------------------
 # mclapply forks orphan at script exit; without a reaping init they accumulate
 # as zombies in long-lived containers (917 observed in the dev container after
 # ~1 day). tini as ENTRYPOINT reaps them regardless of how the container is
 # invoked. (Late layer on purpose: keeps the R build cache during iteration.)
+# fonts-liberation: Arial-metric sans-serif for figure text (Springer Nature
+# artwork guide: Helvetica/Arial, 5-7 pt). Display layer only; same pinned
+# apt snapshot (added 2026-08-28, researcher Go).
 RUN apt-get update \
- && apt-get install -y --no-install-recommends tini \
+ && apt-get install -y --no-install-recommends tini fonts-liberation \
  && rm -rf /var/lib/apt/lists/*
 
 USER ubuntu
