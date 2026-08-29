@@ -7,7 +7,7 @@
 
 [Date]
 
-The Editors
+The Editors  
 British Journal of Cancer
 
 Dear Editors,

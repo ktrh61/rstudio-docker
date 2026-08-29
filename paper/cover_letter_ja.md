@@ -8,7 +8,7 @@
 
 [日付]
 
-British Journal of Cancer
+British Journal of Cancer  
 編集部 御中
 
 編集部の皆様
