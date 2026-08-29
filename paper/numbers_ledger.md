@@ -167,6 +167,7 @@
 | N-93 | 両解析層の被曝例は全例 AS あり(RET 融合 57・BRAF V600E 142 = 199)。正準 IREP CSV は 213 行で、層外の被曝 14 例(共変異 V600E 10・BRAF.MutOther 4)の値を含むが**未使用**。共変異 V600E 3 例(REBC-ACBP・ACDR・ADM9; AKT1/TSHR)は CSV に無い — 理由未記録(来歴: 2025-09 の腕別ファイル thyr_poc_braf_mut / thyr_poc_ret_fusion は当時の分類で作成、研究者 2026-08-28) | AS の使用範囲の開示。表 S1 は解析層の AS のみ提示(研究者決定 2026-08-29: 表に載る AS = 解析に使った AS) | tab_cohort_composition.log「Strata: RET 73 \| BRAF 175 … unused IREP values outside strata 14」+ 正準イメージ内クロス集計(2026-08-28) | Supp Methods AS; Tab S1 凡例 | verified |
 | N-94 | BRAF 層 = Designated V600E 190 例中 175 例(WGS/RNA の候補ドライバー変異が BRAF 単独でない 15 例を除外 — lib/cohort_design.R classify_driver) | 図 1「Driver classified BRAF 175」と S1 の V600E 190 の橋渡し(共変異除外規則の本文開示) | 正準イメージ内クロス集計(2026-08-28)+ N-08(175) | Methods cohorts; Supp QC; Tab S1 凡例 | verified |
 | N-95 | Table 2 の層×帯母数(ペアあり): R_Sporadic 16 (15) / R_Low 19 (15) / R_Mid 20 (16) / R_High 18 (16) / B_Sporadic 33 (29) / B_High 10 (10)。解析 n との差 = ペア・外れ値・純度段階の減少(図 1 と整合: RET 16+18=34→ペア 31、BRAF 33+10=43→ペア 39 = N-08) | 解析群の母集団の開示(旧表 S1 の役割を Table 2 の 1 列に統合) | tab_case_characteristics.log(2026-08-29、正準イメージ)+ thyr_analysis_cohorts.rds(driver×band×is_paired) | Tab 2; Supp Methods AS | verified |
+| N-96 | 補足別ファイルの行数: table_s5_ora_annotation.csv 18,576 / supplementary_data_1_gene_level_results.csv 62,952(= N-15 の全検定遺伝子×4 対比)/ supplementary_data_2_set_level_results.csv 24,798 | 投稿システム入力用の各ファイル ≤50 語要約(declarations「Supplementary file descriptions」)に記載 | 出荷用コピー(paper/gpt_review/supplementary_files)の wc -l −1、2026-08-29 | declarations(要約文); Supp docx 末尾 | verified |
 
 ### M. D6 較正の派生値・採用時測定(執筆用、2026-08-12 追加)
 
@@ -780,3 +781,7 @@
   subscript 化、表の丸めは本文の桁に一致。**GTA 発見: Additional Information は References の前**
   (従来の docx は後ろだった — 是正)。本文第 1 節名は BJC の "Background" を docx 層で適用(正本の
   見出し "Introduction" の改名は研究者判断待ち)
+- 2026-08-29: 正本の本文第 1 節を BJC 規定の "Background" へ改名(研究者 Go; 表 1 根拠列の参照
+  "(Introduction)" も "(Background)" へ — 節名ポインタの更新のみで批准文言は不変。訳は 緒言→背景)。
+  補足別ファイル 4 件(Supp PDF・S5・Data 1・Data 2)の ≤50 語要約を declarations に起草(46/41/42/33 語、
+  N-96)、Supp docx 末尾へ描画し共著者レビュー対象に

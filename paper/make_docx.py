@@ -313,8 +313,20 @@ def supp_preprocess(text):
     assembled = (cover + text.rstrip("\n") + "\n\n" + refs.rstrip("\n")
                  + PAGE_BREAK + "## Supplementary figures\n\n" + PAGE_BREAK.join(figs)
                  + PAGE_BREAK + "## Supplementary tables\n\n" + PAGE_BREAK.join(tabs)
-                 + PAGE_BREAK + "## Supplementary data\n\n" + "\n\n".join(data) + "\n")
+                 + PAGE_BREAK + "## Supplementary data\n\n" + "\n\n".join(data)
+                 + PAGE_BREAK + supp_file_descriptions() + "\n")
     return _finish(assembled)
+
+
+def supp_file_descriptions():
+    """投稿システムに入力する各補足ファイルの ≤50 語要約(declarations 記載)を、
+    共著者レビュー用に Supp 末尾へ描画する。"""
+    d = _declarations()
+    zone = d.split("## Supplementary file descriptions", 1)[1].split("\n## ", 1)[0]
+    out = ["## Supplementary file descriptions (submission-system summaries, ≤50 words each)"]
+    for m in re.finditer(r"^### (.+?)$\n\n(.+?)$", zone, re.M):
+        out += ["", f"**{m.group(1)}.** {m.group(2).strip()}"]
+    return "\n".join(out)
 
 
 def preprocess(text):
@@ -324,7 +336,6 @@ def preprocess(text):
     text = re.sub(r"^-{3,}\s*$", "", text, flags=re.M)
     text = re.sub(r"^\*\*Title:\*\*[^\n]*\n", lambda m: title_page() + PAGE_BREAK, text,
                   count=1, flags=re.M)
-    text = text.replace("## Introduction", "## Background", 1)  # BJC の本文第 1 節名
     leg = re.search(r"^## Figure legends and table captions$.*?(?=^## )", text,
                     flags=re.S | re.M).group(0)
     text = text.replace(leg, "")

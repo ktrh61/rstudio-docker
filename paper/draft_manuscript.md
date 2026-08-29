@@ -25,7 +25,7 @@ In RET fusion-positive PTCs, 1,765 of 15,621 genes met Storey q<0.10 <!-- N-16, 
 
 High-AS and dose-zero RET fusion-positive PTCs differed transcriptionally, compatible with the hypothesized within-driver AS-band association. This does not establish a radiation-specific signature, and the REO profile requires independent validation.
 
-## Introduction
+## Background
 
 <!-- 2026-08-21 C2 ポート: gpt_review 試案 Intro を移植(C1-e 仮説スロット批准・凍結文言は新正準へ統合)。予告列の同期は C4。インライン対訳は廃止(f 保留方針) -->
 
@@ -186,7 +186,7 @@ In conclusion, High-AS and dose-zero RET fusion-positive PTCs differed broadly i
 <!-- 表1(旧表2)本体+脚注規則(正本。Methods: Analysis contrasts から 2026-08-18 移設 — 投稿整形時に一方向切り出し、編集可能な第2コピーは作らない。規則の (a)-(f) 脚注化は研究者の書き直し待ち) -->
 | Contrast | Prespecified standing | Basis |
 | --- | --- | --- |
-| R_Tumor | Hypothesis-bearing; signal expected | primary expectation of the working hypothesis (Introduction); the driver-conditioned gap left by Morton et al. (2021) |
+| R_Tumor | Hypothesis-bearing; signal expected | primary expectation of the working hypothesis (Background); the driver-conditioned gap left by Morton et al. (2021) |
 | R_Normal | Hypothesis-bearing; signal possible | long-term molecular memory of exposure — dose-dependent expression within exposed normal tissue (Abend et al. 2013); exposed-versus-unexposed normal-tissue signatures (Ory et al. 2026) |
 | B_Normal | Test cell for a shared trace | counterpart of the cross-stratum normal comparison; the shared signatures of Ory et al. (2026) were reported without driver stratification |
 | B_Tumor | Direction-agnostic; not excludable | point-mutation drivers become less likely as dose rises in the source cohort (Morton et al. 2021) |
