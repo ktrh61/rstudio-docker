@@ -5,7 +5,8 @@
 #   (author-year 引用+N/C タグ = 照合可能状態を維持する。本スクリプトは読むだけ)
 # 出力 = output/submission/
 #   manuscript_submission.md : タグ・メタ記述を除去し、本文引用を初出順の
-#     Vancouver 数値 [n] へ変換、References を引用台帳の書誌で番号順に生成
+#     Vancouver 数値 [n] へ変換、References を BJC(Nature 形式)の書誌
+#     (paper/bibliography.json — 台帳文字列をキーに題名つきで整形)で番号順に生成
 #   supplementary_submission.md : タグ・メタ記述の除去のみ(SI は author-year のまま —
 #     BJC は SI を submitted のまま掲載するため番号体系を本文と分離しない)
 #   warnings.txt : 未変換候補・台帳不一致・除去タグ数の全数レポート
@@ -153,6 +154,27 @@ def clean_biblio(b):
     return re.sub(r"\s*\(PMID \d+\)", "", b).strip()
 
 
+_BIB = None
+
+
+def bjc_biblio(b, warnings):
+    """台帳の書誌文字列 → BJC(Nature 形式)の投稿用書誌(paper/bibliography.json)。
+    未登録なら台帳文字列を素のまま返し、警告に載せる。"""
+    global _BIB
+    if _BIB is None:
+        import json
+        _BIB = {e["biblio"]: e["formatted"]
+                for e in json.load(open(ROOT / "paper" / "bibliography.json", encoding="utf-8"))["entries"]}
+    if b in _BIB:
+        return _BIB[b]
+    warnings.append(f"書誌未整形(bibliography.json に無い): {b[:60]}")
+    return clean_biblio(b)
+
+
+def first_surname(formatted):
+    return re.split(r"[,.]", formatted, 1)[0].strip().lower()
+
+
 def strip_meta(text, drop_sections):
     text = re.sub(r"<!--.*?-->", "", text, flags=re.S)
     lines = text.split("\n")
@@ -185,7 +207,7 @@ def main():
     refs = ["## References", ""]
     # 台帳の管理注記(「、DOI なし」・「(PMID n)」)は投稿用表示から除去する
     # (BJC の Vancouver 書式は DOI までで PMID を含まない — フェーズ2 整形 2026-08-29)
-    refs += [f"{i+1}. {clean_biblio(b)}" for i, b in enumerate(order)]
+    refs += [f"{i+1}. {bjc_biblio(b, warnings)}" for i, b in enumerate(order)]
     submission = body.rstrip("\n") + "\n\n" + "\n".join(refs) + "\n"
     (OUT / "manuscript_submission.md").write_text(submission, encoding="utf-8")
 
@@ -198,8 +220,8 @@ def main():
     convert(supp, index, supp_order, warnings, do_convert=True)
     if supp_order:
         supp = (supp.rstrip("\n") + "\n\n## Supplementary References\n\n"
-                + "\n\n".join(clean_biblio(b)
-                              for b in sorted(supp_order, key=str.lower)) + "\n")
+                + "\n\n".join(sorted((bjc_biblio(b, warnings) for b in supp_order),
+                                     key=first_surname)) + "\n")
     (OUT / "supplementary_submission.md").write_text(supp, encoding="utf-8")
 
     # 残存 author-year 候補(未変換の検出 — References 節より前の本文のみ)

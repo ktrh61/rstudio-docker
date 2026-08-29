@@ -1,0 +1,1906 @@
+{
+ "_note": "BJC(Nature 形式)の投稿用書誌。key = citation_ledger の書誌文字列。題名は PubMed/CrossRef 取得(2026-08-29)、書籍・ソフトウェア・報告書は手組み。make_submission.py が References を生成する際に参照する。",
+ "entries": [
+  {
+   "biblio": "Morton LM, Karyadi DM, Stewart C, Bogdanova TI, Dawson ET, Steinberg MK, et al. Science 2021;372:eabg2538. doi:10.1126/science.abg2538 (PMID 33888599)",
+   "kind": "article",
+   "pmid": "33888599",
+   "doi": "10.1126/science.abg2538",
+   "title": "Radiation-related genomic profile of papillary thyroid carcinoma after the Chernobyl accident",
+   "authors": [
+    [
+     "Morton",
+     "L.M."
+    ],
+    [
+     "Karyadi",
+     "D.M."
+    ],
+    [
+     "Stewart",
+     "C."
+    ],
+    [
+     "Bogdanova",
+     "T.I."
+    ],
+    [
+     "Dawson",
+     "E.T."
+    ],
+    [
+     "Steinberg",
+     "M.K."
+    ],
+    [
+     "Dai",
+     "J."
+    ],
+    [
+     "Hartley",
+     "S.W."
+    ],
+    [
+     "Schonfeld",
+     "S.J."
+    ],
+    [
+     "Sampson",
+     "J.N."
+    ],
+    [
+     "Maruvka",
+     "Y.E."
+    ],
+    [
+     "Kapoor",
+     "V."
+    ],
+    [
+     "Ramsden",
+     "D.A."
+    ],
+    [
+     "Carvajal-Garcia",
+     "J."
+    ],
+    [
+     "Perou",
+     "C.M."
+    ],
+    [
+     "Parker",
+     "J.S."
+    ],
+    [
+     "Krznaric",
+     "M."
+    ],
+    [
+     "Yeager",
+     "M."
+    ],
+    [
+     "Boland",
+     "J.F."
+    ],
+    [
+     "Hutchinson",
+     "A."
+    ],
+    [
+     "Hicks",
+     "B.D."
+    ],
+    [
+     "Dagnall",
+     "C.L."
+    ],
+    [
+     "Gastier-Foster",
+     "J.M."
+    ],
+    [
+     "Bowen",
+     "J."
+    ],
+    [
+     "Lee",
+     "O."
+    ],
+    [
+     "Machiela",
+     "M.J."
+    ],
+    [
+     "Cahoon",
+     "E.K."
+    ],
+    [
+     "Brenner",
+     "A.V."
+    ],
+    [
+     "Mabuchi",
+     "K."
+    ],
+    [
+     "Drozdovitch",
+     "V."
+    ],
+    [
+     "Masiuk",
+     "S."
+    ],
+    [
+     "Chepurny",
+     "M."
+    ],
+    [
+     "Zurnadzhy",
+     "L.Y."
+    ],
+    [
+     "Hatch",
+     "M."
+    ],
+    [
+     "Berrington de Gonzalez",
+     "A."
+    ],
+    [
+     "Thomas",
+     "G.A."
+    ],
+    [
+     "Tronko",
+     "M.D."
+    ],
+    [
+     "Getz",
+     "G."
+    ],
+    [
+     "Chanock",
+     "S.J."
+    ]
+   ],
+   "journal": "Science",
+   "year": "2021",
+   "volume": "372",
+   "pages": "eabg2538",
+   "formatted": "Morton, L.M., Karyadi, D.M., Stewart, C., Bogdanova, T.I., Dawson, E.T., Steinberg, M.K. et al. Radiation-related genomic profile of papillary thyroid carcinoma after the Chernobyl accident. *Science* **372**, eabg2538 (2021)."
+  },
+  {
+   "biblio": "Abend M, Pfeiffer RM, Ruf C, Hatch M, Bogdanova TI, Tronko MD, et al. PLoS One 2012;7:e39103. doi:10.1371/journal.pone.0039103 (PMID 22848350)",
+   "kind": "article",
+   "pmid": "22848350",
+   "doi": "10.1371/journal.pone.0039103",
+   "title": "Iodine-131 dose dependent gene expression in thyroid cancers and corresponding normal tissues following the Chernobyl accident",
+   "authors": [
+    [
+     "Abend",
+     "M."
+    ],
+    [
+     "Pfeiffer",
+     "R.M."
+    ],
+    [
+     "Ruf",
+     "C."
+    ],
+    [
+     "Hatch",
+     "M."
+    ],
+    [
+     "Bogdanova",
+     "T.I."
+    ],
+    [
+     "Tronko",
+     "M.D."
+    ],
+    [
+     "Riecke",
+     "A."
+    ],
+    [
+     "Hartmann",
+     "J."
+    ],
+    [
+     "Meineke",
+     "V."
+    ],
+    [
+     "Boukheris",
+     "H."
+    ],
+    [
+     "Sigurdson",
+     "A.J."
+    ],
+    [
+     "Mabuchi",
+     "K."
+    ],
+    [
+     "Brenner",
+     "A.V."
+    ]
+   ],
+   "journal": "PLoS One",
+   "year": "2012",
+   "volume": "7",
+   "pages": "e39103",
+   "formatted": "Abend, M., Pfeiffer, R.M., Ruf, C., Hatch, M., Bogdanova, T.I., Tronko, M.D. et al. Iodine-131 dose dependent gene expression in thyroid cancers and corresponding normal tissues following the Chernobyl accident. *PLoS One* **7**, e39103 (2012)."
+  },
+  {
+   "biblio": "Abend M, Pfeiffer RM, Ruf C, Hatch M, Bogdanova TI, Tronko MD, et al. Br J Cancer 2013;109:2286-2294. doi:10.1038/bjc.2013.574 (PMID 24045656)",
+   "kind": "article",
+   "pmid": "24045656",
+   "doi": "10.1038/bjc.2013.574",
+   "title": "Iodine-131 dose-dependent gene expression: alterations in both normal and tumour thyroid tissues of post-Chernobyl thyroid cancers",
+   "authors": [
+    [
+     "Abend",
+     "M."
+    ],
+    [
+     "Pfeiffer",
+     "R.M."
+    ],
+    [
+     "Ruf",
+     "C."
+    ],
+    [
+     "Hatch",
+     "M."
+    ],
+    [
+     "Bogdanova",
+     "T.I."
+    ],
+    [
+     "Tronko",
+     "M.D."
+    ],
+    [
+     "Hartmann",
+     "J."
+    ],
+    [
+     "Meineke",
+     "V."
+    ],
+    [
+     "Mabuchi",
+     "K."
+    ],
+    [
+     "Brenner",
+     "A.V."
+    ]
+   ],
+   "journal": "Br J Cancer",
+   "year": "2013",
+   "volume": "109",
+   "pages": "2286-94",
+   "formatted": "Abend, M., Pfeiffer, R.M., Ruf, C., Hatch, M., Bogdanova, T.I., Tronko, M.D. et al. Iodine-131 dose-dependent gene expression: alterations in both normal and tumour thyroid tissues of post-Chernobyl thyroid cancers. *Br. J. Cancer* **109**, 2286–2294 (2013)."
+  },
+  {
+   "biblio": "Dom G, Tarabichi M, Unger K, Thomas G, Oczko-Wojciechowska M, Bogdanova T, et al. Br J Cancer 2012;107:994-1000. doi:10.1038/bjc.2012.302 (PMID 22828612)",
+   "kind": "article",
+   "pmid": "22828612",
+   "doi": "10.1038/bjc.2012.302",
+   "title": "A gene expression signature distinguishes normal tissues of sporadic and radiation-induced papillary thyroid carcinomas",
+   "authors": [
+    [
+     "Dom",
+     "G."
+    ],
+    [
+     "Tarabichi",
+     "M."
+    ],
+    [
+     "Unger",
+     "K."
+    ],
+    [
+     "Thomas",
+     "G."
+    ],
+    [
+     "Oczko-Wojciechowska",
+     "M."
+    ],
+    [
+     "Bogdanova",
+     "T."
+    ],
+    [
+     "Jarzab",
+     "B."
+    ],
+    [
+     "Dumont",
+     "J.E."
+    ],
+    [
+     "Detours",
+     "V."
+    ],
+    [
+     "Maenhaut",
+     "C."
+    ]
+   ],
+   "journal": "Br J Cancer",
+   "year": "2012",
+   "volume": "107",
+   "pages": "994-1000",
+   "formatted": "Dom, G., Tarabichi, M., Unger, K., Thomas, G., Oczko-Wojciechowska, M., Bogdanova, T. et al. A gene expression signature distinguishes normal tissues of sporadic and radiation-induced papillary thyroid carcinomas. *Br. J. Cancer* **107**, 994–1000 (2012)."
+  },
+  {
+   "biblio": "Ory C, Jouannet C, Panunzi L, Nouira A, Benderitter M, Le Guen B, et al. Sci Rep 2026;16:53030. doi:10.1038/s41598-026-53030-4 (PMID 42151323)",
+   "kind": "article",
+   "pmid": "42151323",
+   "doi": "10.1038/s41598-026-53030-4",
+   "title": "Post-Chornobyl thyroid papillary carcinomas display distinct past ^131^I exposure and radiation-associated carcinogenesis molecular signatures at low and high thyroid doses",
+   "authors": [
+    [
+     "Ory",
+     "C."
+    ],
+    [
+     "Jouannet",
+     "C."
+    ],
+    [
+     "Panunzi",
+     "L."
+    ],
+    [
+     "Nouira",
+     "A."
+    ],
+    [
+     "Benderitter",
+     "M."
+    ],
+    [
+     "Le Guen",
+     "B."
+    ],
+    [
+     "Schlumberger",
+     "M."
+    ],
+    [
+     "de Vathaire",
+     "F."
+    ],
+    [
+     "Deleuze",
+     "J.F."
+    ],
+    [
+     "Bogdanova",
+     "T.I."
+    ],
+    [
+     "Tronko",
+     "M."
+    ],
+    [
+     "Pushkarev",
+     "V.V."
+    ],
+    [
+     "Masiuk",
+     "S."
+    ],
+    [
+     "Souidi",
+     "M."
+    ],
+    [
+     "Benadjaoud",
+     "M.A."
+    ]
+   ],
+   "journal": "Sci Rep",
+   "year": "2026",
+   "volume": "16",
+   "pages": "53030",
+   "formatted": "Ory, C., Jouannet, C., Panunzi, L., Nouira, A., Benderitter, M., Le Guen, B. et al. Post-Chornobyl thyroid papillary carcinomas display distinct past ^131^I exposure and radiation-associated carcinogenesis molecular signatures at low and high thyroid doses. *Sci. Rep.* **16**, 53030 (2026)."
+  },
+  {
+   "biblio": "Nikiforov YE, Rowland JM, Bove KE, Monforte-Munoz H, Fagin JA. Cancer Res 1997;57:1690-1694. (PMID 9135009、DOI なし)",
+   "kind": "article",
+   "pmid": "9135009",
+   "doi": null,
+   "title": "Distinct pattern of ret oncogene rearrangements in morphological variants of radiation-induced and sporadic thyroid papillary carcinomas in children",
+   "authors": [
+    [
+     "Nikiforov",
+     "Y.E."
+    ],
+    [
+     "Rowland",
+     "J.M."
+    ],
+    [
+     "Bove",
+     "K.E."
+    ],
+    [
+     "Monforte-Munoz",
+     "H."
+    ],
+    [
+     "Fagin",
+     "J.A."
+    ]
+   ],
+   "journal": "Cancer Res",
+   "year": "1997",
+   "volume": "57",
+   "pages": "1690-4",
+   "formatted": "Nikiforov, Y.E., Rowland, J.M., Bove, K.E., Monforte-Munoz, H. & Fagin, J.A. Distinct pattern of ret oncogene rearrangements in morphological variants of radiation-induced and sporadic thyroid papillary carcinomas in children. *Cancer Res.* **57**, 1690–1694 (1997)."
+  },
+  {
+   "biblio": "Rabes HM, Demidchik EP, Sidorow JD, Lengfelder E, Beimfohr C, Hoelzel D, et al. Clin Cancer Res 2000;6:1093-1103. (PMID 10741739、DOI なし)",
+   "kind": "article",
+   "pmid": "10741739",
+   "doi": null,
+   "title": "Pattern of radiation-induced RET and NTRK1 rearrangements in 191 post-chernobyl papillary thyroid carcinomas: biological, phenotypic, and clinical implications",
+   "authors": [
+    [
+     "Rabes",
+     "H.M."
+    ],
+    [
+     "Demidchik",
+     "E.P."
+    ],
+    [
+     "Sidorow",
+     "J.D."
+    ],
+    [
+     "Lengfelder",
+     "E."
+    ],
+    [
+     "Beimfohr",
+     "C."
+    ],
+    [
+     "Hoelzel",
+     "D."
+    ],
+    [
+     "Klugbauer",
+     "S."
+    ]
+   ],
+   "journal": "Clin Cancer Res",
+   "year": "2000",
+   "volume": "6",
+   "pages": "1093-103",
+   "formatted": "Rabes, H.M., Demidchik, E.P., Sidorow, J.D., Lengfelder, E., Beimfohr, C., Hoelzel, D. et al. Pattern of radiation-induced RET and NTRK1 rearrangements in 191 post-chernobyl papillary thyroid carcinomas: biological, phenotypic, and clinical implications. *Clin. Cancer Res.* **6**, 1093–1103 (2000)."
+  },
+  {
+   "biblio": "Ito T, Seyama T, Iwamoto KS, Hayashi T, Mizuno T, Tsuyama N, et al. Cancer Res 1993;53:2940-2943. (PMID 8319199、DOI なし)",
+   "kind": "article",
+   "pmid": "8319199",
+   "doi": null,
+   "title": "In vitro irradiation is able to cause RET oncogene rearrangement",
+   "authors": [
+    [
+     "Ito",
+     "T."
+    ],
+    [
+     "Seyama",
+     "T."
+    ],
+    [
+     "Iwamoto",
+     "K.S."
+    ],
+    [
+     "Hayashi",
+     "T."
+    ],
+    [
+     "Mizuno",
+     "T."
+    ],
+    [
+     "Tsuyama",
+     "N."
+    ],
+    [
+     "Dohi",
+     "K."
+    ],
+    [
+     "Nakamura",
+     "N."
+    ],
+    [
+     "Akiyama",
+     "M."
+    ]
+   ],
+   "journal": "Cancer Res",
+   "year": "1993",
+   "volume": "53",
+   "pages": "2940-3",
+   "formatted": "Ito, T., Seyama, T., Iwamoto, K.S., Hayashi, T., Mizuno, T., Tsuyama, N. et al. In vitro irradiation is able to cause RET oncogene rearrangement. *Cancer Res.* **53**, 2940–2943 (1993)."
+  },
+  {
+   "biblio": "Caudill CM, Zhu Z, Ciampi R, Stringer JR, Nikiforov YE. J Clin Endocrinol Metab 2005;90:2364-2369. doi:10.1210/jc.2004-1811 (PMID 15671095)",
+   "kind": "article",
+   "pmid": "15671095",
+   "doi": "10.1210/jc.2004-1811",
+   "title": "Dose-dependent generation of RET/PTC in human thyroid cells after in vitro exposure to gamma-radiation: a model of carcinogenic chromosomal rearrangement induced by ionizing radiation",
+   "authors": [
+    [
+     "Caudill",
+     "C.M."
+    ],
+    [
+     "Zhu",
+     "Z."
+    ],
+    [
+     "Ciampi",
+     "R."
+    ],
+    [
+     "Stringer",
+     "J.R."
+    ],
+    [
+     "Nikiforov",
+     "Y.E."
+    ]
+   ],
+   "journal": "J Clin Endocrinol Metab",
+   "year": "2005",
+   "volume": "90",
+   "pages": "2364-9",
+   "formatted": "Caudill, C.M., Zhu, Z., Ciampi, R., Stringer, J.R. & Nikiforov, Y.E. Dose-dependent generation of RET/PTC in human thyroid cells after in vitro exposure to gamma-radiation: a model of carcinogenic chromosomal rearrangement induced by ionizing radiation. *J. Clin. Endocrinol. Metab.* **90**, 2364–2369 (2005)."
+  },
+  {
+   "biblio": "Nikiforova MN, Stringer JR, Blough R, Medvedovic M, Fagin JA, Nikiforov YE. Science 2000;290:138-141. doi:10.1126/science.290.5489.138 (PMID 11021799)",
+   "kind": "article",
+   "pmid": "11021799",
+   "doi": "10.1126/science.290.5489.138",
+   "title": "Proximity of chromosomal loci that participate in radiation-induced rearrangements in human cells",
+   "authors": [
+    [
+     "Nikiforova",
+     "M.N."
+    ],
+    [
+     "Stringer",
+     "J.R."
+    ],
+    [
+     "Blough",
+     "R."
+    ],
+    [
+     "Medvedovic",
+     "M."
+    ],
+    [
+     "Fagin",
+     "J.A."
+    ],
+    [
+     "Nikiforov",
+     "Y.E."
+    ]
+   ],
+   "journal": "Science",
+   "year": "2000",
+   "volume": "290",
+   "pages": "138-41",
+   "formatted": "Nikiforova, M.N., Stringer, J.R., Blough, R., Medvedovic, M., Fagin, J.A. & Nikiforov, Y.E. Proximity of chromosomal loci that participate in radiation-induced rearrangements in human cells. *Science* **290**, 138–141 (2000)."
+  },
+  {
+   "biblio": "Hamatani K, Eguchi H, Ito R, Mukai M, Takahashi K, Taga M, et al. Cancer Res 2008;68:7176-7182. doi:10.1158/0008-5472.CAN-08-0293 (PMID 18757433)",
+   "kind": "article",
+   "pmid": "18757433",
+   "doi": "10.1158/0008-5472.CAN-08-0293",
+   "title": "RET/PTC rearrangements preferentially occurred in papillary thyroid cancer among atomic bomb survivors exposed to high radiation dose",
+   "authors": [
+    [
+     "Hamatani",
+     "K."
+    ],
+    [
+     "Eguchi",
+     "H."
+    ],
+    [
+     "Ito",
+     "R."
+    ],
+    [
+     "Mukai",
+     "M."
+    ],
+    [
+     "Takahashi",
+     "K."
+    ],
+    [
+     "Taga",
+     "M."
+    ],
+    [
+     "Imai",
+     "K."
+    ],
+    [
+     "Cologne",
+     "J."
+    ],
+    [
+     "Soda",
+     "M."
+    ],
+    [
+     "Arihiro",
+     "K."
+    ],
+    [
+     "Fujihara",
+     "M."
+    ],
+    [
+     "Abe",
+     "K."
+    ],
+    [
+     "Hayashi",
+     "T."
+    ],
+    [
+     "Nakashima",
+     "M."
+    ],
+    [
+     "Sekine",
+     "I."
+    ],
+    [
+     "Yasui",
+     "W."
+    ],
+    [
+     "Hayashi",
+     "Y."
+    ],
+    [
+     "Nakachi",
+     "K."
+    ]
+   ],
+   "journal": "Cancer Res",
+   "year": "2008",
+   "volume": "68",
+   "pages": "7176-82",
+   "formatted": "Hamatani, K., Eguchi, H., Ito, R., Mukai, M., Takahashi, K., Taga, M. et al. RET/PTC rearrangements preferentially occurred in papillary thyroid cancer among atomic bomb survivors exposed to high radiation dose. *Cancer Res.* **68**, 7176–7182 (2008)."
+  },
+  {
+   "biblio": "Detours V, Wattel S, Venet D, Hutsebaut N, Bogdanova T, Tronko MD, et al. Br J Cancer 2005;92:1545-1552. doi:10.1038/sj.bjc.6602521 (PMID 15812549)",
+   "kind": "article",
+   "pmid": "15812549",
+   "doi": "10.1038/sj.bjc.6602521",
+   "title": "Absence of a specific radiation signature in post-Chernobyl thyroid cancers",
+   "authors": [
+    [
+     "Detours",
+     "V."
+    ],
+    [
+     "Wattel",
+     "S."
+    ],
+    [
+     "Venet",
+     "D."
+    ],
+    [
+     "Hutsebaut",
+     "N."
+    ],
+    [
+     "Bogdanova",
+     "T."
+    ],
+    [
+     "Tronko",
+     "M.D."
+    ],
+    [
+     "Dumont",
+     "J.E."
+    ],
+    [
+     "Franc",
+     "B."
+    ],
+    [
+     "Thomas",
+     "G."
+    ],
+    [
+     "Maenhaut",
+     "C."
+    ]
+   ],
+   "journal": "Br J Cancer",
+   "year": "2005",
+   "volume": "92",
+   "pages": "1545-52",
+   "formatted": "Detours, V., Wattel, S., Venet, D., Hutsebaut, N., Bogdanova, T., Tronko, M.D. et al. Absence of a specific radiation signature in post-Chernobyl thyroid cancers. *Br. J. Cancer* **92**, 1545–1552 (2005)."
+  },
+  {
+   "biblio": "Detours V, Delys L, Libert F, Weiss Solís D, Bogdanova T, Dumont JE, et al. Br J Cancer 2007;97:818-825. doi:10.1038/sj.bjc.6603938 (PMID 17712314)",
+   "kind": "article",
+   "pmid": "17712314",
+   "doi": "10.1038/sj.bjc.6603938",
+   "title": "Genome-wide gene expression profiling suggests distinct radiation susceptibilities in sporadic and post-Chernobyl papillary thyroid cancers",
+   "authors": [
+    [
+     "Detours",
+     "V."
+    ],
+    [
+     "Delys",
+     "L."
+    ],
+    [
+     "Libert",
+     "F."
+    ],
+    [
+     "Weiss Solís",
+     "D."
+    ],
+    [
+     "Bogdanova",
+     "T."
+    ],
+    [
+     "Dumont",
+     "J.E."
+    ],
+    [
+     "Franc",
+     "B."
+    ],
+    [
+     "Thomas",
+     "G."
+    ],
+    [
+     "Maenhaut",
+     "C."
+    ]
+   ],
+   "journal": "Br J Cancer",
+   "year": "2007",
+   "volume": "97",
+   "pages": "818-25",
+   "formatted": "Detours, V., Delys, L., Libert, F., Weiss Solís, D., Bogdanova, T., Dumont, J.E. et al. Genome-wide gene expression profiling suggests distinct radiation susceptibilities in sporadic and post-Chernobyl papillary thyroid cancers. *Br. J. Cancer* **97**, 818–825 (2007)."
+  },
+  {
+   "biblio": "Hess J, Thomas G, Braselmann H, Bauer V, Bogdanova T, Wienberg J, et al. PNAS 2011;108:9595-9600. doi:10.1073/pnas.1017137108 (PMID 21606360)",
+   "kind": "article",
+   "pmid": "21606360",
+   "doi": "10.1073/pnas.1017137108",
+   "title": "Gain of chromosome band 7q11 in papillary thyroid carcinomas of young patients is associated with exposure to low-dose irradiation",
+   "authors": [
+    [
+     "Hess",
+     "J."
+    ],
+    [
+     "Thomas",
+     "G."
+    ],
+    [
+     "Braselmann",
+     "H."
+    ],
+    [
+     "Bauer",
+     "V."
+    ],
+    [
+     "Bogdanova",
+     "T."
+    ],
+    [
+     "Wienberg",
+     "J."
+    ],
+    [
+     "Zitzelsberger",
+     "H."
+    ],
+    [
+     "Unger",
+     "K."
+    ]
+   ],
+   "journal": "Proc Natl Acad Sci U S A",
+   "year": "2011",
+   "volume": "108",
+   "pages": "9595-600",
+   "formatted": "Hess, J., Thomas, G., Braselmann, H., Bauer, V., Bogdanova, T., Wienberg, J. et al. Gain of chromosome band 7q11 in papillary thyroid carcinomas of young patients is associated with exposure to low-dose irradiation. *Proc. Natl Acad. Sci. USA* **108**, 9595–9600 (2011)."
+  },
+  {
+   "biblio": "Kocher DC, Apostoaei AI, Henshaw RW, Hoffman FO, Schubauer-Berigan MK, Stancescu DO, et al. Interactive RadioEpidemiological Program (IREP). Health Phys 2008;95:119-147. doi:10.1097/01.HP.0000291191.49583.f7 (PMID 18545036)",
+   "kind": "article",
+   "pmid": "18545036",
+   "doi": "10.1097/01.HP.0000291191.49583.f7",
+   "title": "Interactive RadioEpidemiological Program (IREP): a web-based tool for estimating probability of causation/assigned share of radiogenic cancers",
+   "authors": [
+    [
+     "Kocher",
+     "D.C."
+    ],
+    [
+     "Apostoaei",
+     "A.I."
+    ],
+    [
+     "Henshaw",
+     "R.W."
+    ],
+    [
+     "Hoffman",
+     "F.O."
+    ],
+    [
+     "Schubauer-Berigan",
+     "M.K."
+    ],
+    [
+     "Stancescu",
+     "D.O."
+    ],
+    [
+     "Thomas",
+     "B.A."
+    ],
+    [
+     "Trabalka",
+     "J.R."
+    ],
+    [
+     "Gilbert",
+     "E.S."
+    ],
+    [
+     "Land",
+     "C.E."
+    ]
+   ],
+   "journal": "Health Phys",
+   "year": "2008",
+   "volume": "95",
+   "pages": "119-47",
+   "formatted": "Kocher, D.C., Apostoaei, A.I., Henshaw, R.W., Hoffman, F.O., Schubauer-Berigan, M.K., Stancescu, D.O. et al. Interactive RadioEpidemiological Program (IREP): a web-based tool for estimating probability of causation/assigned share of radiogenic cancers. *Health Phys.* **95**, 119–147 (2008)."
+  },
+  {
+   "biblio": "Chen Y, Lun ATL, Smyth GK. F1000Res 2016;5:1438. doi:10.12688/f1000research.8987.2 (PMID 27508061)",
+   "kind": "article",
+   "pmid": "27508061",
+   "doi": "10.12688/f1000research.8987.2",
+   "title": "From reads to genes to pathways: differential expression analysis of RNA-Seq experiments using Rsubread and the edgeR quasi-likelihood pipeline",
+   "authors": [
+    [
+     "Chen",
+     "Y."
+    ],
+    [
+     "Lun",
+     "A.T."
+    ],
+    [
+     "Smyth",
+     "G.K."
+    ]
+   ],
+   "journal": "F1000Res",
+   "year": "2016",
+   "volume": "5",
+   "pages": "1438",
+   "formatted": "Chen, Y., Lun, A.T. & Smyth, G.K. From reads to genes to pathways: differential expression analysis of RNA-Seq experiments using Rsubread and the edgeR quasi-likelihood pipeline. *F1000Res.* **5**, 1438 (2016)."
+  },
+  {
+   "biblio": "Chen Y, Chen L, Lun ATL, Baldoni PL, Smyth GK. Nucleic Acids Res 2025;53:gkaf018. doi:10.1093/nar/gkaf018",
+   "kind": "article",
+   "pmid": null,
+   "doi": "10.1093/nar/gkaf018",
+   "title": "edgeR v4: powerful differential analysis of sequencing data with expanded functionality and improved support for small counts and larger datasets",
+   "authors": [
+    [
+     "Chen",
+     "Y."
+    ],
+    [
+     "Chen",
+     "L."
+    ],
+    [
+     "Lun",
+     "A.T.L."
+    ],
+    [
+     "Baldoni",
+     "P.L."
+    ],
+    [
+     "Smyth",
+     "G.K."
+    ]
+   ],
+   "journal": "Nucleic Acids Res",
+   "year": "2025",
+   "volume": "53",
+   "pages": "gkaf018",
+   "formatted": "Chen, Y., Chen, L., Lun, A.T.L., Baldoni, P.L. & Smyth, G.K. edgeR v4: powerful differential analysis of sequencing data with expanded functionality and improved support for small counts and larger datasets. *Nucleic Acids Res.* **53**, gkaf018 (2025)."
+  },
+  {
+   "biblio": "Nakayama Y, Yata K, Aoshima M. Jpn J Stat Data Sci 2024;7:739-766. doi:10.1007/s42081-024-00255-0",
+   "kind": "article",
+   "pmid": null,
+   "doi": "10.1007/s42081-024-00255-0",
+   "title": "Test for high-dimensional outliers with principal component analysis",
+   "authors": [
+    [
+     "Nakayama",
+     "Y."
+    ],
+    [
+     "Yata",
+     "K."
+    ],
+    [
+     "Aoshima",
+     "M."
+    ]
+   ],
+   "journal": "Jpn J Stat Data Sci",
+   "year": "2024",
+   "volume": "7",
+   "pages": "739-766",
+   "formatted": "Nakayama, Y., Yata, K. & Aoshima, M. Test for high-dimensional outliers with principal component analysis. *Jpn. J. Stat. Data Sci.* **7**, 739–766 (2024)."
+  },
+  {
+   "biblio": "Shen Q, Hu J, Jiang N, Hu X, Luo Z, Zhang H. contamDE. Bioinformatics 2016;32:705-712. doi:10.1093/bioinformatics/btv657 (PMID 26556386)",
+   "kind": "article",
+   "pmid": "26556386",
+   "doi": "10.1093/bioinformatics/btv657",
+   "title": "contamDE: differential expression analysis of RNA-seq data for contaminated tumor samples",
+   "authors": [
+    [
+     "Shen",
+     "Q."
+    ],
+    [
+     "Hu",
+     "J."
+    ],
+    [
+     "Jiang",
+     "N."
+    ],
+    [
+     "Hu",
+     "X."
+    ],
+    [
+     "Luo",
+     "Z."
+    ],
+    [
+     "Zhang",
+     "H."
+    ]
+   ],
+   "journal": "Bioinformatics",
+   "year": "2016",
+   "volume": "32",
+   "pages": "705-12",
+   "formatted": "Shen, Q., Hu, J., Jiang, N., Hu, X., Luo, Z. & Zhang, H. contamDE: differential expression analysis of RNA-seq data for contaminated tumor samples. *Bioinformatics* **32**, 705–712 (2016)."
+  },
+  {
+   "biblio": "Ji Y, Yu C, Zhang H. contamDE-lm. Bioinformatics 2020;36:2492-2499. doi:10.1093/bioinformatics/btaa006 (PMID 31917401)",
+   "kind": "article",
+   "pmid": "31917401",
+   "doi": "10.1093/bioinformatics/btaa006",
+   "title": "contamDE-lm: linear model-based differential gene expression analysis using next-generation RNA-seq data from contaminated tumor samples",
+   "authors": [
+    [
+     "Ji",
+     "Y."
+    ],
+    [
+     "Yu",
+     "C."
+    ],
+    [
+     "Zhang",
+     "H."
+    ]
+   ],
+   "journal": "Bioinformatics",
+   "year": "2020",
+   "volume": "36",
+   "pages": "2492-2499",
+   "formatted": "Ji, Y., Yu, C. & Zhang, H. contamDE-lm: linear model-based differential gene expression analysis using next-generation RNA-seq data from contaminated tumor samples. *Bioinformatics* **36**, 2492–2499 (2020)."
+  },
+  {
+   "biblio": "Feng Y, Li LM. BMC Bioinformatics 2021;22:386. doi:10.1186/s12859-021-04288-0 (PMID 34320923)",
+   "kind": "article",
+   "pmid": "34320923",
+   "doi": "10.1186/s12859-021-04288-0",
+   "title": "MUREN: a robust and multi-reference approach of RNA-seq transcript normalization",
+   "authors": [
+    [
+     "Feng",
+     "Y."
+    ],
+    [
+     "Li",
+     "L.M."
+    ]
+   ],
+   "journal": "BMC Bioinformatics",
+   "year": "2021",
+   "volume": "22",
+   "pages": "386",
+   "formatted": "Feng, Y. & Li, L.M. MUREN: a robust and multi-reference approach of RNA-seq transcript normalization. *BMC Bioinformatics* **22**, 386 (2021)."
+  },
+  {
+   "biblio": "Brunner E, Munzel U. Biom J 2000;42:17-25. doi:10.1002/(SICI)1521-4036(200001)42:1<17::AID-BIMJ17>3.0.CO;2-U",
+   "kind": "article",
+   "pmid": null,
+   "doi": "10.1002/",
+   "title": "The nonparametric Behrens–Fisher problem: asymptotic theory and a small-sample approximation",
+   "authors": [
+    [
+     "Brunner",
+     "E."
+    ],
+    [
+     "Munzel",
+     "U."
+    ]
+   ],
+   "journal": "Biom J",
+   "year": "2000",
+   "volume": "42",
+   "pages": "17-25",
+   "formatted": "Brunner, E. & Munzel, U. The nonparametric Behrens–Fisher problem: asymptotic theory and a small-sample approximation. *Biom. J.* **42**, 17–25 (2000)."
+  },
+  {
+   "biblio": "Donoho D, Jin J. Ann Stat 2004;32:962-994. doi:10.1214/009053604000000265",
+   "kind": "article",
+   "pmid": null,
+   "doi": "10.1214/009053604000000265",
+   "title": "Higher criticism for detecting sparse heterogeneous mixtures",
+   "authors": [
+    [
+     "Donoho",
+     "D."
+    ],
+    [
+     "Jin",
+     "J."
+    ]
+   ],
+   "journal": "Ann Stat",
+   "year": "2004",
+   "volume": "32",
+   "pages": "962-994",
+   "formatted": "Donoho, D. & Jin, J. Higher criticism for detecting sparse heterogeneous mixtures. *Ann. Stat.* **32**, 962–994 (2004)."
+  },
+  {
+   "biblio": "Kadota K, Nishiyama T, Shimizu K. Algorithms Mol Biol 2012;7:5. doi:10.1186/1748-7188-7-5 (PMID 22475125)",
+   "kind": "article",
+   "pmid": "22475125",
+   "doi": "10.1186/1748-7188-7-5",
+   "title": "A normalization strategy for comparing tag count data",
+   "authors": [
+    [
+     "Kadota",
+     "K."
+    ],
+    [
+     "Nishiyama",
+     "T."
+    ],
+    [
+     "Shimizu",
+     "K."
+    ]
+   ],
+   "journal": "Algorithms Mol Biol",
+   "year": "2012",
+   "volume": "7",
+   "pages": "5",
+   "formatted": "Kadota, K., Nishiyama, T. & Shimizu, K. A normalization strategy for comparing tag count data. *Algorithms Mol. Biol.* **7**, 5 (2012)."
+  },
+  {
+   "biblio": "Sun J, Nishiyama T, Shimizu K, Kadota K. BMC Bioinformatics 2013;14:219. doi:10.1186/1471-2105-14-219",
+   "kind": "article",
+   "pmid": null,
+   "doi": "10.1186/1471-2105-14-219",
+   "title": "TCC: an R package for comparing tag count data with robust normalization strategies",
+   "authors": [
+    [
+     "Sun",
+     "J."
+    ],
+    [
+     "Nishiyama",
+     "T."
+    ],
+    [
+     "Shimizu",
+     "K."
+    ],
+    [
+     "Kadota",
+     "K."
+    ]
+   ],
+   "journal": "BMC Bioinformatics",
+   "year": "2013",
+   "volume": "14",
+   "pages": "219",
+   "formatted": "Sun, J., Nishiyama, T., Shimizu, K. & Kadota, K. TCC: an R package for comparing tag count data with robust normalization strategies. *BMC Bioinformatics* **14**, 219 (2013)."
+  },
+  {
+   "biblio": "Storey JD. J R Stat Soc B 2002;64:479-498. doi:10.1111/1467-9868.00346",
+   "kind": "article",
+   "pmid": null,
+   "doi": "10.1111/1467-9868.00346",
+   "title": "A direct approach to false discovery rates",
+   "authors": [
+    [
+     "Storey",
+     "J.D."
+    ]
+   ],
+   "journal": "J R Stat Soc B",
+   "year": "2002",
+   "volume": "64",
+   "pages": "479-498",
+   "formatted": "Storey, J.D. A direct approach to false discovery rates. *J. R. Stat. Soc. B* **64**, 479–498 (2002)."
+  },
+  {
+   "biblio": "Subramanian A, Tamayo P, Mootha VK, Mukherjee S, Ebert BL, Gillette MA, et al. PNAS 2005;102:15545-15550. doi:10.1073/pnas.0506580102 (PMID 16199517)",
+   "kind": "article",
+   "pmid": "16199517",
+   "doi": "10.1073/pnas.0506580102",
+   "title": "Gene set enrichment analysis: a knowledge-based approach for interpreting genome-wide expression profiles",
+   "authors": [
+    [
+     "Subramanian",
+     "A."
+    ],
+    [
+     "Tamayo",
+     "P."
+    ],
+    [
+     "Mootha",
+     "V.K."
+    ],
+    [
+     "Mukherjee",
+     "S."
+    ],
+    [
+     "Ebert",
+     "B.L."
+    ],
+    [
+     "Gillette",
+     "M.A."
+    ],
+    [
+     "Paulovich",
+     "A."
+    ],
+    [
+     "Pomeroy",
+     "S.L."
+    ],
+    [
+     "Golub",
+     "T.R."
+    ],
+    [
+     "Lander",
+     "E.S."
+    ],
+    [
+     "Mesirov",
+     "J.P."
+    ]
+   ],
+   "journal": "Proc Natl Acad Sci U S A",
+   "year": "2005",
+   "volume": "102",
+   "pages": "15545-50",
+   "formatted": "Subramanian, A., Tamayo, P., Mootha, V.K., Mukherjee, S., Ebert, B.L., Gillette, M.A. et al. Gene set enrichment analysis: a knowledge-based approach for interpreting genome-wide expression profiles. *Proc. Natl Acad. Sci. USA* **102**, 15545–15550 (2005)."
+  },
+  {
+   "biblio": "Benjamini Y, Hochberg Y. J R Stat Soc B 1995;57:289-300. doi:10.1111/j.2517-6161.1995.tb02031.x",
+   "kind": "article",
+   "pmid": null,
+   "doi": "10.1111/j.2517-6161.1995.tb02031.x",
+   "title": "Controlling the false discovery rate: a practical and powerful approach to multiple testing",
+   "authors": [
+    [
+     "Benjamini",
+     "Y."
+    ],
+    [
+     "Hochberg",
+     "Y."
+    ]
+   ],
+   "journal": "J R Stat Soc B",
+   "year": "1995",
+   "volume": "57",
+   "pages": "289-300",
+   "formatted": "Benjamini, Y. & Hochberg, Y. Controlling the false discovery rate: a practical and powerful approach to multiple testing. *J. R. Stat. Soc. B* **57**, 289–300 (1995)."
+  },
+  {
+   "biblio": "Goeman JJ, Bühlmann P. Bioinformatics 2007;23:980-987. doi:10.1093/bioinformatics/btm051",
+   "kind": "article",
+   "pmid": null,
+   "doi": "10.1093/bioinformatics/btm051",
+   "title": "Analyzing gene expression data in terms of gene sets: methodological issues",
+   "authors": [
+    [
+     "Goeman",
+     "J.J."
+    ],
+    [
+     "Bühlmann",
+     "P."
+    ]
+   ],
+   "journal": "Bioinformatics",
+   "year": "2007",
+   "volume": "23",
+   "pages": "980-987",
+   "formatted": "Goeman, J.J. & Bühlmann, P. Analyzing gene expression data in terms of gene sets: methodological issues. *Bioinformatics* **23**, 980–987 (2007)."
+  },
+  {
+   "biblio": "Geman D, d'Avignon C, Naiman DQ, Winslow RL. Stat Appl Genet Mol Biol 2004;3:Article19. doi:10.2202/1544-6115.1071 (PMID 16646797)",
+   "kind": "article",
+   "pmid": "16646797",
+   "doi": "10.2202/1544-6115.1071",
+   "title": "Classifying gene expression profiles from pairwise mRNA comparisons",
+   "authors": [
+    [
+     "Geman",
+     "D."
+    ],
+    [
+     "d'Avignon",
+     "C."
+    ],
+    [
+     "Naiman",
+     "D.Q."
+    ],
+    [
+     "Winslow",
+     "R.L."
+    ]
+   ],
+   "journal": "Stat Appl Genet Mol Biol",
+   "year": "2004",
+   "volume": "3",
+   "pages": "Article19",
+   "formatted": "Geman, D., d'Avignon, C., Naiman, D.Q. & Winslow, R.L. Classifying gene expression profiles from pairwise mRNA comparisons. *Stat. Appl. Genet. Mol. Biol.* **3**, Article 19 (2004)."
+  },
+  {
+   "biblio": "Wang H, Sun Q, Zhao W, Qi L, Gu Y, Li P, et al. Bioinformatics 2015;31:62-68. doi:10.1093/bioinformatics/btu522 (PMID 25165092)",
+   "kind": "article",
+   "pmid": "25165092",
+   "doi": "10.1093/bioinformatics/btu522",
+   "title": "Individual-level analysis of differential expression of genes and pathways for personalized medicine",
+   "authors": [
+    [
+     "Wang",
+     "H."
+    ],
+    [
+     "Sun",
+     "Q."
+    ],
+    [
+     "Zhao",
+     "W."
+    ],
+    [
+     "Qi",
+     "L."
+    ],
+    [
+     "Gu",
+     "Y."
+    ],
+    [
+     "Li",
+     "P."
+    ],
+    [
+     "Zhang",
+     "M."
+    ],
+    [
+     "Li",
+     "Y."
+    ],
+    [
+     "Liu",
+     "S.L."
+    ],
+    [
+     "Guo",
+     "Z."
+    ]
+   ],
+   "journal": "Bioinformatics",
+   "year": "2015",
+   "volume": "31",
+   "pages": "62-8",
+   "formatted": "Wang, H., Sun, Q., Zhao, W., Qi, L., Gu, Y., Li, P. et al. Individual-level analysis of differential expression of genes and pathways for personalized medicine. *Bioinformatics* **31**, 62–68 (2015)."
+  },
+  {
+   "biblio": "Guan Q, Chen R, Yan H, Cai H, Guo Y, Li M, et al. Oncotarget 2016;7:68909-68920. doi:10.18632/oncotarget.11996 (PMID 27634898)",
+   "kind": "article",
+   "pmid": "27634898",
+   "doi": "10.18632/oncotarget.11996",
+   "title": "Differential expression analysis for individual cancer samples based on robust within-sample relative gene expression orderings across multiple profiling platforms",
+   "authors": [
+    [
+     "Guan",
+     "Q."
+    ],
+    [
+     "Chen",
+     "R."
+    ],
+    [
+     "Yan",
+     "H."
+    ],
+    [
+     "Cai",
+     "H."
+    ],
+    [
+     "Guo",
+     "Y."
+    ],
+    [
+     "Li",
+     "M."
+    ],
+    [
+     "Li",
+     "X."
+    ],
+    [
+     "Tong",
+     "M."
+    ],
+    [
+     "Ao",
+     "L."
+    ],
+    [
+     "Li",
+     "H."
+    ],
+    [
+     "Hong",
+     "G."
+    ],
+    [
+     "Guo",
+     "Z."
+    ]
+   ],
+   "journal": "Oncotarget",
+   "year": "2016",
+   "volume": "7",
+   "pages": "68909-68920",
+   "formatted": "Guan, Q., Chen, R., Yan, H., Cai, H., Guo, Y., Li, M. et al. Differential expression analysis for individual cancer samples based on robust within-sample relative gene expression orderings across multiple profiling platforms. *Oncotarget* **7**, 68909–68920 (2016)."
+  },
+  {
+   "biblio": "R Core Team (2026). R: A Language and Environment for Statistical Computing. R Foundation for Statistical Computing, Vienna, Austria. https://www.R-project.org/",
+   "kind": "other",
+   "pmid": null,
+   "doi": null,
+   "formatted": "R Core Team. R: A Language and Environment for Statistical Computing (R Foundation for Statistical Computing, Vienna, 2026). https://www.R-project.org/"
+  },
+  {
+   "biblio": "Morgan M, Davis S (2025). GenomicDataCommons: NIH / NCI Genomic Data Commons Access. R package version 1.34.1. https://bioconductor.org/packages/GenomicDataCommons",
+   "kind": "other",
+   "pmid": null,
+   "doi": null,
+   "formatted": "Morgan, M. & Davis, S. GenomicDataCommons: NIH/NCI Genomic Data Commons Access. R package version 1.34.1 (2025). https://bioconductor.org/packages/GenomicDataCommons"
+  },
+  {
+   "biblio": "Morgan M, Obenchain V, Hester J, Pagès H (2025). SummarizedExperiment: A container (S4 class) for matrix-like assays. R package version 1.40.0. https://bioconductor.org/packages/SummarizedExperiment",
+   "kind": "other",
+   "pmid": null,
+   "doi": null,
+   "formatted": "Morgan, M., Obenchain, V., Hester, J. & Pagès, H. SummarizedExperiment: A container (S4 class) for matrix-like assays. R package version 1.40.0 (2025). https://bioconductor.org/packages/SummarizedExperiment"
+  },
+  {
+   "biblio": "Lawrence M, Gentleman R, Carey V. Bioinformatics 2009;25:1841-1842. doi:10.1093/bioinformatics/btp328",
+   "kind": "article",
+   "pmid": null,
+   "doi": "10.1093/bioinformatics/btp328",
+   "title": "rtracklayer: an R package for interfacing with genome browsers",
+   "authors": [
+    [
+     "Lawrence",
+     "M."
+    ],
+    [
+     "Gentleman",
+     "R."
+    ],
+    [
+     "Carey",
+     "V."
+    ]
+   ],
+   "journal": "Bioinformatics",
+   "year": "2009",
+   "volume": "25",
+   "pages": "1841-1842",
+   "formatted": "Lawrence, M., Gentleman, R. & Carey, V. rtracklayer: an R package for interfacing with genome browsers. *Bioinformatics* **25**, 1841–1842 (2009)."
+  },
+  {
+   "biblio": "Land CE, Gilbert E, Smith JM, et al. Report of the NCI-CDC Working Group to Revise the 1985 NIH Radioepidemiological Tables. NIH Publication No. 03-5387. NIH; 2003",
+   "kind": "other",
+   "pmid": null,
+   "doi": null,
+   "formatted": "Land, C.E., Gilbert, E., Smith, J.M. et al. Report of the NCI-CDC Working Group to Revise the 1985 NIH Radioepidemiological Tables. NIH Publication No. 03-5387 (National Institutes of Health, Bethesda, 2003)."
+  },
+  {
+   "biblio": "Sato T, Manabe K, Hamada N. PLoS One 2014;9:e99831. doi:10.1371/journal.pone.0099831 (PMID 24919099)",
+   "kind": "article",
+   "pmid": "24919099",
+   "doi": "10.1371/journal.pone.0099831",
+   "title": "Microdosimetric analysis confirms similar biological effectiveness of external exposure to gamma-rays and internal exposure to ^137^Cs, ^134^Cs, and ^131^I",
+   "authors": [
+    [
+     "Sato",
+     "T."
+    ],
+    [
+     "Manabe",
+     "K."
+    ],
+    [
+     "Hamada",
+     "N."
+    ]
+   ],
+   "journal": "PLoS One",
+   "year": "2014",
+   "volume": "9",
+   "pages": "e99831",
+   "formatted": "Sato, T., Manabe, K. & Hamada, N. Microdosimetric analysis confirms similar biological effectiveness of external exposure to gamma-rays and internal exposure to ^137^Cs, ^134^Cs, and ^131^I. *PLoS One* **9**, e99831 (2014)."
+  },
+  {
+   "biblio": "Ron E, Lubin JH, Shore RE, et al. Radiat Res 1995;141:259-277. (PMID 7871153、DOI なし)",
+   "kind": "article",
+   "pmid": "7871153",
+   "doi": null,
+   "title": "Thyroid cancer after exposure to external radiation: a pooled analysis of seven studies",
+   "authors": [
+    [
+     "Ron",
+     "E."
+    ],
+    [
+     "Lubin",
+     "J.H."
+    ],
+    [
+     "Shore",
+     "R.E."
+    ],
+    [
+     "Mabuchi",
+     "K."
+    ],
+    [
+     "Modan",
+     "B."
+    ],
+    [
+     "Pottern",
+     "L.M."
+    ],
+    [
+     "Schneider",
+     "A.B."
+    ],
+    [
+     "Tucker",
+     "M.A."
+    ],
+    [
+     "Boice",
+     "J.D."
+    ]
+   ],
+   "journal": "Radiat Res",
+   "year": "1995",
+   "volume": "141",
+   "pages": "259-77",
+   "formatted": "Ron, E., Lubin, J.H., Shore, R.E., Mabuchi, K., Modan, B., Pottern, L.M. et al. Thyroid cancer after exposure to external radiation: a pooled analysis of seven studies. *Radiat. Res.* **141**, 259–277 (1995)."
+  },
+  {
+   "biblio": "Zurnadzhy L, et al. Front Med (Lausanne) 2022;9:882727. doi:10.3389/fmed.2022.882727 (PMID 35665338)",
+   "kind": "article",
+   "pmid": "35665338",
+   "doi": "10.3389/fmed.2022.882727",
+   "title": "Clinicopathological implications of the BRAF^V600E^ mutation in papillary thyroid carcinoma of Ukrainian patients exposed to the Chernobyl radiation in childhood: a study for 30 years after the accident",
+   "authors": [
+    [
+     "Zurnadzhy",
+     "L."
+    ],
+    [
+     "Bogdanova",
+     "T."
+    ],
+    [
+     "Rogounovitch",
+     "T.I."
+    ],
+    [
+     "Ito",
+     "M."
+    ],
+    [
+     "Tronko",
+     "M."
+    ],
+    [
+     "Yamashita",
+     "S."
+    ],
+    [
+     "Mitsutake",
+     "N."
+    ],
+    [
+     "Bolgov",
+     "M."
+    ],
+    [
+     "Chernyshov",
+     "S."
+    ],
+    [
+     "Masiuk",
+     "S."
+    ],
+    [
+     "Saenko",
+     "V.A."
+    ]
+   ],
+   "journal": "Front Med (Lausanne)",
+   "year": "2022",
+   "volume": "9",
+   "pages": "882727",
+   "formatted": "Zurnadzhy, L., Bogdanova, T., Rogounovitch, T.I., Ito, M., Tronko, M., Yamashita, S. et al. Clinicopathological implications of the BRAF^V600E^ mutation in papillary thyroid carcinoma of Ukrainian patients exposed to the Chernobyl radiation in childhood: a study for 30 years after the accident. *Front. Med. (Lausanne)* **9**, 882727 (2022)."
+  },
+  {
+   "biblio": "Bogdanova T, et al. Front Endocrinol (Lausanne) 2022;13:1078258. doi:10.3389/fendo.2022.1078258 (PMID 36589808)",
+   "kind": "article",
+   "pmid": "36589808",
+   "doi": "10.3389/fendo.2022.1078258",
+   "title": "The relationship of the clinicopathological characteristics and treatment results of post-Chornobyl papillary thyroid microcarcinomas with the latency period and radiation exposure",
+   "authors": [
+    [
+     "Bogdanova",
+     "T."
+    ],
+    [
+     "Chernyshov",
+     "S."
+    ],
+    [
+     "Zurnadzhy",
+     "L."
+    ],
+    [
+     "Rogounovitch",
+     "T.I."
+    ],
+    [
+     "Mitsutake",
+     "N."
+    ],
+    [
+     "Tronko",
+     "M."
+    ],
+    [
+     "Ito",
+     "M."
+    ],
+    [
+     "Bolgov",
+     "M."
+    ],
+    [
+     "Masiuk",
+     "S."
+    ],
+    [
+     "Yamashita",
+     "S."
+    ],
+    [
+     "Saenko",
+     "V.A."
+    ]
+   ],
+   "journal": "Front Endocrinol (Lausanne)",
+   "year": "2022",
+   "volume": "13",
+   "pages": "1078258",
+   "formatted": "Bogdanova, T., Chernyshov, S., Zurnadzhy, L., Rogounovitch, T.I., Mitsutake, N., Tronko, M. et al. The relationship of the clinicopathological characteristics and treatment results of post-Chornobyl papillary thyroid microcarcinomas with the latency period and radiation exposure. *Front. Endocrinol. (Lausanne)* **13**, 1078258 (2022)."
+  },
+  {
+   "biblio": "Ritchie ME, Phipson B, Wu D, Hu Y, Law CW, Shi W, Smyth GK. Nucleic Acids Res 2015;43:e47. doi:10.1093/nar/gkv007",
+   "kind": "article",
+   "pmid": null,
+   "doi": "10.1093/nar/gkv007",
+   "title": "limma powers differential expression analyses for RNA-sequencing and microarray studies",
+   "authors": [
+    [
+     "Ritchie",
+     "M.E."
+    ],
+    [
+     "Phipson",
+     "B."
+    ],
+    [
+     "Wu",
+     "D."
+    ],
+    [
+     "Hu",
+     "Y."
+    ],
+    [
+     "Law",
+     "C.W."
+    ],
+    [
+     "Shi",
+     "W."
+    ],
+    [
+     "Smyth",
+     "G.K."
+    ]
+   ],
+   "journal": "Nucleic Acids Res",
+   "year": "2015",
+   "volume": "43",
+   "pages": "e47",
+   "formatted": "Ritchie, M.E., Phipson, B., Wu, D., Hu, Y., Law, C.W., Shi, W. et al. limma powers differential expression analyses for RNA-sequencing and microarray studies. *Nucleic Acids Res.* **43**, e47 (2015)."
+  },
+  {
+   "biblio": "Hodges JL, Lehmann EL. Ann Math Stat 1963;34:598-611. doi:10.1214/aoms/1177704172",
+   "kind": "article",
+   "pmid": null,
+   "doi": "10.1214/aoms/1177704172",
+   "title": "Estimates of location based on rank tests",
+   "authors": [
+    [
+     "Hodges",
+     "J.L."
+    ],
+    [
+     "Lehmann",
+     "E.L."
+    ]
+   ],
+   "journal": "Ann Math Stat",
+   "year": "1963",
+   "volume": "34",
+   "pages": "598-611",
+   "formatted": "Hodges, J.L. & Lehmann, E.L. Estimates of location based on rank tests. *Ann. Math. Stat.* **34**, 598–611 (1963)."
+  },
+  {
+   "biblio": "Efron B, Tibshirani RJ. An Introduction to the Bootstrap. New York: Springer; 1993. doi:10.1007/978-1-4899-4541-9",
+   "kind": "other",
+   "pmid": null,
+   "doi": "10.1007/978-1-4899-4541-9",
+   "formatted": "Efron, B. & Tibshirani, R.J. An Introduction to the Bootstrap (Springer, New York, 1993)."
+  },
+  {
+   "biblio": "Venables WN, Ripley BD (2002). Modern Applied Statistics with S. 4th ed. Springer, New York. ISBN 0-387-95457-0",
+   "kind": "other",
+   "pmid": null,
+   "doi": null,
+   "formatted": "Venables, W.N. & Ripley, B.D. Modern Applied Statistics with S 4th edn (Springer, New York, 2002)."
+  },
+  {
+   "biblio": "Neubert K, Brunner E. Comput Stat Data Anal 2007;51:5192-5204. doi:10.1016/j.csda.2006.05.024",
+   "kind": "article",
+   "pmid": null,
+   "doi": "10.1016/j.csda.2006.05.024",
+   "title": "A studentized permutation test for the non-parametric Behrens–Fisher problem",
+   "authors": [
+    [
+     "Neubert",
+     "K."
+    ],
+    [
+     "Brunner",
+     "E."
+    ]
+   ],
+   "journal": "Comput Stat Data Anal",
+   "year": "2007",
+   "volume": "51",
+   "pages": "5192-5204",
+   "formatted": "Neubert, K. & Brunner, E. A studentized permutation test for the non-parametric Behrens–Fisher problem. *Comput. Stat. Data Anal.* **51**, 5192–5204 (2007)."
+  },
+  {
+   "biblio": "Phipson B, Smyth GK. Stat Appl Genet Mol Biol 2010;9:Article39. doi:10.2202/1544-6115.1585 (PMID 21044043)",
+   "kind": "article",
+   "pmid": "21044043",
+   "doi": "10.2202/1544-6115.1585",
+   "title": "Permutation P-values should never be zero: calculating exact P-values when permutations are randomly drawn",
+   "authors": [
+    [
+     "Phipson",
+     "B."
+    ],
+    [
+     "Smyth",
+     "G.K."
+    ]
+   ],
+   "journal": "Stat Appl Genet Mol Biol",
+   "year": "2010",
+   "volume": "9",
+   "pages": "Article39",
+   "formatted": "Phipson, B. & Smyth, G.K. Permutation P-values should never be zero: calculating exact P-values when permutations are randomly drawn. *Stat. Appl. Genet. Mol. Biol.* **9**, Article 39 (2010)."
+  },
+  {
+   "biblio": "Dolgalev I (2026). msigdbr: MSigDB Gene Sets for Multiple Organisms in a Tidy Data Format. R package version 26.1.0. https://igordot.github.io/msigdbr/",
+   "kind": "other",
+   "pmid": null,
+   "doi": null,
+   "formatted": "Dolgalev, I. msigdbr: MSigDB Gene Sets for Multiple Organisms in a Tidy Data Format. R package version 26.1.0 (2026). https://igordot.github.io/msigdbr/"
+  },
+  {
+   "biblio": "Liberzon A, et al. Cell Syst 2015;1:417-425. doi:10.1016/j.cels.2015.12.004 (PMID 26771021)",
+   "kind": "article",
+   "pmid": "26771021",
+   "doi": "10.1016/j.cels.2015.12.004",
+   "title": "The Molecular Signatures Database (MSigDB) hallmark gene set collection",
+   "authors": [
+    [
+     "Liberzon",
+     "A."
+    ],
+    [
+     "Birger",
+     "C."
+    ],
+    [
+     "Thorvaldsdóttir",
+     "H."
+    ],
+    [
+     "Ghandi",
+     "M."
+    ],
+    [
+     "Mesirov",
+     "J.P."
+    ],
+    [
+     "Tamayo",
+     "P."
+    ]
+   ],
+   "journal": "Cell Syst",
+   "year": "2015",
+   "volume": "1",
+   "pages": "417-425",
+   "formatted": "Liberzon, A., Birger, C., Thorvaldsdóttir, H., Ghandi, M., Mesirov, J.P. & Tamayo, P. The Molecular Signatures Database (MSigDB) hallmark gene set collection. *Cell Syst.* **1**, 417–425 (2015)."
+  },
+  {
+   "biblio": "Clopper CJ, Pearson ES. Biometrika 1934;26:404-413. doi:10.1093/biomet/26.4.404",
+   "kind": "article",
+   "pmid": null,
+   "doi": "10.1093/biomet/26.4.404",
+   "title": "The use of confidence or fiducial limits illustrated in the case of the binomial",
+   "authors": [
+    [
+     "Clopper",
+     "C.J."
+    ],
+    [
+     "Pearson",
+     "E.S."
+    ]
+   ],
+   "journal": "Biometrika",
+   "year": "1934",
+   "volume": "26",
+   "pages": "404-413",
+   "formatted": "Clopper, C.J. & Pearson, E.S. The use of confidence or fiducial limits illustrated in the case of the binomial. *Biometrika* **26**, 404–413 (1934)."
+  },
+  {
+   "biblio": "Eddelbuettel D, François R. J Stat Softw 2011;40:1-18. doi:10.18637/jss.v040.i08",
+   "kind": "article",
+   "pmid": null,
+   "doi": "10.18637/jss.v040.i08",
+   "title": "Rcpp: Seamless R and C++ integration",
+   "authors": [
+    [
+     "Eddelbuettel",
+     "D."
+    ],
+    [
+     "François",
+     "R."
+    ]
+   ],
+   "journal": "J Stat Softw",
+   "year": "2011",
+   "volume": "40",
+   "pages": "1-18",
+   "formatted": "Eddelbuettel, D. & François, R. Rcpp: Seamless R and C++ integration. *J. Stat. Softw.* **40**, 1–18 (2011)."
+  }
+ ]
+}

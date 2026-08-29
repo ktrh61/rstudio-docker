@@ -589,8 +589,7 @@
   英綴り・訳の段落/数値同期・SI 初出順)全通過 2026-08-29。
 - **フェーズ2 未着手の発見(2026-08-29)**: BJC の参考文献書式は Nature 形式(例: McAndrew, N.P.,
   Dickson, M.A., … *et al.* Title. *Br. J. Cancer* **123**, 912–918 (2020))で、**論文題名を含む**。
-  現行の References(Vancouver 風・題名なし)は要整形 — 台帳の書誌に題名列がないため PubMed/CrossRef
-  から題名を取得して生成側で組む(本文 33・Supp 42 件)。投稿前の必須作業。
+  現行の References(Vancouver 風・題名なし)は要整形 — **2026-08-29 実施済み**(下記メモ)。
 - 開いている残件(文言の未決論点はゼロ — 残りは批准・記入・フェーズ2 のみ):
   1. 通し読み = C-01〜17 ratified 化(研究者。C-09 のみ済)。通読で出た修正は軽量運用+訳同期
   2. 条件付き札: Abstract 余裕≥4 回復時に "cases with high estimated radiation attribution"(+2語)を適用
@@ -821,6 +820,14 @@
   事故後腫瘍に特異的な放射線シグネチャを見出さず、感受性シグネチャが提案された」。台帳 B 節に
   verified-abstract で 2 行収載(PubMed 照合)、引用 31→33、以降の番号は自動繰下げ・訳の [n] を写像で
   同期。カバーレターに BJC 系譜(Detours/Dom/Abend)と設計の転用可能性の段落を追加
+- 2026-08-29: **References を BJC(Nature 形式)へ整形**(研究者 Go): paper/bibliography.json を新設
+  (キー = 台帳の書誌文字列、51 件 = 本文 33 ∪ Supp 42)。題名は PubMed(PMID 30 件)・CrossRef(DOI
+  のみ 14 件)から取得、書籍・報告書・R パッケージ 7 件は手組み。形式 = 著者「姓, イニシャル.」・
+  6 名超は先頭 6+et al.・≤6 は最終著者前に &・題名・誌名略号(ピリオド付き、明示対応表)・巻太字・
+  頁(en dash・省略頁を復元)・年(括弧)。DOI は GTA 例に倣い非表示(台帳に保持)。題名の取得側の
+  破損 8 件を手修正(Ory の ^131^I・Zurnadzhy の BRAF^V600E^・Sato の同位体上付き・全大文字/Title
+  Case の 4 件を文頭大文字へ・Rcpp のコロン)。台帳の書誌列は監査記録として不変、make_submission が
+  未整形の書誌を警告に載せるガードつき。docx の References は 1 件 1 段落・静的番号
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
   600 dpi TIFF)/別ファイル CSV 3 件+50 語要約/カバーレター案。残 = Acknowledgements・共著者レビューと
