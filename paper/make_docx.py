@@ -14,6 +14,8 @@
 #   (5) 全ページ番号(PAGE フィールドのフッタを新設)
 # 変換後、docx 本文のトークン集合を入力 md と照合し内容同一性を検査する。
 #
+# カバーレター(paper/cover_letter.md と参考訳 cover_letter_ja.md)も同じタグで書簡体裁の
+# docx にする(行番号・頁番号なし、管理メモは除去)。
 # 日本語参考訳(paper/manuscript_ja.md / paper/supplementary_ja.md)も同時に
 # Word 化し、英語版と同一時刻タグで対応づける(冒頭に対応する英語版ファイル名を
 # 自動記載)。和文書体 = 本文 BIZ UD明朝 Medium 11pt+Times New Roman、見出し
@@ -430,6 +432,16 @@ def preprocess(text):
     return _finish(text)
 
 
+def letter_preprocess(text, ja=False, pair=None):
+    """カバーレター(書簡体裁): md 冒頭の管理メモ(見出し・状態・確認事項の箇条書き)を
+    除き、区切り線以降の本文だけを渡す。和文版は対応版の一行を先頭に付す。"""
+    body = text.split("\n---\n", 1)[1] if "\n---\n" in text else text
+    body = body.strip("\n") + "\n"
+    if ja and pair:
+        body = pair + "\n\n" + body
+    return body
+
+
 def ja_preprocess(text, en_stem, tag, commit, src_label):
     """日本語参考訳の閲覧用整形: 対応する英語版 docx の名前を冒頭に記載し
     (同一時刻タグで同時生成される対)、遺伝子イタリック・V600E 上付き・添字を
@@ -444,7 +456,7 @@ def ja_preprocess(text, en_stem, tag, commit, src_label):
     return typeset_symbols(embed_figures(text))
 
 
-def patch_docx(path, ja=False):
+def patch_docx(path, ja=False, letter=False):
     """styles.xml(1.5 行間)・document.xml(行番号・フッタ参照)・
     footer1.xml(ページ番号)を注入する。ja=True では和文書体
     (本文 游明朝+Times New Roman・見出し 游ゴシック・両端揃え)とし、
@@ -576,7 +588,7 @@ def patch_docx(path, ja=False):
     if "pgSz" not in new_sect:
         # pandoc の sectPr は最小構成 — A4・余白 2.5cm を明示してロケール依存を排し、
         # 英語版のみ続けて lnNumType(スキーマ順: pgSz → pgMar → lnNumType)
-        ln = "" if ja else '<w:lnNumType w:countBy="1" w:restart="continuous"/>'
+        ln = "" if (ja or letter) else '<w:lnNumType w:countBy="1" w:restart="continuous"/>'
         new_sect = new_sect.replace(
             "</w:sectPr>",
             '<w:pgSz w:w="11906" w:h="16838"/>'
@@ -585,7 +597,7 @@ def patch_docx(path, ja=False):
             + ln + '</w:sectPr>',
         )
     footer_ref = '<w:footerReference xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" w:type="default" r:id="rIdFooterPg"/>'
-    if "footerReference" not in new_sect:
+    if "footerReference" not in new_sect and not letter:
         new_sect = re.sub(r"(<w:sectPr[^>]*>)", r"\1" + footer_ref, new_sect)
     parts["word/document.xml"] = doc.replace(sect, new_sect).encode("utf-8")
 
@@ -660,7 +672,7 @@ def tokens_docx(path):
     return re.findall(r"[A-Za-z0-9]+", body)
 
 
-def build(src_name, out_name, prep, ja=False):
+def build(src_name, out_name, prep, ja=False, letter=False):
     src_path = src_name if isinstance(src_name, Path) else SUB / src_name
     src = src_path.read_text(encoding="utf-8")
     pre = prep(src)
@@ -672,7 +684,7 @@ def build(src_name, out_name, prep, ja=False):
          "-o", str(out)],
         check=True,
     )
-    patch_docx(out, ja=ja)
+    patch_docx(out, ja=ja, letter=letter)
     a, b = sorted(tokens_md(pre)), sorted(tokens_docx(out))
     from collections import Counter
     diff = Counter(a) - Counter(b) | Counter(b) - Counter(a)
@@ -680,9 +692,11 @@ def build(src_name, out_name, prep, ja=False):
     styles = zipfile.ZipFile(out).read("word/styles.xml").decode("utf-8")
     media = len([n for n in zipfile.ZipFile(out).namelist()
                  if n.startswith("word/media/")])
-    checks = {"頁番号": "rIdFooterPg" in doc,
+    checks = {"頁番号": ("rIdFooterPg" not in doc) if letter else ("rIdFooterPg" in doc),
               "図埋め込み": media == pre.count("![](")}
-    if ja:
+    if letter:
+        checks["行番号なし"] = "lnNumType" not in doc
+    elif ja:
         checks["行送り19pt"] = 'w:line="380" w:lineRule="atLeast"' in styles
         checks["行番号なし"] = "lnNumType" not in doc
         checks["和文書体"] = ("BIZ UD明朝 Medium" in styles
@@ -720,6 +734,13 @@ def main():
         build(ROOT / "paper" / "supplementary_ja.md", "supplementary_ja.docx",
               lambda t: ja_preprocess(t, "supplementary_submission", tag, commit,
                                       "paper/supplementary_ja.md"), ja=True),
+        # カバーレター(編集部宛の独立文書 — 原稿には混ぜない。書簡体裁: 行番号・頁番号なし)
+        build(ROOT / "paper" / "cover_letter.md", "cover_letter.docx",
+              lambda t: letter_preprocess(t), letter=True),
+        build(ROOT / "paper" / "cover_letter_ja.md", "cover_letter_ja.docx",
+              lambda t: letter_preprocess(t, ja=True, pair=(
+                  f"**対応版**: 英語版 cover_letter_{tag}.docx(同時生成の対)。"
+                  f"ソース: paper/cover_letter_ja.md @{commit}")), ja=True, letter=True),
     ]
     dest = Path("/mnt/c/Users/kotaro/OneDrive/論文関連（説明用資料含）/word_check")
     if dest.parent.exists():
