@@ -294,6 +294,7 @@ SUPP_TABLE_FILES = {
     "S6": "table_s6_between_stratum_concordance.csv",
     "S7": "table_s7_reo_panel.csv",
 }
+LANDSCAPE_TABLES = {"S1", "S4"}  # 列数の多い表のみ横置き
 SUPP_DATA_FILES = {"1": "supplementary_data_1_gene_level_results.csv",
                    "2": "supplementary_data_2_set_level_results.csv"}
 
@@ -320,19 +321,25 @@ def supp_preprocess(text):
             tag = re.match(r"\*\*Table (S\d)", p).group(1)
             fname = SUPP_TABLE_FILES[tag]
             if fname:
-                tabs.append(p + "\n\n" + csv_md_table(supp_files / fname))
+                tabs.append((tag, p + "\n\n" + csv_md_table(supp_files / fname)))
             else:
-                tabs.append(p + "\n\n*Provided as a separate file (table_s5_ora_annotation.csv).*")
+                tabs.append((tag, p + "\n\n*Provided as a separate file (table_s5_ora_annotation.csv).*"))
         elif p.startswith("**Supplementary Data"):
             n = re.match(r"\*\*Supplementary Data (\d)", p).group(1)
             data.append(p + f"\n\n*Provided as a separate file ({SUPP_DATA_FILES[n]}).*")
-    # 補足表は横置きの区間に置く(S1 は 12 列・S4 は 10 列 — 縦置きでは列が潰れる)。
-    # 区間の前後をセクション区切りで閉じ、末尾の区間(Data・要約)は縦置きに戻る。
+    # 補足表は 1 頁 1 表。横置きは列数の多い表だけ(S1 = 12 列、S4 = 10 列)に限り、
+    # 向きが変わる境目にセクション区切り(= 改ページ)を置く。縦長の S2 などは縦置き。
+    # section_break(x) は「直前までの区間」を向き x で閉じる。
+    parts, landscape = [], False
+    for k, (tag, block) in enumerate(tabs):
+        want = tag in LANDSCAPE_TABLES
+        parts.append(section_break(landscape) if want != landscape else PAGE_BREAK)
+        landscape = want
+        parts.append(("## Supplementary tables\n\n" if k == 0 else "") + block)
+    parts.append(section_break(True) if landscape else PAGE_BREAK)
     assembled = (cover + text.rstrip("\n") + "\n\n" + refs.rstrip("\n")
                  + PAGE_BREAK + "## Supplementary figures\n\n" + PAGE_BREAK.join(figs)
-                 + section_break(landscape=False)
-                 + "## Supplementary tables\n\n" + PAGE_BREAK.join(tabs)
-                 + section_break(landscape=True)
+                 + "".join(parts)
                  + "## Supplementary data\n\n" + "\n\n".join(data)
                  + PAGE_BREAK + supp_file_descriptions() + "\n")
     return _finish(assembled)
@@ -520,6 +527,10 @@ def patch_docx(path, ja=False):
                      '<w:color w:val="000000"/>', tbl)
         tbl = re.sub(r"<w:r>(?!<w:rPr>)", '<w:r><w:rPr><w:sz w:val="20"/><w:szCs w:val="20"/>'
                      '<w:color w:val="000000"/></w:rPr>', tbl)
+        # 表内は 1 倍行送り(本文の 1.5 行間は表には不要 — 縦長の表を 1 頁に収める)
+        tbl = re.sub(r'<w:pStyle w:val="Compact" ?/>',
+                     '<w:pStyle w:val="Compact"/><w:spacing w:after="0" w:line="240" w:lineRule="auto"/>',
+                     tbl)
         return tbl
     doc = re.sub(r"<w:tbl>.*?</w:tbl>", _tbl_runs, doc, flags=re.S)
     # 列幅は内容に合わせて自動調整(pandoc は均等固定幅を出し、狭い列で語が分断される)。
