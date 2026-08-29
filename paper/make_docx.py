@@ -5,7 +5,9 @@
 # 出力 = output/submission/manuscript_submission.docx
 #
 # BJC 書式(GTA ライブ照合 2026-08-25)を機械注入する:
-#   (1) 図表凡例節を References の後ろへ移動(BJC: legends は References 後の別ページ)
+#   (1) BJC 節順に組み替え: タイトルページ → Abstract → Background → Methods → Results →
+#       Discussion → Additional Information → References → Figure legends → Tables → Figures
+#       (改ページつき。表は投稿形の列名・脚注、添字は subscript 記法で表示層整形)
 #   (2) 引用番号 [n] を上付きへ(pandoc の ^…^ 記法へ前処理)
 #   (3) 1.5 行間(styles.xml の Normal に w:line=360)
 #   (4) 全行番号(sectPr に lnNumType)
@@ -40,7 +42,7 @@ GENES = ("RET|BRAF|CCDC6|NCOA4|CLIP2|BHLHB9|S100A10|TESC|EHD4|"
          "ATP5MF|MRPL52|NTHL1|URM1|USE1|PXDN|P2RY1|PLK2|PTC1|PTC3")
 
 # 閲覧用の図埋め込み(研究者裁定 2026-08-27 — 表と同じ一体ファイル方針の延長。
-# 投稿時は BJC 規定どおり図を個別 TIFF で分離するため閲覧モード専用の一方向変換)
+# 投稿時は BJC 規定どおり図を個別 TIFF/PDF で分離するため閲覧モード専用の一方向変換)
 FIGS = [
     ("Figure 1", "図 1", "fig_cohort_flow.png"),
     ("Figure 2", "図 2", "fig_gene_bm_evidence.png"),
@@ -48,10 +50,14 @@ FIGS = [
     ("Figure S1", "図 S1", "fig_ma_gene_bm.png"),
     ("Figure S2", "図 S2", "fig_d6_calibration.png"),
 ]
+FIG_PATH = {en: ROOT / "output" / "figures" / f for en, _, f in FIGS}
+
+# 投稿形の改ページ(pandoc raw openxml — 閲覧 docx の組版のみ)
+PAGE_BREAK = "\n\n```{=openxml}\n<w:p><w:r><w:br w:type=\"page\"/></w:r></w:p>\n```\n\n"
 
 
 def embed_figures(text):
-    """図凡例行の直下へ対応 PNG を幅 160mm(A4 余白内)で挿入する。"""
+    """(日本語版) 図凡例行の直下へ対応 PNG を幅 160mm(A4 余白内)で挿入する。"""
     for en, ja, fname in FIGS:
         img = f"![]({ROOT / 'output' / 'figures' / fname}){{width=160mm}}"
         for label in (en, ja):
@@ -61,8 +67,134 @@ def embed_figures(text):
     return text
 
 
+def typeset_symbols(text):
+    """投稿形の添字(表示層のみ — 正本は素の ASCII 表記を維持): π0 → π₀、α0、log2/log10、
+    C(n,nx) → C(n, n_X)。pandoc の subscript 記法へ。"""
+    text = text.replace("π0", "π~0~").replace("α0", "α~0~")
+    text = re.sub(r"\blog(2|10)(?!\d)", r"log~\1~", text)
+    text = text.replace("C(n,nx)", "C(n, n~X~)")
+    text = re.sub(r"\bnx\b", "n~X~", text)
+    return text
+
+
+def _num(v, k):
+    return f"{float(v):.{k}f}".replace("-", "−")
+
+
+def _sci(v):
+    m, e = f"{float(v):.2e}".split("e")
+    e = int(e)
+    return f"{m} × 10^{'−' if e < 0 else ''}{abs(e)}^"
+
+
+COLLECTION = {"H": "Hallmark", "C2:CP": "C2 canonical pathways",
+              "C5:GO:BP": "C5 GO Biological Process",
+              "C2:CGP:radiation": "Radiation-curated (C2:CGP)"}
+
+# 表の投稿形整形(表示層 — 凍結 CSV の列名・値は不変。研究者指示 2026-08-29: 共著者
+# レビュー前に「未完成に見える」列名を最終形へ)。丸めは本文の桁に合わせる。
+TABLE_SPECS = {
+    "tab_case_characteristics.csv": dict(
+        headers={"group": "Group", "n": "n", "pool": "Stratum × band pool, n (paired)",
+                 "female": "Female", "male": "Male",
+                 "age_surgery": "Age at surgery, years, median [range]",
+                 "age_exposure": "Age at exposure, years, median [range]",
+                 "driver_detail": "Designated driver, n"},
+        rows={"R_Sporadic": "R_Sporadic (dose-zero)", "R_Low": "R_Low (Low-AS)",
+              "R_Mid": "R_Mid (Mid-AS)", "R_High": "R_High (High-AS)",
+              "B_Sporadic": "B_Sporadic (dose-zero)", "B_High": "B_High (High-AS)"}),
+    "tab_gene_level_summary.csv": dict(
+        headers={"unit": "Contrast", "n_tested": "Genes tested", "pi0": "π0",
+                 "deg_q10": "Genes at q<0.10", "up": "Higher in High-AS",
+                 "down": "Lower in High-AS", "min_p_exact": "Minimum exact p",
+                 "hc_p": "Higher Criticism p"},
+        fmt={"min_p_exact": _sci}),
+    "table_s1_normalization_diagnostics.csv": dict(
+        headers={"contrast": "Contrast", "reference_group": "Reference group",
+                 "high_group": "High-AS group", "n_reference": "n (reference)",
+                 "n_high": "n (High-AS)", "protein_coding_genes": "Protein-coding genes",
+                 "genes_after_filterByExpr": "Genes after filterByExpr",
+                 "deges_iterations": "DEGES iterations",
+                 "final_screen_pi0": "Screen π0 (iteration 3)",
+                 "final_jaccard": "Jaccard index (iteration 3)",
+                 "norm_factor_min": "Normalization factor, minimum",
+                 "norm_factor_max": "Normalization factor, maximum"}),
+    "table_s2_software_versions.csv": dict(headers={"package": "Package", "version": "Version"}),
+    "table_s3_gene_set_summary.csv": dict(
+        headers={"unit": "Contrast", "collection": "Collection",
+                 "n_sets": "Sets tested (15–500 genes)", "min_q_bh": "Minimum BH q"},
+        values={"collection": COLLECTION}),
+    "table_s4_complete_null_calibration.csv": dict(
+        headers={"unit": "Contrast", "collection": "Collection", "m_sets": "Sets tested",
+                 "replicates": "Pseudo-observations",
+                 "n_any_discovery": "With ≥1 discovery, n", "p_any": "Proportion",
+                 "mean_discoveries": "Mean discoveries",
+                 "max_discoveries": "Maximum discoveries"},
+        values={"collection": COLLECTION},
+        merge=[("95% Clopper–Pearson interval", ["ci_lo", "ci_hi"],
+                lambda lo, hi: f"{_num(lo, 3)}–{_num(hi, 3)}")]),
+    "table_s6_between_stratum_concordance.csv": dict(
+        headers={"pair": "Tissue", "units": "Contrasts", "n_shared_genes": "Shared genes",
+                 "rho": "Spearman ρ", "p_two_sided": "Two-sided shuffle p",
+                 "n_perm": "Shuffles"},
+        fmt={"rho": lambda v: _num(v, 3)},
+        values={"pair": {"normal": "Normal tissue", "tumor": "Tumor tissue"}},
+        merge=[("Central 95% shuffle interval", ["interval_lo", "interval_hi"],
+                lambda lo, hi: f"{_num(lo, 2)} to {_num(hi, 2)}")]),
+    "table_s7_reo_panel.csv": dict(
+        headers={"pair_id": "Pair", "up": "Higher-expression gene (Ensembl)",
+                 "up_name": "Symbol", "down": "Lower-expression gene (Ensembl)",
+                 "down_name": "Symbol",
+                 "median_diff": "Absolute shift in median within-sample log2-TPM difference",
+                 "reversal_rate": "High-AS reversal rate",
+                 "r0_q10": "10th percentile of absolute difference, dose-zero"},
+        fmt={"median_diff": lambda v: _num(v, 3), "reversal_rate": lambda v: _num(v, 2),
+             "r0_q10": lambda v: _num(v, 3)},
+        italic=["up_name", "down_name"]),
+}
+
+
+def fmt_table(path, spec):
+    """凍結 CSV を投稿形の Markdown 表へ(列名の付け替え・値の表示整形のみ)。"""
+    import csv
+    rows = [r for r in csv.reader(open(path, encoding="utf-8"))]
+    head, body = rows[0], rows[1:]
+    idx = {c: i for i, c in enumerate(head)}
+    merges = spec.get("merge", [])
+    merged = {c for _, cols, _ in merges for c in cols}
+    cols = []
+    for c in head:
+        if c in merged:
+            for disp, mcols, fn in merges:
+                if c == mcols[0]:
+                    cols.append((disp, lambda r, mcols=mcols, fn=fn: fn(*[r[idx[x]] for x in mcols])))
+            continue
+        f = spec.get("fmt", {}).get(c, lambda v: v)
+        vmap = spec.get("values", {}).get(c, {})
+        ital = c in spec.get("italic", [])
+
+        def cell(r, c=c, f=f, vmap=vmap, ital=ital):
+            v = r[idx[c]]
+            if v == "NA":
+                return "—"
+            v = vmap.get(v, f(v))
+            if c == head[0]:
+                v = spec.get("rows", {}).get(v, v)
+            if ital:
+                v = f"*{v}*"
+            return v.replace("|", "\\|")
+        cols.append((spec.get("headers", {}).get(c, c), cell))
+    out = ["| " + " | ".join(d.replace("|", "\\|") for d, _ in cols) + " |",
+           "|" + "---|" * len(cols)]
+    out += ["| " + " | ".join(fn(r) for _, fn in cols) + " |" for r in body]
+    return "\n".join(out)
+
+
 def csv_md_table(path):
-    """凍結 CSV を Markdown 表へ(閲覧用の一方向レンダリング — 列名・値は素のまま)。"""
+    """凍結 CSV を Markdown 表へ(整形仕様があれば投稿形、無ければ素のまま)。"""
+    spec = TABLE_SPECS.get(Path(path).name)
+    if spec:
+        return fmt_table(path, spec)
     import csv
     rows = [[c.replace("|", "\\|") for c in r]
             for r in csv.reader(open(path, encoding="utf-8"))]
@@ -72,10 +204,13 @@ def csv_md_table(path):
     return "\n".join(out)
 
 
+def _declarations():
+    return (ROOT / "paper" / "submission_declarations.md").read_text(encoding="utf-8")
+
+
 def author_block():
-    """submission_declarations.md の記入値から閲覧用の著者ブロックを描画する
-    (一方向レンダリング — タイトルページは投稿時に別ファイル化)。"""
-    d = (ROOT / "paper" / "submission_declarations.md").read_text(encoding="utf-8")
+    """submission_declarations.md の記入値から著者ブロックを描画する(一方向)。"""
+    d = _declarations()
     sec = d.split("- **Authors / Affiliations**:", 1)[1]
     authors = re.findall(
         r"^\s+\d+\. (.+?) \((\d+(?:,\s*\d+)*)\)( \*corresponding)?\s*$", sec, re.M)
@@ -91,14 +226,21 @@ def author_block():
     return "\n".join(lines)
 
 
+def title_page():
+    """BJC のタイトルページ(題名・全著者と所属・対応著者の e-mail・ORCID)。"""
+    d = _declarations()
+    title = re.search(r"\*\*Title\*\*: ([^(\n]+)", d).group(1).strip()
+    return "# " + title + "\n\n" + author_block()
+
+
 CJK = re.compile(r"[　-ヿ㐀-鿿＀-￯]")
 
 
 def additional_information():
     """declarations の Additional Information を BJC 規定順で描画する。
-    日本語管理注記(CJK 行)は除去、未記入節(【記入】)は見出しごと省略、
-    URL/DOI の未確定括弧は明示プレースホルダへ置換。"""
-    d = (ROOT / "paper" / "submission_declarations.md").read_text(encoding="utf-8")
+    日本語管理注記(CJK 行)は除去、未記入節(【記入】)は明示プレースホルダ、
+    URL/DOI の未確定括弧も明示プレースホルダへ置換。"""
+    d = _declarations()
     zone = d.split("## Additional Information", 1)[1].split("\n## ", 1)[0]
     zone = zone.split("\n", 1)[1]
     out = ["## Additional Information"]
@@ -111,84 +253,118 @@ def additional_information():
         body = re.sub(r"\n{3,}", "\n\n", "\n".join(lines)).strip()
         body = re.sub(r"^案: ", "", body)
         if not body or "【記入】" in body:
-            continue  # 未確定節(Acknowledgements 等)は記入後の再生成で自動的に現れる
+            body = "[To be completed before submission]"
         out += [f"### {head}", "", body, ""]
     return "\n".join(out).rstrip()
 
 
-def supp_preprocess(text):
-    """Supplementary Material の閲覧用整形: 表紙情報を付与し、遺伝子イタリック・
-    V600E 上付き・区切り線除去を本文と同じ規則で適用する。追加情報が必要になったら
-    この表紙ブロックに足す。"""
-    d = (ROOT / "paper" / "submission_declarations.md").read_text(encoding="utf-8")
-    title = re.search(r"\*\*Title\*\*: ([^(\n]+)", d).group(1).strip()
-    cover = ("**Supplementary Material for:** " + title + "\n\n" + author_block()
-             + "\n\n")
-    text = re.sub(r"^-{3,}\s*$", "", text, flags=re.M)
-    # 小表(S1〜S4・S6・S7)は出荷用コピーの実体をキャプション直下へ埋め込む。
-    # S5(ORA、18,577 行)と Data 1/2 は物理的に埋め込み不能 — キャプションのみ(別ファイル参照)
-    # (2026-08-29: 旧 S1 コホート構成を Table 2 へ統合後、SI 品目を初出順へ再番号付け)
-    supp_files = ROOT / "paper" / "gpt_review" / "supplementary_files"
-    for tag, fname in [
-        ("S1", "table_s1_normalization_diagnostics.csv"),
-        ("S2", "table_s2_software_versions.csv"),
-        ("S3", "table_s3_gene_set_summary.csv"),
-        ("S4", "table_s4_complete_null_calibration.csv"),
-        ("S6", "table_s6_between_stratum_concordance.csv"),
-        ("S7", "table_s7_reo_panel.csv"),
-    ]:
-        tbl = csv_md_table(supp_files / fname)
-        text = re.sub(rf"(^\*\*Table {tag} \|[^\n]*\n)",
-                      lambda m, t=tbl: m.group(1) + "\n" + t + "\n\n",
-                      text, count=1, flags=re.M)
+def _finish(text):
+    """英語版共通の仕上げ: 変異表記の上付き・遺伝子イタリック・添字。"""
     text = text.replace("BRAF V600E", "*BRAF*^V600E^")
     text = re.sub(rf"(?<![\w*])({GENES})(?![\w*])", r"*\1*", text)
-    return cover + embed_figures(text)
+    return typeset_symbols(text)
+
+
+def _legend_paras(section):
+    return [p for p in section.split("\n\n") if p.strip() and not p.startswith("## ")]
+
+
+SUPP_TABLE_FILES = {
+    "S1": "table_s1_normalization_diagnostics.csv",
+    "S2": "table_s2_software_versions.csv",
+    "S3": "table_s3_gene_set_summary.csv",
+    "S4": "table_s4_complete_null_calibration.csv",
+    "S5": None,  # ORA(18,576 行)は別ファイル供給
+    "S6": "table_s6_between_stratum_concordance.csv",
+    "S7": "table_s7_reo_panel.csv",
+}
+SUPP_DATA_FILES = {"1": "supplementary_data_1_gene_level_results.csv",
+                   "2": "supplementary_data_2_set_level_results.csv"}
+
+
+def supp_preprocess(text):
+    """Supplementary Material の投稿形整形: 表紙 → 本文 → Supplementary References →
+    図(凡例+図、1 ページ 1 図)→ 表(キャプション+表、1 ページ 1 表)→ Data のキャプション。"""
+    d = _declarations()
+    title = re.search(r"\*\*Title\*\*: ([^(\n]+)", d).group(1).strip()
+    cover = "# Supplementary Material\n\n**" + title + "**\n\n" + author_block() + PAGE_BREAK
+    text = re.sub(r"^-{3,}\s*$", "", text, flags=re.M)
+    leg = re.search(r"^## Supplementary figure and table legends$.*?(?=^## |\Z)", text, re.S | re.M).group(0)
+    text = text.replace(leg, "")
+    refs = re.search(r"^## Supplementary References$.*?(?=^## |\Z)", text, re.S | re.M).group(0)
+    text = text.replace(refs, "")
+    paras = _legend_paras(leg)
+    supp_files = ROOT / "paper" / "gpt_review" / "supplementary_files"
+    figs, tabs, data = [], [], []
+    for p in paras:
+        if p.startswith("**Figure S"):
+            n = re.match(r"\*\*(Figure S\d)", p).group(1)
+            figs.append(p + "\n\n" + f"![]({FIG_PATH[n]}){{width=160mm}}")
+        elif p.startswith("**Table S"):
+            tag = re.match(r"\*\*Table (S\d)", p).group(1)
+            fname = SUPP_TABLE_FILES[tag]
+            if fname:
+                tabs.append(p + "\n\n" + csv_md_table(supp_files / fname))
+            else:
+                tabs.append(p + "\n\n*Provided as a separate file (table_s5_ora_annotation.csv).*")
+        elif p.startswith("**Supplementary Data"):
+            n = re.match(r"\*\*Supplementary Data (\d)", p).group(1)
+            data.append(p + f"\n\n*Provided as a separate file ({SUPP_DATA_FILES[n]}).*")
+    assembled = (cover + text.rstrip("\n") + "\n\n" + refs.rstrip("\n")
+                 + PAGE_BREAK + "## Supplementary figures\n\n" + PAGE_BREAK.join(figs)
+                 + PAGE_BREAK + "## Supplementary tables\n\n" + PAGE_BREAK.join(tabs)
+                 + PAGE_BREAK + "## Supplementary data\n\n" + "\n\n".join(data) + "\n")
+    return _finish(assembled)
 
 
 def preprocess(text):
-    """凡例節を References 後へ移動し、引用 [n] を上付き記法へ。"""
-    # Markdown の区切り線(---)は原稿の可視要素ではない — 罫線化させない
+    """本文の投稿形整形(BJC GTA 節順): タイトルページ → Abstract → Background → Methods →
+    Results → Discussion → Additional Information → References → Figure legends →
+    Tables(1 ページ 1 表)→ Figures(1 ページ 1 図)。引用 [n] は上付き。"""
     text = re.sub(r"^-{3,}\s*$", "", text, flags=re.M)
-    # タイトル直下に著者ブロック(declarations 記入値の一方向描画)
-    blk = author_block()
-    text = re.sub(r"(\*\*Title:\*\*[^\n]*\n)",
-                  lambda m: m.group(1) + "\n" + blk + "\n\n", text, count=1)
-    # 閲覧用: Table 2・3 の実体(凍結 CSV)をキャプション直下へ埋め込む
-    # (研究者決定 2026-08-26: 共著者版は一体ファイル — 版ズレ回避・コメント集約。
-    #  投稿時は 3 表とも個別ファイルへ分離するため、この埋め込みは閲覧モード専用)
-    t2 = csv_md_table(ROOT / "output" / "tables" / "tab_case_characteristics.csv")
-    text = re.sub(r"(\*\*Table 2 \| Case characteristics\.\*\*[^\n]*\n)",
-                  r"\1\n" + t2.replace("\\", "\\\\") + "\n\n", text, count=1)
-    t3 = csv_md_table(ROOT / "output" / "tables" / "tab_gene_level_summary.csv")
-    text = re.sub(r"(\*\*Table 3 \| Gene-level results\.\*\*[^\n]*\n)",
-                  r"\1\n" + t3.replace("\\", "\\\\") + "\n\n", text, count=1)
-    m = re.search(r"^## Figure legends and table captions$.*?(?=^## )", text,
-                  flags=re.S | re.M)
-    legends = m.group(0)
-    text = text.replace(legends, "")
-    # BJC 節順: 本文 → References → Additional Information → 凡例・表
-    text = (text.rstrip("\n") + "\n\n" + additional_information()
-            + "\n\n" + legends.rstrip("\n") + "\n")
+    text = re.sub(r"^\*\*Title:\*\*[^\n]*\n", lambda m: title_page() + PAGE_BREAK, text,
+                  count=1, flags=re.M)
+    text = text.replace("## Introduction", "## Background", 1)  # BJC の本文第 1 節名
+    leg = re.search(r"^## Figure legends and table captions$.*?(?=^## )", text,
+                    flags=re.S | re.M).group(0)
+    text = text.replace(leg, "")
+    refs = re.search(r"^## References$.*?(?=^## |\Z)", text, flags=re.S | re.M).group(0)
+    text = text.replace(refs, "")
     # References の番号はリスト化させず静的テキストとして残し(再採番事故の予防)、
-    # 各文献を 1 件 1 段落にする(空行区切り — 連続行は 1 段落に融合してしまうため)
-    refs = re.search(r"^## References$.*?(?=^## |\Z)", text, flags=re.S | re.M)
-    fixed = re.sub(r"^(\d+)\. ", r"\1\\. ", refs.group(0), flags=re.M)
+    # 各文献を 1 件 1 段落にする
+    fixed = re.sub(r"^(\d+)\. ", r"\1\\. ", refs, flags=re.M)
     fixed = re.sub(r"\n(?=\d+\\\. )", "\n\n", fixed)
-    text = text.replace(refs.group(0), fixed)
-    # 本文中の [1] / [1,2] を上付き化
-    text = re.sub(r"\[(\d+(?:,\d+)*)\]", r"^\1^", text)
-    # 変異表記は BJC 現行慣行(2024–25 掲載例)の上付き形へ(正本は不変 — 派生層の組版)
-    text = text.replace("BRAF V600E", "*BRAF*^V600E^")
-    # ヒト遺伝子記号のイタリック(解析ラベル中の RET/BRAF も含む — 研究者裁定 2026-08-25。
-    # 既にイタリック化済みトークンは再包止め)
-    text = re.sub(rf"(?<![\w*])({GENES})(?![\w*])", r"*\1*", text)
-    return embed_figures(text)
+    paras = _legend_paras(leg)
+    fig_legends = [p for p in paras if p.startswith("**Figure ")]
+    blocks, cur = [], None
+    for p in paras:
+        if p.startswith("**Table "):
+            cur = [p]
+            blocks.append(cur)
+        elif p.startswith("**Figure "):
+            cur = None
+        elif cur is not None:
+            cur.append(p)
+    # Table 2・3 の実体(凍結 CSV)をキャプション直下へ(脚注は CSV 表の後ろに残る)
+    for b in blocks:
+        if b[0].startswith("**Table 2 |"):
+            b.insert(1, csv_md_table(ROOT / "output" / "tables" / "tab_case_characteristics.csv"))
+        if b[0].startswith("**Table 3 |"):
+            b.insert(1, csv_md_table(ROOT / "output" / "tables" / "tab_gene_level_summary.csv"))
+    tables_md = PAGE_BREAK.join("\n\n".join(b) for b in blocks)
+    figures_md = PAGE_BREAK.join(
+        f"**{n}**\n\n![]({FIG_PATH[n]}){{width=160mm}}" for n in ("Figure 1", "Figure 2", "Figure 3"))
+    text = (text.rstrip("\n") + "\n\n" + additional_information() + "\n\n" + fixed.rstrip("\n")
+            + PAGE_BREAK + "## Figure legends\n\n" + "\n\n".join(fig_legends)
+            + PAGE_BREAK + "## Tables\n\n" + tables_md
+            + PAGE_BREAK + "## Figures\n\n" + figures_md + "\n")
+    text = re.sub(r"\[(\d+(?:,\d+)*)\]", r"^\1^", text)  # 本文中の [1] / [1,2] を上付き化
+    return _finish(text)
 
 
 def ja_preprocess(text, en_stem, tag, commit, src_label):
     """日本語参考訳の閲覧用整形: 対応する英語版 docx の名前を冒頭に記載し
-    (同一時刻タグで同時生成される対)、遺伝子イタリック・V600E 上付きを
+    (同一時刻タグで同時生成される対)、遺伝子イタリック・V600E 上付き・添字を
     英語版と同じ規則で適用する。引用 [n] は素のまま(英語版 References 対応)。"""
     text = re.sub(r"^-{3,}\s*$", "", text, flags=re.M)
     pair = (f"**対応版**: 英語版 {en_stem}_{tag}.docx(同時生成の対)。"
@@ -197,7 +373,7 @@ def ja_preprocess(text, en_stem, tag, commit, src_label):
                   text, count=1)
     text = text.replace("BRAF V600E", "*BRAF*^V600E^")
     text = re.sub(rf"(?<![\w*])({GENES})(?![\w*])", r"*\1*", text)
-    return embed_figures(text)
+    return typeset_symbols(embed_figures(text))
 
 
 def patch_docx(path, ja=False):
@@ -368,9 +544,11 @@ def patch_docx(path, ja=False):
 
 
 def tokens_md(text):
+    text = re.sub(r"```\{=openxml\}.*?```", " ", text, flags=re.S)  # 改ページ(非テキスト)
     text = re.sub(r"!\[[^\]]*\]\([^)]*\)(\{[^}]*\})?", " ", text)  # 画像構文は非テキスト
-    text = re.sub(r"\^(\d[\d,]*)\^", r" \1 ", text)
-    text = re.sub(r"[#*|`^]", " ", text)
+    text = re.sub(r"\^([^\^\s]+)\^", r" \1 ", text)  # 上付き(引用番号・V600E・10^−6)
+    text = re.sub(r"~([^~\s]+)~", r" \1 ", text)  # 添字(π0・log2・n_X)
+    text = re.sub(r"[#*|`^~]", " ", text)
     return re.findall(r"[A-Za-z0-9]+", text)
 
 
@@ -390,7 +568,8 @@ def build(src_name, out_name, prep, ja=False):
     md.write_text(pre, encoding="utf-8")
     out = SUB / out_name
     subprocess.run(
-        [PANDOC, str(md), "-f", "markdown+superscript", "-o", str(out)],
+        [PANDOC, str(md), "-f", "markdown+superscript+subscript+raw_attribute",
+         "-o", str(out)],
         check=True,
     )
     patch_docx(out, ja=ja)
@@ -411,6 +590,9 @@ def build(src_name, out_name, prep, ja=False):
     else:
         checks["1.5行間"] = 'w:line="360"' in styles
         checks["行番号"] = "lnNumType" in doc
+        if "## Additional Information" in pre and "## References" in pre:
+            checks["節順"] = (pre.index("## Additional Information") < pre.index("## References")
+                            < pre.index("## Figure legends"))
     print(f"{out_name}: token差 {sum(diff.values())} 件"
           + (f" {dict(list(diff.items())[:5])} " if diff else " ")
           + " ".join(f"{k}:{'OK' if v else 'NG'}" for k, v in checks.items()))

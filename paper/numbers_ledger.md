@@ -772,3 +772,11 @@
   S7→S6・REO パネル S3→S7、Data 1(セット)↔ Data 2(遺伝子)を交換。本文・Supp・訳・凡例順・出荷
   ファイル名・make_docx 埋め込み(S5 のみ非埋め込み)・manifest・README を同期。台帳の過去メモの
   表番号は当時の番号のまま(この対応表で読み替え)
+- 2026-08-29: **閲覧用 docx を投稿形へ組み替え**(研究者指示 — 共著者は書式の未完成に引っかかる):
+  BJC GTA 節順(タイトルページ[題名・著者・所属・対応著者 e-mail・ORCID]→ Abstract → Background →
+  Methods → Results → Discussion → Additional Information[未記入節は "To be completed" 表示]→
+  References → Figure legends → Tables[1 頁 1 表・投稿形の列名・脚注]→ Figures[1 頁 1 図])、
+  Supp も同構造(本文 → Supp References → 図 → 表 → Data)。添字(π0・α0・log2・n_X)は表示層で
+  subscript 化、表の丸めは本文の桁に一致。**GTA 発見: Additional Information は References の前**
+  (従来の docx は後ろだった — 是正)。本文第 1 節名は BJC の "Background" を docx 層で適用(正本の
+  見出し "Introduction" の改名は研究者判断待ち)
