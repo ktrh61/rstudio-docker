@@ -745,3 +745,8 @@
   と同内容)・Discussion REO の「not an estimate of predictive performance」(同段落末尾と Limitations
   に残存)・Results の「did not test the shape」(Methods・Discussion に残存)を削除。C タグ行は不触。
   限定句は各々 Methods/Discussion/Limitations に 1 箇所以上残ることを機械確認。訳同期済み
+- 2026-08-29: Discussion の焦点整理(研究者指示 — 薄い点在を一箇所へ): Limitations の共変量・推定対象
+  の再論(Methods「Covariate disclosure and estimand」と同内容)を Methods 参照に集約(−約 40 語)、
+  Results の BRAF-tumor 括弧「direction-agnostic, not a negative control」(Intro・Methods・Discussion
+  に続く 4 度目)を削除(−9 語)。数値直後の限定句(Results の equivalence・detection-limit 文)と
+  C 行・凍結文は不触。訳同期済み
