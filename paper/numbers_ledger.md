@@ -741,3 +741,7 @@
   REO パネルは 27 例から調整なしに選択のため標本特異的であり得る→性能推定なし・独立検証要。
   新規主張ではなく C-09・BRAF 非同等性の既批准立場の標本サイズ面での言い直し(C 行なし)。
   旧「the small High-AS BRAF group」句は範囲表記に吸収。訳同期済み
+- 2026-08-29: 標本サイズ文の追加に伴う重複整理(研究者 Go、−31 語): Results REO の because 節(Methods
+  と同内容)・Discussion REO の「not an estimate of predictive performance」(同段落末尾と Limitations
+  に残存)・Results の「did not test the shape」(Methods・Discussion に残存)を削除。C タグ行は不触。
+  限定句は各々 Methods/Discussion/Limitations に 1 箇所以上残ることを機械確認。訳同期済み
