@@ -742,6 +742,10 @@ def main():
                   f"**対応版**: 英語版 cover_letter_{tag}.docx(同時生成の対)。"
                   f"ソース: paper/cover_letter_ja.md @{commit}")), ja=True, letter=True),
     ]
+    # 投稿システムの Cover Letter 欄への貼り付け用プレーンテキスト(書式記号なし)
+    letter_txt = SUB / "cover_letter.txt"
+    subprocess.run([PANDOC, str(SUB / "cover_letter_input.md"), "-f", "markdown+superscript",
+                    "-t", "plain", "--wrap=none", "-o", str(letter_txt)], check=True)
     dest = Path("/mnt/c/Users/kotaro/OneDrive/論文関連（説明用資料含）/word_check")
     if dest.parent.exists():
         dest.mkdir(exist_ok=True)
@@ -749,6 +753,8 @@ def main():
             view = dest / f"{out.stem}_{tag}.docx"
             shutil.copy2(out, view)
             print(f"閲覧用コピー: {view}")
+        shutil.copy2(letter_txt, dest / f"cover_letter_{tag}.txt")
+        print(f"貼り付け用テキスト: {dest / f'cover_letter_{tag}.txt'}")
 
 
 if __name__ == "__main__":
