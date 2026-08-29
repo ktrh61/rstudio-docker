@@ -186,7 +186,7 @@ Five of the 39 Ory shared-tissue signature genes tested in each contrast occurre
 
 **Table S1 | Expression filtering and DEGES-MUREN normalization diagnostics by contrast.** The table reports group sizes, the number of protein-coding genes before and after `filterByExpr`, the number of DEGES iterations, the third-iteration screening π0 estimate and Jaccard index, and the range of final normalization factors.
 
-**Table S2 | Software versions.** Versions of R packages used in the pinned publication container are listed.
+**Table S2 | Software versions.** R packages loaded by the reported work, with their versions pinned in the publication container. Role indicates whether a package is loaded by the analysis pipeline (including figure and table scripts), by the reported diagnostics, or only by the test suite as a reference implementation or framework. Packages present in the container but not loaded by these files are omitted; the container recipe in the code repository records the complete environment.
 
 **Table S3 | Gene-set results summarized by contrast and collection.** The number of sets passing the 15–500-gene size filter and the minimum within-collection Benjamini–Hochberg q-value are shown for each of the 16 contrast-by-collection cells.
 

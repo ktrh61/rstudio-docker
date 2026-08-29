@@ -294,7 +294,45 @@ SUPP_TABLE_FILES = {
     "S6": "table_s6_between_stratum_concordance.csv",
     "S7": "table_s7_reo_panel.csv",
 }
-LANDSCAPE_TABLES = {"S1", "S4"}  # 列数の多い表のみ横置き
+PORTRAIT_TEXT_MM = 160  # A4 縦置きの本文幅(余白 25 mm)
+LANDSCAPE_OVER_MM = 140  # 自然幅がこれを超えたら横置き(見出しの折返しで窮屈になる手前で切替)
+
+
+def table_width_mm(md, char_mm=1.8, pad_mm=2.5, wrap_cap=16):
+    """Markdown 表の自然幅(mm)を見積もる: 各列 = max(折返し不能な最長セル, 見出し)。
+    数値・ID(空白なし)は折り返せないので実長、文章セルは wrap_cap 字で折り返す前提、
+    見出しは 2 行までの折返しを許容(最長語と全長の半分の大きい方)。10 pt 前提。"""
+    rows = [[c.strip() for c in r.strip("|").split("|")]
+            for r in md.split("\n") if r.startswith("|") and not r.startswith("|---")]
+    head, body = rows[0], rows[1:]
+    total = 0.0
+    for j, h in enumerate(head):
+        cells = [r[j] for r in body if j < len(r)]
+        cell_w = max([len(c) if not re.search(r"\s", c) else min(len(c), wrap_cap) for c in cells] or [0])
+        words = h.split() or [""]
+        head_w = max(max(len(w) for w in words), (len(h) + 1) // 2)
+        total += max(cell_w, head_w) * char_mm + pad_mm
+    return total
+
+
+def is_landscape(block):
+    """表ブロック(キャプション+Markdown 表)の向き。表が無ければ縦置き。"""
+    m = re.search(r"(?:^\|.*\n)+", block, re.M)
+    return bool(m) and table_width_mm(m.group(0)) > LANDSCAPE_OVER_MM
+
+
+def orient_blocks(blocks, heading):
+    """1 頁 1 表で並べ、向きが変わる境目にセクション区切りを置く。blocks は
+    (label, block) のリスト。返り値は連結済み文字列(末尾で縦置きへ戻す)。"""
+    parts, landscape = [], False
+    for k, (label, block) in enumerate(blocks):
+        want = is_landscape(block)
+        parts.append(section_break(landscape) if want != landscape else PAGE_BREAK)
+        landscape = want
+        parts.append((heading + "\n\n" if k == 0 else "") + block)
+        print(f"  {label}: ~{table_width_mm(re.search(r'(?:^\|.*\n)+', block, re.M).group(0)) if re.search(r'(?:^\|.*\n)+', block, re.M) else 0:.0f} mm -> {'landscape' if want else 'portrait'}")
+    parts.append(section_break(True) if landscape else PAGE_BREAK)
+    return "".join(parts)
 SUPP_DATA_FILES = {"1": "supplementary_data_1_gene_level_results.csv",
                    "2": "supplementary_data_2_set_level_results.csv"}
 
@@ -327,19 +365,10 @@ def supp_preprocess(text):
         elif p.startswith("**Supplementary Data"):
             n = re.match(r"\*\*Supplementary Data (\d)", p).group(1)
             data.append(p + f"\n\n*Provided as a separate file ({SUPP_DATA_FILES[n]}).*")
-    # 補足表は 1 頁 1 表。横置きは列数の多い表だけ(S1 = 12 列、S4 = 10 列)に限り、
-    # 向きが変わる境目にセクション区切り(= 改ページ)を置く。縦長の S2 などは縦置き。
-    # section_break(x) は「直前までの区間」を向き x で閉じる。
-    parts, landscape = [], False
-    for k, (tag, block) in enumerate(tabs):
-        want = tag in LANDSCAPE_TABLES
-        parts.append(section_break(landscape) if want != landscape else PAGE_BREAK)
-        landscape = want
-        parts.append(("## Supplementary tables\n\n" if k == 0 else "") + block)
-    parts.append(section_break(True) if landscape else PAGE_BREAK)
+    # 補足表は 1 頁 1 表。向きは表の自然幅(セル内容+見出し)で決め、境目にセクション区切り。
     assembled = (cover + text.rstrip("\n") + "\n\n" + refs.rstrip("\n")
                  + PAGE_BREAK + "## Supplementary figures\n\n" + PAGE_BREAK.join(figs)
-                 + "".join(parts)
+                 + orient_blocks([(f"Table {tag}", b) for tag, b in tabs], "## Supplementary tables")
                  + "## Supplementary data\n\n" + "\n\n".join(data)
                  + PAGE_BREAK + supp_file_descriptions() + "\n")
     return _finish(assembled)
@@ -389,13 +418,14 @@ def preprocess(text):
             b.insert(1, csv_md_table(ROOT / "output" / "tables" / "tab_case_characteristics.csv"))
         if b[0].startswith("**Table 3 |"):
             b.insert(1, csv_md_table(ROOT / "output" / "tables" / "tab_gene_level_summary.csv"))
-    tables_md = PAGE_BREAK.join("\n\n".join(b) for b in blocks)
+    tables_md = orient_blocks(
+        [(re.match(r"\*\*(Table \d)", b[0]).group(1), "\n\n".join(b)) for b in blocks], "## Tables")
     figures_md = PAGE_BREAK.join(
         f"**{n}**\n\n![]({FIG_PATH[n]}){{width=160mm}}" for n in ("Figure 1", "Figure 2", "Figure 3"))
     text = (text.rstrip("\n") + "\n\n" + additional_information() + "\n\n" + fixed.rstrip("\n")
             + PAGE_BREAK + "## Figure legends\n\n" + "\n\n".join(fig_legends)
-            + PAGE_BREAK + "## Tables\n\n" + tables_md
-            + PAGE_BREAK + "## Figures\n\n" + figures_md + "\n")
+            + tables_md
+            + "## Figures\n\n" + figures_md + "\n")
     text = re.sub(r"\[(\d+(?:,\d+)*)\]", r"^\1^", text)  # 本文中の [1] / [1,2] を上付き化
     return _finish(text)
 
