@@ -750,3 +750,7 @@
   Results の BRAF-tumor 括弧「direction-agnostic, not a negative control」(Intro・Methods・Discussion
   に続く 4 度目)を削除(−9 語)。数値直後の限定句(Results の equivalence・detection-limit 文)と
   C 行・凍結文は不触。訳同期済み
+- 2026-08-29: REO ペア選択規則の閾値を Supp から本文 Methods へ復帰(研究者 Go、+約 55 語): デッド
+  ゾーン log2(1.2)・例外 1 例・10 パーセンタイル log2(1.5)・逆転率 50–100%・中央値シフト順位・
+  Spearman ≥0.75 冗長除外(N-74 参照)。「without tuning」の裏付けを本文内で検証可能にする目的。
+  X 連鎖数の本文復帰は任意扱いのまま未適用。訳同期済み
