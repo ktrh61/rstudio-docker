@@ -6,10 +6,10 @@
 # inference is performed. The observed composition is written as a
 # publication-formatting CSV as well as printed.
 #
-# Output: output/tables/supp_tab_cohort_composition.csv (Table S1, wide:
-#         one row per category, one column per AS band, cell = all (paired);
-#         unevaluated band cells outside the IREP reference groups are shown as
-#         an em dash, never 0) and *_long.csv (provenance grid, 225 rows).
+# Output: output/tables/supp_tab_cohort_composition.csv (Table S1: rows = analysis
+#         strata and the cases outside them, columns = dose-zero / AS bands /
+#         exposed outside strata / total, cell = all (paired); AS shown only for
+#         the strata) and *_long.csv (designated-driver x band provenance grid).
 # Input : processed/thyr_clinical.rds               (from 030; key REBC_ID)
 #         processed/thyr_case_assigned_share.rds     (from 130; AS per case)
 #         processed/thyr_se_raw.rds                  (from 120; for pair status)
@@ -201,57 +201,75 @@ long_path <- file.path(out_dir, "supp_tab_cohort_composition_long.csv")
 utils::write.csv(summary_wide, long_path, row.names = FALSE)
 message("Saved (long, provenance): ", long_path)
 
-# --- Publication table (wide; Table S1) --------------------------------------
-# One row per category, one column per AS band, cell = all cases (paired cases).
-# AS was calculated only for the IREP reference set: exposed cases in the
-# RET-fusion and BRAF-mutation designated driver groups. For categories outside
-# those groups the Low/Mid/High cells were never evaluated and are shown as
-# "—", not 0 -- a printed 0 is reserved for an evaluated band with no case
-# (researcher decision 2026-08-28: no cell may read as a count that was never
-# taken). Column labels follow the manuscript band names.
-ref_groups <- c("Fusion.RET", "Mut.BRAF")
-na_fill <- function(v) {
-  v <- as.character(v)
-  v[is.na(v) | v == ""] <- "na"
-  v
-}
-cat_ref <- unique(rbindlist(list(
-  dt[, .(level = "Group", category = na_fill(Designated_DriverGroup),
-         in_ref = Designated_DriverGroup %in% ref_groups)],
-  dt[, .(level = "Driver", category = na_fill(Designated_Driver),
-         in_ref = Designated_DriverGroup %in% ref_groups)]
-)))
-if (anyDuplicated(cat_ref[, .(level, category)]) > 0) {
-  stop("A category spans reference and non-reference driver groups.")
-}
-band_pub <- c(
-  non_exposed = "dose-zero", no_reference = "exposed, AS not calculated",
-  `(0,33.3)` = "Low-AS", `[33.3,66.6)` = "Mid-AS", `[66.6,100]` = "High-AS"
+# --- Publication table (Table S1; analysis-frame rows) -----------------------
+# Rows follow the analysis design rather than the source cohort's driver
+# catalogue: the two analysis strata (RET fusion-positive by partner; BRAF
+# V600E without a co-occurring candidate driver mutation) carry AS-band cells,
+# and every case outside the strata is counted in one exposed column without
+# AS. The versioned IREP file also holds values for exposed cases outside the
+# strata; they enter no analysis and are not displayed (researcher decision
+# 2026-08-29: the table shows exactly the AS the analysis used). An em dash
+# marks a cell that does not apply; 0 is a counted band with no case.
+# Cell = all cases (paired cases).
+source(file.path(paths$root, "lib", "cohort_design.R"))
+design <- classify_driver(clinical)
+dt <- merge(dt,
+  data.table(REBC_ID = design$case_submitter_id, driver = design$driver),
+  by = "REBC_ID", all.x = TRUE
 )
-pub <- merge(summary_wide, cat_ref, by = c("level", "category"))
-pub[, evaluated := in_ref | band %in% c("non_exposed", "no_reference")]
-# Semantics check: an unevaluated cell must carry no case.
-if (any(pub[evaluated == FALSE, all] != 0)) {
-  print(pub[evaluated == FALSE & all != 0])
-  stop("A case carries an AS band outside the IREP reference groups.")
+if (nrow(dt) != nrow(clinical)) stop("Row count changed after driver join.")
+drv <- as.character(dt$Designated_Driver)
+drv[is.na(drv) | drv == ""] <- "na"
+is_ret <- !is.na(dt$driver) & dt$driver == "RET"
+is_braf <- !is.na(dt$driver) & dt$driver == "BRAF"
+dt[, in_stratum := is_ret | is_braf]
+dt[, exposed := assigned_share_status != "not_required_sporadic"]
+# Guard (mirrors 140): every exposed stratum case carries an IREP value.
+if (any(dt[in_stratum & exposed, assigned_share_status] != "irep")) {
+  stop("An exposed stratum case lacks an IREP value.")
 }
-pub[, cell := fifelse(evaluated, sprintf("%d (%d)", all, paired), "—")]
-pub[, band_lab := factor(band_pub[as.character(band)], levels = unname(band_pub))]
-pub_wide <- dcast(pub, level + category ~ band_lab, value.var = "cell")
-tot <- summary_wide[, .(cat_n = sum(all),
-                        total = sprintf("%d (%d)", sum(all), sum(paired))),
-                    by = .(level, category)]
-pub_wide <- merge(pub_wide, tot, by = c("level", "category"))
-setorder(pub_wide, level, -cat_n, category)
-pub_wide[, cat_n := NULL]
-setcolorder(pub_wide, c("level", "category", unname(band_pub), "total"))
-message("Reference-set cases (AS calculated): ",
-        sum(dt$assigned_share_status == "irep"), " = ",
-        paste(sprintf("%s %d", ref_groups,
-          vapply(ref_groups, function(g)
-            sum(dt$assigned_share_status == "irep" & dt$Designated_DriverGroup == g),
-            integer(1))), collapse = " + "))
+dt[, row := fcase(
+  is_ret & drv == "CCDC6-RET", "CCDC6-RET",
+  is_ret & drv == "NCOA4-RET", "NCOA4-RET",
+  is_ret, "Other RET fusion partner",
+  is_braf, "BRAF V600E stratum (no co-occurring candidate driver mutation)",
+  drv == "BRAF.MutV600E", "BRAF V600E with a co-occurring candidate driver mutation",
+  drv == "na", "No designated driver",
+  default = "Other designated driver"
+)]
+band_pub <- c(`(0,33.3)` = "Low-AS", `[33.3,66.6)` = "Mid-AS", `[66.6,100]` = "High-AS")
+cell <- function(d) sprintf("%d (%d)", nrow(d), sum(d$pair_class == "paired"))
+make_row <- function(d, label) {
+  any_str <- any(d$in_stratum)
+  any_out <- any(!d$in_stratum)
+  out <- list(category = label, `dose-zero` = cell(d[exposed == FALSE]))
+  for (b in names(band_pub)) {
+    out[[band_pub[[b]]]] <- if (any_str) {
+      cell(d[in_stratum & exposed & as.character(band) == b])
+    } else "—"
+  }
+  out[["exposed, outside strata"]] <- if (any_out) cell(d[!in_stratum & exposed]) else "—"
+  out[["total"]] <- cell(d)
+  as.data.table(out)
+}
+pub <- rbindlist(list(
+  make_row(dt[row == "CCDC6-RET"], "CCDC6-RET"),
+  make_row(dt[row == "NCOA4-RET"], "NCOA4-RET"),
+  make_row(dt[row == "Other RET fusion partner"], "Other RET fusion partner"),
+  make_row(dt[is_ret], "RET fusion-positive stratum, subtotal"),
+  make_row(dt[is_braf], "BRAF V600E stratum (no co-occurring candidate driver mutation)"),
+  make_row(dt[row == "BRAF V600E with a co-occurring candidate driver mutation"],
+           "BRAF V600E with a co-occurring candidate driver mutation"),
+  make_row(dt[row == "Other designated driver"], "Other designated driver"),
+  make_row(dt[row == "No designated driver"], "No designated driver"),
+  make_row(dt, "All cases")
+))
+message(sprintf(
+  "Strata: RET %d | BRAF %d (of %d designated V600E) | exposed outside strata %d | unused IREP values outside strata %d",
+  sum(is_ret), sum(is_braf), sum(drv == "BRAF.MutV600E"),
+  sum(!dt$in_stratum & dt$exposed),
+  sum(!dt$in_stratum & dt$assigned_share_status == "irep")))
 
 out_path <- file.path(out_dir, "supp_tab_cohort_composition.csv")
-utils::write.csv(pub_wide, out_path, row.names = FALSE)
-message("Saved (Table S1, wide): ", out_path)
+utils::write.csv(pub, out_path, row.names = FALSE)
+message("Saved (Table S1): ", out_path)
