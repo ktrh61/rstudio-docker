@@ -13,7 +13,10 @@
 # uncertainty distribution Lognormal(1,1), 10,000 iterations, random number
 # seed 99),
 # read from the canonical file raw/clinical/thyr_irep_assigned_share.csv
-# (2 columns, exposed driver-classified cases only; provenance, the input-
+# (2 columns; 213 exposed cases = every exposed case of the RET-fusion and BRAF-
+# mutation designated driver groups except three co-mutated V600E cases, i.e.
+# 199 analysis-stratum cases plus 14 outside the strata that enter no analysis
+# -- ledger N-93; provenance, the input-
 # identity verification against this clinical table, and the REBC-AC8W
 # adjudication are recorded in reorg plan v2 B.11).
 #

@@ -3,6 +3,8 @@
 # 2026-08-14: per-driver attrition is carried by this figure, not by text).
 # Formatting only -- draws the frozen step counts from 230; values must
 # match N-08 on first run. Base graphics; layout is a draft for 判断点5.
+# Box wording fixed 2026-08-29: the application set requires a tumor sample only
+# (230: driver RET & Low/Mid & has_tumor_reo); 31 of the 36 also have a normal.
 # Extended 2026-08-15 (researcher Go): (i) step-1 box shows the total only
 # (driver counts appear from the classification step onward), (ii) per-step
 # exclusion annotations (differences of the frozen counts; REMARK-style),
@@ -102,7 +104,7 @@ rect(9.0, y2 - 2.45, 13.3, y2 - 0.45)
 text(11.15, y2 - 0.75, "REO application set", cex = 1.0, font = 2)
 text(11.15, y2 - 1.12, sprintf("of %d RET Low-/Mid-AS cases,", n_lowmid_ret),
      cex = 0.86)
-text(11.15, y2 - 1.44, sprintf("%d with tumor/normal pairs", nrow(ev)),
+text(11.15, y2 - 1.44, sprintf("%d with a tumor RNA-seq sample", nrow(ev)),
      cex = 0.86)
 text(11.15, y2 - 1.76, sprintf("(Low-AS %d | Mid-AS %d)", n_low, n_mid),
      cex = 0.86)

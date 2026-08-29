@@ -58,7 +58,7 @@
 | N-08 | 440 → 248 → 77 → 70 → 69 → 63(n_RET 73→73→34→31→31→27、n_BRAF 175→175→43→39→38→36) | コホートフロー6段(all_cases → driver_classified → band_sporadic_or_high → paired → pcod_clean → purity_pass) | run/xeon_results/logs/230_finalize_analysis_cohorts.log:1-8 キー「Cohort flow (main BM)」 | Results / フロー図表(Methods は n = 63 のみ) | verified |
 | N-09 | B_High 9 / B_Sporadic 27 / R_High 15 / R_Sporadic 12 | main BM 63症例の群内訳 | 同 log:9-12 キー「include_main_bm by group」 | Results | verified |
 | N-10 | training 27 / evaluation 36(R_Low 17・R_Mid 19) | REO コホート | 同 log:13 キー「REO training: 27」 | Methods / Results | verified |
-| N-11 | 臨床 440 症例; AS 帯 non_exposed 81 / no_reference 146 / (0,33.3) 100 / [33.3,66.6) 82 / [66.6,100] 31; paired 392 / unpaired 48 | 臨床全数と AS バンド構成(整合性検査通過) | run/xeon_results/logs/tab_cohort_composition.log:1-4(Driver×AS帯×pair の全225行は同 log:9-233) | Tab(コホート構成 — 2026-08-29 出荷用 S1 を解析枠準拠へ改稿: 行 = RET 層(パートナー別+小計 73)・BRAF V600E 層 175・層外 3 行(共変異 V600E 15・その他指定ドライバー・未分類 11)・全 440、列 = dose-zero 81 / Low / Mid / High / 被曝・層外 160(= 旧 no_reference 146 + 未使用 AS 14)/ 計、セル = 全数(ペア)。帯セルは層の行のみ。指定ドライバー×帯の長形式は *_long.csv に保持) | verified |
+| N-11 | 臨床 440 症例; AS 帯 non_exposed 81 / no_reference 146 / (0,33.3) 100 / [33.3,66.6) 82 / [66.6,100] 31; paired 392 / unpaired 48 | **本文不使用**(2026-08-29: 表 S1 を廃止し Table 2 の母数列 N-95 へ統合 — 数値は tab_cohort_composition.R の provenance 出力に保持) | run/xeon_results/logs/tab_cohort_composition.log:1-4(Driver×AS帯×pair の全225行は同 log:9-233) | Tab(コホート構成 — 2026-08-29 出荷用 S1 を解析枠準拠へ改稿: 行 = RET 層(パートナー別+小計 73)・BRAF V600E 層 175・層外 3 行(共変異 V600E 15・その他指定ドライバー・未分類 11)・全 440、列 = dose-zero 81 / Low / Mid / High / 被曝・層外 160(= 旧 no_reference 146 + 未使用 AS 14)/ 計、セル = 全数(ペア)。帯セルは層の行のみ。指定ドライバー×帯の長形式は *_long.csv に保持) | verified |
 | N-12 | R系 4群(R_Sporadic/R_Low/R_Mid/R_High): n 12/17/19/15、女/男 10/2・13/4・14/5・11/4、手術時年齢中央値[範囲] 20.5[14–27]/30[22–44]/25[17–31]/23[14–31]、被曝時年齢 NA/12[6–19]/3[0–13]/2[0–12]、CCDC6-RET 6/8/12/7、NCOA4-RET 2/5/3/4、RET-OTHER 4/4/4/4 | 症例特性(R系、群×帯) | run/xeon_results/processed/thyr_analysis_cohorts.rds + thyr_clinical.rds を case_submitter_id=REBC_ID で結合(§15 B で再現。2026-08-12 コンテナ内で再実行し一致) | Methods / Tab(症例特性) | verified |
 | N-13 | B系 2群(B_Sporadic/B_High): n 27/9、女/男 23/4・4/5、手術時年齢中央値[範囲] 24[11–29]/29[19–39]、被曝時年齢 NA/3[0–13]、Driver は全例 BRAF.MutV600E | 症例特性(B系) | 同上(§15 B) | Methods / Tab(症例特性) | verified |
 
@@ -166,6 +166,7 @@
 | N-92 | 取得照会日(2026-07-23・2026-08-09)はいずれも GDC Data Release 45.0(2025-12-04 公開)の期間内。次リリース 46.0 は 2026-08-10 公開で、45.0 と 46.0 の間に中間リリースなし。取得時にリリース番号のログはなく、帰属はリリースノートの日付照合による(計算なしの文書事実) | GDC データ状態の版明示(Supp Methods) | https://docs.gdc.cancer.gov/Data/Release_Notes/Data_Release_Notes/(照合 2026-08-21)。版固定原典 = NCI-GDC/gdc-docs コミット 6d9a957fd50d5c349e5b94201874837de0a75939 の docs/Data/Release_Notes/Data_Release_Notes.md(45.0/46.0/44.0 の Release Date を逐語確認) | Supp Methods | verified(2026-08-21 原文照合) |
 | N-93 | 両解析層の被曝例は全例 AS あり(RET 融合 57・BRAF V600E 142 = 199)。正準 IREP CSV は 213 行で、層外の被曝 14 例(共変異 V600E 10・BRAF.MutOther 4)の値を含むが**未使用**。共変異 V600E 3 例(REBC-ACBP・ACDR・ADM9; AKT1/TSHR)は CSV に無い — 理由未記録(来歴: 2025-09 の腕別ファイル thyr_poc_braf_mut / thyr_poc_ret_fusion は当時の分類で作成、研究者 2026-08-28) | AS の使用範囲の開示。表 S1 は解析層の AS のみ提示(研究者決定 2026-08-29: 表に載る AS = 解析に使った AS) | tab_cohort_composition.log「Strata: RET 73 \| BRAF 175 … unused IREP values outside strata 14」+ 正準イメージ内クロス集計(2026-08-28) | Supp Methods AS; Tab S1 凡例 | verified |
 | N-94 | BRAF 層 = Designated V600E 190 例中 175 例(WGS/RNA の候補ドライバー変異が BRAF 単独でない 15 例を除外 — lib/cohort_design.R classify_driver) | 図 1「Driver classified BRAF 175」と S1 の V600E 190 の橋渡し(共変異除外規則の本文開示) | 正準イメージ内クロス集計(2026-08-28)+ N-08(175) | Methods cohorts; Supp QC; Tab S1 凡例 | verified |
+| N-95 | Table 2 の層×帯母数(ペアあり): R_Sporadic 16 (15) / R_Low 19 (15) / R_Mid 20 (16) / R_High 18 (16) / B_Sporadic 33 (29) / B_High 10 (10)。解析 n との差 = ペア・外れ値・純度段階の減少(図 1 と整合: RET 16+18=34→ペア 31、BRAF 33+10=43→ペア 39 = N-08) | 解析群の母集団の開示(旧表 S1 の役割を Table 2 の 1 列に統合) | tab_case_characteristics.log(2026-08-29、正準イメージ)+ thyr_analysis_cohorts.rds(driver×band×is_paired) | Tab 2; Supp Methods AS | verified |
 
 ### M. D6 較正の派生値・採用時測定(執筆用、2026-08-12 追加)
 
@@ -727,3 +728,11 @@
   73/175 が図 1 と直結。Supp の参照セット段落(213/156/4/10/3)を「両層の被曝例全例に AS あり
   (57+142)、入力ファイルの層外 14 例分は未使用」へ縮約。追加 IREP 計算は不採用(枠外・再現実行
   の費用のみ)。訳同期済み
+- 2026-08-29: **表 S1 を廃止し Table 2 へ統合**(研究者決定): 各解析群の層×帯母数(ペアあり)を
+  Table 2 の 1 列(N-95)に付け、旧 S1 の残余(BRAF Low/Mid 母数・層外内訳・層全体のパートナー別)は
+  論文の主張に不要として不掲載。**S2〜S8 → S1〜S7 へ繰り上げ**(本文・Supp・訳・出荷ファイル名・
+  make_docx 埋め込み・manifest)。旧番号対応: 旧S2=正規化診断→S1、旧S3=ORA→S2、旧S4=REO→S3、
+  旧S5=版→S4、旧S6=セット要約→S5、旧S7=較正→S6、旧S8=層間一致→S7。Supp AS 節の「入力
+  ファイルの層外 14 例分」句は論文から外し 130 ヘッダへ移動。**図 1 の右箱の誤記を訂正**
+  ("36 with tumor/normal pairs" → "36 with a tumor RNA-seq sample"; 36 は腫瘍検体ありの定義で
+  対応正常を持つのは 31)

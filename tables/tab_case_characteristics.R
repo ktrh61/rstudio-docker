@@ -1,7 +1,8 @@
-# tab_case_characteristics.R  (Table 1)
+# tab_case_characteristics.R  (Table 2)
 # Case characteristics by analysis group: main BM (R_Sporadic/R_High/
 # B_Sporadic/B_High) and REO evaluation (R_Low/R_Mid). Formatting only --
-# no computation beyond counts/medians of frozen inputs; canonical sources
+# no computation beyond counts/medians of frozen inputs (plus the stratum-by-
+# band pool sizes, N-95); canonical sources
 # for the ledger remain the primary rds (N-09, N-12, N-13). CSV is a
 # typesetting convenience. Age-difference footnote values (N-64, N-65) come
 # from diagnostics/output/age_arm_difference.rds and are appended as notes.
@@ -42,10 +43,20 @@ fmt_med <- function(v) {
   if (length(v) == 0) return("NA")
   sprintf("%g [%g-%g]", stats::median(v), min(v), max(v))
 }
+# Stratum-by-band pool each analysed group was drawn from: every case of the
+# stratum in that band before the sample-based steps (pair, outlier screen,
+# purity). Cell = pool size (cases with a tumor-normal pair). Replaces the
+# former Table S1 (researcher decision 2026-08-29).
+pool_of <- function(g) {
+  d <- if (startsWith(g, "R_")) "RET" else "BRAF"
+  b <- sub("^[RB]_", "", g)
+  pool <- co[co$driver %in% d & co$band %in% b, ]
+  sprintf("%d (%d)", nrow(pool), sum(pool$is_paired))
+}
 rows <- lapply(split(sel, sel$group), function(s) {
   drv <- sort(table(s$Designated_Driver), decreasing = TRUE)
   data.frame(
-    group = s$group[1], n = nrow(s),
+    group = s$group[1], n = nrow(s), pool = pool_of(s$group[1]),
     female = sum(s$SEX %in% c("F", "Female", "female")),
     male = sum(s$SEX %in% c("M", "Male", "male")),
     age_surgery = fmt_med(s$AGE_SURGERY),
