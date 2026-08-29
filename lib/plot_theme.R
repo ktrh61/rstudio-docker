@@ -41,7 +41,7 @@ theme_thyr <- function(base_size = 7, legend_position = "top") {
 # Figures land in output/figures/ (reorg plan v2 s2.6: figure scripts read
 # processed/ only and write output/figures/ only). width/height are in mm at
 # final display size; three copies are written from the same object:
-#   .png 160 dpi  -- preview (embedded in the review docx)
+#   .png 300 dpi  -- embedded in the review/submission docx (Word -> PDF keeps 300 dpi)
 #   .tif 600 dpi  -- bitmap submission copy (BJC GTA: >= 300 dpi)
 #   .pdf vector   -- line-art submission copy (artwork guide), fonts embedded
 save_figure <- function(plot, filename, width, height) {
@@ -51,7 +51,7 @@ save_figure <- function(plot, filename, width, height) {
   }
   out_png <- file.path(out_dir, filename)
   ggplot2::ggsave(out_png, plot,
-    width = width, height = height, units = "mm", dpi = 160, type = "cairo"
+    width = width, height = height, units = "mm", dpi = 300, type = "cairo"
   )
   message("Saved: ", out_png)
   out_tif <- file.path(out_dir, sub("\\.png$", ".tif", filename))

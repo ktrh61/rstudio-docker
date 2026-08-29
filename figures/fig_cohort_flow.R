@@ -117,7 +117,7 @@ W_IN <- 175 / 25.4 # final width: BJC double column
 H_IN <- W_IN * (230 * n) / 2200 # aspect of the original layout
 PT <- 7 # base point size at final width (artwork guide: text 5-7 pt)
 png(file.path(out_dir, "fig_cohort_flow.png"), type = "cairo",
-    width = W_IN, height = H_IN, units = "in", res = 160,
+    width = W_IN, height = H_IN, units = "in", res = 300,
     pointsize = PT, family = FONT_FAMILY)
 draw_flow()
 dev.off()

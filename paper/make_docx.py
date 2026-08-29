@@ -55,6 +55,22 @@ FIG_PATH = {en: ROOT / "output" / "figures" / f for en, _, f in FIGS}
 # 投稿形の改ページ(pandoc raw openxml — 閲覧 docx の組版のみ)
 PAGE_BREAK = "\n\n```{=openxml}\n<w:p><w:r><w:br w:type=\"page\"/></w:r></w:p>\n```\n\n"
 
+PG_MAR = ('<w:pgMar w:top="1417" w:right="1417" w:bottom="1417" w:left="1417" '
+          'w:header="709" w:footer="709" w:gutter="0"/>')
+FOOTER_REF = ('<w:footerReference xmlns:r="http://schemas.openxmlformats.org/officeDocument/'
+              '2006/relationships" w:type="default" r:id="rIdFooterPg"/>')
+
+
+def section_break(landscape):
+    """直前までの区間を閉じるセクション区切り(A4、向きは引数)。フッタ(頁番号)と
+    行番号は各区間に明示(Word はセクションごとに保持するため)。"""
+    pg = ('<w:pgSz w:w="16838" w:h="11906" w:orient="landscape"/>' if landscape
+          else '<w:pgSz w:w="11906" w:h="16838"/>')
+    return ("\n\n```{=openxml}\n<w:p><w:pPr><w:sectPr>" + FOOTER_REF
+            + '<w:type w:val="nextPage"/>' + pg + PG_MAR
+            + '<w:lnNumType w:countBy="1" w:restart="continuous"/>'
+            + "</w:sectPr></w:pPr></w:p>\n```\n\n")
+
 
 def embed_figures(text):
     """(日本語版) 図凡例行の直下へ対応 PNG を幅 160mm(A4 余白内)で挿入する。"""
@@ -310,10 +326,14 @@ def supp_preprocess(text):
         elif p.startswith("**Supplementary Data"):
             n = re.match(r"\*\*Supplementary Data (\d)", p).group(1)
             data.append(p + f"\n\n*Provided as a separate file ({SUPP_DATA_FILES[n]}).*")
+    # 補足表は横置きの区間に置く(S1 は 12 列・S4 は 10 列 — 縦置きでは列が潰れる)。
+    # 区間の前後をセクション区切りで閉じ、末尾の区間(Data・要約)は縦置きに戻る。
     assembled = (cover + text.rstrip("\n") + "\n\n" + refs.rstrip("\n")
                  + PAGE_BREAK + "## Supplementary figures\n\n" + PAGE_BREAK.join(figs)
-                 + PAGE_BREAK + "## Supplementary tables\n\n" + PAGE_BREAK.join(tabs)
-                 + PAGE_BREAK + "## Supplementary data\n\n" + "\n\n".join(data)
+                 + section_break(landscape=False)
+                 + "## Supplementary tables\n\n" + PAGE_BREAK.join(tabs)
+                 + section_break(landscape=True)
+                 + "## Supplementary data\n\n" + "\n\n".join(data)
                  + PAGE_BREAK + supp_file_descriptions() + "\n")
     return _finish(assembled)
 
@@ -492,7 +512,18 @@ def patch_docx(path, ja=False):
     parts["word/styles.xml"] = styles.encode("utf-8")
 
     doc = parts["word/document.xml"].decode("utf-8")
-    sect = re.search(r"<w:sectPr[^>]*>.*?</w:sectPr>", doc, re.S).group(0)
+    # 表のセル本文は 10pt・黒を run に明示(段落スタイル Compact の継承・和文版の
+    # メタ箇条書き用 9pt 灰色の影響を受けない。表の見出し行の太字は pandoc 既定)
+    def _tbl_runs(m):
+        tbl = m.group(0)
+        tbl = re.sub(r"<w:rPr>(?![^<]*<w:sz )", '<w:rPr><w:sz w:val="20"/><w:szCs w:val="20"/>'
+                     '<w:color w:val="000000"/>', tbl)
+        tbl = re.sub(r"<w:r>(?!<w:rPr>)", '<w:r><w:rPr><w:sz w:val="20"/><w:szCs w:val="20"/>'
+                     '<w:color w:val="000000"/></w:rPr>', tbl)
+        return tbl
+    doc = re.sub(r"<w:tbl>.*?</w:tbl>", _tbl_runs, doc, flags=re.S)
+    # 文書末尾の sectPr(本文中に挿入したセクション区切りではなく最終区間)を対象にする
+    sect = re.findall(r"<w:sectPr[^>]*>(?:(?!<w:sectPr).)*?</w:sectPr>", doc, re.S)[-1]
     new_sect = sect
     if "pgSz" not in new_sect:
         # pandoc の sectPr は最小構成 — A4・余白 2.5cm を明示してロケール依存を排し、
