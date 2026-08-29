@@ -147,6 +147,12 @@ def convert(text, index, order, warnings, do_convert=True):
     return text
 
 
+def clean_biblio(b):
+    """書誌から台帳の管理注記を除く(「、DOI なし」・末尾の「 (PMID n)」)。"""
+    b = b.replace("、DOI なし", "")
+    return re.sub(r"\s*\(PMID \d+\)", "", b).strip()
+
+
 def strip_meta(text, drop_sections):
     text = re.sub(r"<!--.*?-->", "", text, flags=re.S)
     lines = text.split("\n")
@@ -177,8 +183,9 @@ def main():
     body = convert(body, index, order, warnings, do_convert=True)
 
     refs = ["## References", ""]
-    # 台帳の管理注記(「、DOI なし」)は投稿用表示から除去する
-    refs += [f"{i+1}. {b.replace('、DOI なし', '')}" for i, b in enumerate(order)]
+    # 台帳の管理注記(「、DOI なし」・「(PMID n)」)は投稿用表示から除去する
+    # (BJC の Vancouver 書式は DOI までで PMID を含まない — フェーズ2 整形 2026-08-29)
+    refs += [f"{i+1}. {clean_biblio(b)}" for i, b in enumerate(order)]
     submission = body.rstrip("\n") + "\n\n" + "\n".join(refs) + "\n"
     (OUT / "manuscript_submission.md").write_text(submission, encoding="utf-8")
 
@@ -191,7 +198,7 @@ def main():
     convert(supp, index, supp_order, warnings, do_convert=True)
     if supp_order:
         supp = (supp.rstrip("\n") + "\n\n## Supplementary References\n\n"
-                + "\n\n".join(b.replace("、DOI なし", "")
+                + "\n\n".join(clean_biblio(b)
                               for b in sorted(supp_order, key=str.lower)) + "\n")
     (OUT / "supplementary_submission.md").write_text(supp, encoding="utf-8")
 
