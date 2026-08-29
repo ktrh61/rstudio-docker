@@ -125,17 +125,17 @@ def supp_preprocess(text):
     cover = ("**Supplementary Material for:** " + title + "\n\n" + author_block()
              + "\n\n")
     text = re.sub(r"^-{3,}\s*$", "", text, flags=re.M)
-    # 小表(S1・S3〜S7)は出荷用コピーの実体をキャプション直下へ埋め込む。
-    # S2(ORA、18,577 行)と Data 1/2 は物理的に埋め込み不能 — キャプションのみ(別ファイル参照)
-    # (旧 S1 コホート構成は 2026-08-29 に Table 2 の母数列へ統合、S2〜S8 を繰り上げ)
+    # 小表(S1〜S4・S6・S7)は出荷用コピーの実体をキャプション直下へ埋め込む。
+    # S5(ORA、18,577 行)と Data 1/2 は物理的に埋め込み不能 — キャプションのみ(別ファイル参照)
+    # (2026-08-29: 旧 S1 コホート構成を Table 2 へ統合後、SI 品目を初出順へ再番号付け)
     supp_files = ROOT / "paper" / "gpt_review" / "supplementary_files"
     for tag, fname in [
         ("S1", "table_s1_normalization_diagnostics.csv"),
-        ("S3", "table_s3_reo_panel.csv"),
-        ("S4", "table_s4_software_versions.csv"),
-        ("S5", "table_s5_gene_set_summary.csv"),
-        ("S6", "table_s6_complete_null_calibration.csv"),
-        ("S7", "table_s7_between_stratum_concordance.csv"),
+        ("S2", "table_s2_software_versions.csv"),
+        ("S3", "table_s3_gene_set_summary.csv"),
+        ("S4", "table_s4_complete_null_calibration.csv"),
+        ("S6", "table_s6_between_stratum_concordance.csv"),
+        ("S7", "table_s7_reo_panel.csv"),
     ]:
         tbl = csv_md_table(supp_files / fname)
         text = re.sub(rf"(^\*\*Table {tag} \|[^\n]*\n)",
