@@ -556,6 +556,16 @@ def patch_docx(path, ja=False):
         '<w:r><w:fldChar w:fldCharType="end"/></w:r></w:p></w:ftr>'
     ).encode("utf-8")
 
+    # 画像の自動圧縮を文書設定で無効化(Word の「ファイル内のイメージを圧縮しない」に相当。
+    # 文書単位の設定なので生成時に埋め込み、開くたびの再設定を不要にする。CT_Settings の
+    # 順序: clrSchemeMapping の後・decimalSymbol の前)
+    st = parts["word/settings.xml"].decode("utf-8")
+    if "doNotAutoCompressPictures" not in st:
+        flag = "<w:doNotAutoCompressPictures/>"
+        st = (st.replace("<w:decimalSymbol", flag + "<w:decimalSymbol", 1)
+              if "<w:decimalSymbol" in st else st.replace("</w:settings>", flag + "</w:settings>"))
+    parts["word/settings.xml"] = st.encode("utf-8")
+
     ct = parts["[Content_Types].xml"].decode("utf-8")
     if "footer1.xml" not in ct:
         ct = ct.replace(
