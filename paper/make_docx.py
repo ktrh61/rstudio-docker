@@ -522,6 +522,13 @@ def patch_docx(path, ja=False):
                      '<w:color w:val="000000"/></w:rPr>', tbl)
         return tbl
     doc = re.sub(r"<w:tbl>.*?</w:tbl>", _tbl_runs, doc, flags=re.S)
+    # 列幅は内容に合わせて自動調整(pandoc は均等固定幅を出し、狭い列で語が分断される)。
+    # 罫線は学術表の三線式に揃える: 表の上下に実線(見出し下線は pandoc 既定)
+    doc = doc.replace('<w:tblLayout w:type="fixed" />', '<w:tblLayout w:type="autofit" />')
+    doc = re.sub(r'(<w:tblW [^>]*/>)',
+                 r'\1<w:tblBorders><w:top w:val="single" w:sz="8" w:space="0" w:color="000000"/>'
+                 r'<w:bottom w:val="single" w:sz="8" w:space="0" w:color="000000"/></w:tblBorders>',
+                 doc)
     # 文書末尾の sectPr(本文中に挿入したセクション区切りではなく最終区間)を対象にする
     sect = re.findall(r"<w:sectPr[^>]*>(?:(?!<w:sectPr).)*?</w:sectPr>", doc, re.S)[-1]
     new_sect = sect
