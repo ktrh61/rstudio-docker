@@ -93,6 +93,39 @@ Complete gene-level results for every tested gene in each of the four contrasts 
 
 Complete label-permutation gene-set results for all tested sets in each contrast and collection (24,798 rows): set size, enrichment score, normalized enrichment score, sign-conditional permutation p-value, within-collection Benjamini–Hochberg q-value, redundancy annotation, and leading-edge genes.
 
+## 公開リポジトリ・プレプリント運用(2026-08-29 記録 — 共著者の同意待ち。決定後に不採用側を削除)
+
+前提(規定はライブ確認 2026-08-29): BJC・npj Precision Oncology(Nature Portfolio)・ERC(Bioscientifica)の
+3 誌ともプレプリント許容(BJC = 投稿時 DOI 開示+本文で参照/npj = DOI+ライセンス開示/Bioscientifica =
+投稿時通知+出版後にプレプリントから最終版へリンク)。コードは審査中「求めに応じて利用可能」で足り、
+公開義務は出版時。bioRxiv は雑誌出版まで改訂版を同一 DOI 下に投稿可(出版後は不可)、投稿は全著者同意が条件。
+判断軸(共著者説明用): 公開データ+公開ソフトの再解析は参入障壁がなく、コホート所有者(Morton ら)が最も
+出しやすい当事者/実行コスト低下で希少資源は設計側に移り、防御は非公開でなく日付つき開示/被引用の副次
+効果(Fu & Hughey 2019 eLife 等)。制約 = 全著者同意・v1 は永久に残る・優先権は規範であり評価ではない。
+
+### ルート A(推奨 — 共著者同意あり): bioRxiv を雑誌投稿と同日に掲載
+1. 公開リポジトリを切り出し(published-repo-scope)→ GitHub 公開 → Zenodo 連携リリース → DOI 取得。
+2. bioRxiv に投稿版と同一の全文(本文+Supp+図表)を投稿(Cancer Biology または Genomics、ライセンスは
+   全著者で選択)。掲載承認で DOI 確定。
+3. 原稿へ反映: Data/Code availability = GitHub URL+Zenodo DOI/プレプリントを本文で参照し文献に収載
+   (BJC 規定)/カバーレターの "has not been posted as a preprint" を「posted on bioRxiv (DOI, licence)」へ。
+4. 雑誌投稿(同日)。投稿システムでプレプリント DOI・ライセンスを開示。
+5. 審査中: 再投稿ごとに改訂版を bioRxiv へ(v2, v3 …)。受理前の最終改訂版まで可。
+6. 受理・出版後: Zenodo に最終版タグ/bioRxiv は約 2 週間で出版版へ自動リンク/SharedIt リンクを配布/
+   購読ルートなら出版 6 か月後に accepted manuscript を機関リポジトリへ(Springer Nature STM エンバーゴ)。
+   転載(BJC 不採択 → ERC/npj)時はプレプリントはそのまま、次誌の通知・開示規定に従う。
+
+### ルート B(フォールバック — 同意なし): Zenodo 予約 DOI+査読専用添付
+1. 切り出しは同じ。GitHub は非公開のまま。
+2. Zenodo に下書きレコードを作り DOI を予約(Publish しない — 下書きは非公開)。
+3. 原稿へ反映: Data/Code availability = 予約 DOI+"to be released on publication"/カバーレターは
+   「has not been posted as a preprint」のまま、コード文を「provided for review; released under a reserved
+   DOI on publication」へ。
+4. 査読用に切り出しアーカイブを投稿システムへ査読専用ファイルとして添付。
+5. 受理時: GitHub 公開+Zenodo Publish(予約 DOI がそのまま有効)。出版後は A-6 と同じ。
+
+両ルート共通で今から着手可能: 切り出し・Zenodo アカウント(ORCID 連携)・フェーズ6 再構築確認。
+
 ## AI 開示の転記先メモ
 
 - BJC: Methods(Reproducibility and AI use 節)に短文開示、Supp Methods(Scope and verification of AI use 小節)に機構詳細を記載済み — 追加転記は不要(GTA は Methods 文書化を要求)。
