@@ -601,8 +601,9 @@
      図は最終幅 175 mm・文字 5–7 pt(Liberation Sans)・PDF ベクター+600 dpi TIFF で供給
      (2026-08-28 実施済み — 下記メモ)/Supp は可能なら一体 PDF+Data 1/2 に各 50 語要約/
      タイトルページ(≤150字・非結論形 — 現115字適合・対応著者 ORCID)/カバーレター(重要性・
-     BJC 宣言・未発表言明・対応著者情報・COI 文)/Supp 各ファイルの 50 語要約(S5 ORA・Data 1/2 は
-     別ファイル)
+     BJC 宣言・未発表言明・対応著者情報・COI 文)/Supp 各ファイルの 50 語要約(起草済み — S5 ORA・
+     Data 1/2 は **CSV のまま**別ファイル: 正本とバイト一致・Excel の遺伝子記号→日付変換を持ち込まない。
+     投稿システムが CSV を拒否する場合のみ ZIP、XLSX は不採用 — 研究者裁定 2026-08-29。Supp 本体は PDF)
   6. 公開リポジトリ(published-repo-scope: 論文再現に必要なスクリプト・lib・figures・tables・Dockerfile・
      docker/・raw/clinical の IREP CSV・manifest のみ)を切り出し → アーカイブ(DOI)→ declarations の
      URL/DOI 記入。フェーズ6 = 更新済み Dockerfile(fonts-liberation 込み)からイメージ再構築と
