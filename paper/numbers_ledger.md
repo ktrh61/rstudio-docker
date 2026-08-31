@@ -583,11 +583,10 @@
 
 ## 現況(通常セッションはこの節と直近の改訂メモのみ読めば足りる — 2026-08-29 更新)
 
-- 語数(2026-08-31 更新): **投稿版基準([n] 変換後 — ジャーナルが見る形)を判断の正とする**(研究者
-  決定 2026-08-31 — BJC 規定が数えるのは投稿形のため)。現在 4,851/5,000(余裕 149)。正本基準
-  (author-year のまま・見出し除く)は参考記録 — 現在 4,989。Abstract 197(余裕 3)。留意: 引用の
-  新規追加は投稿版でも [n] 分増える/BJC 側計数器の揺らぎへ多少のマージンは残す。機械検査(凍結4・
-  N/C タグ・引用 33/警告0・英綴り・訳の段落/数値同期・SI 初出順)全通過 2026-08-29。
+- 語数: **投稿版基準([n] 変換後 — ジャーナルが見る形)が判断の正**(研究者決定 2026-08-31)。正本基準
+  (author-year のまま・見出し除く)は参考。最新値は語数記載のある直近の改訂メモ参照。Abstract 197
+  (余裕 3)。留意: 引用の新規追加は投稿版でも [n] 分増える。機械検査(凍結4・N/C タグ・引用 33/
+  警告0・英綴り・訳の段落/数値同期・SI 初出順)全通過 2026-08-29。
 - **フェーズ2 未着手の発見(2026-08-29)**: BJC の参考文献書式は Nature 形式(例: McAndrew, N.P.,
   Dickson, M.A., … *et al.* Title. *Br. J. Cancer* **123**, 912–918 (2020))で、**論文題名を含む**。
   現行の References(Vancouver 風・題名なし)は要整形 — **2026-08-29 実施済み**(下記メモ)。
@@ -835,31 +834,22 @@
 - 2026-08-29: カバーレター全段落を本文の強度へ整合(自己評価的修辞・本文外の主張を除去、Morton 2021 明示)。
   **公開リポジトリ・プレプリント運用を declarations に記録**(ルート A = bioRxiv 同日掲載+GitHub/Zenodo 公開、
   ルート B = Zenodo 予約 DOI+査読専用添付。3 誌の規定はライブ確認済み。共著者同意で分岐、決定後に不採用側を削除)
-- 2026-08-31: Limitations の連語修正(研究者 Go): "kept validity independent of asymptotic approximations"
-  → "did not rely on asymptotic approximations for validity"(+2語 → 正本 4,987・余裕 13)。主張強度・
-  限定句は不変、訳(manuscript_ja)は既に同型のため同期修正なし
-- 2026-08-31: REO ペア選択文の混在リストを分離(研究者 Go): 適格条件3項を "Prespecified rules
-  required A, B, and C" の並列名詞句に、順位付け・貪欲選択・相関除外を "We ranked … and selected …,
-  excluding …" の1文に再構成(番号列挙・動詞三連は不採用 — 除外は選択中の相対条件のため)。数値・
-  限定句・N-37/N-74 タグ不変、+1語 → 正本 4,988・余裕 12。訳同期済み
-- 2026-08-31: REO 逆転率の英文端点を実装(510:136 `> 0.5 & reversal_count < n_r1` = 両端排除)と
-  照合し "between 50% and 100%" → "above 50% but below 100%" へ(研究者 Go、+1語 → 正本 4,989・
-  余裕 11)。和訳「50% 超 100% 未満」は元から実装と一致、同期修正なし
+- 2026-08-31: Limitations の連語を "did not rely on asymptotic approximations for validity" へ修正
+  (研究者 Go、+2語)。訳は既に同型で同期不要
+- 2026-08-31: REO ペア選択文を適格条件の並列名詞句+手続き1文へ分離(研究者 Go、+1語)。動詞三連は
+  不採用 — 除外は選択中の相対条件のため。訳同期済み
+- 2026-08-31: REO 逆転率の英文端点を実装(510:136 = 両端排除)と照合し "above 50% but below 100%"
+  へ(研究者 Go、+1語)。和訳は元から一致
 - 2026-08-31: 語数の判断基準を投稿版基準へ一本化(研究者決定 — 規定は投稿形を数える)。正本基準は
   参考記録に降格。現況節に反映
-- 2026-08-31: AS 目盛りの chronic 圧縮文を明確化(研究者 Go): "over the High band essentially by
-  one common factor" → "across the High-AS band by essentially the same factor for all cases"
-  (語順・係数の共有先の明示・裸の High band 表記を High-AS へ統一。"essentially" の限定は維持 —
-  厳密に共通なのは ERR 側のため)。+3語 → 投稿版 4,854・余裕 146(正本 4,992 参考)。訳同期済み
-- 2026-08-31: 主コホート定義文を4基準の動詞並列(were/belonged/had/had)へ再構成(研究者 Go):
-  V600E 制限括弧を第2基準直後へ移動("V600E" 再名指し不要化)、外れ値スクリーンはペア基準の内部
-  修飾に。臨床 Methods の適格基準文の定型。和訳は元からこの構造で同期不要。+4語 → 投稿版 4,858・
-  余裕 142(正本 4,996 参考)
-- 2026-08-31: Supp の層外症例文を受動へ(研究者 Go): "entered no analysis" → "were not included in
-  any analysis"(同段落の IREP 入力義 "entered" との語義衝突解消・手続き文=受動の態方針に整合・
-  these で照応強化)。訳の現在形「入らない」も過去形「含めなかった」へ同期。Supp のため語数影響なし
-- 2026-08-31: Supp の BRAF 層構成文を症例主体へ("contained BRAF V600E" → "consisted of BRAF
-  V600E-positive cases"、研究者 Go)。訳同期済み。Supp のため語数影響なし
+- 2026-08-31: chronic 圧縮文を "across the High-AS band by essentially the same factor for all cases"
+  へ明確化(研究者 Go、+3語)。"essentially" は維持 — 厳密に共通なのは ERR 側。訳同期済み
+- 2026-08-31: 主コホート定義文を4基準の動詞並列へ再構成、V600E 括弧を第2基準直後へ(研究者 Go、
+  +4語 → 投稿版 4,858・余裕 142)。訳は元から同構造で同期不要
+- 2026-08-31: Supp の層外症例文を "were not included in any analysis" へ(研究者 Go)。訳の現在形も
+  過去形へ同期。語数影響なし(Supp)
+- 2026-08-31: Supp の BRAF 層構成文を "consisted of BRAF V600E-positive cases" へ(研究者 Go)。
+  訳同期済み。語数影響なし(Supp)
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
   600 dpi TIFF)/別ファイル CSV 3 件+50 語要約/カバーレター案。残 = Acknowledgements・共著者レビューと
