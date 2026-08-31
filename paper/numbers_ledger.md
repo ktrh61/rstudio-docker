@@ -851,6 +851,10 @@
   one common factor" → "across the High-AS band by essentially the same factor for all cases"
   (語順・係数の共有先の明示・裸の High band 表記を High-AS へ統一。"essentially" の限定は維持 —
   厳密に共通なのは ERR 側のため)。+3語 → 投稿版 4,854・余裕 146(正本 4,992 参考)。訳同期済み
+- 2026-08-31: 主コホート定義文を4基準の動詞並列(were/belonged/had/had)へ再構成(研究者 Go):
+  V600E 制限括弧を第2基準直後へ移動("V600E" 再名指し不要化)、外れ値スクリーンはペア基準の内部
+  修飾に。臨床 Methods の適格基準文の定型。和訳は元からこの構造で同期不要。+4語 → 投稿版 4,858・
+  余裕 142(正本 4,996 参考)
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
   600 dpi TIFF)/別ファイル CSV 3 件+50 語要約/カバーレター案。残 = Acknowledgements・共著者レビューと
