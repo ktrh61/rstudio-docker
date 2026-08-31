@@ -847,6 +847,10 @@
   余裕 11)。和訳「50% 超 100% 未満」は元から実装と一致、同期修正なし
 - 2026-08-31: 語数の判断基準を投稿版基準へ一本化(研究者決定 — 規定は投稿形を数える)。正本基準は
   参考記録に降格。現況節に反映
+- 2026-08-31: AS 目盛りの chronic 圧縮文を明確化(研究者 Go): "over the High band essentially by
+  one common factor" → "across the High-AS band by essentially the same factor for all cases"
+  (語順・係数の共有先の明示・裸の High band 表記を High-AS へ統一。"essentially" の限定は維持 —
+  厳密に共通なのは ERR 側のため)。+3語 → 投稿版 4,854・余裕 146(正本 4,992 参考)。訳同期済み
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
   600 dpi TIFF)/別ファイル CSV 3 件+50 語要約/カバーレター案。残 = Acknowledgements・共著者レビューと
