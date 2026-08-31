@@ -854,6 +854,8 @@
   作用域を ORA 文に限定、較正済み帰無を独立文へ)。限定句・強度不変、訳同期済み
 - 2026-08-31: カバーレターの "All inference used" → "All inferential procedures used"(研究者 Go —
   本文 Limitations の "procedures" と語彙整合)。射程・強度不変、訳同期済み
+- 2026-08-31: Supp の Ory 引用を後置へ("signatures in Ory et al. (2026) Supplementary Tables …" →
+  "signatures reported in Supplementary Tables … of Ory et al. (2026)"、研究者 Go)。訳は元から同構造
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
   600 dpi TIFF)/別ファイル CSV 3 件+50 語要約/カバーレター案。残 = Acknowledgements・共著者レビューと
