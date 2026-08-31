@@ -858,6 +858,8 @@
 - 2026-08-31: Supp の層外症例文を受動へ(研究者 Go): "entered no analysis" → "were not included in
   any analysis"(同段落の IREP 入力義 "entered" との語義衝突解消・手続き文=受動の態方針に整合・
   these で照応強化)。訳の現在形「入らない」も過去形「含めなかった」へ同期。Supp のため語数影響なし
+- 2026-08-31: Supp の BRAF 層構成文を症例主体へ("contained BRAF V600E" → "consisted of BRAF
+  V600E-positive cases"、研究者 Go)。訳同期済み。Supp のため語数影響なし
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
   600 dpi TIFF)/別ファイル CSV 3 件+50 語要約/カバーレター案。残 = Acknowledgements・共著者レビューと
