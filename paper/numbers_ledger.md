@@ -834,6 +834,9 @@
 - 2026-08-29: カバーレター全段落を本文の強度へ整合(自己評価的修辞・本文外の主張を除去、Morton 2021 明示)。
   **公開リポジトリ・プレプリント運用を declarations に記録**(ルート A = bioRxiv 同日掲載+GitHub/Zenodo 公開、
   ルート B = Zenodo 予約 DOI+査読専用添付。3 誌の規定はライブ確認済み。共著者同意で分岐、決定後に不採用側を削除)
+- 2026-08-31: Limitations の連語修正(研究者 Go): "kept validity independent of asymptotic approximations"
+  → "did not rely on asymptotic approximations for validity"(+2語 → 正本 4,987・余裕 13)。主張強度・
+  限定句は不変、訳(manuscript_ja)は既に同型のため同期修正なし
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
   600 dpi TIFF)/別ファイル CSV 3 件+50 語要約/カバーレター案。残 = Acknowledgements・共著者レビューと
