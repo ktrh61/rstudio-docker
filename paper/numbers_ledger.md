@@ -837,6 +837,10 @@
 - 2026-08-31: Limitations の連語修正(研究者 Go): "kept validity independent of asymptotic approximations"
   → "did not rely on asymptotic approximations for validity"(+2語 → 正本 4,987・余裕 13)。主張強度・
   限定句は不変、訳(manuscript_ja)は既に同型のため同期修正なし
+- 2026-08-31: REO ペア選択文の混在リストを分離(研究者 Go): 適格条件3項を "Prespecified rules
+  required A, B, and C" の並列名詞句に、順位付け・貪欲選択・相関除外を "We ranked … and selected …,
+  excluding …" の1文に再構成(番号列挙・動詞三連は不採用 — 除外は選択中の相対条件のため)。数値・
+  限定句・N-37/N-74 タグ不変、+1語 → 正本 4,988・余裕 12。訳同期済み
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
   600 dpi TIFF)/別ファイル CSV 3 件+50 語要約/カバーレター案。残 = Acknowledgements・共著者レビューと
