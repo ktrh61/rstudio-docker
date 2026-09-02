@@ -716,6 +716,21 @@ def build(src_name, out_name, prep, ja=False, letter=False):
     return out
 
 
+KEEP_VIEW_GENERATIONS = 3  # 閲覧用コピー(docx/txt)は最新 3 世代だけ残す。PDF とタグなしファイルは対象外(共有済みの可能性 — 研究者決定 2026-09-02)
+
+
+def prune_view_copies(dest, keep=KEEP_VIEW_GENERATIONS):
+    """word_check の閲覧用コピーのうち、時刻タグ付き docx/txt を最新 keep 世代だけ残して削除する。"""
+    pat = re.compile(r"^(.*)_(\d{8}_\d{4})\.(docx|txt)$")
+    tags = sorted({m.group(2) for f in dest.iterdir() if (m := pat.match(f.name))}, reverse=True)
+    drop = set(tags[keep:])
+    for f in sorted(dest.iterdir()):
+        m = pat.match(f.name)
+        if m and m.group(2) in drop:
+            f.unlink()
+            print(f"閲覧用コピー削除(旧世代): {f.name}")
+
+
 def main():
     import time
     print(subprocess.run([PANDOC, "--version"], capture_output=True,
@@ -756,6 +771,7 @@ def main():
             print(f"閲覧用コピー: {view}")
         shutil.copy2(letter_txt, dest / f"cover_letter_{tag}.txt")
         print(f"貼り付け用テキスト: {dest / f'cover_letter_{tag}.txt'}")
+        prune_view_copies(dest)
 
 
 if __name__ == "__main__":
