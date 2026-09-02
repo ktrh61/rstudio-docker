@@ -870,6 +870,10 @@
   (WGS 展開・DEG 略語の解消)を適用(研究者 Go)。タグ 73・警告0 を確認、訳同期済み。続けて推奨 5 件("In the … assessment"・"Within"・
   higher-/lower-expression・BRAF V600E-positive・"the Dom normal-tissue list")と QC 展開を適用(研究者 Go)。E29/E32 の定型句は
   本文と同じく見送り、sPLS-DA/DIABLO は原著の手法名として現状維持
+- 2026-09-02: カバーレターに言語レビューの必要 2 件(PTC・REO 定義)・推奨 3 件(IREP 展開・COI 文の主語・"co-authors")
+  と全体評価由来の改善 3 件(読者層に radiation biology・"We submit"・公開データ使用の一文)を適用(研究者 Go)。第 2 段落の
+  推論法文・結語 "Yours sincerely"・Gmail 単独は現状維持(研究者決定)。**プレプリントは未掲載で仕上げる**(研究者決定 —
+  共著者不同意を前提、同意があれば投稿後に切替可): declarations のルート B を既定・A を条件付きへ。訳同期済み
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
   600 dpi TIFF)/別ファイル CSV 3 件+50 語要約/カバーレター案。残 = Acknowledgements・共著者レビューと

@@ -93,7 +93,7 @@ Complete gene-level results for every tested gene in each of the four contrasts 
 
 Complete label-permutation gene-set results for all tested sets in each contrast and collection (24,798 rows): set size, enrichment score, normalized enrichment score, sign-conditional permutation p-value, within-collection Benjamini–Hochberg q-value, redundancy annotation, and leading-edge genes.
 
-## 公開リポジトリ・プレプリント運用(2026-08-29 記録 — 共著者の同意待ち。決定後に不採用側を削除)
+## 公開リポジトリ・プレプリント運用(2026-08-29 記録。2026-09-02 研究者決定: 共著者不同意を前提にルート B を既定として仕上げる — 同意が得られた場合のみルート A へ切替(投稿後も規定上可)。切替可能性のため両ルートの記述を保持)
 
 前提(規定はライブ確認 2026-08-29): BJC・npj Precision Oncology(Nature Portfolio)・ERC(Bioscientifica)の
 3 誌ともプレプリント許容(BJC = 投稿時 DOI 開示+本文で参照/npj = DOI+ライセンス開示/Bioscientifica =
@@ -103,7 +103,7 @@ Complete label-permutation gene-set results for all tested sets in each contrast
 出しやすい当事者/実行コスト低下で希少資源は設計側に移り、防御は非公開でなく日付つき開示/被引用の副次
 効果(Fu & Hughey 2019 eLife 等)。制約 = 全著者同意・v1 は永久に残る・優先権は規範であり評価ではない。
 
-### ルート A(推奨 — 共著者同意あり): bioRxiv を雑誌投稿と同日に掲載
+### ルート A(条件付き — 共著者同意が得られた場合): bioRxiv を雑誌投稿と同日(または投稿後)に掲載
 1. 公開リポジトリを切り出し(published-repo-scope)→ GitHub 公開 → Zenodo 連携リリース → DOI 取得。
 2. bioRxiv に投稿版と同一の全文(本文+Supp+図表)を投稿(Cancer Biology または Genomics、ライセンスは
    全著者で選択)。掲載承認で DOI 確定。
@@ -115,7 +115,7 @@ Complete label-permutation gene-set results for all tested sets in each contrast
    購読ルートなら出版 6 か月後に accepted manuscript を機関リポジトリへ(Springer Nature STM エンバーゴ)。
    転載(BJC 不採択 → ERC/npj)時はプレプリントはそのまま、次誌の通知・開示規定に従う。
 
-### ルート B(フォールバック — 同意なし): Zenodo 予約 DOI+査読専用添付
+### ルート B(既定 — 2026-09-02 研究者決定): Zenodo 予約 DOI+査読専用添付
 1. 切り出しは同じ。GitHub は非公開のまま。
 2. Zenodo に下書きレコードを作り DOI を予約(Publish しない — 下書きは非公開)。
 3. 原稿へ反映: Data/Code availability = 予約 DOI+"to be released on publication"/カバーレターは
