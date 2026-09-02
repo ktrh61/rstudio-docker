@@ -867,7 +867,9 @@
   裁定済み: E39(GO 展開)・E41(en dash 2 箇所)・E42("rather than from")を採択(+3 語)、E27/E29(定型句)見送り、
   E31/E40 はフェーズ2 組版へ(残件 5 に追記)、E43(Dom et al.)は Ory の姓のみ表記との整合を理由に撤回
 - 2026-09-02: 言語レビュー(SI)の必要 3 件(FDR "control"・"of at least 0.6"・BRAF-tumor 検定集合の明示)と任意 E39
-  (WGS 展開・DEG 略語の解消)を適用(研究者 Go)。タグ 73・警告0 を確認、訳同期済み。推奨 5 件と QC 展開は裁定待ち
+  (WGS 展開・DEG 略語の解消)を適用(研究者 Go)。タグ 73・警告0 を確認、訳同期済み。続けて推奨 5 件("In the … assessment"・"Within"・
+  higher-/lower-expression・BRAF V600E-positive・"the Dom normal-tissue list")と QC 展開を適用(研究者 Go)。E29/E32 の定型句は
+  本文と同じく見送り、sPLS-DA/DIABLO は原著の手法名として現状維持
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
   600 dpi TIFF)/別ファイル CSV 3 件+50 語要約/カバーレター案。残 = Acknowledgements・共著者レビューと
