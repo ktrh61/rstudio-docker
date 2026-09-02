@@ -584,15 +584,15 @@
 ## 現況(通常セッションはこの節と直近の改訂メモのみ読めば足りる — 2026-08-29 更新)
 
 - 語数: **投稿版基準([n] 変換後 — ジャーナルが見る形)が判断の正**(研究者決定 2026-08-31)。正本基準
-  (author-year のまま・見出し除く)は参考。最新値は語数記載のある直近の改訂メモ参照。Abstract 197
-  (余裕 3)。留意: 引用の新規追加は投稿版でも [n] 分増える。機械検査(凍結4・N/C タグ・引用 33/
+  (author-year のまま・見出し除く)は参考。最新値は語数記載のある直近の改訂メモ参照。Abstract 200
+  (計数規則 = 小見出し 4 語込み・"Abstract" 表題除く、Word 計数 2026-09-02、余裕 0)。留意: 引用の新規追加は投稿版でも [n] 分増える。機械検査(凍結4・N/C タグ・引用 33/
   警告0・英綴り・訳の段落/数値同期・SI 初出順)全通過 2026-08-29。
 - **フェーズ2 未着手の発見(2026-08-29)**: BJC の参考文献書式は Nature 形式(例: McAndrew, N.P.,
   Dickson, M.A., … *et al.* Title. *Br. J. Cancer* **123**, 912–918 (2020))で、**論文題名を含む**。
   現行の References(Vancouver 風・題名なし)は要整形 — **2026-08-29 実施済み**(下記メモ)。
 - 開いている残件(文言の未決論点はゼロ — 残りは批准・記入・フェーズ2 のみ):
   1. 通し読み = C-01〜17 ratified 化(研究者。C-09 のみ済)。通読で出た修正は軽量運用+訳同期
-  2. 条件付き保留: Abstract 余裕≥4 回復時に "cases with high estimated radiation attribution"(+2語)を適用
+  2. 条件付き保留: Abstract に余裕が生じた場合に "differed transcriptionally" → "differed in expression"(+1語)を検討(2026-09-02)
   3. submission_declarations の【記入】残 = Acknowledgements(親族相談中)+公開リポジトリ URL/DOI 2箇所
      (公開時確定)。所属現名称・貢献文は共著者検収で確定
   4. フェーズ1 = 共著者レビュー(英語 docx 対を送付、埋め込み図表は「レビュー用一体版・投稿時は
@@ -856,6 +856,9 @@
   本文 Limitations の "procedures" と語彙整合)。射程・強度不変、訳同期済み
 - 2026-08-31: Supp の Ory 引用を後置へ("signatures in Ory et al. (2026) Supplementary Tables …" →
   "signatures reported in Supplementary Tables … of Ory et al. (2026)"、研究者 Go)。訳は元から同構造
+- 2026-09-02: 抄録の計数規則を確定(小見出し込み・表題除く、Word = 200)し、"(PTC)" 定義(+1)と保留中だった
+  "cases with high estimated radiation attribution"(+2)を採択、相殺 = "(omnibus p=0.0112)" 化(−1)・"across bands"
+  削除(−2)で 200 維持(研究者 Go、案1)。凍結4・N タグ・警告0・docx token 差 0 を再確認、訳同期済み
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
   600 dpi TIFF)/別ファイル CSV 3 件+50 語要約/カバーレター案。残 = Acknowledgements・共著者レビューと
