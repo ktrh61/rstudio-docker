@@ -265,11 +265,12 @@ def additional_information():
     for m in re.finditer(r"^### (.+?)$\n(.*?)(?=^### |\Z)", zone, re.S | re.M):
         head, body = m.group(1).strip(), m.group(2)
         body = re.sub(r"<!--.*?-->", "", body, flags=re.S)
+        # 管理接頭辞「案: 」は CJK 行除去より前に外す(先頭行の英文が行ごと脱落する不具合の修正 2026-09-02)
+        body = re.sub(r"^案: ", "", body, flags=re.M)
         body = re.sub(r"【リポジトリ URL/DOI[^】]*】", "[URL/DOI to be added at publication]", body)
         body = re.sub(r"【公開リポジトリの URL/DOI[^】]*】", "", body)
         lines = [l for l in body.split("\n") if not CJK.search(l)]
         body = re.sub(r"\n{3,}", "\n\n", "\n".join(lines)).strip()
-        body = re.sub(r"^案: ", "", body)
         if not body or "【記入】" in body:
             body = "[To be completed before submission]"
         out += [f"### {head}", "", body, ""]
