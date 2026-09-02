@@ -85,7 +85,7 @@ Higher Criticism(HC)[23] を RET-tumor の唯一の主要対比レベル検定�
 
 符号付き Brunner–Munzel 統計量のタイ平均正規スコアで遺伝子を順位付けし、自作の重み付きランニングサム統計量をタイブロック境界でのみ評価した。タイのない入力では、この統計量は標準の遺伝子セット濃縮解析(GSEA)統計量と一致する [27]。保存した対比別 9,999 ラベルシャッフルをセットレベルの参照分布に用い、符号条件付き並べ替え p 値をコレクション内で Benjamini–Hochberg 法(BH)により調整し [28]、コレクション横断の主張をせずに q<0.10 を適用した。
 
-Hallmark、選択した C2 canonical-pathway サブコレクション(Reactome・WikiPathways・KEGG MEDICUS・BioCarta・PID)、C5 GO Biological Process、および放射線キュレーション C2:CGP ファミリーを検定し、15–500 遺伝子の範囲外のセットは除外した。
+Hallmark、選択した C2 canonical-pathway サブコレクション(Reactome・WikiPathways・KEGG MEDICUS・BioCarta・PID)、C5 Gene Ontology(GO)Biological Process、および放射線キュレーション C2:CGP ファミリーを検定し、15–500 遺伝子の範囲外のセットは除外した。
 セットレベル手続きの選択には、報告する実データ実行より前の held-out 完全帰無評価を用い、選択された手続きの最終的な動作特性を 9,999 シャッフルの参照プールで評価した。1 セット 1.15 倍のスパイクインを単一シナリオの陽性対照チェックとした。手続きの全容は補足方法に記す。
 
 記述的補完として、主要 RET-tumor の q<0.10 リストを同じコレクション群に対する片側超幾何過剰代表検定にかけた。ユニバースはその対比で検定した全遺伝子とし、ファミリー×リストの組合せ内で Benjamini–Hochberg 調整を行った。これらの gene-sampling p 値は被験者レベルのランダム化を表現しない。実験レベルの解釈はラベル並べ替え解析に依拠する [29]。

@@ -599,7 +599,7 @@
      BJC 規定どおり分離」と一言添える)。指摘は交渉層で自由、確定層は検査+改訂メモ 1 行
   5. フェーズ2 送り(書式仕様は BJC GTA ライブ照合 2026-08-25 で確定):
      References 投稿規定整形(Vancouver・6著者超は先頭6+et al.・上付き・PMID 併記整理)/
-     組版記号(C(n,nx)・n_X)/Word 化 = 1.5 行間・全ページ+全行番号・図凡例は References 後の
+     組版記号(C(n,nx)・n_X・Spearman rho→ρ・表1 "post-hoc"→"post hoc")/Word 化 = 1.5 行間・全ページ+全行番号・図凡例は References 後の
      別ページ・Additional Information 7節を規定順/表1〜3 は個別ファイル+キャプション/
      図は最終幅 175 mm・文字 5–7 pt(Liberation Sans)・PDF ベクター+600 dpi TIFF で供給
      (2026-08-28 実施済み — 下記メモ)/Supp は可能なら一体 PDF+Data 1/2 に各 50 語要約/
@@ -863,7 +863,9 @@
   (Limitations)→(see Discussion)/BRAF 層文の主語/"mechanically"→sex composition/枚挙対象・"as continuous evidence"・
   FWER/FDR "control"/Hamatani 文・CLIP2 発現・"near the upper end"・filterByExpr 手順・"smallest 10%"・"Each case"・
   π0 先行詞・"compared with"・cutoff 文・"exempted"・"nonzero counts"・met/structure。+32 語(空白区切り差分、投稿版基準は
-  次回 Word 計数で更新)。凍結4・タグ 116・警告0 を確認、訳同期済み。任意 8 件(E27/E29/E31/E39/E40/E41/E42/E43)は裁定待ち
+  次回 Word 計数で更新)。凍結4・タグ 116・警告0 を確認、訳同期済み。任意 8 件は
+  裁定済み: E39(GO 展開)・E41(en dash 2 箇所)・E42("rather than from")を採択(+3 語)、E27/E29(定型句)見送り、
+  E31/E40 はフェーズ2 組版へ(残件 5 に追記)、E43(Dom et al.)は Ory の姓のみ表記との整合を理由に撤回
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
   600 dpi TIFF)/別ファイル CSV 3 件+50 語要約/カバーレター案。残 = Acknowledgements・共著者レビューと
