@@ -859,6 +859,11 @@
 - 2026-09-02: 抄録の計数規則を確定(小見出し込み・表題除く、Word = 200)し、"(PTC)" 定義(+1)と保留中だった
   "cases with high estimated radiation attribution"(+2)を採択、相殺 = "(omnibus p=0.0112)" 化(−1)・"across bands"
   削除(−2)で 200 維持(研究者 Go、案1)。凍結4・N タグ・警告0・docx token 差 0 を再確認、訳同期済み
+- 2026-09-02: 言語レビュー(本文)の必要 10 件・推奨 12 件を適用(研究者 Go): PTC・IREP・対比短縮名の定義/
+  (Limitations)→(see Discussion)/BRAF 層文の主語/"mechanically"→sex composition/枚挙対象・"as continuous evidence"・
+  FWER/FDR "control"/Hamatani 文・CLIP2 発現・"near the upper end"・filterByExpr 手順・"smallest 10%"・"Each case"・
+  π0 先行詞・"compared with"・cutoff 文・"exempted"・"nonzero counts"・met/structure。+32 語(空白区切り差分、投稿版基準は
+  次回 Word 計数で更新)。凍結4・タグ 116・警告0 を確認、訳同期済み。任意 8 件(E27/E29/E31/E39/E40/E41/E42/E43)は裁定待ち
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
   600 dpi TIFF)/別ファイル CSV 3 件+50 語要約/カバーレター案。残 = Acknowledgements・共著者レビューと
