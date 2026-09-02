@@ -8,7 +8,7 @@
 #   (1) BJC 節順に組み替え: タイトルページ → Abstract → Background → Methods → Results →
 #       Discussion → Additional Information → References → Figure legends → Tables → Figures
 #       (改ページつき。表は投稿形の列名・脚注、添字は subscript 記法で表示層整形)
-#   (2) 引用番号 [n] を上付きへ(pandoc の ^…^ 記法へ前処理)
+#   (2) 引用番号 [n] は角括弧のまま(BJC GTA の指定。2026-09-02 に上付き化を撤回)
 #   (3) 1.5 行間(styles.xml の Normal に w:line=360)
 #   (4) 全行番号(sectPr に lnNumType)
 #   (5) 全ページ番号(PAGE フィールドのフッタを新設)
@@ -391,7 +391,7 @@ def supp_file_descriptions():
 def preprocess(text):
     """本文の投稿形整形(BJC GTA 節順): タイトルページ → Abstract → Background → Methods →
     Results → Discussion → Additional Information → References → Figure legends →
-    Tables(1 ページ 1 表)→ Figures(1 ページ 1 図)。引用 [n] は上付き。"""
+    Tables(1 ページ 1 表)→ Figures(1 ページ 1 図)。引用 [n] は角括弧のまま。"""
     text = re.sub(r"^-{3,}\s*$", "", text, flags=re.M)
     text = re.sub(r"^\*\*Title:\*\*[^\n]*\n", lambda m: title_page() + PAGE_BREAK, text,
                   count=1, flags=re.M)
@@ -429,7 +429,7 @@ def preprocess(text):
             + PAGE_BREAK + "## Figure legends\n\n" + "\n\n".join(fig_legends)
             + tables_md
             + "## Figures\n\n" + figures_md + "\n")
-    text = re.sub(r"\[(\d+(?:,\d+)*)\]", r"^\1^", text)  # 本文中の [1] / [1,2] を上付き化
+    # 引用番号 [1] / [1,2] は角括弧のまま(BJC GTA: "reference numbers should be placed in square brackets" — 2026-09-02 に上付き化を撤回)
     return _finish(text)
 
 

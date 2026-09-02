@@ -45,8 +45,9 @@ designed and implemented by KH. All authors reviewed and approved the final manu
 This study is a secondary analysis of publicly available, de-identified data obtained from
 the open-access tier of the NCI Genomic Data Commons (project REBC-THYR). No new data
 involving human participants were collected by the authors, and no additional ethical
-approval was required. Ethical approvals and participant consent for the original data
-collection are described in the source study (Morton et al. 2021).
+approval was required. The study was performed in accordance with the Declaration of
+Helsinki. Ethical approvals and participant consent for the original data collection are
+described in the source study (Morton et al. 2021).
 (研究者承認 2026-08-26 — Thyroid 誌投稿時のオールオープンデータ回答の経緯と同型)
 
 ### Consent for publication
@@ -55,21 +56,18 @@ Not applicable. The manuscript contains no individual person's identifiable data
 
 ### Data availability
 
-案: Gene-level RNA-seq counts and clinical data are openly available from the NCI Genomic
+Gene-level RNA-seq counts and clinical data are openly available from the NCI Genomic
 Data Commons (project REBC-THYR; STAR - Counts, open access). The exact 906-file download
 manifest (MD5 7defb0c5574453474c67dfac8367a589) is provided with the analysis code
 <!-- N-89 -->. Processed analysis objects sufficient to regenerate the reported figures and
-tables accompany the paper. 【公開リポジトリの URL/DOI 確定後に記入】
-
-### Code availability
-
-案: Analysis code, versioned inputs, and the date-pinned container build recipe sufficient
-to regenerate the reported analyses are available at 【リポジトリ URL/DOI — 公開範囲は
+tables accompany the paper. Analysis code, versioned inputs, and the date-pinned container
+build recipe sufficient to regenerate the reported analyses are available at 【リポジトリ URL/DOI — 公開範囲は
 「論文再現に必要なスクリプトのみ」の方針(2026-08-14 研究者決定)に従い確定】.
+(2026-09-02: BJC GTA の必須 7 節・順序に合わせ、旧 Code availability 節を本節末尾へ統合。URL/DOI は公開時に記入)
 
 ### Competing interests
 
-The authors declare no competing interests.
+The authors declare no conflict of interest.
 
 ### Funding
 
