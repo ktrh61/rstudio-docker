@@ -888,6 +888,10 @@
   Data availability へ統合(必須 7 節・順序に一致)。**ハウススタイル**: 「4 回未満の語は略さない」に従い本文の CI・FDR・GDC・
   GO・NCI・TPM・BH・GSEA を綴り出し/定義削除(−2 語、HC は 4 回で可、訳同期済み)。引用番号は "[1]" 角括弧の指定に従い
   make_docx の上付き化を撤回。語数の算入範囲は GTA 未言及のまま(投稿画面は要アカウント → 編集部問合せ予定)
+- 2026-09-02: **MTS 登録・下書き作成**(研究者): アカウント = ktrh61/ktrh61@gmail.com(共通 SPD 登録、ORCID 連携済み)、下書き
+  追跡番号 **BJC-A3360181**(未投稿。投稿時に流用か削除)。抄録は Check Length で小見出し込み 200 語でも "Length ok"(システム
+  確認済み)。Manuscript Information に本文語数欄なし → 算入範囲は編集部問合せで確定(文案は会話記録)。残件: 学位取得前に
+  MTS 副アドレス(大学)を削除/Subject Terms・推薦査読者・Reporting guidelines(STROBE 該当性)の回答準備
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
   600 dpi TIFF)/別ファイル CSV 3 件+50 語要約/カバーレター案。残 = Acknowledgements・共著者レビューと
