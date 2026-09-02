@@ -88,7 +88,7 @@
 
 | N-ID | 値 | 定義 | 出典 | 使用箇所 | 状態 |
 | --- | --- | --- | --- | --- | --- |
-| N-24 | 16セル全表(4対比×4コレクション: m_sets、p_any、95%CI、mean/max 発見数。p_any 範囲 0.01–0.18) | D6 較正の完全な表 | run/xeon_final_20260811/logs/d6_calibration.log:6-39(rds は repo/diagnostics/output/gsea_null_calibration.rds) | Supp | verified |
+| N-24 | 16セル全表(4対比×4コレクション: m_sets、p_any、95%CI、mean/max 発見数。p_any 範囲 0.01–0.18; プール = 102/1,600 = 0.064、tab_set_level_calibration.csv の n_any_discovery 合計で照合 2026-09-02) | D6 較正の完全な表 | run/xeon_final_20260811/logs/d6_calibration.log:6-39(rds は repo/diagnostics/output/gsea_null_calibration.rds) | Supp | verified |
 | N-25 | 0.18(95%CI 0.110–0.269 — rds 実値 ci_hi 0.26947709。旧記載 0.270 は転記時の丸め誤り、2026-08-25 訂正) | 唯一の名目 0.10 超過: B_Normal/H の p_any(CI 下限も 0.10 超) | 同 log:19 キー「13 B_Normal H 50 100 18 0.18 0.110311」・log:36(ci_hi 0.2695) | Results / Disc | verified |
 | N-26 | B_Tumor/radiation 0.10(CI 0.049–0.176)、B_Normal/radiation 0.12(CI 0.064–0.200) | CI が 0.10 を跨ぐ境界セル | 同 log:18・22(ci_hi は log:35・39) | Supp / Disc | verified |
 
@@ -591,7 +591,8 @@
   Dickson, M.A., … *et al.* Title. *Br. J. Cancer* **123**, 912–918 (2020))で、**論文題名を含む**。
   現行の References(Vancouver 風・題名なし)は要整形 — **2026-08-29 実施済み**(下記メモ)。
 - 開いている残件(文言の未決論点はゼロ — 残りは批准・記入・フェーズ2 のみ):
-  1. 通し読み = C-01〜17 ratified 化(研究者。C-09 のみ済)。通読で出た修正は軽量運用+訳同期
+  1. 通し読み = C-01〜17 ratified 化(研究者。C-09 のみ済)。通読で出た修正は軽量運用+訳同期。段 0(機械的照合)は 2026-09-02 完了 —
+     通読シート・変更ダイジェスト・照合表は OneDrive word_check の stage0a/0b/0c、手順は段 1(通読・判定 3 択)→段 2(凍結・git タグ)
   2. 条件付き保留: Abstract に余裕が生じた場合に "differed transcriptionally" → "differed in expression"(+1語)を検討(2026-09-02)
   3. submission_declarations の【記入】残 = Acknowledgements(親族相談中)+公開リポジトリ URL/DOI 2箇所
      (公開時確定)。所属現名称・貢献文は共著者検収で確定
@@ -892,6 +893,12 @@
   追跡番号 **BJC-A3360181**(未投稿。投稿時に流用か削除)。抄録は Check Length で小見出し込み 200 語でも "Length ok"(システム
   確認済み)。Manuscript Information に本文語数欄なし → 算入範囲は編集部問合せで確定(文案は会話記録)。残件: 学位取得前に
   MTS 副アドレス(大学)を削除/Subject Terms・推薦査読者・Reporting guidelines(STROBE 該当性)の回答準備
+- 2026-09-02: **段 0(機械的照合)完了**: Methods↔スクリプト 88 項目で不一致 0(判定不能 16 = データ値・外部仕様)/写像検査 C 17 行・
+  N 66 タグで値の不一致 0/変更ダイジェスト = e163e8e 以降 38 段落(新規・削除 0)。材料 3 点は OneDrive word_check(stage0a/0b/0c)。
+  記録側: L81 に N-05・L99 に N-75 を併記、N-24 行にプール値。**開示追記 7 件を SI へ**(研究者 Go): 純度作業遺伝子の規則(BH p<0.1・
+  |log2FC|>log2(1.5)・上位 1,000・擬似カウント 1・trend)、|Spearman|≥0.75(本文 "absolute" +1 語)、長さ注釈内で上位 500、10 パーセンタイル
+  = ceiling(0.1·n0) 番目、exact/MC 切替 C(n,nx)≤1e8、Data 2 冗長性 = q<0.10 候補間の leading-edge Jaccard≥0.5、ワーカー数の理由。
+  任意 5 件(R0 同数時の符号・NES 除数の ES=0 除外・effect=0.5 の符号 0・個数統計量の分位・棄却曲線範囲)は報告値に影響しない端点として不採用
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
   600 dpi TIFF)/別ファイル CSV 3 件+50 語要約/カバーレター案。残 = Acknowledgements・共著者レビューと
