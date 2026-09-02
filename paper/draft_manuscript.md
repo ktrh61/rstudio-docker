@@ -245,7 +245,7 @@ Pattern rules, fixed with the map: signal in R_Tumor is read as agreement with p
 被曝指標・その他:
 
 - Kocher DC, et al. Interactive RadioEpidemiological Program (IREP): a web-based tool for estimating probability of causation/assigned share. Health Phys 2008;95:119–147. doi:10.1097/01.HP.0000291191.49583.f7 — NIH IREP(Methods: Exposure metric。使用版 5.7.3。全文照合 2026-08-16: 放射性ヨウ素への言及ゼロ — 内部被曝の正当化は単独では担えない、下記 Land・Sato・IREP 文書と分担)
-- Land CE, Gilbert E, Smith JM, et al. Report of the NCI-CDC Working Group to Revise the 1985 NIH Radioepidemiological Tables. NIH Publication No. 03-5387. Bethesda, MD: National Institutes of Health; 2003. — REF 表(electrons E>15keV = 単一値 1.0; 放射性核種β線は平均エネルギーで区分に割り付け — 脚注 c)・DDREF 規則(chronic 全域/acute は D_L = 0.03–0.2 Gy 対数一様以上で 1)・甲状腺モデル来歴(全文 PDF 逐語照合 2026-08-16 完了、md5 は N-83 — 再確認札は解除)(Methods: Exposure metric)
+- Land CE, Gilbert E, Smith JM, et al. Report of the NCI-CDC Working Group to Revise the 1985 NIH Radioepidemiological Tables. NIH Publication No. 03-5387. Bethesda, MD: National Institutes of Health; 2003. — REF 表(electrons E>15keV = 単一値 1.0; 放射性核種β線は平均エネルギーで区分に割り付け — 脚注 c)・DDREF 規則(chronic 全域/acute は D_L = 0.03–0.2 Gy 対数一様以上で 1)・甲状腺モデル来歴(全文 PDF 逐語照合 2026-08-16 完了、md5 は N-83 — 再確認の保留は解除)(Methods: Exposure metric)
 - NIH-IREP v5.7.3 オンライン文書「Guidance on Selection of Radiation Type — Internal Exposure」(radiationcalculators.cancer.gov/irep/ 配下、参照 2026-08-16)— ヨウ素131の electrons E>15keV 指定の典拠(2回名指し)。投稿書式での web 引用整形は後工程(Methods: Exposure metric)
 - Sato T, Manabe K, Hamada N. Microdosimetric analysis confirms similar biological effectiveness of external exposure to gamma-rays and internal exposure to 137Cs, 134Cs, and 131I. PLoS One 2014;9:e99831. doi:10.1371/journal.pone.0099831(PubMed 照合済み 2026-08-16、pmid 24919099)— 内部ヨウ素131の RBE ≈ 1(保守的仮定下でも最大 1.04)の独立した物理的支持(Methods: Exposure metric)
 - Ron E, Lubin JH, Shore RE, et al. Thyroid cancer after exposure to external radiation: a pooled analysis of seven studies. Radiat Res 1995;141:259–277.(PubMed 照合済み 2026-08-16、pmid 7871153、DOI なし)— IREP 甲状腺モデルの適合データ来歴(Methods: Exposure metric)
@@ -269,7 +269,7 @@ Pattern rules, fixed with the map: signal in R_Tumor is read as agreement with p
 
 - Abend M, et al. PLoS One 2012;7:e39103. doi:10.1371/journal.pone.0039103(PubMed 照合済み)— ペア差リスト(11 遺伝子)
 - Abend M, et al. Iodine-131 dose-dependent gene expression. Br J Cancer 2013;109:2286–2294. doi:10.1038/bjc.2013.574(PubMed 照合済み)— 正常8/腫瘍6
-- Dom G, et al. A gene expression signature distinguishes normal tissues of sporadic and radiation-induced papillary thyroid carcinomas. Br J Cancer 2012;107:994–1000. doi:10.1038/bjc.2012.302(PubMed 照合済み)— 正常7 = SERPINE1・DUSP1・TRIB1・S100A10・ANXA1・GNAL・RDH12(原文 Results と Fig. 2 legend で照合 2026-08-16、diagnostics/external_gene_anchors.csv と 1:1 一致 — 札解除。clade E の番号は SERPINE1 と legend に明記)
+- Dom G, et al. A gene expression signature distinguishes normal tissues of sporadic and radiation-induced papillary thyroid carcinomas. Br J Cancer 2012;107:994–1000. doi:10.1038/bjc.2012.302(PubMed 照合済み)— 正常7 = SERPINE1・DUSP1・TRIB1・S100A10・ANXA1・GNAL・RDH12(原文 Results と Fig. 2 legend で照合 2026-08-16、diagnostics/external_gene_anchors.csv と 1:1 一致 — 保留解除。clade E の番号は SERPINE1 と legend に明記)
 - Hess J, et al. Gain of chromosome band 7q11 in papillary thyroid carcinomas of young patients is associated with exposure to low-dose irradiation. PNAS 2011;108:9595–9600. doi:10.1073/pnas.1017137108(PubMed 照合済み)— CLIP2 (追加検証: doi:10.1038/onc.2014.311)
 
 正常組織・対照・仮説:

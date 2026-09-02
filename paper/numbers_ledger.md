@@ -351,14 +351,14 @@
   表3(遺伝子レベル)/補足 = 図S1(MA)・図S2(D6較正 — 新規作図、N-24/25/26 照合一致)・
   表S1〜S8・データ1。本文の(仮)17参照を全置換、SX/SY 解消、Intro のマップ参照は番号なし化。
   作表3本実行(特性・遺伝子・セット — 台帳と全一致)。TabS2(正規化)・TabS4(REO パネル)は
-  作表スクリプト未作成の札(manifest に pending 記録)
+  作表スクリプト未作成の保留事項(manifest に pending 記録)
 - 2026-08-18: 投稿規定の原典確認(研究者指示 — Methods 分量配分の検討入力。研究者決定:
   ETJ は注力対象外とし、BJC→ERC→npj PO の三段構えで設計目標は BJC 5,000 語に単一化):
   (1) BJC 現行 GTA(nature.com/bjc/authors-and-referees/gta、2026-08-18 生 HTML 逐語)—
   Article = "5,000 words (excluding abstract, references and figure legends)"・Tables/Figures
   "Max of 6"・structured abstract max 200 words・references "Typically max 60"。2026-08-16
-  記録(5,000語・主6品目)と一致し、保留札「現行版 GTA 再確認」のうち語数・品目数は解除
-  (残札 = 図2の4パネル=2品目換算の編集部確認、投稿時)。SI 条項 = "The article must be
+  記録(5,000語・主6品目)と一致し、保留事項「現行版 GTA 再確認」のうち語数・品目数は解除
+  (残る保留事項 = 図2の4パネル=2品目換算の編集部確認、投稿時)。SI 条項 = "The article must be
   complete and self-explanatory without the Supplementary Information"(Methods 分割の設計制約)。
   (2) ERC 著者ガイドライン(journals.bioscientifica.com/erc/pages/author-guidelines —
   Cloudflare により機械取得不可のため研究者がブラウザ取得、Claude Code が全文検分)—
@@ -379,13 +379,13 @@
   (md5 9a358740e9db29c34e78d56da4266d54)、ERC投稿規定.pdf
   (md5 637978fc9c2ed403dd31f583c461aaba)。※PDF は保存操作の記録であり、逐語の根拠は
   各ページ本文(BJC/npj は取得 HTML、ERC は研究者提供の全文)。
-  札(新規): 生成 AI 使用の開示 — ERC は開示文言必須("disclose in a statement whether or
+  保留事項(新規): 生成 AI 使用の開示 — ERC は開示文言必須("disclose in a statement whether or
   not they have used generative AI ... the name, version, model, and source")、BJC も GTA に
   "Use of an LLM should be properly documented in the Methods section"。開示は本文 Software
   節に記載済み(Claude Fable 5・GPT-5.6sol — 用途・データ範囲・検証・責任)で、残作業は
   投稿時の各誌書式への転記のみ(ERC = Declarations 文言、BJC = Methods 記載)。当初
   「暫定結果閲覧歴の開示深度」と併記したが成熟度が異なるため分離(次エントリで同件決着)
-- 2026-08-18: 「暫定結果閲覧歴の開示深度」札を決着(研究者決定: **論文レベル非開示**)。
+- 2026-08-18: 「暫定結果閲覧歴の開示深度」の保留事項を決着(研究者決定: **論文レベル非開示**)。
   対象: 計画v2 §0.6 決定記録(2026-08-07)が「旧パイプラインの暫定結果(R_Tumor 有意・
   B_Tumor 静か・B_Normal 異常高)を閲覧済みの状態でマップ固定」と記録し、紙面文言
   "before the reported results existed" を超える開示の深さがコレスポ判断として保留されて
@@ -418,8 +418,8 @@
   (物語様式の**許容**であり要求ではない)/ npj PO = Methods 末尾のため Results の方向づけは
   様式上の必然。補強2点: 移送しても語数は浮かない(BJC/ERC とも Methods・Results 同一枠)/
   事前(規則)対実現(値)の境界は本論文の装置であり深度配分(2026-08-14)を維持。
-  共著者説明札3点: (1) BJC の Results 定義逐語、(2) 語数利得ゼロ、(3) 事前固定マップ設計に
-  おける Methods 前置の装置性(表2 の RR 先例札と同系)。ERC で厚みを求められた場合の譲歩線 =
+  共著者向け説明事項3点: (1) BJC の Results 定義逐語、(2) 語数利得ゼロ、(3) 事前固定マップ設計に
+  おける Methods 前置の装置性(表2 の RR 先例の論点と同系)。ERC で厚みを求められた場合の譲歩線 =
   方向づけ1→2文の追記のみ(規範的内容は移送しない)
 - 2026-08-18: BJC→ERC 転送チェックリスト(リジェクト時の再調査回避のため記録。転送時に照合):
   (1) Abstract を構造化200語 → 単一段落 ≤250語へ組み直し(唯一の内容作業)、(2) 引用を
@@ -440,7 +440,7 @@
   数値↔解析出力・引用↔原典・主張文言↔批准済み主張マップ、各段階の著者承認)+
   科学的判断の委譲否定 — 形容詞でなく機構の名指しで丸投げ自走と識別する設計(研究者要求)。
   ERC Declarations 用短縮形も同時確定。実装は B1(Software 小節の改稿)。
-  既存 AI 開示札(2026-08-18 前段、転記のみ)の内容を本決定で上書き
+  既存の AI 開示保留事項(2026-08-18 前段、転記のみ)の内容を本決定で上書き
 - 2026-08-18: Methods 圧縮 B1 実施(研究者検収・Go): Data sources 186→96・Normalization
   131→98・Software 326→331(AI 開示拡張 +80 が環境圧縮 −81 を相殺)。Supp Methods に
   同名3小節を新設(移動は逐語)。タグ移動 N-66/67/77/79 → Supp Methods(使用箇所列同期済み)。
@@ -592,7 +592,7 @@
   現行の References(Vancouver 風・題名なし)は要整形 — **2026-08-29 実施済み**(下記メモ)。
 - 開いている残件(文言の未決論点はゼロ — 残りは批准・記入・フェーズ2 のみ):
   1. 通し読み = C-01〜17 ratified 化(研究者。C-09 のみ済)。通読で出た修正は軽量運用+訳同期
-  2. 条件付き札: Abstract 余裕≥4 回復時に "cases with high estimated radiation attribution"(+2語)を適用
+  2. 条件付き保留: Abstract 余裕≥4 回復時に "cases with high estimated radiation attribution"(+2語)を適用
   3. submission_declarations の【記入】残 = Acknowledgements(親族相談中)+公開リポジトリ URL/DOI 2箇所
      (公開時確定)。所属現名称・貢献文は共著者検収で確定
   4. フェーズ1 = 共著者レビュー(英語 docx 対を送付、埋め込み図表は「レビュー用一体版・投稿時は
