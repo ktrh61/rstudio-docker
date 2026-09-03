@@ -591,8 +591,8 @@
   Dickson, M.A., … *et al.* Title. *Br. J. Cancer* **123**, 912–918 (2020))で、**論文題名を含む**。
   現行の References(Vancouver 風・題名なし)は要整形 — **2026-08-29 実施済み**(下記メモ)。
 - 開いている残件(文言の未決論点はゼロ — 残りは批准・記入・フェーズ2 のみ):
-  1. 通し読み = C-01〜17 ratified 化(研究者。C-09 のみ済)。通読で出た修正は軽量運用+訳同期。段 0(機械的照合)は 2026-09-02 完了 —
-     通読シート・変更ダイジェスト・照合表は OneDrive word_check の stage0a/0b/0c、手順は段 1(通読・判定 3 択)→段 2(凍結・git タグ)
+  1. **通読完了・C-01〜17 全行 ratified(2026-09-03)**。次 = 段 2: 機械検査の全通過確認 → docx 再生成 → git タグ(coauthor-review-v1)→
+     claim_map を frozen へ。以後の変更は共著者コメント起点で軽量運用+訳同期
   2. 条件付き保留: Abstract に余裕が生じた場合に "differed transcriptionally" → "differed in expression"(+1語)を検討(2026-09-02)
   3. submission_declarations の【記入】残 = Acknowledgements(親族相談中)+公開リポジトリ URL/DOI 2箇所
      (公開時確定)。所属現名称・貢献文は共著者検収で確定
@@ -911,6 +911,8 @@
   規則段落の trace/bounded null/post-hoc labeling を標準語へ(各規則の前件・後件と凍結句は不変)。連動して本文の design index・
   signal-bearing・confounding-first・hypothesis-bearing・direction-agnostic・trace 系(Disc 2 箇所、A/B 中立性保存)を平易化(+約 25 語)。
   表 1 ブロック「不可侵」の扱いは本裁定で解除(以後は軽量運用)。訳同期済み
+- 2026-09-03: **段 1 通読完了**(研究者): C-01〜17 を全行 ratified(C-04・C-09 は会話で accept、他 15 行は通読シートで accept)。所感 =
+  C-12 以降は統計密度が高く専門外読者には重いが内容は可。査読者の生成 AI 併用を想定した「要約時に限定句が落ちないか」の検査は任意
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
   600 dpi TIFF)/別ファイル CSV 3 件+50 語要約/カバーレター案。残 = Acknowledgements・共著者レビューと
