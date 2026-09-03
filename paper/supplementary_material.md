@@ -34,7 +34,7 @@ We estimated relative tumor purity jointly for dose-zero and High-AS cases withi
 
 Case pairing used the GDC merged-aliquot expression assays. Each included case was required to have one unique merged tumor and one unique merged normal sample. The main cohort additionally required RET fusion-positive classification or BRAF V600E-positive classification without another candidate driver mutation in the source cohort's whole-genome sequencing (WGS) or RNA calls (175 of 190 V600E cases <!-- N-94 -->), membership in the dose-zero or High-AS group, both tissues passing the outlier screen, and relative purity of at least 0.6.
 
-The REO construction set comprised the RET fusion-positive subset of the main cohort. The intermediate-band application set comprised RET fusion-positive PTCs from the Low-AS and Mid-AS bands, whether or not a matched normal was available. Construction-cohort outlier and purity exclusions were not applied to this set; corresponding metrics were reported as ancillary diagnostics and did not authorize exclusions.
+The REO construction set comprised the RET fusion-positive subset of the main cohort. The intermediate-band application set comprised RET fusion-positive PTCs from the Low-AS and Mid-AS bands, whether or not a matched normal was available. The outlier and purity exclusions used for the construction cohort were not applied to this set, so that no case was removed from the set to which the panel was applied; the corresponding metrics were reported as descriptive diagnostics and were not used to exclude cases.
 
 ### Analysis contrasts
 
@@ -110,7 +110,7 @@ We summarized graded scores across all four bands, with dose-zero and High-AS se
 
 ### Ancillary REO quality and purity diagnostics
 
-As a non-exclusion QC diagnostic, we applied the same PC-OD input construction separately within the Low-AS and Mid-AS RET fusion-positive PTCs. The resulting flags had no exclusion authority; every intermediate-band case remained in the REO application.
+As a descriptive quality check, we applied the same PC-OD input construction separately within the Low-AS and Mid-AS RET fusion-positive PTCs. Flags from this screen were reported but were not used to exclude cases; every intermediate-band case remained in the REO application.
 
 For cases with matched normal tissue, we estimated relative purity on a common scale by pooling paired cases across all four RET groups in one contamDE-lm proportion run and summarized the resulting scores in each band by their median. Cases without matched normal tissue remained in the REO application but did not enter the purity analyses.
 
@@ -128,11 +128,11 @@ We mapped published symbols to the GENCODE v36 annotation and, for each source l
 
 ### Software, seeds, and reproducibility
 
-We built the container from the immutable Ubuntu 24.04 base image (noble-20260410) and matching apt snapshot, compiled R 4.5.3 (R Core Team 2026) against reference BLAS/LAPACK 3.12.0, and installed R packages from the 2026-04-09 CRAN and Bioconductor 3.22 snapshots <!-- N-79 -->. The bit-level reproduction contract targeted linux/amd64.
+We built the container from the immutable Ubuntu 24.04 base image (noble-20260410) and matching apt snapshot, compiled R 4.5.3 (R Core Team 2026) against reference BLAS/LAPACK 3.12.0, and installed R packages from the 2026-04-09 CRAN and Bioconductor 3.22 snapshots <!-- N-79 -->. Bit-level reproducibility was targeted for linux/amd64.
 
 In-house components included exact-enumeration and Monte Carlo Brunner–Munzel statistics, the Storey plug-in estimator, tie-block enrichment, DEGES-MUREN normalization, the contamDE-lm proportion score, the principal-component outlier procedure, and REO panel construction. External packages included edgeR, SummarizedExperiment, msigdbr, limma, GenomicDataCommons, rtracklayer, Rcpp (Eddelbuettel and François 2011), and MASS. Packages are cited at first use, and their full version numbers are listed in Table S2.
 
-The canonical inference seed was 19860426; diagnostics used documented seeds based on 19450809 <!-- N-05, N-06 -->. The publication run began from a clean repository state <!-- N-01 -->. We independently executed the full pipeline with four workers on two x86-64 machines; the 1,819 files in the versioned raw-input tree were MD5-identical between machines <!-- N-52 -->. The worker count is part of the reproduction contract: each MUREN worker uses its own random-number stream for the least-trimmed-squares subsampling, so the count determines which subsamples are drawn. Both runs passed 415 tests without failures and produced identical primary artifacts <!-- N-51 -->.
+The canonical inference seed was 19860426; diagnostics used documented seeds based on 19450809 <!-- N-05, N-06 -->. The publication run began from a clean repository state <!-- N-01 -->. We independently executed the full pipeline with four workers on two x86-64 machines; the 1,819 files in the versioned raw-input tree were MD5-identical between machines <!-- N-52 -->. The worker count must be held fixed for reproduction: each MUREN worker uses its own random-number stream for the least-trimmed-squares subsampling, so the count determines which subsamples are drawn. Both runs passed 415 tests without failures and produced identical primary artifacts <!-- N-51 -->.
 
 ### Scope and verification of AI use
 
@@ -166,7 +166,7 @@ The construction-band classifications and intermediate-band results are reported
 
 ### Ancillary REO quality and purity diagnostics
 
-The ancillary PC-OD screen identified no outliers among the intermediate-band tumors (Low-AS, 0/17; Mid-AS, 0/19) <!-- N-43 -->. Independently of this result, the screen was non-exclusionary, and all 36 tumors remained in the REO application <!-- N-10 -->.
+The ancillary PC-OD screen identified no outliers among the intermediate-band tumors (Low-AS, 0/17; Mid-AS, 0/19) <!-- N-43 -->. Independently of this result, the screen was not used to exclude cases, and all 36 tumors remained in the REO application <!-- N-10 -->.
 
 Relative purity could be estimated for 15 Low-AS and 16 Mid-AS tumors <!-- N-44 -->; two Low-AS and three Mid-AS tumors lacked the matched normal assay required by the matched-pair estimator and remained in the REO analysis without a purity score. In the pooled paired RET purity run, median relative purity scores were 0.690, 0.704, 0.739, and 0.814 in the dose-zero, Low-AS, Mid-AS, and High-AS bands, respectively <!-- N-44 -->. This diagnostic refitted the relative scale across all paired RET bands and is therefore not numerically interchangeable with the main-cohort purity scale.
 

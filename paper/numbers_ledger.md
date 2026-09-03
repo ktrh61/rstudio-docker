@@ -902,6 +902,10 @@
 - 2026-09-02: OneDrive word_check の閲覧用コピーを整理(研究者 Go): 旧世代の docx/txt 236 件を削除(タグなし 2 件 = 08-25 初期
   make_docx 出力と判定済み)、最新世代 20260902_2141・段 0 資料・PDF 23 件は保持(PDF は共有済みの可能性があるため手動削除)。
   make_docx に自動整理を追加: docx/txt のみ最新 3 世代を保持(PDF・タグなしは対象外)、単体テストで確認
+- 2026-09-03: **著者用語(造語)は避ける方針を批准**(研究者 — 生成 AI の影響下で決めた語に固執するメリットはない): C-09 系の
+  "exclusion authority"/"non-exclusion diagnostic"/"non-exclusionary"(本文 2・SI 3)を平易化し、適用セットに除外を適用しない理由
+  (2026-08-12 批准の選択衛生)を一句で本文・SI に明示(+16 語)。"descriptive completion"(本文 2)・"reproduction contract"(SI 2)も
+  平易化。同日の E27/E29/E32 見送り裁定を上書き。C-09 は ratified 行のため軽量運用(検査+本メモ+研究者 accept)。訳同期済み
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
   600 dpi TIFF)/別ファイル CSV 3 件+50 語要約/カバーレター案。残 = Acknowledgements・共著者レビューと
