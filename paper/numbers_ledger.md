@@ -906,6 +906,11 @@
   "exclusion authority"/"non-exclusion diagnostic"/"non-exclusionary"(本文 2・SI 3)を平易化し、適用セットに除外を適用しない理由
   (2026-08-12 批准の選択衛生)を一句で本文・SI に明示(+16 語)。"descriptive completion"(本文 2)・"reproduction contract"(SI 2)も
   平易化。同日の E27/E29/E32 見送り裁定を上書き。C-09 は ratified 行のため軽量運用(検査+本メモ+研究者 accept)。訳同期済み
+- 2026-09-03: **表 1 ブロックの語を研究者判断で平易化**(全件 accept): "Prespecified standing"→role、"Hypothesis-bearing"→"Tests the working
+  hypothesis"、"Test cell for a shared trace"→共有される被曝関連変化の検定、"Direction-agnostic; not excludable"→方向未指定・排除不能、
+  規則段落の trace/bounded null/post-hoc labeling を標準語へ(各規則の前件・後件と凍結句は不変)。連動して本文の design index・
+  signal-bearing・confounding-first・hypothesis-bearing・direction-agnostic・trace 系(Disc 2 箇所、A/B 中立性保存)を平易化(+約 25 語)。
+  表 1 ブロック「不可侵」の扱いは本裁定で解除(以後は軽量運用)。訳同期済み
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
   600 dpi TIFF)/別ファイル CSV 3 件+50 語要約/カバーレター案。残 = Acknowledgements・共著者レビューと
