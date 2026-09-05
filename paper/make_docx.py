@@ -254,6 +254,25 @@ def title_page():
 CJK = re.compile(r"[　-ヿ㐀-鿿＀-￯]")
 
 
+def _citation_converter():
+    """本文と同じ初出順で author-year を [n] へ変換する関数を返す(宣言節用。順序は本文の変換で再構築)。"""
+    sys.path.insert(0, str(ROOT / "paper"))
+    import make_submission as ms
+    index = ms.load_ledger()
+    warnings, order = [], []
+    body = ms.strip_meta((ROOT / "paper" / "draft_manuscript.md").read_text(encoding="utf-8"),
+                         drop_sections=["引用文献", "起草メモ"])
+    ms.convert(body, index, order, warnings, do_convert=True)
+    n_main = len(order)
+
+    def conv(text):
+        out = ms.convert(text, index, order, warnings, do_convert=True)
+        if len(order) != n_main:
+            raise RuntimeError("宣言節が本文に無い文献を引用しています(References の番号が本文と食い違う): " + ", ".join(order[n_main:]))
+        return out
+    return conv
+
+
 def additional_information():
     """declarations の Additional Information を BJC 規定順で描画する。
     日本語管理注記(CJK 行)は除去、未記入節(【記入】)は明示プレースホルダ、
@@ -261,6 +280,7 @@ def additional_information():
     d = _declarations()
     zone = d.split("## Additional Information", 1)[1].split("\n## ", 1)[0]
     zone = zone.split("\n", 1)[1]
+    conv = _citation_converter()
     out = ["## Additional Information"]
     for m in re.finditer(r"^### (.+?)$\n(.*?)(?=^### |\Z)", zone, re.S | re.M):
         head, body = m.group(1).strip(), m.group(2)
@@ -271,6 +291,7 @@ def additional_information():
         body = re.sub(r"【公開リポジトリの URL/DOI[^】]*】", "", body)
         lines = [l for l in body.split("\n") if not CJK.search(l)]
         body = re.sub(r"\n{3,}", "\n\n", "\n".join(lines)).strip()
+        body = conv(body)  # 宣言節内の author-year 引用も本文と同じ [n] へ(2026-09-05)
         if not body or "【記入】" in body:
             body = "[To be completed before submission]"
         out += [f"### {head}", "", body, ""]
