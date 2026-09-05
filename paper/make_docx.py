@@ -257,6 +257,7 @@ CJK = re.compile(r"[　-ヿ㐀-鿿＀-￯]")
 def _citation_converter():
     """本文と同じ初出順で author-year を [n] へ変換する関数を返す(宣言節用。順序は本文の変換で再構築)。"""
     sys.path.insert(0, str(ROOT / "paper"))
+    sys.dont_write_bytecode = True  # paper/__pycache__ を作らない
     import make_submission as ms
     index = ms.load_ledger()
     warnings, order = [], []
