@@ -81,7 +81,7 @@ The authors received no specific funding for this work.
 
 ### Supplementary Material (PDF)
 
-Supplementary Methods and Results, Figures S1–S2, Tables S1–S4, S6 and S7, and Supplementary References (Table S5 and Supplementary Data 1–2 are separate files). Covers data sources, Assigned Share inputs, quality control, normalization, gene-level, omnibus and gene-set inference, REO panel construction, external gene-list comparison, and AI-use verification.
+Supplementary Methods and Results, Figures S1–S2, Tables S1–S4 and S6–S8, and Supplementary References (Table S5 and Supplementary Data 1–2 are separate files). Covers data sources, Assigned Share inputs, quality control, normalization, gene-level, omnibus and gene-set inference, REO panel construction, external gene-list comparison, and AI-use verification.
 
 ### Table S5 (table_s5_ora_annotation.csv)
 

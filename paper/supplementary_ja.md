@@ -4,7 +4,7 @@
 - 対象版: 2026-08-27 時点の補足資料(コミット e163e8e 系列、Supplementary References 42 件)。
 - **同期規則**: 補足資料を修正するコミットは、本ファイルの該当段落の同期修正を同一コミットに含める(本文訳 paper/manuscript_ja.md と同じ規則)。
 - **docx 対応規則**: 閲覧用 docx は英語版と同一時刻タグで同時生成され(make_docx.py)、冒頭に対応する英語版ファイル名が自動記載される。タグの一致 = 同一版の対。
-- 引用は英語版と同じ著者-年形式のまま残す。書誌は英語版末尾の Supplementary References(42 件)を参照し、翻訳では再掲しない。
+- 引用は英語版と同じ著者-年形式のまま残す。書誌は英語版末尾の Supplementary References(65 件)を参照し、翻訳では再掲しない。
 - 用語固定表: 本文訳(paper/manuscript_ja.md)冒頭の表と共通。追加分: label shuffle=ラベルシャッフル / pseudo-observation=疑似観測 / plus-one counting=plus-one 計数 / exhaustive enumeration=全数枚挙 / construction band=構築帯 / reversal score=逆転スコア / dead zone=デッドゾーン / over-representation=過剰代表 / normalized enrichment score=正規化濃縮スコア(NES) / held-out・gene-sampling・spike-in・acute・chronic は英字のまま。
 
 ---
@@ -13,11 +13,11 @@
 
 ### データソースと発現行列
 
-国立がん研究所(NCI)Genomic Data Commons(GDC)の API に対し、GDC Data Release 45.0 の下でプロジェクト REBC-THYR のオープンアクセスファイルを、データカテゴリ Transcriptome Profiling、実験戦略 RNA-Seq、データタイプ Gene Expression Quantification、ワークフロータイプ STAR - Counts を指定して照会した。この照会により 906 のリリース済みファイルが得られた。付随するマニフェストはファイルの UUID・名称・サイズ・GDC 提供の MD5 チェックサムを含み(マニフェスト MD5、7defb0c5574453474c67dfac8367a589)、ダウンロードした全ファイルを記録されたチェックサムと照合検証した。
+国立がん研究所(NCI)Genomic Data Commons(GDC)の API(Heath et al. 2021)に対し、GDC Data Release 45.0 の下でプロジェクト REBC-THYR のオープンアクセスファイルを、データカテゴリ Transcriptome Profiling、実験戦略 RNA-Seq、データタイプ Gene Expression Quantification、ワークフロータイプ STAR - Counts を指定して照会した。この照会により 906 のリリース済みファイルが得られた。付随するマニフェストはファイルの UUID・名称・サイズ・GDC 提供の MD5 チェックサムを含み(マニフェスト MD5、7defb0c5574453474c67dfac8367a589)、ダウンロードした全ファイルを記録されたチェックサムと照合検証した。
 
 臨床データの出典は Morton et al. (2021) の Data S1 であり、全列を保持し値を一切編集せずに読み込んだ。欠測マーカーは NA へ変換し、非欠測値のすべてが数値として解釈できた場合に限り列を数値型とした。
 
-GDC API を通じ GenomicDataCommons(Morgan and Davis 2025)を用いてファイルを症例・生体試料に対応付け、SummarizedExperiment コンテナ(Morgan et al. 2025)に検体ごとのカウントアッセイを 1 つずつ組み上げた。全ゼロ遺伝子の除去により 58,448 遺伝子 × 906 検体を得た。エクソン結合遺伝子長は、GDC の GENCODE v36 参照アノテーションから rtracklayer(Lawrence et al. 2009)を用いて導出した。
+GDC API を通じ GenomicDataCommons(Morgan and Davis 2025)を用いてファイルを症例・生体試料に対応付け、SummarizedExperiment コンテナ(Morgan et al. 2025)に検体ごとのカウントアッセイを 1 つずつ組み上げた。全ゼロ遺伝子の除去により 58,448 遺伝子 × 906 検体を得た。エクソン結合遺伝子長は、GDC の GENCODE v36 参照アノテーション(Mudge et al. 2025)から rtracklayer(Lawrence et al. 2009)を用いて導出した。
 
 各検体について、STAR の 2 つのストランド列の合計からライブラリのストランドを判定した。小さい方の合計が大きい方の半分以下である場合にストランド有りと分類し、その場合は大きい方の列を用いた。それ以外の場合は unstranded 列を用いた。906 ライブラリすべてが逆向きストランド(reverse stranded)と分類され、小/大比は 0.056〜0.110 の範囲にあり、閾値 0.5 を十分下回った。GDC の TPM・FPKM 列は用いなかった。REO 解析では、選択したカウントアッセイとエクソン結合遺伝子長から TPM を再計算した。
 
@@ -25,7 +25,7 @@ GDC API を通じ GenomicDataCommons(Morgan and Davis 2025)を用いてファイ
 
 過剰相対リスクの期待値に対応する Assigned Share を、NIH IREP バージョン 5.7.3(Kocher et al. 2008)を用いて算出した。固定入力は、電子 E>15 keV、acute の被曝率、cSv=mGy/10 の定数として入力した臓器線量、記録された性別、被曝年 1986、1986 から被曝時年齢を引いて算出した出生年、出生年に手術時年齢を足して算出した手術年である。他の設定はすべてプログラムの既定のままとした: ユーザー定義不確実性分布 Lognormal(1,1)、10,000 反復、乱数シード 99。バージョン管理された AS ファイル中の線量・年齢入力は、臨床表に対して症例ごとに検査した。
 
-IREP の手引きは、電子 E>15 keV 経路の一例としてヨウ素 131 を挙げている。この経路の放射線効果係数(radiation effectiveness factor)は参照とする高エネルギー光子に対して 1.0 であり(Land et al. 2003)、吸収線量あたりの内部ヨウ素 131 と外部ガンマ線の生物学的効果が同程度であることには独立したマイクロドジメトリの支持がある(Sato et al. 2014)。これが扱うのは放射線の質であり、外部光子被曝に適合された甲状腺リスクモデルの移転ではない。IREP の甲状腺モデルは、原爆被爆者と、小児期に医療適応で照射を受けた集団に基づく(Ron et al. 1995; Kocher et al. 2008)。
+IREP の手引きは、電子 E>15 keV 経路の一例としてヨウ素 131 を挙げている(National Cancer Institute n.d.)。この経路の放射線効果係数(radiation effectiveness factor)は参照とする高エネルギー光子に対して 1.0 であり(Land et al. 2003)、吸収線量あたりの内部ヨウ素 131 と外部ガンマ線の生物学的効果が同程度であることには独立したマイクロドジメトリの支持がある(Sato et al. 2014)。これが扱うのは放射線の質であり、外部光子被曝に適合された甲状腺リスクモデルの移転ではない。IREP の甲状腺モデルは、原爆被爆者と、小児期に医療適応で照射を受けた集団に基づく(Ron et al. 1995; Kocher et al. 2008)。
 
 acute 設定を保持したのは、同じ研究プログラムによるチョルノービリ後乳頭癌へのこれまでの IREP 適用(Zurnadzhy et al. 2022; Bogdanova et al. 2022)との計算上の連続性を保つためである。これらの研究はこの規約の来歴を文書化するものであり、遷延した内部ヨウ素 131 被曝への acute コーディングを独立に検証するものではない。IREP では、被曝率は線量・線量率効果係数を通じて計算に影響する。acute 設定の下では、この係数は不確かな参照線量(0.03〜0.2 Gy に対数一様分布)以上で 1 に近づき、High-AS 帯の最小線量は 188 mGy であった。chronic 計算は AS の数値尺度を下げる。
 
@@ -35,7 +35,7 @@ acute 設定を保持したのは、同じ研究プログラムによるチョ�
 
 観測された群×組織の部分行列ごとに、edgeR の filterByExpr(Chen et al. 2016; Chen et al. 2025)で遺伝子をフィルタした後、主成分スコアに基づく外れ値検出(PC-OD)を適用した。counts per million の分母にはフィルタ前のライブラリサイズを保持し、prior count 2 の未正規化 log counts per million を用いることで、組成異常が検体間正規化によって先に減衰しないようにした。各反復で、第 1 主成分上で最も極端な検体を両側 α=0.05 の PC-OD 規則により除去し、棄却される検体がなくなるまで手続きを続けた(Nakayama et al. 2024)。PC-OD は品質管理(QC)・コホート定義の段階であって遺伝子レベルの仮説検定ではなく、確定したフラグは下流の推論で固定した。RET 融合陽性層では腫瘍・正常のいずれの検体にもフラグは立たず、4 つの主要標的群でのフラグは High-AS の BRAF V600E 陽性腫瘍 1 検体のみであった。したがって主要な RET 融合陽性コホートは変わらなかった。
 
-相対腫瘍純度は、contamDE-lm の反復擬似尤度発現変動モデルではなくその初期の対応ペア比率スコアの自作実装を用い、各ドライバーコホート内で dose-zero と High-AS の症例を合同で推定した(Shen et al. 2016; Ji et al. 2020)。タンパク質コードかつ filterByExpr で縮約したペアカウントを MUREN 正規化した(Feng and Li 2021)。ロバスト empirical Bayes を用いたペア limma-voom モデルで、スコア構築に用いる上方・下方制御の作業遺伝子を選択し(Ritchie et al. 2015)、スコアはコホート最大が 1 になるよう再スケールした。作業遺伝子は Benjamini–Hochberg 調整 p<0.1 かつ |log2 fold change|>log2(1.5) を満たす遺伝子とし、調整 p の基準を満たす遺伝子が 1,000 を超える場合は調整 p の小さい 1,000 遺伝子に限定した。比率スコアに用いるペアの log2 腫瘍/正常比は擬似カウント 1 を加えて計算し、empirical Bayes 推定はロバスト推定に加えて平均-分散トレンドを用いた。この limma-voom 適合は純度推定の段階のみに用い、報告する遺伝子レベル推論には用いなかった。合同推定は両群を共通の相対尺度に載せた。これは各ドライバーコホート内に共通の、ドライバー支配的な腫瘍参照を仮定する。純度は合同推定した症例内の相対スコアとして扱い、絶対的な細胞分画としても、純度をあらゆる AS 整列発現構造から分離する装置としても扱わなかった。
+相対腫瘍純度は、contamDE-lm の反復擬似尤度発現変動モデルではなくその初期の対応ペア比率スコアの自作実装を用い、各ドライバーコホート内で dose-zero と High-AS の症例を合同で推定した(Shen et al. 2016; Ji et al. 2020)。タンパク質コードかつ filterByExpr で縮約したペアカウントを MUREN 正規化した(Feng and Li 2021)。ロバスト empirical Bayes(Phipson et al. 2016)を用いたペア limma-voom モデル(Law et al. 2014; Ritchie et al. 2015)で、スコア構築に用いる上方・下方制御の作業遺伝子を選択し、スコアはコホート最大が 1 になるよう再スケールした。作業遺伝子は Benjamini–Hochberg 調整 p<0.1 かつ |log2 fold change|>log2(1.5) を満たす遺伝子とし、調整 p の基準を満たす遺伝子が 1,000 を超える場合は調整 p の小さい 1,000 遺伝子に限定した。比率スコアに用いるペアの log2 腫瘍/正常比は擬似カウント 1 を加えて計算し、empirical Bayes 推定はロバスト推定に加えて平均-分散トレンドを用いた。この limma-voom 適合は純度推定の段階のみに用い、報告する遺伝子レベル推論には用いなかった。合同推定は両群を共通の相対尺度に載せた。これは各ドライバーコホート内に共通の、ドライバー支配的な腫瘍参照を仮定する。純度は合同推定した症例内の相対スコアとして扱い、絶対的な細胞分画としても、純度をあらゆる AS 整列発現構造から分離する装置としても扱わなかった。
 
 症例ペアリングには GDC のマージ済みアリコート発現アッセイを用いた。組み入れた各症例には、一意のマージ済み腫瘍検体 1 つと一意のマージ済み正常検体 1 つを要求した。主コホートはさらに、RET 融合陽性の分類、または出典コホートの全ゲノムシーケンシング(WGS)・RNA コールに他の候補ドライバー変異を持たない BRAF V600E 陽性の分類(V600E 190 例中 175 例)、dose-zero または High-AS 群への所属、両組織の外れ値スクリーン通過、相対純度 0.6 以上を要求した。
 
@@ -83,7 +83,7 @@ Higher Criticism は事前規定の主要オムニバス統計量である。走
 
 遺伝子セット帰無は、各対比の同じ 9,999 保存ラベルシャッフルからなる。遺伝子ではなく検体ラベルを並べ替えることで被験者レベルの遺伝子依存構造を保持し、シャッフルバンクの再利用により、オムニバスと遺伝子セットの手続きが同じラベル割当上で評価されることを保証した。観測 NES が正の場合、符号条件付き並べ替え p 値は(1+観測値以上の帰無 NES 数)/(1+非負の帰無 NES 数)とし、負の NES には対応する下側裾の計数を用いた。Benjamini–Hochberg 法をコレクション内で適用し(Benjamini and Hochberg 1995)、コレクション横断の主張なしに q<0.10 を用いた。セットレベルでは π0 を推定しなかった。この設定で BH 法は π0=1 と置くことと等価である。依存し合うセットレベル p 値から得るプラグイン推定は不安定になり得るため、この選択によりそれへの依拠を避けた。
 
-遺伝子セット定義は msigdbr 26.1.0(Dolgalev 2026)で取得した。15–500 遺伝子のサイズフィルタの前で、4 コレクションは Hallmark(50 セット; Liberzon et al. 2015)、Reactome・WikiPathways・KEGG MEDICUS・BioCarta・PID に限定した C2 canonical pathways(3,910 セット。レガシー KEGG サブコレクションは除外)、C5 GO Biological Process(7,538 セット)、C2:CGP の放射線キュレーション部分集合(28 セット)である。放射線キュレーション規則は、報告するセットレベル実行の前に固定した。
+遺伝子セット定義は MSigDB(Subramanian et al. 2005)から msigdbr 26.1.0(Dolgalev 2026)で取得した。15–500 遺伝子のサイズフィルタの前で、4 コレクションは Hallmark(50 セット; Liberzon et al. 2015)、Reactome(Milacic et al. 2024)・WikiPathways(Agrawal et al. 2024)・KEGG MEDICUS(Kanehisa et al. 2025)・BioCarta(Nishimura 2001)・PID(Schaefer et al. 2009)に限定した C2 canonical pathways(3,910 セット。レガシー KEGG サブコレクションは除外)、C5 GO Biological Process(7,538 セット; Ashburner et al. 2000; The Gene Ontology Consortium 2026)、C2:CGP の放射線キュレーション部分集合(28 セット)である。放射線キュレーション規則は、報告するセットレベル実行の前に固定した。報告結果に現れる放射線キュレーションセットの原典は表 S8 に示す。
 
 スパイクインでは、BRAF-tumor 対比の確定済み正規化 counts-per-million 行列から出発し、行列中に存在する HALLMARK_ADIPOGENESIS の 195 遺伝子の値を、その High-AS 9 検体で 1.15 倍した。その後、上記の完全な順位付け・遺伝子セット手続きを 9,999 ラベルシャッフルと診断シード 19450809 で繰り返した。埋め込んだセットの Hallmark 内順位は BH q 値の昇順で定義した。これは単一の整合シグナルのチェックであり、一般的な検出力解析ではない。
 
@@ -202,6 +202,35 @@ held-out 完全帰無評価では、少なくとも 1 つの発見を生じた�
 **表 S6 | 符号付き遺伝子レベル統計量の層間一致。** 正常組織・腫瘍組織の比較を別々に示し、ペアとなる対比、共有遺伝子数、Spearman 相関、中央 95% ラベルシャッフル区間、両側シャッフル p 値、シャッフル数を含む。
 
 **表 S7 | 10 ペア相対発現順序パネル。** 選択された各ペアについて、高発現・低発現遺伝子の Ensembl 識別子と遺伝子シンボル、検体内 log2-TPM 差の中央値の構築帯間絶対シフト、High-AS 逆転率、dose-zero 構築症例における検体内絶対差の 10 パーセンタイルを示す。
+
+**表 S8 | Supplementary Data 2 に現れる放射線キュレーション遺伝子セットの原典。** 各行は遺伝子セットの定義と、MSigDB に記録された原典を示す。サイズフィルタ後に報告結果へ現れたセットのみを載せる。セットは MSigDB を通じて取得したものであり、原研究から再導出したものではない。
+
+| MSigDB 遺伝子セット名 | 原典 | PMID |
+| --- | --- | --- |
+| GHANDHI_BYSTANDER_IRRADIATION_UP | Ghandhi et al. (2008) | [19108712](https://pubmed.ncbi.nlm.nih.gov/19108712/) |
+| GHANDHI_DIRECT_IRRADIATION_DN | Ghandhi et al. (2008) | [19108712](https://pubmed.ncbi.nlm.nih.gov/19108712/) |
+| GHANDHI_DIRECT_IRRADIATION_UP | Ghandhi et al. (2008) | [19108712](https://pubmed.ncbi.nlm.nih.gov/19108712/) |
+| KYNG_DNA_DAMAGE_BY_GAMMA_RADIATION | Kyng et al. (2005) | [15897889](https://pubmed.ncbi.nlm.nih.gov/15897889/) |
+| MACAEVA_PBMC_RESPONSE_TO_IR | Macaeva et al. (2016) | [26763932](https://pubmed.ncbi.nlm.nih.gov/26763932/) |
+| MONNIER_POSTRADIATION_TUMOR_ESCAPE_DN | Monnier et al. (2008) | [18794119](https://pubmed.ncbi.nlm.nih.gov/18794119/) |
+| MONNIER_POSTRADIATION_TUMOR_ESCAPE_UP | Monnier et al. (2008) | [18794119](https://pubmed.ncbi.nlm.nih.gov/18794119/) |
+| QUINTENS_EMBRYONIC_BRAIN_RESPONSE_TO_IR | Quintens et al. (2015) | [25681390](https://pubmed.ncbi.nlm.nih.gov/25681390/) |
+| RASHI_RESPONSE_TO_IONIZING_RADIATION_1 | Rashi-Elkeles et al. (2006) | [16314843](https://pubmed.ncbi.nlm.nih.gov/16314843/) |
+| RASHI_RESPONSE_TO_IONIZING_RADIATION_2 | Rashi-Elkeles et al. (2006) | [16314843](https://pubmed.ncbi.nlm.nih.gov/16314843/) |
+| RASHI_RESPONSE_TO_IONIZING_RADIATION_3 | Rashi-Elkeles et al. (2006) | [16314843](https://pubmed.ncbi.nlm.nih.gov/16314843/) |
+| RASHI_RESPONSE_TO_IONIZING_RADIATION_4 | Rashi-Elkeles et al. (2006) | [16314843](https://pubmed.ncbi.nlm.nih.gov/16314843/) |
+| RASHI_RESPONSE_TO_IONIZING_RADIATION_5 | Rashi-Elkeles et al. (2006) | [16314843](https://pubmed.ncbi.nlm.nih.gov/16314843/) |
+| RASHI_RESPONSE_TO_IONIZING_RADIATION_6 | Rashi-Elkeles et al. (2006) | [16314843](https://pubmed.ncbi.nlm.nih.gov/16314843/) |
+| SMIRNOV_RESPONSE_TO_IR_2HR_DN | Smirnov et al. (2012) | [21844125](https://pubmed.ncbi.nlm.nih.gov/21844125/) |
+| SMIRNOV_RESPONSE_TO_IR_2HR_UP | Smirnov et al. (2012) | [21844125](https://pubmed.ncbi.nlm.nih.gov/21844125/) |
+| SMIRNOV_RESPONSE_TO_IR_6HR_DN | Smirnov et al. (2012) | [21844125](https://pubmed.ncbi.nlm.nih.gov/21844125/) |
+| SMIRNOV_RESPONSE_TO_IR_6HR_UP | Smirnov et al. (2012) | [21844125](https://pubmed.ncbi.nlm.nih.gov/21844125/) |
+| TSAI_RESPONSE_TO_IONIZING_RADIATION | Tsai et al. (2006) | [16247478](https://pubmed.ncbi.nlm.nih.gov/16247478/) |
+| TSAI_RESPONSE_TO_RADIATION_THERAPY | Tsai et al. (2007) | [17440099](https://pubmed.ncbi.nlm.nih.gov/17440099/) |
+| WARTERS_IR_RESPONSE_5GY | Warters et al. (2009) | [19580510](https://pubmed.ncbi.nlm.nih.gov/19580510/) |
+| WARTERS_RESPONSE_TO_IR_SKIN | Warters et al. (2009) | [19580510](https://pubmed.ncbi.nlm.nih.gov/19580510/) |
+| ZHOU_CELL_CYCLE_GENES_IN_IR_RESPONSE_24HR | Zhou et al. (2007) | [17404513](https://pubmed.ncbi.nlm.nih.gov/17404513/) |
+| ZHOU_CELL_CYCLE_GENES_IN_IR_RESPONSE_6HR | Zhou et al. (2007) | [17404513](https://pubmed.ncbi.nlm.nih.gov/17404513/) |
 
 **補足データ 1 | 遺伝子レベル結果の完全版。** 4 対比それぞれの全検定遺伝子について、Ensembl 識別子、遺伝子シンボル、Brunner–Munzel 相対効果 θ、正確並べ替え p 値、Storey q 値を提供する。完全な一覧は、後続研究による交差参照と、報告した q<0.10 規則以外の閾値での再解析を支援する。
 

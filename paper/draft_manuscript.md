@@ -240,6 +240,20 @@ Reading rules, fixed with the map: a signal in R_Tumor is read as agreement with
 - Ashburner M, Ball CA, Blake JA, Botstein D, Butler H, Cherry JM, et al. Nat Genet 2000;25:25-29. doi:10.1038/75556 — Gene ontology: tool for the unification of biology (Supplementary Methods: Gene-set inference、収録元の原典引用)。
 - The Gene Ontology Consortium. Nucleic Acids Res 2026;54:D1779-D1792. doi:10.1093/nar/gkaf1292 — The Gene Ontology knowledgebase in 2026 (Supplementary Methods: Gene-set inference、収録元の原典引用)。
 
+放射線関連 C2:CGP の原典(Supplementary Methods: Gene-set inference / Table S8、2026-09-07 追加。報告対象24セットの出典11報であり、本研究の独立した検証研究としては扱わない):
+
+- Ghandhi SA, Yaghoubian B, Amundson SA. BMC Med Genomics 2008;1:63. doi:10.1186/1755-8794-1-63 — Global gene expression analyses of bystander and alpha particle irradiated normal human lung fibroblasts: synchronous and differential responses.
+- Kyng KJ, May A, Stevnsner T, Becker KG, Kølvrå S, Bohr VA. Oncogene 2005;24:5026-5042. doi:10.1038/sj.onc.1208692 — Gene expression responses to DNA damage are altered in human aging and in Werner Syndrome.
+- Macaeva E, Saeys Y, Tabury K, Janssen A, Michaux A, Benotmane MA, et al. Sci Rep 2016;6:19251. doi:10.1038/srep19251 — Radiation-induced alternative transcription and splicing events and their applicability to practical biodosimetry.
+- Monnier Y, Farmer P, Bieler G, Imaizumi N, Sengstag T, Alghisi GC, et al. Cancer Res 2008;68:7323-7331. doi:10.1158/0008-5472.CAN-08-0841 — CYR61 and alphaVbeta5 integrin cooperate to promote invasion and metastasis of tumors growing in preirradiated stroma.
+- Quintens R, Verreet T, Janssen A, Neefs M, Leysen L, Michaux A, et al. Biol Open 2015;4:331-344. doi:10.1242/bio.20149969 — Identification of novel radiation-induced p53-dependent transcripts extensively regulated during mouse brain development.
+- Rashi-Elkeles S, Elkon R, Weizman N, Linhart C, Amariglio N, Sternberg G, et al. Oncogene 2006;25:1584-1592. doi:10.1038/sj.onc.1209189 — Parallel induction of ATM-dependent pro- and antiapoptotic signals in response to ionizing radiation in murine lymphoid tissue.
+- Smirnov DA, Brady L, Halasa K, Morley M, Solomon S, Cheung VG. Genome Res 2012;22:332-339. doi:10.1101/gr.122044.111 — Genetic variation in radiation-induced cell death.
+- Tsai MH, Chen X, Chandramouli GV, Chen Y, Yan H, Zhao S, et al. Oncogene 2006;25:622-632. doi:10.1038/sj.onc.1209082 — Transcriptional responses to ionizing radiation reveal that p53R2 protects against radiation-induced mutagenesis in human lymphoblastoid cells.
+- Tsai MH, Cook JA, Chandramouli GV, DeGraff W, Yan H, Zhao S, et al. Cancer Res 2007;67:3845-3852. doi:10.1158/0008-5472.CAN-06-4250 — Gene expression profiling of breast, prostate, and glioma cells following single versus fractionated doses of radiation.
+- Warters RL, Packard AT, Kramer GF, Gaffney DK, Moos PJ. Radiat Res 2009;172:82-95. doi:10.1667/RR1677.1 — Differential gene expression in primary human skin keratinocytes and fibroblasts in response to ionizing radiation.
+- Zhou T, Chou J, Mullen TE, Elkon R, Zhou Y, Simpson DA, et al. Cell Cycle 2007;6:972-981. doi:10.4161/cc.6.8.4106 — Identification of primary transcriptional regulation of cell cycle-regulated genes upon DNA damage.
+
 前処理・正規化・純度(いずれも Methods: Data sources / Normalization / QC):
 
 - Law CW, Chen Y, Shi W, Smyth GK. voom: precision weights unlock linear model analysis tools for RNA-seq read counts. Genome Biol 2014;15:R29. doi:10.1186/gb-2014-15-2-r29 — 純度推定に用いる limma-voom の個別手法引用(Supplementary Methods: Quality control and analysis cohorts)。

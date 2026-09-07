@@ -78,7 +78,7 @@ We used the complete gene ranking rather than a thresholded list of differential
 
 The gene-set null comprised these same 9,999 saved label shuffles for each contrast. Permuting sample labels rather than genes preserved the subject-level gene-dependence structure, and reusing the shuffle bank ensured that the omnibus and gene-set procedures were evaluated on the same label allocations. For an observed positive NES, the sign-conditional permutation p-value was (1 plus the number of null NES values at least as large as observed)/(1 plus the number of non-negative null NES values); the corresponding lower-tail counts were used for a negative NES. We applied the Benjamini–Hochberg procedure within each collection (Benjamini and Hochberg 1995), using q<0.10 without making a cross-collection claim. We did not estimate π0 at the set level; in this setting, the BH procedure is equivalent to setting π0=1. This choice avoided reliance on a potentially unstable plug-in estimate from the dependent set-level p-values.
 
-We obtained gene-set definitions from MSigDB (Subramanian et al. 2005) with msigdbr 26.1.0 (Dolgalev 2026). Before the 15–500-gene size filter, the four collections were Hallmark (50 sets; Liberzon et al. 2015); C2 canonical pathways restricted to Reactome (Milacic et al. 2024), WikiPathways (Agrawal et al. 2024), KEGG MEDICUS (Kanehisa et al. 2025), BioCarta (Nishimura 2001), and PID (Schaefer et al. 2009) (3,910 sets; the legacy KEGG subcollection was excluded); C5 GO Biological Process (7,538 sets; Ashburner et al. 2000; The Gene Ontology Consortium 2026); and a radiation-curated subset of C2:CGP (28 sets) <!-- N-29 -->. The radiation curation rule was fixed before the reported set-level run <!-- N-55 -->.
+We obtained gene-set definitions from MSigDB (Subramanian et al. 2005) with msigdbr 26.1.0 (Dolgalev 2026). Before the 15–500-gene size filter, the four collections were Hallmark (50 sets; Liberzon et al. 2015); C2 canonical pathways restricted to Reactome (Milacic et al. 2024), WikiPathways (Agrawal et al. 2024), KEGG MEDICUS (Kanehisa et al. 2025), BioCarta (Nishimura 2001), and PID (Schaefer et al. 2009) (3,910 sets; the legacy KEGG subcollection was excluded); C5 GO Biological Process (7,538 sets; Ashburner et al. 2000; The Gene Ontology Consortium 2026); and a radiation-curated subset of C2:CGP (28 sets) <!-- N-29 -->. The radiation curation rule was fixed before the reported set-level run <!-- N-55 -->. Source publications for the radiation-curated sets represented in the reported results are listed in Table S8.
 
 For the spike-in, we started from the finalized normalized counts-per-million matrix for the BRAF-tumor contrast and multiplied the values of the 195 HALLMARK_ADIPOGENESIS genes present in the matrix by 1.15 in its nine High-AS samples <!-- N-30 -->. We then repeated the complete ranking and gene-set procedure described above with 9,999 label shuffles and diagnostic seed 19450809. We defined the planted set's within-Hallmark rank by ascending BH q-value. This was a single coherent-signal check, not a general power analysis.
 
@@ -197,6 +197,35 @@ Five of the 39 Ory shared-tissue signature genes tested in each contrast occurre
 **Table S6 | Between-stratum concordance of signed gene-level statistics.** Normal-tissue and tumor-tissue comparisons are shown separately with the paired contrasts, number of shared genes, Spearman correlation, central 95% label-shuffle interval, two-sided shuffle p-value, and number of shuffles.
 
 **Table S7 | Ten-pair relative-expression-ordering panel.** For each selected pair, the table gives Ensembl identifiers and gene symbols for the higher- and lower-expression genes, the absolute construction-band shift in median within-sample log2-TPM difference, the High-AS reversal rate, and the 10th percentile of the absolute within-sample difference among dose-zero construction cases.
+
+**Table S8 | Source publications for the radiation-curated gene sets represented in Supplementary Data 2.** Each row identifies a gene-set definition and its source publication as recorded by MSigDB. Only sets represented in the reported results after size filtering are listed. The sets were obtained through MSigDB, not re-derived from the source studies.
+
+| MSigDB gene-set name | Source publication | PMID |
+| --- | --- | --- |
+| GHANDHI_BYSTANDER_IRRADIATION_UP | Ghandhi et al. (2008) | [19108712](https://pubmed.ncbi.nlm.nih.gov/19108712/) |
+| GHANDHI_DIRECT_IRRADIATION_DN | Ghandhi et al. (2008) | [19108712](https://pubmed.ncbi.nlm.nih.gov/19108712/) |
+| GHANDHI_DIRECT_IRRADIATION_UP | Ghandhi et al. (2008) | [19108712](https://pubmed.ncbi.nlm.nih.gov/19108712/) |
+| KYNG_DNA_DAMAGE_BY_GAMMA_RADIATION | Kyng et al. (2005) | [15897889](https://pubmed.ncbi.nlm.nih.gov/15897889/) |
+| MACAEVA_PBMC_RESPONSE_TO_IR | Macaeva et al. (2016) | [26763932](https://pubmed.ncbi.nlm.nih.gov/26763932/) |
+| MONNIER_POSTRADIATION_TUMOR_ESCAPE_DN | Monnier et al. (2008) | [18794119](https://pubmed.ncbi.nlm.nih.gov/18794119/) |
+| MONNIER_POSTRADIATION_TUMOR_ESCAPE_UP | Monnier et al. (2008) | [18794119](https://pubmed.ncbi.nlm.nih.gov/18794119/) |
+| QUINTENS_EMBRYONIC_BRAIN_RESPONSE_TO_IR | Quintens et al. (2015) | [25681390](https://pubmed.ncbi.nlm.nih.gov/25681390/) |
+| RASHI_RESPONSE_TO_IONIZING_RADIATION_1 | Rashi-Elkeles et al. (2006) | [16314843](https://pubmed.ncbi.nlm.nih.gov/16314843/) |
+| RASHI_RESPONSE_TO_IONIZING_RADIATION_2 | Rashi-Elkeles et al. (2006) | [16314843](https://pubmed.ncbi.nlm.nih.gov/16314843/) |
+| RASHI_RESPONSE_TO_IONIZING_RADIATION_3 | Rashi-Elkeles et al. (2006) | [16314843](https://pubmed.ncbi.nlm.nih.gov/16314843/) |
+| RASHI_RESPONSE_TO_IONIZING_RADIATION_4 | Rashi-Elkeles et al. (2006) | [16314843](https://pubmed.ncbi.nlm.nih.gov/16314843/) |
+| RASHI_RESPONSE_TO_IONIZING_RADIATION_5 | Rashi-Elkeles et al. (2006) | [16314843](https://pubmed.ncbi.nlm.nih.gov/16314843/) |
+| RASHI_RESPONSE_TO_IONIZING_RADIATION_6 | Rashi-Elkeles et al. (2006) | [16314843](https://pubmed.ncbi.nlm.nih.gov/16314843/) |
+| SMIRNOV_RESPONSE_TO_IR_2HR_DN | Smirnov et al. (2012) | [21844125](https://pubmed.ncbi.nlm.nih.gov/21844125/) |
+| SMIRNOV_RESPONSE_TO_IR_2HR_UP | Smirnov et al. (2012) | [21844125](https://pubmed.ncbi.nlm.nih.gov/21844125/) |
+| SMIRNOV_RESPONSE_TO_IR_6HR_DN | Smirnov et al. (2012) | [21844125](https://pubmed.ncbi.nlm.nih.gov/21844125/) |
+| SMIRNOV_RESPONSE_TO_IR_6HR_UP | Smirnov et al. (2012) | [21844125](https://pubmed.ncbi.nlm.nih.gov/21844125/) |
+| TSAI_RESPONSE_TO_IONIZING_RADIATION | Tsai et al. (2006) | [16247478](https://pubmed.ncbi.nlm.nih.gov/16247478/) |
+| TSAI_RESPONSE_TO_RADIATION_THERAPY | Tsai et al. (2007) | [17440099](https://pubmed.ncbi.nlm.nih.gov/17440099/) |
+| WARTERS_IR_RESPONSE_5GY | Warters et al. (2009) | [19580510](https://pubmed.ncbi.nlm.nih.gov/19580510/) |
+| WARTERS_RESPONSE_TO_IR_SKIN | Warters et al. (2009) | [19580510](https://pubmed.ncbi.nlm.nih.gov/19580510/) |
+| ZHOU_CELL_CYCLE_GENES_IN_IR_RESPONSE_24HR | Zhou et al. (2007) | [17404513](https://pubmed.ncbi.nlm.nih.gov/17404513/) |
+| ZHOU_CELL_CYCLE_GENES_IN_IR_RESPONSE_6HR | Zhou et al. (2007) | [17404513](https://pubmed.ncbi.nlm.nih.gov/17404513/) |
 
 **Supplementary Data 1 | Complete gene-level results.** For every tested gene in each of the four contrasts, the file provides the Ensembl identifier, gene symbol, Brunner–Munzel relative effect θ, exact permutation p-value, and Storey q-value <!-- N-15, N-16 -->. The complete listing supports cross-referencing by later studies and reanalysis at thresholds other than the reported q<0.10 rule.
 

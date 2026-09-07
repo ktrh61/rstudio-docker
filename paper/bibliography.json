@@ -2144,6 +2144,544 @@
    "volume": "54",
    "pages": "D1779-D1792",
    "formatted": "The Gene Ontology Consortium. The Gene Ontology knowledgebase in 2026. *Nucleic Acids Res.* **54**, D1779–D1792 (2026)."
+  },
+  {
+   "biblio": "Ghandhi SA, Yaghoubian B, Amundson SA. BMC Med Genomics 2008;1:63. doi:10.1186/1755-8794-1-63",
+   "kind": "article",
+   "pmid": "19108712",
+   "doi": "10.1186/1755-8794-1-63",
+   "title": "Global gene expression analyses of bystander and alpha particle irradiated normal human lung fibroblasts: synchronous and differential responses",
+   "authors": [
+    [
+     "Ghandhi",
+     "S.A."
+    ],
+    [
+     "Yaghoubian",
+     "B."
+    ],
+    [
+     "Amundson",
+     "S.A."
+    ]
+   ],
+   "journal": "BMC Med Genomics",
+   "year": "2008",
+   "volume": "1",
+   "pages": "63",
+   "formatted": "Ghandhi, S.A., Yaghoubian, B. & Amundson, S.A. Global gene expression analyses of bystander and alpha particle irradiated normal human lung fibroblasts: synchronous and differential responses. *BMC Med. Genomics* **1**, 63 (2008)."
+  },
+  {
+   "biblio": "Kyng KJ, May A, Stevnsner T, Becker KG, Kølvrå S, Bohr VA. Oncogene 2005;24:5026-5042. doi:10.1038/sj.onc.1208692",
+   "kind": "article",
+   "pmid": "15897889",
+   "doi": "10.1038/sj.onc.1208692",
+   "title": "Gene expression responses to DNA damage are altered in human aging and in Werner Syndrome",
+   "authors": [
+    [
+     "Kyng",
+     "K.J."
+    ],
+    [
+     "May",
+     "A."
+    ],
+    [
+     "Stevnsner",
+     "T."
+    ],
+    [
+     "Becker",
+     "K.G."
+    ],
+    [
+     "Kølvrå",
+     "S."
+    ],
+    [
+     "Bohr",
+     "V.A."
+    ]
+   ],
+   "journal": "Oncogene",
+   "year": "2005",
+   "volume": "24",
+   "pages": "5026-5042",
+   "formatted": "Kyng, K.J., May, A., Stevnsner, T., Becker, K.G., Kølvrå, S. & Bohr, V.A. Gene expression responses to DNA damage are altered in human aging and in Werner Syndrome. *Oncogene* **24**, 5026–5042 (2005)."
+  },
+  {
+   "biblio": "Macaeva E, Saeys Y, Tabury K, Janssen A, Michaux A, Benotmane MA, et al. Sci Rep 2016;6:19251. doi:10.1038/srep19251",
+   "kind": "article",
+   "pmid": "26763932",
+   "doi": "10.1038/srep19251",
+   "title": "Radiation-induced alternative transcription and splicing events and their applicability to practical biodosimetry",
+   "authors": [
+    [
+     "Macaeva",
+     "E."
+    ],
+    [
+     "Saeys",
+     "Y."
+    ],
+    [
+     "Tabury",
+     "K."
+    ],
+    [
+     "Janssen",
+     "A."
+    ],
+    [
+     "Michaux",
+     "A."
+    ],
+    [
+     "Benotmane",
+     "M.A."
+    ],
+    [
+     "De Vos",
+     "W.H."
+    ],
+    [
+     "Baatout",
+     "S."
+    ],
+    [
+     "Quintens",
+     "R."
+    ]
+   ],
+   "journal": "Sci Rep",
+   "year": "2016",
+   "volume": "6",
+   "pages": "19251",
+   "formatted": "Macaeva, E., Saeys, Y., Tabury, K., Janssen, A., Michaux, A., Benotmane, M.A. et al. Radiation-induced alternative transcription and splicing events and their applicability to practical biodosimetry. *Sci. Rep.* **6**, 19251 (2016)."
+  },
+  {
+   "biblio": "Monnier Y, Farmer P, Bieler G, Imaizumi N, Sengstag T, Alghisi GC, et al. Cancer Res 2008;68:7323-7331. doi:10.1158/0008-5472.CAN-08-0841",
+   "kind": "article",
+   "pmid": "18794119",
+   "doi": "10.1158/0008-5472.CAN-08-0841",
+   "title": "CYR61 and alphaVbeta5 integrin cooperate to promote invasion and metastasis of tumors growing in preirradiated stroma",
+   "authors": [
+    [
+     "Monnier",
+     "Y."
+    ],
+    [
+     "Farmer",
+     "P."
+    ],
+    [
+     "Bieler",
+     "G."
+    ],
+    [
+     "Imaizumi",
+     "N."
+    ],
+    [
+     "Sengstag",
+     "T."
+    ],
+    [
+     "Alghisi",
+     "G.C."
+    ],
+    [
+     "Stehle",
+     "J.C."
+    ],
+    [
+     "Ciarloni",
+     "L."
+    ],
+    [
+     "Andrejevic-Blant",
+     "S."
+    ],
+    [
+     "Moeckli",
+     "R."
+    ],
+    [
+     "Mirimanoff",
+     "R.O."
+    ],
+    [
+     "Goodman",
+     "S.L."
+    ],
+    [
+     "Delorenzi",
+     "M."
+    ],
+    [
+     "Rüegg",
+     "C."
+    ]
+   ],
+   "journal": "Cancer Res",
+   "year": "2008",
+   "volume": "68",
+   "pages": "7323-7331",
+   "formatted": "Monnier, Y., Farmer, P., Bieler, G., Imaizumi, N., Sengstag, T., Alghisi, G.C. et al. CYR61 and alphaVbeta5 integrin cooperate to promote invasion and metastasis of tumors growing in preirradiated stroma. *Cancer Res.* **68**, 7323–7331 (2008)."
+  },
+  {
+   "biblio": "Quintens R, Verreet T, Janssen A, Neefs M, Leysen L, Michaux A, et al. Biol Open 2015;4:331-344. doi:10.1242/bio.20149969",
+   "kind": "article",
+   "pmid": "25681390",
+   "doi": "10.1242/bio.20149969",
+   "title": "Identification of novel radiation-induced p53-dependent transcripts extensively regulated during mouse brain development",
+   "authors": [
+    [
+     "Quintens",
+     "R."
+    ],
+    [
+     "Verreet",
+     "T."
+    ],
+    [
+     "Janssen",
+     "A."
+    ],
+    [
+     "Neefs",
+     "M."
+    ],
+    [
+     "Leysen",
+     "L."
+    ],
+    [
+     "Michaux",
+     "A."
+    ],
+    [
+     "Verslegers",
+     "M."
+    ],
+    [
+     "Samari",
+     "N."
+    ],
+    [
+     "Pani",
+     "G."
+    ],
+    [
+     "Verheyde",
+     "J."
+    ],
+    [
+     "Baatout",
+     "S."
+    ],
+    [
+     "Benotmane",
+     "M.A."
+    ]
+   ],
+   "journal": "Biol Open",
+   "year": "2015",
+   "volume": "4",
+   "pages": "331-344",
+   "formatted": "Quintens, R., Verreet, T., Janssen, A., Neefs, M., Leysen, L., Michaux, A. et al. Identification of novel radiation-induced p53-dependent transcripts extensively regulated during mouse brain development. *Biol. Open* **4**, 331–344 (2015)."
+  },
+  {
+   "biblio": "Rashi-Elkeles S, Elkon R, Weizman N, Linhart C, Amariglio N, Sternberg G, et al. Oncogene 2006;25:1584-1592. doi:10.1038/sj.onc.1209189",
+   "kind": "article",
+   "pmid": "16314843",
+   "doi": "10.1038/sj.onc.1209189",
+   "title": "Parallel induction of ATM-dependent pro- and antiapoptotic signals in response to ionizing radiation in murine lymphoid tissue",
+   "authors": [
+    [
+     "Rashi-Elkeles",
+     "S."
+    ],
+    [
+     "Elkon",
+     "R."
+    ],
+    [
+     "Weizman",
+     "N."
+    ],
+    [
+     "Linhart",
+     "C."
+    ],
+    [
+     "Amariglio",
+     "N."
+    ],
+    [
+     "Sternberg",
+     "G."
+    ],
+    [
+     "Rechavi",
+     "G."
+    ],
+    [
+     "Barzilai",
+     "A."
+    ],
+    [
+     "Shamir",
+     "R."
+    ],
+    [
+     "Shiloh",
+     "Y."
+    ]
+   ],
+   "journal": "Oncogene",
+   "year": "2006",
+   "volume": "25",
+   "pages": "1584-1592",
+   "formatted": "Rashi-Elkeles, S., Elkon, R., Weizman, N., Linhart, C., Amariglio, N., Sternberg, G. et al. Parallel induction of ATM-dependent pro- and antiapoptotic signals in response to ionizing radiation in murine lymphoid tissue. *Oncogene* **25**, 1584–1592 (2006)."
+  },
+  {
+   "biblio": "Smirnov DA, Brady L, Halasa K, Morley M, Solomon S, Cheung VG. Genome Res 2012;22:332-339. doi:10.1101/gr.122044.111",
+   "kind": "article",
+   "pmid": "21844125",
+   "doi": "10.1101/gr.122044.111",
+   "title": "Genetic variation in radiation-induced cell death",
+   "authors": [
+    [
+     "Smirnov",
+     "D.A."
+    ],
+    [
+     "Brady",
+     "L."
+    ],
+    [
+     "Halasa",
+     "K."
+    ],
+    [
+     "Morley",
+     "M."
+    ],
+    [
+     "Solomon",
+     "S."
+    ],
+    [
+     "Cheung",
+     "V.G."
+    ]
+   ],
+   "journal": "Genome Res",
+   "year": "2012",
+   "volume": "22",
+   "pages": "332-339",
+   "formatted": "Smirnov, D.A., Brady, L., Halasa, K., Morley, M., Solomon, S. & Cheung, V.G. Genetic variation in radiation-induced cell death. *Genome Res.* **22**, 332–339 (2012)."
+  },
+  {
+   "biblio": "Tsai MH, Chen X, Chandramouli GV, Chen Y, Yan H, Zhao S, et al. Oncogene 2006;25:622-632. doi:10.1038/sj.onc.1209082",
+   "kind": "article",
+   "pmid": "16247478",
+   "doi": "10.1038/sj.onc.1209082",
+   "title": "Transcriptional responses to ionizing radiation reveal that p53R2 protects against radiation-induced mutagenesis in human lymphoblastoid cells",
+   "authors": [
+    [
+     "Tsai",
+     "M.H."
+    ],
+    [
+     "Chen",
+     "X."
+    ],
+    [
+     "Chandramouli",
+     "G.V."
+    ],
+    [
+     "Chen",
+     "Y."
+    ],
+    [
+     "Yan",
+     "H."
+    ],
+    [
+     "Zhao",
+     "S."
+    ],
+    [
+     "Keng",
+     "P."
+    ],
+    [
+     "Liber",
+     "H.L."
+    ],
+    [
+     "Coleman",
+     "C.N."
+    ],
+    [
+     "Mitchell",
+     "J.B."
+    ],
+    [
+     "Chuang",
+     "E.Y."
+    ]
+   ],
+   "journal": "Oncogene",
+   "year": "2006",
+   "volume": "25",
+   "pages": "622-632",
+   "formatted": "Tsai, M.H., Chen, X., Chandramouli, G.V., Chen, Y., Yan, H., Zhao, S. et al. Transcriptional responses to ionizing radiation reveal that p53R2 protects against radiation-induced mutagenesis in human lymphoblastoid cells. *Oncogene* **25**, 622–632 (2006)."
+  },
+  {
+   "biblio": "Tsai MH, Cook JA, Chandramouli GV, DeGraff W, Yan H, Zhao S, et al. Cancer Res 2007;67:3845-3852. doi:10.1158/0008-5472.CAN-06-4250",
+   "kind": "article",
+   "pmid": "17440099",
+   "doi": "10.1158/0008-5472.CAN-06-4250",
+   "title": "Gene expression profiling of breast, prostate, and glioma cells following single versus fractionated doses of radiation",
+   "authors": [
+    [
+     "Tsai",
+     "M.H."
+    ],
+    [
+     "Cook",
+     "J.A."
+    ],
+    [
+     "Chandramouli",
+     "G.V."
+    ],
+    [
+     "DeGraff",
+     "W."
+    ],
+    [
+     "Yan",
+     "H."
+    ],
+    [
+     "Zhao",
+     "S."
+    ],
+    [
+     "Coleman",
+     "C.N."
+    ],
+    [
+     "Mitchell",
+     "J.B."
+    ],
+    [
+     "Chuang",
+     "E.Y."
+    ]
+   ],
+   "journal": "Cancer Res",
+   "year": "2007",
+   "volume": "67",
+   "pages": "3845-3852",
+   "formatted": "Tsai, M.H., Cook, J.A., Chandramouli, G.V., DeGraff, W., Yan, H., Zhao, S. et al. Gene expression profiling of breast, prostate, and glioma cells following single versus fractionated doses of radiation. *Cancer Res.* **67**, 3845–3852 (2007)."
+  },
+  {
+   "biblio": "Warters RL, Packard AT, Kramer GF, Gaffney DK, Moos PJ. Radiat Res 2009;172:82-95. doi:10.1667/RR1677.1",
+   "kind": "article",
+   "pmid": "19580510",
+   "doi": "10.1667/RR1677.1",
+   "title": "Differential gene expression in primary human skin keratinocytes and fibroblasts in response to ionizing radiation",
+   "authors": [
+    [
+     "Warters",
+     "R.L."
+    ],
+    [
+     "Packard",
+     "A.T."
+    ],
+    [
+     "Kramer",
+     "G.F."
+    ],
+    [
+     "Gaffney",
+     "D.K."
+    ],
+    [
+     "Moos",
+     "P.J."
+    ]
+   ],
+   "journal": "Radiat Res",
+   "year": "2009",
+   "volume": "172",
+   "pages": "82-95",
+   "formatted": "Warters, R.L., Packard, A.T., Kramer, G.F., Gaffney, D.K. & Moos, P.J. Differential gene expression in primary human skin keratinocytes and fibroblasts in response to ionizing radiation. *Radiat. Res.* **172**, 82–95 (2009)."
+  },
+  {
+   "biblio": "Zhou T, Chou J, Mullen TE, Elkon R, Zhou Y, Simpson DA, et al. Cell Cycle 2007;6:972-981. doi:10.4161/cc.6.8.4106",
+   "kind": "article",
+   "pmid": "17404513",
+   "doi": "10.4161/cc.6.8.4106",
+   "title": "Identification of primary transcriptional regulation of cell cycle-regulated genes upon DNA damage",
+   "authors": [
+    [
+     "Zhou",
+     "T."
+    ],
+    [
+     "Chou",
+     "J."
+    ],
+    [
+     "Mullen",
+     "T.E."
+    ],
+    [
+     "Elkon",
+     "R."
+    ],
+    [
+     "Zhou",
+     "Y."
+    ],
+    [
+     "Simpson",
+     "D.A."
+    ],
+    [
+     "Bushel",
+     "P.R."
+    ],
+    [
+     "Paules",
+     "R.S."
+    ],
+    [
+     "Lobenhofer",
+     "E.K."
+    ],
+    [
+     "Hurban",
+     "P."
+    ],
+    [
+     "Kaufmann",
+     "W.K."
+    ]
+   ],
+   "journal": "Cell Cycle",
+   "year": "2007",
+   "volume": "6",
+   "pages": "972-981",
+   "formatted": "Zhou, T., Chou, J., Mullen, T.E., Elkon, R., Zhou, Y., Simpson, D.A. et al. Identification of primary transcriptional regulation of cell cycle-regulated genes upon DNA damage. *Cell Cycle* **6**, 972–981 (2007)."
   }
  ]
 }
