@@ -42,7 +42,7 @@ Only the RET fusion-positive and BRAF V600E-positive strata contained enough dos
 <!-- 2026-08-21 C2 ポート: gpt_review 試案 Methods を移植(C1-a AI開示復元・C1-d 目盛り要約復帰・chronic監査文は不採用)。写像検査・★アンカー同期は C4 -->
 ### Data sources
 
-Gene-level STAR count files for REBC-THYR were downloaded from the National Cancer Institute Genomic Data Commons and verified against the download manifest. The clinical source was Data S1 of Morton et al. (2021), containing 440 cases <!-- N-11 -->. Files were mapped to cases and biospecimens through the Genomic Data Commons API and assembled into a matrix of 58,448 genes with nonzero counts and 906 samples <!-- N-14 -->. Strandedness, gene-length derivation, file-selection, and manifest-verification procedures are in Supplementary Methods.
+Gene-level STAR count files for REBC-THYR were downloaded from the National Cancer Institute Genomic Data Commons (Heath et al. 2021) and verified against the download manifest. The clinical source was Data S1 of Morton et al. (2021), containing 440 cases <!-- N-11 -->. Files were mapped to cases and biospecimens through the Genomic Data Commons API and assembled into a matrix of 58,448 genes with nonzero counts and 906 samples <!-- N-14 -->. Strandedness, gene-length derivation, file-selection, and manifest-verification procedures are in Supplementary Methods.
 
 ### Assigned Share
 
@@ -233,7 +233,8 @@ Reading rules, fixed with the map: a signal in R_Tumor is read as agreement with
 前処理・正規化・純度(いずれも Methods: Data sources / Normalization / QC):
 
 - Dobin A, et al. STAR: ultrafast universal RNA-seq aligner. Bioinformatics 2013;29:15–21. doi:10.1093/bioinformatics/bts635 — STAR counts の来歴(GDC パイプライン言及の形でも可)
-- Grossman RL, et al. Toward a shared vision for cancer genomic data. N Engl J Med 2016;375:1109–1112. doi:10.1056/NEJMp1607591 — GDC
+- Heath AP, Ferretti V, Agrawal S, et al. The NCI Genomic Data Commons. Nat Genet 2021;53:257–262. doi:10.1038/s41588-021-00791-5 — GDC の公式引用案内が指定するリソース論文(Methods: Data sources / Supplementary Methods: Data sources and expression matrix)。REBC-THYR の原研究 Morton et al. 2021 とアクセス用パッケージ Morgan and Davis 2025 の引用は別に保持する。
+- Grossman RL, et al. Toward a shared vision for cancer genomic data. N Engl J Med 2016;375:1109–1112. doi:10.1056/NEJMp1607591 — GDC の旧候補(本文不使用。公式指定の Heath et al. 2021 を採用)
 - Robinson MD, McCarthy DJ, Smyth GK. edgeR: a Bioconductor package for differential expression analysis of digital gene expression data. Bioinformatics 2010;26:139–140. doi:10.1093/bioinformatics/btp616— filterByExpr / DGEList / CPM〔使用パッケージ〕
 - Chen Y, Lun ATL, Smyth GK. From reads to genes to pathways: differential expression analysis of RNA-Seq experiments using Rsubread and the edgeR quasi-likelihood pipeline. F1000Res 2016;5:1438. doi:10.12688/f1000research.8987.2(Crossref 照合済み 2026-08-15)— filterByExpr の規則の出典(Methods: QC 初出 — 本文反映済み。以降の filterByExpr 出現は同規則)
 - Kadota K, Nishiyama T, Shimizu K. A normalization strategy for comparing tag count data. Algorithms Mol Biol 2012;7:5. doi:10.1186/1748-7188-7-5 — DEGES

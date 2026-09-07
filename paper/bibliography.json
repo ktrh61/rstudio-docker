@@ -1901,6 +1901,18 @@
    "volume": "40",
    "pages": "1-18",
    "formatted": "Eddelbuettel, D. & François, R. Rcpp: Seamless R and C++ integration. *J. Stat. Softw.* **40**, 1–18 (2011)."
+  },
+  {
+   "biblio": "Heath AP, Ferretti V, Agrawal S, et al. Nat Genet 2021;53:257-262. doi:10.1038/s41588-021-00791-5",
+   "kind": "article",
+   "pmid": null,
+   "doi": "10.1038/s41588-021-00791-5",
+   "title": "The NCI Genomic Data Commons",
+   "journal": "Nat Genet",
+   "year": "2021",
+   "volume": "53",
+   "pages": "257-262",
+   "formatted": "Heath, A.P., Ferretti, V., Agrawal, S. et al. The NCI Genomic Data Commons. *Nat. Genet.* **53**, 257–262 (2021)."
   }
  ]
 }

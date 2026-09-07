@@ -146,6 +146,12 @@
 | Eddelbuettel D, François R. J Stat Softw 2011;40:1-18. doi:10.18637/jss.v040.i08 | Supplementary Methods: Software, seeds, and reproducibility | Rcpp 1.1.1 の `citation("Rcpp")` が提示する査読付きソフトウェア論文の一つ | C++ 実装との接続基盤の引用。パッケージが提示する複数候補のうち、基本機能を記述する原著論文を採用した | 2026-08-20 / 正準イメージ rebc-r453:refblas 内の `citation("Rcpp")` | verified |
 | Venables WN, Ripley BD (2002). Modern Applied Statistics with S. 4th ed. Springer, New York. ISBN 0-387-95457-0 | Supplementary Methods: Normalization(MUREN の least-trimmed-squares 実装) | MASS 7.3-65 の `citation("MASS")` が指定する書籍 | `MASS::ltsreg` の実装引用であり、MUREN 法自体の典拠は Feng and Li 2021 として別に保持する。原 MUREN 実装も同エンジン(GitHub hippo-yf/MUREN: NAMESPACE importFrom(MASS,ltsreg)・utils.R の reg_sp/reg_dp が同式 — 照合 2026-08-27)であり、Supp は「the engine used by the original MUREN implementation」とエンジン同一性のみ主張(出力等価は未検証のため主張しない) | 2026-08-20 / 正準イメージ rebc-r453:refblas 内の `citation("MASS")` | verified |
 
+## データリソースと遺伝子セットの原典
+
+| 引用 | 本文の使用箇所 | 出典が実際に述べること(逐語の要点) | 射程・但し書き | 照合日・方法 | 状態 |
+| --- | --- | --- | --- | --- | --- |
+| Heath AP, Ferretti V, Agrawal S, et al. Nat Genet 2021;53:257-262. doi:10.1038/s41588-021-00791-5 | Methods: Data sources / Supplementary Methods: Data sources and expression matrix | GDC 公式 FAQ: "Please credit the NCI Genomic Data Commons (GDC) in your manuscript"。指定論文は "The NCI Genomic Data Commons" | GDC リソースの利用に対する引用。REBC-THYR の原研究 Morton et al. 2021 と、API アクセス用パッケージ Morgan and Davis 2025 の引用を代替しない。Grossman et al. 2016 は旧候補としてのみ保持 | 2026-09-07 / GDC 公式引用案内 https://gdc.cancer.gov/content/how-do-i-cite-nci-gdc (指定論文の書誌を含む) | verified |
+
 ## I. 本文未使用の候補(driver と線量の背景。セッション内で要旨照合済み)
 
 いずれも現時点で draft_manuscript.md の本文には現れない。Introduction の層選定の根拠を厚くする場合、または「driver 組成と線量の共変」への査読指摘に答える場合の一次資料として保持する。
@@ -192,7 +198,7 @@
 いずれも draft_manuscript.md の文献リストにあり書誌は照合済みだが、今回の引用忠実性監査は主張を担う文献に絞られたため、逐語照合の記録がない。**行を立てるには一次資料に当たる必要がある。**
 
 - Dobin A, et al. Bioinformatics 2013;29:15-21(STAR。GDC パイプラインの来歴)
-- Grossman RL, et al. N Engl J Med 2016;375:1109-1112(GDC)
+- Grossman RL, et al. N Engl J Med 2016;375:1109-1112(GDC。2026-09-07: 現在の公式指定論文 Heath et al. 2021 を採用し、本論文は旧候補としてのみ保持)
 - Hodges JL, Lehmann EL. Ann Math Stat 1963;34:598-611(HL 推定量。本文は推定量名のみで、慣用のため省略可という判断が文献リストに記録されている)
 - Selmansberger M, et al. doi:10.1038/onc.2014.311(CLIP2 の追加検証。diagnostics/external_gene_anchors.csv の注記としてのみ存在し、本文にも監査対象にも入っていない)
 
