@@ -232,6 +232,8 @@ Reading rules, fixed with the map: a signal in R_Tumor is read as agreement with
 
 前処理・正規化・純度(いずれも Methods: Data sources / Normalization / QC):
 
+- Law CW, Chen Y, Shi W, Smyth GK. voom: precision weights unlock linear model analysis tools for RNA-seq read counts. Genome Biol 2014;15:R29. doi:10.1186/gb-2014-15-2-r29 — 純度推定に用いる limma-voom の個別手法引用(Supplementary Methods: Quality control and analysis cohorts)。
+- Phipson B, Lee S, Majewski IJ, Alexander WS, Smyth GK. Robust hyperparameter estimation protects against hypervariable genes and improves power to detect differential expression. Ann Appl Stat 2016;10:946–963. doi:10.1214/16-AOAS920 — 同工程の頑健な経験ベイズ推定。既存の limma 全体の Ritchie et al. 2015 と、置換 p 値の Phipson and Smyth 2010 はそれぞれ別に保持する。
 - Dobin A, et al. STAR: ultrafast universal RNA-seq aligner. Bioinformatics 2013;29:15–21. doi:10.1093/bioinformatics/bts635 — STAR counts の来歴(GDC パイプライン言及の形でも可)
 - Heath AP, Ferretti V, Agrawal S, et al. The NCI Genomic Data Commons. Nat Genet 2021;53:257–262. doi:10.1038/s41588-021-00791-5 — GDC の公式引用案内が指定するリソース論文(Methods: Data sources / Supplementary Methods: Data sources and expression matrix)。REBC-THYR の原研究 Morton et al. 2021 とアクセス用パッケージ Morgan and Davis 2025 の引用は別に保持する。
 - Mudge JM, Carbonell-Sala S, Diekhans M, Martinez JG, Hunt T, Jungreis I, et al. GENCODE 2025: reference gene annotation for human and mouse. Nucleic Acids Res 2025;53:D966–D975. doi:10.1093/nar/gkae1078 — GENCODE 自体の公式代表引用(Supplementary Methods: Data sources and expression matrix)。使用データは GENCODE v36 のままであり、2025 年の注釈版へ更新したという意味ではない。

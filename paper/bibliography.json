@@ -1925,6 +1925,70 @@
    "volume": "53",
    "pages": "D966-D975",
    "formatted": "Mudge, J.M., Carbonell-Sala, S., Diekhans, M., Martinez, J.G., Hunt, T., Jungreis, I. et al. GENCODE 2025: reference gene annotation for human and mouse. *Nucleic Acids Res.* **53**, D966–D975 (2025)."
+  },
+  {
+   "biblio": "Law CW, Chen Y, Shi W, Smyth GK. Genome Biol 2014;15:R29. doi:10.1186/gb-2014-15-2-r29",
+   "kind": "article",
+   "pmid": "24485249",
+   "doi": "10.1186/gb-2014-15-2-r29",
+   "title": "voom: precision weights unlock linear model analysis tools for RNA-seq read counts",
+   "authors": [
+    [
+     "Law",
+     "C.W."
+    ],
+    [
+     "Chen",
+     "Y."
+    ],
+    [
+     "Shi",
+     "W."
+    ],
+    [
+     "Smyth",
+     "G.K."
+    ]
+   ],
+   "journal": "Genome Biol",
+   "year": "2014",
+   "volume": "15",
+   "pages": "R29",
+   "formatted": "Law, C.W., Chen, Y., Shi, W. & Smyth, G.K. voom: precision weights unlock linear model analysis tools for RNA-seq read counts. *Genome Biol.* **15**, R29 (2014)."
+  },
+  {
+   "biblio": "Phipson B, Lee S, Majewski IJ, Alexander WS, Smyth GK. Ann Appl Stat 2016;10:946-963. doi:10.1214/16-AOAS920",
+   "kind": "article",
+   "pmid": "28367255",
+   "doi": "10.1214/16-AOAS920",
+   "title": "Robust hyperparameter estimation protects against hypervariable genes and improves power to detect differential expression",
+   "authors": [
+    [
+     "Phipson",
+     "B."
+    ],
+    [
+     "Lee",
+     "S."
+    ],
+    [
+     "Majewski",
+     "I.J."
+    ],
+    [
+     "Alexander",
+     "W.S."
+    ],
+    [
+     "Smyth",
+     "G.K."
+    ]
+   ],
+   "journal": "Ann Appl Stat",
+   "year": "2016",
+   "volume": "10",
+   "pages": "946-963",
+   "formatted": "Phipson, B., Lee, S., Majewski, I.J., Alexander, W.S. & Smyth, G.K. Robust hyperparameter estimation protects against hypervariable genes and improves power to detect differential expression. *Ann. Appl. Stat.* **10**, 946–963 (2016)."
   }
  ]
 }
