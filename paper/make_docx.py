@@ -6,8 +6,9 @@
 #
 # BJC 書式(GTA ライブ照合 2026-08-25)を機械注入する:
 #   (1) BJC 節順に組み替え: タイトルページ → Abstract → Background → Methods → Results →
-#       Discussion → Additional Information → References → Figure legends → Tables → Figures
-#       (改ページつき。表は投稿形の列名・脚注、添字は subscript 記法で表示層整形)
+#       Discussion → Additional Information → References → Figure legends(改ページつき)。
+#       表 1〜3 はキャプション付きの個別 docx、図 1〜3 は個別 TIFF として同じ時刻タグで出力する
+#       (投稿形そのものを共有する方針 — 研究者決定 2026-09-05。旧「閲覧用一体版」は廃止)
 #   (2) 引用番号 [n] は角括弧のまま(BJC GTA の指定。2026-09-02 に上付き化を撤回)
 #   (3) 1.5 行間(styles.xml の Normal に w:line=360)
 #   (4) 全行番号(sectPr に lnNumType)
@@ -43,8 +44,7 @@ W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 GENES = ("RET|BRAF|CCDC6|NCOA4|CLIP2|BHLHB9|S100A10|TESC|EHD4|"
          "ATP5MF|MRPL52|NTHL1|URM1|USE1|PXDN|P2RY1|PLK2|PTC1|PTC3")
 
-# 閲覧用の図埋め込み(研究者裁定 2026-08-27 — 表と同じ一体ファイル方針の延長。
-# 投稿時は BJC 規定どおり図を個別 TIFF/PDF で分離するため閲覧モード専用の一方向変換)
+# 図の対応表(英語版は個別 TIFF を出力、日本語参考訳のみ凡例直下に PNG を埋め込む)
 FIGS = [
     ("Figure 1", "図 1", "fig_cohort_flow.png"),
     ("Figure 2", "図 2", "fig_gene_bm_evidence.png"),
@@ -53,6 +53,8 @@ FIGS = [
     ("Figure S2", "図 S2", "fig_d6_calibration.png"),
 ]
 FIG_PATH = {en: ROOT / "output" / "figures" / f for en, _, f in FIGS}
+FIG_TIF = {en: ROOT / "output" / "figures" / f.replace(".png", ".tif") for en, _, f in FIGS}
+TABLE_BLOCKS = []  # preprocess() が本文から切り出した表ブロック(label, markdown)。個別 docx 出力に使う
 
 # 投稿形の改ページ(pandoc raw openxml — 閲覧 docx の組版のみ)
 PAGE_BREAK = "\n\n```{=openxml}\n<w:p><w:r><w:br w:type=\"page\"/></w:r></w:p>\n```\n\n"
@@ -412,8 +414,9 @@ def supp_file_descriptions():
 
 def preprocess(text):
     """本文の投稿形整形(BJC GTA 節順): タイトルページ → Abstract → Background → Methods →
-    Results → Discussion → Additional Information → References → Figure legends →
-    Tables(1 ページ 1 表)→ Figures(1 ページ 1 図)。引用 [n] は角括弧のまま。"""
+    Results → Discussion → Additional Information → References → Figure legends。
+    表と図は本文に埋め込まず(BJC 規定)、表ブロックは TABLE_BLOCKS に退避して個別 docx にする。
+    引用 [n] は角括弧のまま。"""
     text = re.sub(r"^-{3,}\s*$", "", text, flags=re.M)
     text = re.sub(r"^\*\*Title:\*\*[^\n]*\n", lambda m: title_page() + PAGE_BREAK, text,
                   count=1, flags=re.M)
@@ -443,14 +446,9 @@ def preprocess(text):
             b.insert(1, csv_md_table(ROOT / "output" / "tables" / "tab_case_characteristics.csv"))
         if b[0].startswith("**Table 3 |"):
             b.insert(1, csv_md_table(ROOT / "output" / "tables" / "tab_gene_level_summary.csv"))
-    tables_md = orient_blocks(
-        [(re.match(r"\*\*(Table \d)", b[0]).group(1), "\n\n".join(b)) for b in blocks], "## Tables")
-    figures_md = PAGE_BREAK.join(
-        f"**{n}**\n\n![]({FIG_PATH[n]}){{width=160mm}}" for n in ("Figure 1", "Figure 2", "Figure 3"))
+    TABLE_BLOCKS[:] = [(re.match(r"\*\*(Table \d)", b[0]).group(1), "\n\n".join(b)) for b in blocks]
     text = (text.rstrip("\n") + "\n\n" + additional_information() + "\n\n" + fixed.rstrip("\n")
-            + PAGE_BREAK + "## Figure legends\n\n" + "\n\n".join(fig_legends)
-            + tables_md
-            + "## Figures\n\n" + figures_md + "\n")
+            + PAGE_BREAK + "## Figure legends\n\n" + "\n\n".join(fig_legends) + "\n")
     # 引用番号 [1] / [1,2] は角括弧のまま(BJC GTA: "reference numbers should be placed in square brackets" — 2026-09-02 に上付き化を撤回)
     return _finish(text)
 
@@ -479,7 +477,7 @@ def ja_preprocess(text, en_stem, tag, commit, src_label):
     return typeset_symbols(embed_figures(text))
 
 
-def patch_docx(path, ja=False, letter=False):
+def patch_docx(path, ja=False, letter=False, landscape=False):
     """styles.xml(1.5 行間)・document.xml(行番号・フッタ参照)・
     footer1.xml(ページ番号)を注入する。ja=True では和文書体
     (本文 游明朝+Times New Roman・見出し 游ゴシック・両端揃え)とし、
@@ -612,12 +610,11 @@ def patch_docx(path, ja=False, letter=False):
         # pandoc の sectPr は最小構成 — A4・余白 2.5cm を明示してロケール依存を排し、
         # 英語版のみ続けて lnNumType(スキーマ順: pgSz → pgMar → lnNumType)
         ln = "" if (ja or letter) else '<w:lnNumType w:countBy="1" w:restart="continuous"/>'
+        pgsz = ('<w:pgSz w:w="16838" w:h="11906" w:orient="landscape"/>' if landscape
+                else '<w:pgSz w:w="11906" w:h="16838"/>')
         new_sect = new_sect.replace(
             "</w:sectPr>",
-            '<w:pgSz w:w="11906" w:h="16838"/>'
-            '<w:pgMar w:top="1417" w:right="1417" w:bottom="1417" w:left="1417" '
-            'w:header="709" w:footer="709" w:gutter="0"/>'
-            + ln + '</w:sectPr>',
+            pgsz + PG_MAR + ln + '</w:sectPr>',
         )
     footer_ref = '<w:footerReference xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" w:type="default" r:id="rIdFooterPg"/>'
     if "footerReference" not in new_sect and not letter:
@@ -695,7 +692,7 @@ def tokens_docx(path):
     return re.findall(r"[A-Za-z0-9]+", body)
 
 
-def build(src_name, out_name, prep, ja=False, letter=False):
+def build(src_name, out_name, prep, ja=False, letter=False, landscape=False):
     src_path = src_name if isinstance(src_name, Path) else SUB / src_name
     src = src_path.read_text(encoding="utf-8")
     pre = prep(src)
@@ -707,7 +704,7 @@ def build(src_name, out_name, prep, ja=False, letter=False):
          "-o", str(out)],
         check=True,
     )
-    patch_docx(out, ja=ja, letter=letter)
+    patch_docx(out, ja=ja, letter=letter, landscape=landscape)
     a, b = sorted(tokens_md(pre)), sorted(tokens_docx(out))
     from collections import Counter
     diff = Counter(a) - Counter(b) | Counter(b) - Counter(a)
@@ -738,12 +735,71 @@ def build(src_name, out_name, prep, ja=False, letter=False):
     return out
 
 
+def export_tables():
+    """表 1〜3 をキャプション(+脚注)付きの個別 docx にする(BJC: 表は 1 つずつ別ファイル)。
+    行番号・頁番号なし、幅の広い表は横置き。"""
+    outs = []
+    for label, block in TABLE_BLOCKS:
+        n = label.split()[1]
+        land = is_landscape(block)
+        md = SUB / f"table_{n}_input.md"
+        md.write_text(_finish(block) + "\n", encoding="utf-8")
+        print(f"  {label}: {'landscape' if land else 'portrait'}(個別 docx)")
+        outs.append(build(md, f"table_{n}.docx", lambda t: t, letter=True, landscape=land))
+    return outs
+
+
+def export_figures():
+    """図 1〜3 の投稿用 TIFF(600 dpi、tables/figures スクリプトの産物)を output/submission へ複製する。"""
+    outs = []
+    for en in ("Figure 1", "Figure 2", "Figure 3"):
+        src = FIG_TIF[en]
+        dst = SUB / f"figure_{en.split()[1]}.tif"
+        shutil.copy2(src, dst)
+        outs.append(dst)
+    return outs
+
+
+def _word_counts(docx_path):
+    """投稿形 docx の本文(Background 見出し〜Additional Information 直前、見出し込み)・
+    抄録(小見出し込み)・Additional Information の空白区切り語数。Word の計数とは
+    en dash 結合の扱いで数十語ずれる(参考値)。"""
+    plain = subprocess.run([PANDOC, str(docx_path), "-t", "plain", "--wrap=none"],
+                           capture_output=True, text=True, check=True).stdout.split("\n")
+    def at(h):
+        return [i for i, l in enumerate(plain) if l.strip() == h]
+    try:
+        ab, bg, ai, rf = at("Abstract")[0], at("Background")[1], at("Additional Information")[0], at("References")[0]
+    except IndexError:
+        return {}
+    wc = lambda a, b: len(" ".join(plain[a:b]).split())
+    return {"abstract(+4 subheadings)": wc(ab + 1, bg), "main text(headings included)": wc(bg, ai),
+            "additional information": wc(ai, rf)}
+
+
+def package_manifest(files, tag, commit, dest):
+    """同一タグの出荷ファイル一覧(MD5・サイズ)と語数・コミットを 1 ファイルに記録する。"""
+    import hashlib
+    lines = [f"# Submission package {tag}", f"source commit: {commit}",
+             "files (name, MD5, bytes):"]
+    for f in files:
+        h = hashlib.md5(Path(f).read_bytes()).hexdigest()
+        lines.append(f"  {Path(f).name}  {h}  {Path(f).stat().st_size}")
+    main_docx = [f for f in files if Path(f).name.startswith("manuscript_submission_")]
+    if main_docx:
+        for k, v in _word_counts(main_docx[0]).items():
+            lines.append(f"word count ({k}, whitespace-delimited): {v}")
+    out = dest / f"package_{tag}.txt"
+    out.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    return out
+
+
 KEEP_VIEW_GENERATIONS = 3  # 閲覧用コピー(docx/txt)は最新 3 世代だけ残す。PDF とタグなしファイルは対象外(共有済みの可能性 — 研究者決定 2026-09-02)
 
 
 def prune_view_copies(dest, keep=KEEP_VIEW_GENERATIONS):
-    """word_check の閲覧用コピーのうち、時刻タグ付き docx/txt を最新 keep 世代だけ残して削除する。"""
-    pat = re.compile(r"^(.*)_(\d{8}_\d{4})\.(docx|txt)$")
+    """word_check の閲覧用コピーのうち、時刻タグ付き docx/txt/tif を最新 keep 世代だけ残して削除する(PDF・タグなしは対象外)。"""
+    pat = re.compile(r"^(.*)_(\d{8}_\d{4})\.(docx|txt|tif)$")
     tags = sorted({m.group(2) for f in dest.iterdir() if (m := pat.match(f.name))}, reverse=True)
     drop = set(tags[keep:])
     for f in sorted(dest.iterdir()):
@@ -780,6 +836,8 @@ def main():
                   f"**対応版**: 英語版 cover_letter_{tag}.docx(同時生成の対)。"
                   f"ソース: paper/cover_letter_ja.md @{commit}")), ja=True, letter=True),
     ]
+    outs += export_tables()
+    fig_outs = export_figures()
     # 投稿システムの Cover Letter 欄への貼り付け用プレーンテキスト(書式記号なし)
     letter_txt = SUB / "cover_letter.txt"
     subprocess.run([PANDOC, str(SUB / "cover_letter_input.md"), "-f", "markdown+superscript",
@@ -793,6 +851,14 @@ def main():
             print(f"閲覧用コピー: {view}")
         shutil.copy2(letter_txt, dest / f"cover_letter_{tag}.txt")
         print(f"貼り付け用テキスト: {dest / f'cover_letter_{tag}.txt'}")
+        shipped = [dest / f"{out.stem}_{tag}.docx" for out in outs] + [dest / f"cover_letter_{tag}.txt"]
+        for f in fig_outs:
+            view = dest / f"{f.stem}_{tag}.tif"
+            shutil.copy2(f, view)
+            shipped.append(view)
+            print(f"図の投稿用コピー: {view}")
+        man = package_manifest(shipped, tag, commit, dest)
+        print(f"パッケージ一覧: {man}")
         prune_view_copies(dest)
 
 
