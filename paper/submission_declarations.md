@@ -26,11 +26,12 @@
 
 ### Acknowledgements
 
-This study used open-access data from the REBC-THYR project, accessed through the National
-Cancer Institute Genomic Data Commons; we thank the participants and investigators of the
-source study (Morton et al. 2021) for making these data available.
-(データ提供元への謝辞 = NIH GDS ポリシー「データセットと NIH 指定リポジトリを謝辞で明示」に対応、2026-09-05 研究者 Go。
-妹(Sayumi Matsuo、MD PhD)への原稿作成助言の謝辞 "We thank Sayumi Matsuo (MD, PhD) for advice on manuscript preparation." は本人同意待ち)
+The results reported here are based in part on data from the REBC-THYR study (Morton et al.
+2021). We thank the study participants for their contributions and the investigators for making
+the data available. We also thank the National Cancer Institute Genomic Data Commons for
+processing and providing access to the RNA-seq data. KH thanks Sayumi Matsuo, MD, PhD, for
+advice on manuscript preparation.
+(2026-09-07 研究者起草・校正反映(KH 略記・MD, PhD 表記)。Sayumi Matsuo 氏の掲載同意は取得済み。データ提供元の謝辞は NIH GDS ポリシーに対応)
 
 ### Authors' contributions
 

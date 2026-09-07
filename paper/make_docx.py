@@ -294,6 +294,7 @@ def additional_information():
         body = re.sub(r"【公開リポジトリの URL/DOI[^】]*】", "", body)
         lines = [l for l in body.split("\n") if not CJK.search(l)]
         body = re.sub(r"\n{3,}", "\n\n", "\n".join(lines)).strip()
+        body = re.sub(r"(?<!\n)\n(?!\n)", " ", body)  # 段落内の改行は空白へ(引用が行をまたいでも変換できるように)
         body = conv(body)  # 宣言節内の author-year 引用も本文と同じ [n] へ(2026-09-05)
         if not body or "【記入】" in body:
             body = "[To be completed before submission]"
