@@ -1989,6 +1989,13 @@
    "volume": "10",
    "pages": "946-963",
    "formatted": "Phipson, B., Lee, S., Majewski, I.J., Alexander, W.S. & Smyth, G.K. Robust hyperparameter estimation protects against hypervariable genes and improves power to detect differential expression. *Ann. Appl. Stat.* **10**, 946–963 (2016)."
+  },
+  {
+   "biblio": "National Cancer Institute (n.d.). NIH-IREP: Guidance on Selection of Radiation Type. https://radiationcalculators.cancer.gov/irep/model/help/help_totaldose/ (accessed 7 September 2026)",
+   "kind": "other",
+   "pmid": null,
+   "doi": null,
+   "formatted": "National Cancer Institute. NIH-IREP: Guidance on Selection of Radiation Type. https://radiationcalculators.cancer.gov/irep/model/help/help_totaldose/ (accessed 7 September 2026)."
   }
  ]
 }
