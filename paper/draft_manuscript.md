@@ -230,6 +230,16 @@ Reading rules, fixed with the map: a signal in R_Tumor is read as agreement with
 - Subramanian A, et al. Gene set enrichment analysis. PNAS 2005;102:15545–15550. doi:10.1073/pnas.0506580102 — 標準 GSEA 統計量・MSigDB〔手法引用/自作実装 — tie-block 拡張、tie-free 一致は自動テストで強制〕(Methods: Gene-set — 本文反映済み)
 - Liberzon A, et al. The Molecular Signatures Database (MSigDB) hallmark gene set collection. Cell Syst 2015;1:417–425. doi:10.1016/j.cels.2015.12.004 — Hallmark(Methods: Gene-set)
 
+遺伝子セットの収録元(Supplementary Methods: Gene-set inference、2026-09-07 追加。MSigDB・msigdbr・Hallmark の既存引用を保持):
+
+- Milacic M, Beavers D, Conley P, Gong C, Gillespie M, Griss J, et al. Nucleic Acids Res 2024;52:D672-D678. doi:10.1093/nar/gkad1025 — The Reactome Pathway Knowledgebase 2024 (Supplementary Methods: Gene-set inference、収録元の原典引用)。
+- Agrawal A, Balcı H, Hanspers K, Coort SL, Martens M, Slenter DN, et al. Nucleic Acids Res 2024;52:D679-D689. doi:10.1093/nar/gkad960 — WikiPathways 2024: next generation pathway database (Supplementary Methods: Gene-set inference、収録元の原典引用)。
+- Kanehisa M, Furumichi M, Sato Y, Matsuura Y, Ishiguro-Watanabe M. Nucleic Acids Res 2025;53:D672-D677. doi:10.1093/nar/gkae909 — KEGG: biological systems database as a model of the real world (Supplementary Methods: Gene-set inference、収録元の原典引用)。
+- Nishimura D. Biotech Softw Internet Rep 2001;2:117-120. doi:10.1089/152791601750294344 — BioCarta (Supplementary Methods: Gene-set inference、収録元の原典引用)。
+- Schaefer CF, Anthony K, Krupa S, Buchoff J, Day M, Hannay T, et al. Nucleic Acids Res 2009;37:D674-D679. doi:10.1093/nar/gkn653 — PID: the Pathway Interaction Database (Supplementary Methods: Gene-set inference、収録元の原典引用)。
+- Ashburner M, Ball CA, Blake JA, Botstein D, Butler H, Cherry JM, et al. Nat Genet 2000;25:25-29. doi:10.1038/75556 — Gene ontology: tool for the unification of biology (Supplementary Methods: Gene-set inference、収録元の原典引用)。
+- The Gene Ontology Consortium. Nucleic Acids Res 2026;54:D1779-D1792. doi:10.1093/nar/gkaf1292 — The Gene Ontology knowledgebase in 2026 (Supplementary Methods: Gene-set inference、収録元の原典引用)。
+
 前処理・正規化・純度(いずれも Methods: Data sources / Normalization / QC):
 
 - Law CW, Chen Y, Shi W, Smyth GK. voom: precision weights unlock linear model analysis tools for RNA-seq read counts. Genome Biol 2014;15:R29. doi:10.1186/gb-2014-15-2-r29 — 純度推定に用いる limma-voom の個別手法引用(Supplementary Methods: Quality control and analysis cohorts)。

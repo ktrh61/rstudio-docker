@@ -1996,6 +1996,154 @@
    "pmid": null,
    "doi": null,
    "formatted": "National Cancer Institute. NIH-IREP: Guidance on Selection of Radiation Type. https://radiationcalculators.cancer.gov/irep/model/help/help_totaldose/ (accessed 7 September 2026)."
+  },
+  {
+   "biblio": "Milacic M, Beavers D, Conley P, Gong C, Gillespie M, Griss J, et al. Nucleic Acids Res 2024;52:D672-D678. doi:10.1093/nar/gkad1025",
+   "kind": "article",
+   "pmid": null,
+   "doi": "10.1093/nar/gkad1025",
+   "title": "The Reactome Pathway Knowledgebase 2024",
+   "journal": "Nucleic Acids Res",
+   "year": "2024",
+   "volume": "52",
+   "pages": "D672-D678",
+   "formatted": "Milacic, M., Beavers, D., Conley, P., Gong, C., Gillespie, M., Griss, J. et al. The Reactome Pathway Knowledgebase 2024. *Nucleic Acids Res.* **52**, D672–D678 (2024)."
+  },
+  {
+   "biblio": "Agrawal A, Balcı H, Hanspers K, Coort SL, Martens M, Slenter DN, et al. Nucleic Acids Res 2024;52:D679-D689. doi:10.1093/nar/gkad960",
+   "kind": "article",
+   "pmid": "37941138",
+   "doi": "10.1093/nar/gkad960",
+   "title": "WikiPathways 2024: next generation pathway database",
+   "journal": "Nucleic Acids Res",
+   "year": "2024",
+   "volume": "52",
+   "pages": "D679-D689",
+   "formatted": "Agrawal, A., Balcı, H., Hanspers, K., Coort, S.L., Martens, M., Slenter, D.N. et al. WikiPathways 2024: next generation pathway database. *Nucleic Acids Res.* **52**, D679–D689 (2024)."
+  },
+  {
+   "biblio": "Kanehisa M, Furumichi M, Sato Y, Matsuura Y, Ishiguro-Watanabe M. Nucleic Acids Res 2025;53:D672-D677. doi:10.1093/nar/gkae909",
+   "kind": "article",
+   "pmid": "39417505",
+   "doi": "10.1093/nar/gkae909",
+   "title": "KEGG: biological systems database as a model of the real world",
+   "authors": [
+    [
+     "Kanehisa",
+     "M."
+    ],
+    [
+     "Furumichi",
+     "M."
+    ],
+    [
+     "Sato",
+     "Y."
+    ],
+    [
+     "Matsuura",
+     "Y."
+    ],
+    [
+     "Ishiguro-Watanabe",
+     "M."
+    ]
+   ],
+   "journal": "Nucleic Acids Res",
+   "year": "2025",
+   "volume": "53",
+   "pages": "D672-D677",
+   "formatted": "Kanehisa, M., Furumichi, M., Sato, Y., Matsuura, Y. & Ishiguro-Watanabe, M. KEGG: biological systems database as a model of the real world. *Nucleic Acids Res.* **53**, D672–D677 (2025)."
+  },
+  {
+   "biblio": "Nishimura D. Biotech Softw Internet Rep 2001;2:117-120. doi:10.1089/152791601750294344",
+   "kind": "article",
+   "pmid": null,
+   "doi": "10.1089/152791601750294344",
+   "title": "BioCarta",
+   "authors": [
+    [
+     "Nishimura",
+     "D."
+    ]
+   ],
+   "journal": "Biotech Softw Internet Rep",
+   "year": "2001",
+   "volume": "2",
+   "pages": "117-120",
+   "formatted": "Nishimura, D. BioCarta. *Biotech Softw. Internet Rep.* **2**, 117–120 (2001)."
+  },
+  {
+   "biblio": "Schaefer CF, Anthony K, Krupa S, Buchoff J, Day M, Hannay T, et al. Nucleic Acids Res 2009;37:D674-D679. doi:10.1093/nar/gkn653",
+   "kind": "article",
+   "pmid": "18832364",
+   "doi": "10.1093/nar/gkn653",
+   "title": "PID: the Pathway Interaction Database",
+   "authors": [
+    [
+     "Schaefer",
+     "C.F."
+    ],
+    [
+     "Anthony",
+     "K."
+    ],
+    [
+     "Krupa",
+     "S."
+    ],
+    [
+     "Buchoff",
+     "J."
+    ],
+    [
+     "Day",
+     "M."
+    ],
+    [
+     "Hannay",
+     "T."
+    ],
+    [
+     "Buetow",
+     "K.H."
+    ]
+   ],
+   "journal": "Nucleic Acids Res",
+   "year": "2009",
+   "volume": "37",
+   "pages": "D674-D679",
+   "formatted": "Schaefer, C.F., Anthony, K., Krupa, S., Buchoff, J., Day, M., Hannay, T. et al. PID: the Pathway Interaction Database. *Nucleic Acids Res.* **37**, D674–D679 (2009)."
+  },
+  {
+   "biblio": "Ashburner M, Ball CA, Blake JA, Botstein D, Butler H, Cherry JM, et al. Nat Genet 2000;25:25-29. doi:10.1038/75556",
+   "kind": "article",
+   "pmid": "10802651",
+   "doi": "10.1038/75556",
+   "title": "Gene ontology: tool for the unification of biology",
+   "journal": "Nat Genet",
+   "year": "2000",
+   "volume": "25",
+   "pages": "25-29",
+   "formatted": "Ashburner, M., Ball, C.A., Blake, J.A., Botstein, D., Butler, H., Cherry, J.M. et al. Gene ontology: tool for the unification of biology. *Nat. Genet.* **25**, 25–29 (2000)."
+  },
+  {
+   "biblio": "The Gene Ontology Consortium. Nucleic Acids Res 2026;54:D1779-D1792. doi:10.1093/nar/gkaf1292",
+   "kind": "article",
+   "pmid": "41413728",
+   "doi": "10.1093/nar/gkaf1292",
+   "title": "The Gene Ontology knowledgebase in 2026",
+   "authors": [
+    [
+     "The Gene Ontology Consortium",
+     ""
+    ]
+   ],
+   "journal": "Nucleic Acids Res",
+   "year": "2026",
+   "volume": "54",
+   "pages": "D1779-D1792",
+   "formatted": "The Gene Ontology Consortium. The Gene Ontology knowledgebase in 2026. *Nucleic Acids Res.* **54**, D1779–D1792 (2026)."
   }
  ]
 }
