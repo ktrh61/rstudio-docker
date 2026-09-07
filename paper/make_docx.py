@@ -8,7 +8,7 @@
 #   (1) BJC 節順に組み替え: タイトルページ → Abstract → Background → Methods → Results →
 #       Discussion → Additional Information → References → Figure legends(改ページつき)。
 #       表 1〜3 はキャプション付きの個別 docx、図 1〜3 は個別 TIFF として同じ時刻タグで出力する
-#       (投稿形そのものを共有する方針 — 研究者決定 2026-09-05。旧「閲覧用一体版」は廃止)
+#       (投稿形そのものを共有する方針 — 研究者決定 2026-09-07。旧「閲覧用一体版」と一覧ファイル・SI 末尾の要約節は廃止)
 #   (2) 引用番号 [n] は角括弧のまま(BJC GTA の指定。2026-09-02 に上付き化を撤回)
 #   (3) 1.5 行間(styles.xml の Normal に w:line=360)
 #   (4) 全行番号(sectPr に lnNumType)
@@ -396,20 +396,9 @@ def supp_preprocess(text):
     assembled = (cover + text.rstrip("\n") + "\n\n" + refs.rstrip("\n")
                  + PAGE_BREAK + "## Supplementary figures\n\n" + PAGE_BREAK.join(figs)
                  + orient_blocks([(f"Table {tag}", b) for tag, b in tabs], "## Supplementary tables")
-                 + "## Supplementary data\n\n" + "\n\n".join(data)
-                 + PAGE_BREAK + supp_file_descriptions() + "\n")
+                 + "## Supplementary data\n\n" + "\n\n".join(data) + "\n")
     return _finish(assembled)
 
-
-def supp_file_descriptions():
-    """投稿システムに入力する各補足ファイルの ≤50 語要約(declarations 記載)を、
-    共著者レビュー用に Supp 末尾へ描画する。"""
-    d = _declarations()
-    zone = d.split("## Supplementary file descriptions", 1)[1].split("\n## ", 1)[0]
-    out = ["## Supplementary file descriptions (submission-system summaries, ≤50 words each)"]
-    for m in re.finditer(r"^### (.+?)$\n\n(.+?)$", zone, re.M):
-        out += ["", f"**{m.group(1)}.** {m.group(2).strip()}"]
-    return "\n".join(out)
 
 
 def preprocess(text):
@@ -760,39 +749,6 @@ def export_figures():
     return outs
 
 
-def _word_counts(docx_path):
-    """投稿形 docx の本文(Background 見出し〜Additional Information 直前、見出し込み)・
-    抄録(小見出し込み)・Additional Information の空白区切り語数。Word の計数とは
-    en dash 結合の扱いで数十語ずれる(参考値)。"""
-    plain = subprocess.run([PANDOC, str(docx_path), "-t", "plain", "--wrap=none"],
-                           capture_output=True, text=True, check=True).stdout.split("\n")
-    def at(h):
-        return [i for i, l in enumerate(plain) if l.strip() == h]
-    try:
-        ab, bg, ai, rf = at("Abstract")[0], at("Background")[1], at("Additional Information")[0], at("References")[0]
-    except IndexError:
-        return {}
-    wc = lambda a, b: len(" ".join(plain[a:b]).split())
-    return {"abstract(+4 subheadings)": wc(ab + 1, bg), "main text(headings included)": wc(bg, ai),
-            "additional information": wc(ai, rf)}
-
-
-def package_manifest(files, tag, commit, dest):
-    """同一タグの出荷ファイル一覧(MD5・サイズ)と語数・コミットを 1 ファイルに記録する。"""
-    import hashlib
-    lines = [f"# Submission package {tag}", f"source commit: {commit}",
-             "files (name, MD5, bytes):"]
-    for f in files:
-        h = hashlib.md5(Path(f).read_bytes()).hexdigest()
-        lines.append(f"  {Path(f).name}  {h}  {Path(f).stat().st_size}")
-    main_docx = [f for f in files if Path(f).name.startswith("manuscript_submission_")]
-    if main_docx:
-        for k, v in _word_counts(main_docx[0]).items():
-            lines.append(f"word count ({k}, whitespace-delimited): {v}")
-    out = dest / f"package_{tag}.txt"
-    out.write_text("\n".join(lines) + "\n", encoding="utf-8")
-    return out
-
 
 KEEP_VIEW_GENERATIONS = 3  # 閲覧用コピー(docx/txt)は最新 3 世代だけ残す。PDF とタグなしファイルは対象外(共有済みの可能性 — 研究者決定 2026-09-02)
 
@@ -851,14 +807,10 @@ def main():
             print(f"閲覧用コピー: {view}")
         shutil.copy2(letter_txt, dest / f"cover_letter_{tag}.txt")
         print(f"貼り付け用テキスト: {dest / f'cover_letter_{tag}.txt'}")
-        shipped = [dest / f"{out.stem}_{tag}.docx" for out in outs] + [dest / f"cover_letter_{tag}.txt"]
         for f in fig_outs:
             view = dest / f"{f.stem}_{tag}.tif"
             shutil.copy2(f, view)
-            shipped.append(view)
             print(f"図の投稿用コピー: {view}")
-        man = package_manifest(shipped, tag, commit, dest)
-        print(f"パッケージ一覧: {man}")
         prune_view_copies(dest)
 
 
