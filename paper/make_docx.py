@@ -378,12 +378,23 @@ def supp_preprocess(text):
     paras = _legend_paras(leg)
     supp_files = ROOT / "paper" / "gpt_review" / "supplementary_files"
     figs, tabs, data = [], [], []
-    for p in paras:
+    skip = set()
+    for i, p in enumerate(paras):
+        if i in skip:
+            continue
         if p.startswith("**Figure S"):
             n = re.match(r"\*\*(Figure S\d)", p).group(1)
             figs.append(p + "\n\n" + f"![]({FIG_PATH[n]}){{width=160mm}}")
         elif p.startswith("**Table S"):
             tag = re.match(r"\*\*Table (S\d)", p).group(1)
+            if tag not in SUPP_TABLE_FILES:
+                # CSV 由来でない表(例: S8 原典表)は凡例直後の Markdown 表をそのまま用いる
+                nxt = paras[i + 1] if i + 1 < len(paras) else ""
+                if not nxt.startswith("|"):
+                    raise RuntimeError(f"Table {tag}: 凡例直後に Markdown 表がありません")
+                skip.add(i + 1)
+                tabs.append((tag, p + "\n\n" + nxt))
+                continue
             fname = SUPP_TABLE_FILES[tag]
             if fname:
                 tabs.append((tag, p + "\n\n" + csv_md_table(supp_files / fname)))
@@ -667,6 +678,7 @@ def patch_docx(path, ja=False, letter=False, landscape=False):
 def tokens_md(text):
     text = re.sub(r"```\{=openxml\}.*?```", " ", text, flags=re.S)  # 改ページ(非テキスト)
     text = re.sub(r"!\[[^\]]*\]\([^)]*\)(\{[^}]*\})?", " ", text)  # 画像構文は非テキスト
+    text = re.sub(r"(?<!!)\[([^\]]*)\]\((?:https?://)[^)]*\)", r"\1", text)  # ハイパーリンクは表示文字だけ
     text = re.sub(r"\^([^\^\s]+)\^", r" \1 ", text)  # 上付き(引用番号・V600E・10^−6)
     text = re.sub(r"~([^~\s]+)~", r" \1 ", text)  # 添字(π0・log2・n_X)
     text = re.sub(r"[#*|`^~]", " ", text)

@@ -22,7 +22,9 @@ ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "output" / "submission"
 OUT.mkdir(parents=True, exist_ok=True)
 
-ORG_AUTHORS = ["R Core Team"]  # 多語の団体著者
+ORG_AUTHORS = ["R Core Team", "National Cancer Institute", "The Gene Ontology Consortium"]  # 多語の団体著者
+ORG_ALT = "|".join(re.escape(o) for o in ORG_AUTHORS)
+YEAR = r"(?:(?:19|20)\d\d[a-z]?|n\.d\.)"  # 年または n.d.(日付のない Web ページ)
 
 CJK = re.compile(r"[　-ヿ㐀-鿿＀-￯]")
 
@@ -42,6 +44,8 @@ def load_ledger():
               or re.search(r"\(((?:19|20)\d\d[a-z]?)\)", biblio)
               or re.search(r";\s((?:19|20)\d\d[a-z]?)\b", biblio)
               or re.search(r"\b((?:19|20)\d\d[a-z]?)\b", biblio))
+        if "(n.d.)" in biblio:
+            ym = re.search(r"\((n\.d\.)\)", biblio)
         if not m or not ym:
             continue
         year = ym.group(1)
@@ -65,8 +69,8 @@ def load_ledger():
 CITE_PART = re.compile(
     r"(?:^|;\s*|\(\s*)"
     r"(?P<pre>[^();]*?)"
-    r"(?P<auth>(?:R Core Team)|(?:[A-ZÀ-Þ][\w'’-]+(?: et al\.| and [A-ZÀ-Þ][\w'’-]+)?))"
-    r"[,]? (?P<years>(?:19|20)\d\d[a-z]?(?:,\s*(?:19|20)\d\d[a-z]?)*)"
+    r"(?P<auth>(?:" + ORG_ALT + r")|(?:[A-ZÀ-Þ][\w'’-]+(?: et al\.| and [A-ZÀ-Þ][\w'’-]+)?))"
+    r"[,]? (?P<years>" + YEAR + r"(?:,\s*" + YEAR + r")*)"
     r"\s*(?=$|;|\))"
 )
 
@@ -98,15 +102,15 @@ def convert(text, index, order, warnings, do_convert=True):
 
     def paren_repl(m):
         inner = m.group(1)
-        if not re.search(r"\b(19|20)\d\d[a-z]?\b", inner):
+        if not re.search(r"\b(19|20)\d\d[a-z]?\b|n\.d\.", inner):
             return m.group(0)
         parts = [p.strip() for p in inner.split(";")]
         nums, keep = [], []
         for p in parts:
             pm = re.match(
                 r"^(?:(?P<pre>[^,]*?[;,]\s*)?)"
-                r"(?P<auth>(?:R Core Team)|(?:[A-ZÀ-Þ][\w'’-]+(?: et al\.| and [A-ZÀ-Þ][\w'’-]+)?))"
-                r",? (?P<years>(?:19|20)\d\d[a-z]?(?:,\s*(?:19|20)\d\d[a-z]?)*)$", p)
+                r"(?P<auth>(?:" + ORG_ALT + r")|(?:[A-ZÀ-Þ][\w'’-]+(?: et al\.| and [A-ZÀ-Þ][\w'’-]+)?))"
+                r",? (?P<years>" + YEAR + r"(?:,\s*" + YEAR + r")*)$", p)
             if pm:
                 for y in re.split(r",\s*", pm.group("years")):
                     n = assign(pm.group("auth"), y)
@@ -140,8 +144,8 @@ def convert(text, index, order, warnings, do_convert=True):
     if do_convert:
         # 地の文: "Morton et al. (2021)" / "Abend et al. (2012, 2013)"
         text = re.sub(
-            r"\b((?:R Core Team)|(?:[A-ZÀ-Þ][\w'’-]+(?: et al\.| and [A-ZÀ-Þ][\w'’-]+)?)) "
-            r"\(((?:19|20)\d\d[a-z]?(?:,\s*(?:19|20)\d\d[a-z]?)*)\)",
+            r"\b((?:" + ORG_ALT + r")|(?:[A-ZÀ-Þ][\w'’-]+(?: et al\.| and [A-ZÀ-Þ][\w'’-]+)?)) "
+            r"\((" + YEAR + r"(?:,\s*" + YEAR + r")*)\)",
             narrative_repl, text)
         # 括弧内
         text = re.sub(r"\(([^()]*)\)", paren_repl, text)
