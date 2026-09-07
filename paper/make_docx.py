@@ -295,6 +295,8 @@ def additional_information():
         lines = [l for l in body.split("\n") if not CJK.search(l)]
         body = re.sub(r"\n{3,}", "\n\n", "\n".join(lines)).strip()
         body = re.sub(r"(?<!\n)\n(?!\n)", " ", body)  # 段落内の改行は空白へ(引用が行をまたいでも変換できるように)
+        body = re.sub(r"  +", " ", body)          # タグ除去痕の連続スペース(make_submission.strip_meta と同じ整理)
+        body = re.sub(r" ([.,;)])", r"\1", body)  # 句読点前の孤立スペース
         body = conv(body)  # 宣言節内の author-year 引用も本文と同じ [n] へ(2026-09-05)
         if not body or "【記入】" in body:
             body = "[To be completed before submission]"
