@@ -1913,6 +1913,18 @@
    "volume": "53",
    "pages": "257-262",
    "formatted": "Heath, A.P., Ferretti, V., Agrawal, S. et al. The NCI Genomic Data Commons. *Nat. Genet.* **53**, 257–262 (2021)."
+  },
+  {
+   "biblio": "Mudge JM, Carbonell-Sala S, Diekhans M, Martinez JG, Hunt T, Jungreis I, et al. Nucleic Acids Res 2025;53:D966-D975. doi:10.1093/nar/gkae1078",
+   "kind": "article",
+   "pmid": "39565199",
+   "doi": "10.1093/nar/gkae1078",
+   "title": "GENCODE 2025: reference gene annotation for human and mouse",
+   "journal": "Nucleic Acids Res",
+   "year": "2025",
+   "volume": "53",
+   "pages": "D966-D975",
+   "formatted": "Mudge, J.M., Carbonell-Sala, S., Diekhans, M., Martinez, J.G., Hunt, T., Jungreis, I. et al. GENCODE 2025: reference gene annotation for human and mouse. *Nucleic Acids Res.* **53**, D966–D975 (2025)."
   }
  ]
 }

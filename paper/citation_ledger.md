@@ -151,6 +151,7 @@
 | 引用 | 本文の使用箇所 | 出典が実際に述べること(逐語の要点) | 射程・但し書き | 照合日・方法 | 状態 |
 | --- | --- | --- | --- | --- | --- |
 | Heath AP, Ferretti V, Agrawal S, et al. Nat Genet 2021;53:257-262. doi:10.1038/s41588-021-00791-5 | Methods: Data sources / Supplementary Methods: Data sources and expression matrix | GDC 公式 FAQ: "Please credit the NCI Genomic Data Commons (GDC) in your manuscript"。指定論文は "The NCI Genomic Data Commons" | GDC リソースの利用に対する引用。REBC-THYR の原研究 Morton et al. 2021 と、API アクセス用パッケージ Morgan and Davis 2025 の引用を代替しない。Grossman et al. 2016 は旧候補としてのみ保持 | 2026-09-07 / GDC 公式引用案内 https://gdc.cancer.gov/content/how-do-i-cite-nci-gdc (指定論文の書誌を含む) | verified |
+| Mudge JM, Carbonell-Sala S, Diekhans M, Martinez JG, Hunt T, Jungreis I, et al. Nucleic Acids Res 2025;53:D966-D975. doi:10.1093/nar/gkae1078 | Supplementary Methods: Data sources and expression matrix(GENCODE v36 の初出。染色体割当て・外部シンボル対応にも同じ注釈を使用) | GENCODE 公式サイトの "Reference Publication": "GENCODE 2025: reference gene annotation for human and mouse" | GENCODE リソース自体の代表引用。使用注釈の版数は v36 のまま保持し、2025 年の注釈版を解析したという意味にはしない。rtracklayer の Lawrence et al. 2009 は読込みソフトウェアの引用として別に保持 | 2026-09-07 / GENCODE 公式代表論文の書誌 https://www.gencodegenes.org/pages/publications.html と引用案内 https://www.gencodegenes.org/pages/gencode.html (論文全文の照合ではない) | verified-abstract |
 
 ## I. 本文未使用の候補(driver と線量の背景。セッション内で要旨照合済み)
 
