@@ -596,8 +596,8 @@
   2. 条件付き保留: Abstract に余裕が生じた場合に "differed transcriptionally" → "differed in expression"(+1語)を検討(2026-09-02)
   3. submission_declarations の【記入】残 = Acknowledgements(親族相談中)+公開リポジトリ URL/DOI 2箇所
      (公開時確定)。所属現名称・貢献文は共著者検収で確定
-  4. フェーズ1 = 共著者レビュー(投稿形パッケージ = 本文 docx・表 3 ファイル・図 3 TIFF・SI・カバーレター、package_<タグ>.txt
-     の一覧つきで送付。2026-09-07 に一体版方針を廃止)。指摘は交渉層で自由、確定層は検査+改訂メモ 1 行
+  4. フェーズ1 = 共著者レビュー(投稿形パッケージ = 本文 docx・表 3 ファイル・図 3 TIFF・SI・カバーレターを送付。
+     2026-09-07 に一体版方針と一覧ファイルを廃止)。指摘は交渉層で自由、確定層は検査+改訂メモ 1 行
   5. フェーズ2 送り(書式仕様は BJC GTA ライブ照合 2026-08-25 で確定):
      References 投稿規定整形(Vancouver・6著者超は先頭6+et al.・上付き・PMID 併記整理)/
      組版記号(C(n,nx)・n_X・Spearman rho→ρ・表1 "post-hoc"→"post hoc")/Word 化 = 1.5 行間・全ページ+全行番号・図凡例は References 後の
@@ -934,6 +934,9 @@
   表 1〜3 をキャプション付き個別 docx(表 2 は横置き、行番号・頁番号なし)、図 1〜3 を 600 dpi TIFF の個別コピーとして同一時刻タグで
   出力。パッケージ一覧 package_<タグ>.txt(ファイル名・MD5・サイズ・ソースコミット・参考語数)を同梱。SI 一体 docx・訳・カバーレターは
   従来どおり。自動整理は docx/txt/tif の最新 3 世代。図の都度再生成は不採用(図は R 産物で git 管理、タグ対と MD5 で版対応を担保)
+- 2026-09-07: 一覧ファイル package_<タグ>.txt の生成と、SI docx 末尾の「Supplementary file descriptions」節(レビュー用)を廃止
+  (研究者決定 — 共有物を投稿形に完全一致させる。版の対応はファイル名の時刻タグと git タグで足り、50 語要約の正本は declarations)。
+  共有物 = 本文 docx・表 1〜3 docx・図 1〜3 TIFF・SI docx(投稿時は Word から PDF 化)・カバーレター英日+txt・訳 2 本(内部用)
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
   600 dpi TIFF)/別ファイル CSV 3 件+50 語要約/カバーレター案。残 = Acknowledgements・共著者レビューと
