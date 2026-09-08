@@ -1,8 +1,9 @@
-# REBC-THYR driver-conditioned expression analysis
+# ptc-driver-conditioned-transcriptomics
 
-Analysis code for the manuscript on driver-conditioned transcriptomic
-differences across radiation-attributability bands in papillary thyroid
-carcinoma (REBC-THYR RNA-seq, NCI Genomic Data Commons).
+Analysis code for “Driver-conditioned transcriptomic differences across
+radiation-attributability bands in papillary thyroid carcinoma” (Harakawa K,
+Saenko VA, Mitsutake N). The input data are the REBC-THYR RNA-seq counts and
+clinical table distributed by the NCI Genomic Data Commons.
 
 ## Layout
 
