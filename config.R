@@ -20,6 +20,13 @@ SEED <- 19860426L
 # purity 2e-14, scaling coefficients 2e-13, every cohort decision identical).
 WORKERS <- 4L
 
+# Seed base for the secondary stages (240 age disclosure, 415 null calibration,
+# 416 spike-in control, 440 signature agreement, 540-560 REO band checks),
+# independent of SEED so that none of them shares a random stream with the
+# inference (unified 2026-08-09). Each stage documents how it derives its
+# stream from this base.
+DIAGNOSTIC_SEED <- 19450809L
+
 # Brunner-Munzel exact-enumeration threads and allocation cap (310/410).
 EXACT_THREADS <- 4L
 BM_EXACT_MAX <- 1e8

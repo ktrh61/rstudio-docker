@@ -5,14 +5,13 @@
 # The calibration cell table is located defensively (first data.frame in the
 # rds carrying a p_any column) because the rds layout predates this script.
 # Input : processed/thyr_enrichment_test.rds
-#         diagnostics/output/gsea_null_calibration.rds
+#         processed/thyr_gsea_null_calibration.rds (from 415)
 # Output: output/tables/tab_set_level_summary.csv (+ printed table)
 
 source("setup.R")
 
 en <- readRDS(file.path(paths$processed, "thyr_enrichment_test.rds"))
-cal <- readRDS(file.path(paths$root, "diagnostics", "output",
-                         "gsea_null_calibration.rds"))
+cal <- readRDS(file.path(paths$processed, "thyr_gsea_null_calibration.rds"))
 
 find_cells <- function(obj) {
   if (is.data.frame(obj) && "p_any" %in% names(obj)) return(obj)

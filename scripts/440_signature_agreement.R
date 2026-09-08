@@ -1,4 +1,4 @@
-# signature_agreement.R
+# 440_signature_agreement.R
 # Between-driver-arm signature agreement, normal and tumor tissue (reorg plan
 # v2 s0.5 6th confirmation and appendix B.7; reading rules for both pairs
 # fixed there before the corresponding first run).
@@ -37,7 +37,7 @@
 # Input : processed/thyr_expression_test.rds    (from 410; effect, statistic,
 #         perm_index)
 #         processed/thyr_normalized_counts.rds  (from 310; per-unit DGEList)
-# Output: diagnostics/output/signature_agreement.rds
+# Output: processed/thyr_signature_agreement.rds
 
 source("setup.R")
 
@@ -58,7 +58,7 @@ PAIRS <- list(
 )
 # One distinct shuffle seed per unit (see header). Base = the shared
 # diagnostic base seed (v2 B.10); offset = unit position.
-AGREEMENT_SEED_BASE <- 19450809L
+AGREEMENT_SEED_BASE <- DIAGNOSTIC_SEED # shared secondary-stage seed base (config.R)
 
 expression_test <- readRDS(
   file.path(paths$processed, "thyr_expression_test.rds")
@@ -132,9 +132,8 @@ compare_pair <- function(pair_name, units) {
 results <- lapply(names(PAIRS), function(nm) compare_pair(nm, PAIRS[[nm]]))
 names(results) <- names(PAIRS)
 
-out_dir <- file.path(paths$root, "diagnostics", "output")
-if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
-out <- file.path(out_dir, "signature_agreement.rds")
+out_dir <- paths$processed
+out <- file.path(out_dir, "thyr_signature_agreement.rds")
 saveRDS(
   list(
     date = Sys.Date(),

@@ -1,4 +1,4 @@
-# sex_chromosome_annotation.R
+# 450_sex_chromosome_annotation.R
 # Sex-chromosome membership of the discovered gene lists (descriptive
 # annotation; researcher Go 2026-08-16).
 #
@@ -19,7 +19,7 @@
 # Input : raw/reference/gencode.v36.annotation.gtf
 #         processed/thyr_expression_test.rds  (410: gene_id, effect, q_storey)
 #         processed/thyr_se_raw.rds           (gene_id -> gene_name)
-# Output: diagnostics/output/sex_chromosome_annotation.rds
+# Output: processed/thyr_sex_chromosome_annotation.rds
 
 source("setup.R")
 suppressPackageStartupMessages({
@@ -83,7 +83,6 @@ xy <- xy[order(xy$chrom, xy$p_exact),
            "effect", "p_exact", "q_storey")]
 print(xy, row.names = FALSE)
 
-out <- file.path(paths$root, "diagnostics", "output",
-                 "sex_chromosome_annotation.rds")
+out <- file.path(paths$processed, "thyr_sex_chromosome_annotation.rds")
 saveRDS(list(summary = tab, r_tumor_xy = xy), out)
 message("Saved: ", out)

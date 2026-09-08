@@ -1,4 +1,4 @@
-# gsea_null_calibration.R
+# 415_gsea_null_calibration.R
 # Held-out null calibration of the spec-B gene-set inference (reorg plan v2
 # D6, decided 2026-08-07). A linear diagnostic that reports a measurement; it
 # gates nothing by mechanism. The pre-registered constraint is ordering only:
@@ -31,7 +31,7 @@
 # Input : processed/thyr_normalized_counts.rds  (from 310)
 #         lib/stat_brunnermunzel.R, lib/gsea_permutation.R,
 #         lib/gsea_collections.R
-# Output: diagnostics/output/gsea_null_calibration.rds
+# Output: processed/thyr_gsea_null_calibration.rds
 #           list(date, config, summary, counts)
 
 source("setup.R")
@@ -50,7 +50,7 @@ source(file.path(paths$root, "lib", "annotation.R"))
 
 # --- Configuration ---------------------------------------------------------
 SPECIES <- "Homo sapiens"
-CALIB_SEED <- 19450809L # shared diagnostic base seed (v2 B.10); independent of SEED
+CALIB_SEED <- DIAGNOSTIC_SEED # shared secondary-stage seed base (config.R); independent of SEED
 R_REPLICATES <- 100L
 # B (the shared null pool) matches the analysis N_PERM from config.R, so the
 # calibration measures the machinery at the resolution 420 actually uses.
@@ -65,8 +65,7 @@ normalized <- readRDS(norm_path)
 collections <- load_gene_set_collections(SPECIES)
 gene_sets <- collections$gene_sets
 
-out_dir <- file.path(paths$root, "diagnostics", "output")
-if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
+out_dir <- paths$processed
 
 # --- Per-unit calibration --------------------------------------------------
 calibrate_unit <- function(dgelist, unit) {
@@ -167,6 +166,6 @@ gsea_null_calibration <- list(
   counts = lapply(results, `[[`, "counts")
 )
 
-out <- file.path(out_dir, "gsea_null_calibration.rds")
+out <- file.path(out_dir, "thyr_gsea_null_calibration.rds")
 saveRDS(gsea_null_calibration, out)
 message("Saved: ", out)

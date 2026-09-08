@@ -7,7 +7,7 @@
 # N-25 (B_Normal/H excess) and N-26 (boundary cells) on first run.
 # The single cell whose CI sits above the nominal level (B_Normal/Hallmark)
 # is emphasised; it is the disclosed calibration excess.
-# Input : diagnostics/output/gsea_null_calibration.rds
+# Input : processed/thyr_gsea_null_calibration.rds (from 415)
 # Output: output/figures/fig_d6_calibration.png (+ .tif 600 dpi, .pdf vector)
 # Drawn at final width 175 mm, text 5.6-7 pt, no in-figure title/subtitle;
 # key and axis wording follow the manuscript (Clopper-Pearson interval,
@@ -20,8 +20,7 @@ suppressPackageStartupMessages({
 
 source(file.path(paths$root, "lib", "plot_theme.R"))
 
-cal <- readRDS(file.path(paths$root, "diagnostics", "output",
-                         "gsea_null_calibration.rds"))
+cal <- readRDS(file.path(paths$processed, "thyr_gsea_null_calibration.rds"))
 s <- cal$summary
 stopifnot(nrow(s) == 16L, cal$config$nominal == 0.1)
 

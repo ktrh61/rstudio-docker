@@ -7,13 +7,12 @@
 # n_shared, rho, rho_null (9,999 values), p_two_sided, n_perm. The reference
 # interval is the central 95% of rho_null (2.5/97.5 percentiles) -- verified
 # to reproduce N-33 ([-0.3914, +0.3930]) and N-34 ([-0.4615, +0.4580]).
-# Input : diagnostics/output/signature_agreement.rds
+# Input : processed/thyr_signature_agreement.rds (from 440)
 # Output: output/tables/supp_tab_concordance.csv (+ printed structure)
 
 source("setup.R")
 
-sa <- readRDS(file.path(paths$root, "diagnostics", "output",
-                        "signature_agreement.rds"))
+sa <- readRDS(file.path(paths$processed, "thyr_signature_agreement.rds"))
 cat("top-level names:", paste(names(sa), collapse = ", "), "\n")
 utils::str(sa, max.level = 2)
 

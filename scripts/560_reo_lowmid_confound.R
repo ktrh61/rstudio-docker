@@ -1,4 +1,4 @@
-# reo_lowmid_confound.R
+# 560_reo_lowmid_confound.R
 # Ancillary QC for the REO intermediate-band application. This script provides
 # two descriptive views of the band-score pattern in cases with relative-purity
 # estimates:
@@ -8,14 +8,14 @@
 # Neither analysis establishes an AS-band association independent of purity.
 # This diagnostic runs outside the numbered stream and reads the output from
 # reo_lowmid_purity.R.
-# Input : diagnostics/output/reo_lowmid_purity.rds
+# Input : processed/thyr_reo_lowmid_purity.rds (from 550)
 #         lib/stat_brunnermunzel.R
-# Output: diagnostics/output/reo_confound.rds
+# Output: processed/thyr_reo_lowmid_confound.rds
 
 source("setup.R")
 source(file.path(paths$root, "lib", "stat_brunnermunzel.R"))
 
-d <- readRDS(file.path(paths$root, "diagnostics", "output", "reo_lowmid_purity.rds"))
+d <- readRDS(file.path(paths$processed, "thyr_reo_lowmid_purity.rds"))
 d <- d[d$band %in% c("R_Low", "R_Mid") & !is.na(d$score) & !is.na(d$tumor_purity), , drop = FALSE]
 d$band_num <- ifelse(d$band == "R_Mid", 1L, 0L) # ordered: Mid higher AS
 message("R_Low/Mid with score+purity: ",
@@ -80,8 +80,7 @@ out <- list(
   strata = strata_tbl,
   data = d[, c("case_submitter_id", "band", "assigned_share", "tumor_purity", "score", "stratum")]
 )
-out_dir <- file.path(paths$root, "diagnostics", "output")
-if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
-out_rds <- file.path(out_dir, "reo_confound.rds")
+out_dir <- paths$processed
+out_rds <- file.path(out_dir, "thyr_reo_lowmid_confound.rds")
 saveRDS(out, out_rds)
 message("\nSaved: ", out_rds)

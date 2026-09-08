@@ -1,4 +1,4 @@
-# external_gene_anchors.R
+# 460_external_gene_anchors.R
 # Descriptive cross-reference of externally published radiation-associated
 # thyroid gene lists against this study's per-unit DEG sets (claim map C-13).
 #
@@ -27,11 +27,11 @@
 # mapping is reproducible from repository contents. Unresolved or
 # multi-mapped symbols are printed, not silently dropped.
 #
-# Input : diagnostics/external_gene_anchors.csv  (validated anchor lists)
-#         diagnostics/ory2026_gene_signatures.csv (multivariate signatures)
+# Input : raw/external/external_gene_anchors.csv  (validated anchor lists)
+#         raw/external/ory2026_gene_signatures.csv (multivariate signatures)
 #         processed/thyr_expression_test.rds     (from 410; genes table)
 #         processed/thyr_se_raw.rds              (rowData: gene_id, gene_name)
-# Output: diagnostics/output/external_gene_anchors.rds
+# Output: processed/thyr_external_gene_anchors.rds
 
 source("setup.R")
 
@@ -40,7 +40,7 @@ suppressPackageStartupMessages({
 })
 
 validated <- read.csv(
-  file.path(paths$root, "diagnostics", "external_gene_anchors.csv"),
+  file.path(paths$raw, "external", "external_gene_anchors.csv"),
   stringsAsFactors = FALSE
 )
 validated$evidence_class <- "validated_anchor"
@@ -48,7 +48,7 @@ validated$source_table <- ""
 validated$ensembl_id <- ""
 
 ory <- read.csv(
-  file.path(paths$root, "diagnostics", "ory2026_gene_signatures.csv"),
+  file.path(paths$raw, "external", "ory2026_gene_signatures.csv"),
   stringsAsFactors = FALSE
 )
 names(ory)[names(ory) == "signature"] <- "anchor_set"
@@ -203,7 +203,6 @@ result <- list(
   summary = summary_tab,
   detail = detail_tab
 )
-out_dir <- file.path(paths$root, "diagnostics", "output")
-dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
-saveRDS(result, file.path(out_dir, "external_gene_anchors.rds"))
-cat("\nSaved:", file.path(out_dir, "external_gene_anchors.rds"), "\n")
+out_dir <- paths$processed
+saveRDS(result, file.path(out_dir, "thyr_external_gene_anchors.rds"))
+cat("\nSaved:", file.path(out_dir, "thyr_external_gene_anchors.rds"), "\n")

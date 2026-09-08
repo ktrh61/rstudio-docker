@@ -1,4 +1,4 @@
-# age_arm_difference.R
+# 240_age_arm_difference.R
 # Between-arm age-at-surgery difference, estimated with CI (claim map C-15;
 # reading fixed there before this script's first run).
 #
@@ -29,12 +29,12 @@
 #
 # Input : processed/thyr_analysis_cohorts.rds (include_main_bm, driver, band)
 #         processed/thyr_clinical.rds         (REBC_ID, AGE_SURGERY, AGE_EXPOSURE)
-# Output: diagnostics/output/age_arm_difference.rds
+# Output: processed/thyr_age_arm_difference.rds
 
 source("setup.R")
 source(file.path(paths$root, "lib", "stat_brunnermunzel.R"))
 
-SEED <- 19450809L
+BOOT_SEED <- DIAGNOSTIC_SEED # shared secondary-stage seed base (config.R)
 B_BOOT <- 9999L
 
 cohorts <- readRDS(file.path(paths$processed, "thyr_analysis_cohorts.rds"))
@@ -59,10 +59,10 @@ fmt_med <- function(v) {
 cat(
   "Age-at-surgery arm difference (High - Sporadic), main BM cohort;",
   "HL shift + BM effect, percentile bootstrap B =", B_BOOT,
-  ", seed", SEED, "\n"
+  ", seed", BOOT_SEED, "\n"
 )
 
-set.seed(SEED)
+set.seed(BOOT_SEED)
 result_rows <- list()
 boot_draws <- list()
 for (drv in c("RET", "BRAF")) {
@@ -120,11 +120,10 @@ for (drv in c("RET", "BRAF")) {
 
 result <- list(
   date = Sys.time(),
-  config = list(seed = SEED, b_boot = B_BOOT, ci = "percentile 2.5/97.5"),
+  config = list(seed = BOOT_SEED, b_boot = B_BOOT, ci = "percentile 2.5/97.5"),
   summary = do.call(rbind, result_rows),
   bootstrap = boot_draws
 )
-out_dir <- file.path(paths$root, "diagnostics", "output")
-dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
-saveRDS(result, file.path(out_dir, "age_arm_difference.rds"))
-cat("\nSaved:", file.path(out_dir, "age_arm_difference.rds"), "\n")
+out_dir <- paths$processed
+saveRDS(result, file.path(out_dir, "thyr_age_arm_difference.rds"))
+cat("\nSaved:", file.path(out_dir, "thyr_age_arm_difference.rds"), "\n")

@@ -16,6 +16,12 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
+# MSigDB gene sets: msigdbr 26.1.0 reads a pinned Zenodo release
+# (msigdb.2026.1.zip, MD5 512ba99c6827141a9d471972b812d4ac) from the R user
+# cache. Keep that cache inside the repository (raw/cache/R/msigdbr/) so the
+# gene-set data is a versioned raw input and no run depends on the network.
+export R_USER_CACHE_DIR="$PWD/raw/cache"
+
 order=()
 for f in scripts/*.R figures/*.R tables/*.R; do
   [ -e "$f" ] && order+=("$f")

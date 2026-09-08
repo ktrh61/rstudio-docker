@@ -5,9 +5,9 @@
 # band pool sizes, N-95); canonical sources
 # for the ledger remain the primary rds (N-09, N-12, N-13). CSV is a
 # typesetting convenience. Age-difference footnote values (N-64, N-65) come
-# from diagnostics/output/age_arm_difference.rds and are appended as notes.
+# from processed/thyr_age_arm_difference.rds (stage 240) and are appended as notes.
 # Input : processed/thyr_analysis_cohorts.rds, processed/thyr_clinical.rds,
-#         diagnostics/output/age_arm_difference.rds
+#         processed/thyr_age_arm_difference.rds (from 240)
 # Output: output/tables/tab_case_characteristics.csv,
 #         output/tables/tab_case_characteristics_notes.txt (+ printed table)
 
@@ -15,9 +15,9 @@ source("setup.R")
 
 co <- readRDS(file.path(paths$processed, "thyr_analysis_cohorts.rds"))
 cl <- readRDS(file.path(paths$processed, "thyr_clinical.rds"))
-age_path <- file.path(paths$root, "diagnostics", "output", "age_arm_difference.rds")
+age_path <- file.path(paths$processed, "thyr_age_arm_difference.rds")
 if (!file.exists(age_path)) {
-  stop("age_arm_difference.rds not found (run diagnostics/age_arm_difference.R first)")
+  stop("thyr_age_arm_difference.rds not found (run scripts/240_age_arm_difference.R first)")
 }
 age <- readRDS(age_path)
 required_age_columns <- c(
@@ -29,7 +29,7 @@ stopifnot(
   all(required_age_columns %in% names(age$summary)),
   setequal(age$summary$stratum, c("R", "B")),
   identical(age$config$b_boot, 9999L),
-  identical(age$config$seed, 19450809L)
+  identical(age$config$seed, DIAGNOSTIC_SEED)
 )
 m <- merge(
   co, cl[, c("REBC_ID", "SEX", "AGE_SURGERY", "AGE_EXPOSURE", "Designated_Driver")],

@@ -1,4 +1,4 @@
-# reo_lowmid_outliers.R
+# 540_reo_lowmid_outliers.R
 # Ancillary QC for the REO intermediate-band application: apply the PC-OD
 # procedure to R_Low / R_Mid tumours, record any flags without excluding cases,
 # and descriptively recompute the graded comparison after removing flagged
@@ -7,7 +7,7 @@
 # Input : processed/thyr_case_design.rds (from 140),
 #         thyr_se_raw.rds, thyr_reo_evaluation.rds
 #         lib/qc_pc_od.R, lib/stat_brunnermunzel.R
-# Output: diagnostics/output/reo_lowmid_outliers.rds
+# Output: processed/thyr_reo_lowmid_outliers.rds
 
 source("setup.R")
 suppressPackageStartupMessages({
@@ -71,8 +71,7 @@ report(rep(TRUE, nrow(cases)), "all samples")
 report(cases$is_outlier == 0, "outliers removed")
 
 # --- Save ------------------------------------------------------------------
-out_dir <- file.path(paths$root, "diagnostics", "output")
-if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
-out_rds <- file.path(out_dir, "reo_lowmid_outliers.rds")
+out_dir <- paths$processed
+out_rds <- file.path(out_dir, "thyr_reo_lowmid_outliers.rds")
 saveRDS(cases[, c("case_submitter_id", "band", "assigned_share", "tumor_id", "score", "is_outlier")], out_rds)
 message("Saved: ", out_rds, " (", sum(cases$is_outlier), " outlier(s) flagged)")

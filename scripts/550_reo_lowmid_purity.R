@@ -1,4 +1,4 @@
-# reo_lowmid_purity.R
+# 550_reo_lowmid_purity.R
 # Ancillary QC for the REO intermediate-band application: estimate relative
 # tumour purity on one common scale by pooling paired RET cases from all four
 # groups (Sporadic + Low + Mid + High) in one ContamDE run, then describe its
@@ -10,7 +10,7 @@
 #         thyr_se_raw.rds, thyr_reo_evaluation.rds
 #         lib/norm_muren_helpers.R, lib/norm_muren.R,
 #         lib/purity_contamde.R
-# Output: diagnostics/output/reo_lowmid_purity.rds
+# Output: processed/thyr_reo_lowmid_purity.rds
 
 source("setup.R")
 suppressPackageStartupMessages({
@@ -81,8 +81,7 @@ for (b in c("R_Low", "R_Mid")) {
 r_all <- suppressWarnings(cor(lm$tumor_purity, lm$score, method = "spearman"))
 message(sprintf("  pooled Low+Mid Spearman(purity, score) = %+.3f (n=%d)", r_all, nrow(lm)))
 
-out_dir <- file.path(paths$root, "diagnostics", "output")
-if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
-out_rds <- file.path(out_dir, "reo_lowmid_purity.rds")
+out_dir <- paths$processed
+out_rds <- file.path(out_dir, "thyr_reo_lowmid_purity.rds")
 saveRDS(cases[, c("case_submitter_id", "band", "assigned_share", "tumor_purity", "score")], out_rds)
 message("Saved: ", out_rds)

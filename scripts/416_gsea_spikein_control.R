@@ -1,4 +1,4 @@
-# gsea_spikein_control.R
+# 416_gsea_spikein_control.R
 # Spike-in positive control for the spec-B gene-set inference (reorg plan v2,
 # phase 4 step 15). The historical control (a 15% shift over one Hallmark set
 # planted in a unit with no gene-level signal, caught at Westfall-Young fwer
@@ -14,7 +14,7 @@
 # Input : processed/thyr_normalized_counts.rds  (from 310)
 #         lib/stat_brunnermunzel.R, lib/gsea_permutation.R,
 #         lib/gsea_collections.R
-# Output: diagnostics/output/gsea_spikein_control.rds
+# Output: processed/thyr_gsea_spikein_control.rds
 
 source("setup.R")
 
@@ -35,7 +35,7 @@ SPECIES <- "Homo sapiens"
 SPIKE_UNIT <- "B_Tumor" # no gene-level signal against its own null
 SPIKE_SET <- "HALLMARK_ADIPOGENESIS" # one mid-size Hallmark set
 SPIKE_FACTOR <- 1.15 # 15% multiplicative shift on the High arm
-SPIKE_SEED <- 19450809L # shared diagnostic base seed (v2 B.10); independent
+SPIKE_SEED <- DIAGNOSTIC_SEED # shared secondary-stage seed base (config.R); independent
 # of the inference seed. Same literal as CALIB_SEED by design (one base value
 # for all non-inferential diagnostics), so for a given unit the two
 # diagnostics share a shuffle stream. Harmless: they are separate
@@ -51,8 +51,7 @@ normalized <- readRDS(norm_path)
 collections <- load_gene_set_collections(SPECIES)
 gene_sets <- collections$gene_sets
 
-out_dir <- file.path(paths$root, "diagnostics", "output")
-if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
+out_dir <- paths$processed
 
 # --- Build the spiked matrix ------------------------------------------------
 dgelist <- normalized$units[[SPIKE_UNIT]]$dgelist
@@ -151,6 +150,6 @@ gsea_spikein_control <- list(
   hallmark_rank = hallmark_rank,
   sets = sets
 )
-out <- file.path(out_dir, "gsea_spikein_control.rds")
+out <- file.path(out_dir, "thyr_gsea_spikein_control.rds")
 saveRDS(gsea_spikein_control, out)
 message("Saved: ", out)
