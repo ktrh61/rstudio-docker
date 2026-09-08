@@ -48,7 +48,8 @@ designed and implemented by KH. All authors reviewed and approved the final manu
 ### Ethics approval and consent to participate
 
 This study is a secondary analysis of publicly available, de-identified data obtained from
-the open-access tier of the NCI Genomic Data Commons (project REBC-THYR). No new data
+the open-access tier of the National Cancer Institute Genomic Data Commons (project
+REBC-THYR). No new data
 involving human participants were collected by the authors, and no additional ethical
 approval was required. The study was performed in accordance with the Declaration of
 Helsinki. Ethical approvals and participant consent for the original data collection are
@@ -61,8 +62,9 @@ Not applicable. The manuscript contains no individual person's identifiable data
 
 ### Data availability
 
-Gene-level RNA-seq counts and clinical data are openly available from the NCI Genomic
-Data Commons (project REBC-THYR; STAR - Counts, open access). The exact 906-file download
+Gene-level RNA-seq counts and clinical data are openly available from the National Cancer
+Institute Genomic Data Commons (project REBC-THYR,
+https://portal.gdc.cancer.gov/projects/REBC-THYR; STAR - Counts, open access). The exact 906-file download
 manifest (MD5 7defb0c5574453474c67dfac8367a589) is provided with the analysis code
 <!-- N-89 -->. Processed analysis objects sufficient to regenerate the reported figures and
 tables accompany the paper. Analysis code, versioned inputs, and the date-pinned container
@@ -74,7 +76,7 @@ build recipe sufficient to regenerate the reported analyses are available at 【
 
 The authors declare no conflict of interest.
 
-### Funding
+### Funding information
 
 The authors received no specific funding for this work.
 
@@ -95,6 +97,11 @@ Complete gene-level results for every tested gene in each of the four contrasts 
 ### Supplementary Data 2 (supplementary_data_2_set_level_results.csv)
 
 Complete label-permutation gene-set results for all tested sets in each contrast and collection (24,798 rows): set size, enrichment score, normalized enrichment score, sign-conditional permutation p-value, within-collection Benjamini–Hochberg q-value, redundancy annotation, and leading-edge genes.
+
+### STROBE checklist (strobe_checklist.pdf)
+
+Completed STROBE checklist for cross-sectional studies (22 items). Each reporting item is mapped to the manuscript section, page, and line numbers where it is addressed; items that do not apply to this secondary analysis of publicly available data are marked as such with the reason.
+(2026-09-08 研究者 Go: 共著者送付版に下書きを同梱、頁・行は本文確定後の最終版で更新。投稿時は Word から PDF 化)
 
 ## 公開リポジトリ・プレプリント運用(2026-08-29 記録。2026-09-02 研究者決定: 共著者不同意を前提にルート B を既定として仕上げる — 同意が得られた場合のみルート A へ切替(投稿後も規定上可)。切替可能性のため両ルートの記述を保持)
 

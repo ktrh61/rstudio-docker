@@ -806,6 +806,9 @@ def main():
               lambda t: letter_preprocess(t, ja=True, pair=(
                   f"**対応版**: 英語版 cover_letter_{tag}.docx(同時生成の対)。"
                   f"ソース: paper/cover_letter_ja.md @{commit}")), ja=True, letter=True),
+        # STROBE チェックリスト(横断研究版、補足資料。書簡と同じ体裁: 行番号なし。2026-09-08 研究者 Go)
+        build(ROOT / "paper" / "strobe_checklist.md", "strobe_checklist.docx",
+              lambda t: letter_preprocess(t), letter=True),
     ]
     outs += export_tables()
     fig_outs = export_figures()
