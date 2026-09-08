@@ -169,6 +169,7 @@
 | N-95 | Table 2 の層×帯母数(ペアあり): R_Sporadic 16 (15) / R_Low 19 (15) / R_Mid 20 (16) / R_High 18 (16) / B_Sporadic 33 (29) / B_High 10 (10)。解析 n との差 = ペア・外れ値・純度段階の減少(図 1 と整合: RET 16+18=34→ペア 31、BRAF 33+10=43→ペア 39 = N-08) | 解析群の母集団の開示(旧表 S1 の役割を Table 2 の 1 列に統合) | tab_case_characteristics.log(2026-08-29、正準イメージ)+ thyr_analysis_cohorts.rds(driver×band×is_paired) | Tab 2; Supp Methods AS | verified |
 | N-96 | 補足別ファイルの行数: table_s5.csv 18,576 / supplementary_data_1.csv 62,952(= N-15 の全検定遺伝子×4 対比)/ supplementary_data_2.csv 24,798 | 投稿システム入力用の各ファイル ≤50 語要約(declarations「Supplementary file descriptions」)に記載 | 出荷用コピー(paper/gpt_review/supplementary_files)の wc -l −1、2026-08-29 | declarations(要約文); Supp docx 末尾 | verified |
 | N-97 | MUREN 再実装の worker 乱数ストリーム種 = 12345(全 MUREN 呼び出し共通、220・310・550) | 実装の性質(研究シードではない) | lib/norm_muren.R `muren_norm(stream_seed = 12345L)`。配布版 github.com/hippo-yf/MUREN の R/norm.R は worker の seed を設定しない(2026-09-08 取得・確認) | Supp Methods: Normalization / Software, seeds, and reproducibility | verified |
+| N-98 | MSigDB リリース 2026.1(ヒト)= msigdbr 26.1.0 が固定して取得するリリース | 遺伝子セット定義の版 | msigdbr 26.1.0 の check_cache が固定する zip 名 msigdb.2026.1.zip(MD5 512ba99c6827141a9d471972b812d4ac、Zenodo 記録 18968178)と展開ファイル名 msigdb.2026.1.Hs.*.rds(2026-09-08 確認)。zip は再配布しない(KEGG_LEGACY 等の条件) | Supp Methods: Gene-set inference | verified |
 
 ### M. D6 較正の派生値・採用時測定(執筆用、2026-08-12 追加)
 
@@ -968,6 +969,7 @@
 - 2026-09-08: **MUREN のシード = A(研究者決定、再実行なし)**: 12345 は再実装に付帯する解法の定数として lib/norm_muren.R の引数 stream_seed の既定値に置き(値不変、呼び出し側は上書きしない)、config.R の注記を実態(540〜560 は推論シードを再利用)に合わせ、SI の正規化段落に実装の性質として一句(N-97)、シードの一文を段階別に正確化(訳同期)。19450809 の値は据え置き。
 - 2026-09-08: **再監査の取り残し 3 件**: 410 の帰無側 storey_pi0 にも STOREY_LAMBDA を渡す、530/540/560 に列挙上限オプション(BM_EXACT_MAX・EXACT_THREADS)を設定(いずれも値同一・出力不変)。本文 Results/Discussion と SI の "Pr(Low<Mid)=" 表記を θ(同順位の半分を含む相対効果、Methods 定義)に訂正(N-40 の値 0.616 と SI の 0.580/0.532 は不変、訳同期)。530 の保存キー effect_P_low_lt_mid は成果物との整合のため改名せず、θ を格納する旨をコメント。
 - 2026-09-08: **テストの文を「実行記録」から「検証内容」へ**(研究者 Go): 本文・SI とも「両実行は同一の主要成果物を生成した。自作 BM 手続きと running-sum 統計量は同梱の自動テストで参照実装と照合して検証した」に統一(実行時点・件数・両機通過への言及を除去)。N-51 は検証の事実の出典として保持。訳同期。
+- 2026-09-08: **MSigDB zip は生入力一覧(N-52)に加えず再配布もしない**(研究者決定): KEGG_LEGACY の条件と、msigdbr の版・MD5 照合で同一性が担保されるため。SI に「MSigDB リリース 2026.1(ヒト)」の一句(N-98)、README に識別子・MD5・Zenodo 記録番号を記録。
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
   600 dpi TIFF)/別ファイル CSV 3 件+50 語要約/カバーレター案。残 = Acknowledgements・共著者レビューと
