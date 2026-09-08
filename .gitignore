@@ -37,14 +37,14 @@ Thumbs.db
 
 # === v7 specific ===
 # GDC download directories (explicit)
-analysis_v7/data/raw/gdc/
+_archive/analysis_v7/data/raw/gdc/
 
 # Logs directory (execution records)
-analysis_v7/logs/
-!analysis_v7/logs/.gitkeep
+_archive/analysis_v7/logs/
+!_archive/analysis_v7/logs/.gitkeep
 
 # Keep manifests for reproducibility
-!analysis_v7/data/raw/manifest_*.tsv
+!_archive/analysis_v7/data/raw/manifest_*.tsv
 
 # Session info logs
 session_info_*.txt
@@ -62,7 +62,7 @@ gdc-client*
 
 # Remove manifest inclusion (too many files)
 # Manifests should be documented in README instead
-analysis_v7/data/raw/manifest_*.tsv
+_archive/analysis_v7/data/raw/manifest_*.tsv
 
 # === new top-level work dirs (raw/processed/output/meta) ===
 # 作業ディレクトリの中身は追跡しないが、器(.gitkeep)は残す
@@ -99,12 +99,12 @@ _archive_root/
 !docker/versions.tsv
 
 # Diagnostics outputs are generated measurements (same handling as processed/)
-diagnostics/output/
+_archive/diagnostics/output/
 
 # Curated external gene lists are a hand-made input with cited sources, not a
 # generated measurement: the anchor cross-reference is not reproducible
 # without it (narrow exception like the IREP input above)
-!diagnostics/external_gene_anchors.csv
+!raw/external/*.csv
 
 # Submission-assembly copies retained with the GPT review deliverables.
 !paper/gpt_review/supplementary_files/
