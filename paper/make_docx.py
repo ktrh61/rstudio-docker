@@ -46,11 +46,11 @@ GENES = ("RET|BRAF|CCDC6|NCOA4|CLIP2|BHLHB9|S100A10|TESC|EHD4|"
 
 # 図の対応表(英語版は個別 TIFF を出力、日本語参考訳のみ凡例直下に PNG を埋め込む)
 FIGS = [
-    ("Figure 1", "図 1", "fig_cohort_flow.png"),
-    ("Figure 2", "図 2", "fig_gene_bm_evidence.png"),
-    ("Figure 3", "図 3", "fig_reo_grading.png"),
-    ("Figure S1", "図 S1", "fig_ma_gene_bm.png"),
-    ("Figure S2", "図 S2", "fig_d6_calibration.png"),
+    ("Figure 1", "図 1", "figure_1.png"),
+    ("Figure 2", "図 2", "figure_2.png"),
+    ("Figure 3", "図 3", "figure_3.png"),
+    ("Figure S1", "図 S1", "figure_s1.png"),
+    ("Figure S2", "図 S2", "figure_s2.png"),
 ]
 FIG_PATH = {en: ROOT / "output" / "figures" / f for en, _, f in FIGS}
 FIG_TIF = {en: ROOT / "output" / "figures" / f.replace(".png", ".tif") for en, _, f in FIGS}
@@ -114,7 +114,7 @@ COLLECTION = {"H": "Hallmark", "C2:CP": "C2 canonical pathways",
 # 表の投稿形整形(表示層 — 凍結 CSV の列名・値は不変。研究者指示 2026-08-29: 共著者
 # レビュー前に「未完成に見える」列名を最終形へ)。丸めは本文の桁に合わせる。
 TABLE_SPECS = {
-    "tab_case_characteristics.csv": dict(
+    "table_2.csv": dict(
         headers={"group": "Group", "n": "n", "pool": "Stratum × band pool, n (paired)",
                  "female": "Female", "male": "Male",
                  "age_surgery": "Age at surgery, years, median [range]",
@@ -123,13 +123,13 @@ TABLE_SPECS = {
         rows={"R_Sporadic": "R_Sporadic (dose-zero)", "R_Low": "R_Low (Low-AS)",
               "R_Mid": "R_Mid (Mid-AS)", "R_High": "R_High (High-AS)",
               "B_Sporadic": "B_Sporadic (dose-zero)", "B_High": "B_High (High-AS)"}),
-    "tab_gene_level_summary.csv": dict(
+    "table_3.csv": dict(
         headers={"unit": "Contrast", "n_tested": "Genes tested", "pi0": "π0",
                  "deg_q10": "Genes at q<0.10", "up": "Higher in High-AS",
                  "down": "Lower in High-AS", "min_p_exact": "Minimum exact p",
                  "hc_p": "Higher Criticism p"},
         fmt={"min_p_exact": _sci}),
-    "table_s1_normalization_diagnostics.csv": dict(
+    "table_s1.csv": dict(
         headers={"contrast": "Contrast", "reference_group": "Reference group",
                  "high_group": "High-AS group", "n_reference": "n (reference)",
                  "n_high": "n (High-AS)", "protein_coding_genes": "Protein-coding genes",
@@ -139,12 +139,12 @@ TABLE_SPECS = {
                  "final_jaccard": "Jaccard index (iteration 3)",
                  "norm_factor_min": "Normalization factor, minimum",
                  "norm_factor_max": "Normalization factor, maximum"}),
-    "table_s2_software_versions.csv": dict(headers={"package": "Package", "version": "Version"}),
-    "table_s3_gene_set_summary.csv": dict(
+    "table_s2.csv": dict(headers={"package": "Package", "version": "Version"}),
+    "table_s3.csv": dict(
         headers={"unit": "Contrast", "collection": "Collection",
                  "n_sets": "Sets tested (15–500 genes)", "min_q_bh": "Minimum BH q"},
         values={"collection": COLLECTION}),
-    "table_s4_complete_null_calibration.csv": dict(
+    "table_s4.csv": dict(
         headers={"unit": "Contrast", "collection": "Collection", "m_sets": "Sets tested",
                  "replicates": "Pseudo-observations",
                  "n_any_discovery": "With ≥1 discovery, n", "p_any": "Proportion",
@@ -153,7 +153,7 @@ TABLE_SPECS = {
         values={"collection": COLLECTION},
         merge=[("95% Clopper–Pearson interval", ["ci_lo", "ci_hi"],
                 lambda lo, hi: f"{_num(lo, 3)}–{_num(hi, 3)}")]),
-    "table_s6_between_stratum_concordance.csv": dict(
+    "table_s6.csv": dict(
         headers={"pair": "Tissue", "units": "Contrasts", "n_shared_genes": "Shared genes",
                  "rho": "Spearman ρ", "p_two_sided": "Two-sided shuffle p",
                  "n_perm": "Shuffles"},
@@ -161,7 +161,7 @@ TABLE_SPECS = {
         values={"pair": {"normal": "Normal tissue", "tumor": "Tumor tissue"}},
         merge=[("Central 95% shuffle interval", ["interval_lo", "interval_hi"],
                 lambda lo, hi: f"{_num(lo, 2)} to {_num(hi, 2)}")]),
-    "table_s7_reo_panel.csv": dict(
+    "table_s7.csv": dict(
         headers={"pair_id": "Pair", "up": "Higher-expression gene (Ensembl)",
                  "up_name": "Symbol", "down": "Lower-expression gene (Ensembl)",
                  "down_name": "Symbol",
@@ -316,13 +316,13 @@ def _legend_paras(section):
 
 
 SUPP_TABLE_FILES = {
-    "S1": "table_s1_normalization_diagnostics.csv",
-    "S2": "table_s2_software_versions.csv",
-    "S3": "table_s3_gene_set_summary.csv",
-    "S4": "table_s4_complete_null_calibration.csv",
+    "S1": "table_s1.csv",
+    "S2": "table_s2.csv",
+    "S3": "table_s3.csv",
+    "S4": "table_s4.csv",
     "S5": None,  # ORA(18,576 行)は別ファイル供給
-    "S6": "table_s6_between_stratum_concordance.csv",
-    "S7": "table_s7_reo_panel.csv",
+    "S6": "table_s6.csv",
+    "S7": "table_s7.csv",
 }
 PORTRAIT_TEXT_MM = 160  # A4 縦置きの本文幅(余白 25 mm)
 LANDSCAPE_OVER_MM = 140  # 自然幅がこれを超えたら横置き(見出しの折返しで窮屈になる手前で切替)
@@ -363,8 +363,8 @@ def orient_blocks(blocks, heading):
         print(f"  {label}: ~{table_width_mm(re.search(r'(?:^\|.*\n)+', block, re.M).group(0)) if re.search(r'(?:^\|.*\n)+', block, re.M) else 0:.0f} mm -> {'landscape' if want else 'portrait'}")
     parts.append(section_break(True) if landscape else PAGE_BREAK)
     return "".join(parts)
-SUPP_DATA_FILES = {"1": "supplementary_data_1_gene_level_results.csv",
-                   "2": "supplementary_data_2_set_level_results.csv"}
+SUPP_DATA_FILES = {"1": "supplementary_data_1.csv",
+                   "2": "supplementary_data_2.csv"}
 
 
 def supp_preprocess(text):
@@ -379,7 +379,7 @@ def supp_preprocess(text):
     refs = re.search(r"^## Supplementary References$.*?(?=^## |\Z)", text, re.S | re.M).group(0)
     text = text.replace(refs, "")
     paras = _legend_paras(leg)
-    supp_files = ROOT / "paper" / "gpt_review" / "supplementary_files"
+    supp_files = ROOT / "output" / "tables"
     figs, tabs, data = [], [], []
     skip = set()
     for i, p in enumerate(paras):
@@ -402,7 +402,7 @@ def supp_preprocess(text):
             if fname:
                 tabs.append((tag, p + "\n\n" + csv_md_table(supp_files / fname)))
             else:
-                tabs.append((tag, p + "\n\n*Provided as a separate file (table_s5_ora_annotation.csv).*"))
+                tabs.append((tag, p + "\n\n*Provided as a separate file (table_s5.csv).*"))
         elif p.startswith("**Supplementary Data"):
             n = re.match(r"\*\*Supplementary Data (\d)", p).group(1)
             data.append(p + f"\n\n*Provided as a separate file ({SUPP_DATA_FILES[n]}).*")
@@ -446,9 +446,9 @@ def preprocess(text):
     # Table 2・3 の実体(凍結 CSV)をキャプション直下へ(脚注は CSV 表の後ろに残る)
     for b in blocks:
         if b[0].startswith("**Table 2 |"):
-            b.insert(1, csv_md_table(ROOT / "output" / "tables" / "tab_case_characteristics.csv"))
+            b.insert(1, csv_md_table(ROOT / "output" / "tables" / "table_2.csv"))
         if b[0].startswith("**Table 3 |"):
-            b.insert(1, csv_md_table(ROOT / "output" / "tables" / "tab_gene_level_summary.csv"))
+            b.insert(1, csv_md_table(ROOT / "output" / "tables" / "table_3.csv"))
     TABLE_BLOCKS[:] = [(re.match(r"\*\*(Table \d)", b[0]).group(1), "\n\n".join(b)) for b in blocks]
     text = (text.rstrip("\n") + "\n\n" + additional_information() + "\n\n" + fixed.rstrip("\n")
             + PAGE_BREAK + "## Figure legends\n\n" + "\n\n".join(fig_legends) + "\n")

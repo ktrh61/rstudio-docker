@@ -86,15 +86,15 @@ The authors received no specific funding for this work.
 
 Supplementary Methods and Results, Figures S1–S2, Tables S1–S4 and S6–S8, and Supplementary References (Table S5 and Supplementary Data 1–2 are separate files). Covers data sources, Assigned Share inputs, quality control, normalization, gene-level, omnibus and gene-set inference, REO panel construction, external gene-list comparison, and AI-use verification.
 
-### Table S5 (table_s5_ora_annotation.csv)
+### Table S5 (table_s5.csv)
 
 Descriptive over-representation annotation of the RET-tumor q<0.10 gene list (18,576 rows). For each family (Hallmark, C2 canonical pathways, C5 GO Biological Process, radiation-curated) and list (higher, lower, combined): set size, observed and expected overlap, one-sided hypergeometric p-value, and family-by-list Benjamini–Hochberg q-value.
 
-### Supplementary Data 1 (supplementary_data_1_gene_level_results.csv)
+### Supplementary Data 1 (supplementary_data_1.csv)
 
 Complete gene-level results for every tested gene in each of the four contrasts (62,952 rows): contrast, Ensembl identifier, gene symbol, Brunner–Munzel relative effect θ, exact permutation p-value, and Storey q-value. Supports cross-referencing and reanalysis at thresholds other than the reported q<0.10 rule.
 
-### Supplementary Data 2 (supplementary_data_2_set_level_results.csv)
+### Supplementary Data 2 (supplementary_data_2.csv)
 
 Complete label-permutation gene-set results for all tested sets in each contrast and collection (24,798 rows): set size, enrichment score, normalized enrichment score, sign-conditional permutation p-value, within-collection Benjamini–Hochberg q-value, redundancy annotation, and leading-edge genes.
 
