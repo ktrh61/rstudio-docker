@@ -1,16 +1,16 @@
-# fig_reo_grading.R
+# figure_3_reo_scores.R  (Figure 3)
 # Figure for the REO out-of-sample evaluation, same concept as the v7
 # 13_reo_evaluation_poc plot: REO reversal score (x) against assigned share
 # (assigned share %, y), coloured by exposure band, training groups open /
 # evaluation arms filled, with the AS band boundaries (33.3/66.6) and the A
 # classification threshold marked. Shows the graded pattern (band medians rise
 # with assigned share) at the descriptive-observation level fixed in the plan
-# (v2 s0.5). Status is tracked in figures/manifest.csv.
+# (v2 s0.5).
 # Input : processed/thyr_reo_panel.rds        (from 520; panel + boundary + training)
 #         processed/thyr_reo_evaluation.rds   (from 530; R_Low/Mid scores)
 #         processed/thyr_se_raw.rds           (sample -> case for training AS)
 #         processed/thyr_case_assigned_share.rds (assigned share)
-# Output: output/figures/fig_reo_grading.png (+ .tif 600 dpi, .pdf vector)
+# Output: output/figures/figure_3.png (300 dpi), output/figures/figure_3.tif (600 dpi)
 # Drawn at final width 175 mm, text 5.5-7 pt, no in-figure title/subtitle --
 # artwork-guide alignment 2026-08-28 (the retired subtitle's 'out-of-sample'
 # wording also conflicted with the manuscript's non-validation stance).
@@ -88,7 +88,7 @@ p <- ggplot(d, aes(x = score, y = y)) +
     y = "Assigned share  (radiation attributability, %)") +
   theme_thyr(legend_position = "right")
 
-save_figure(p, "fig_reo_grading.png", width = 175, height = 120)
+save_figure(p, "figure_3.png", width = 175, height = 120)
 
 for (b in levels(d$band)) {
   s <- d$score[d$band == b]

@@ -1,18 +1,17 @@
-# supp_tab_package_versions.R  (Table S2)
+# table_s2_software_versions.R  (Table S2)
 # Package-version table for the software statement. Lists the R packages the
 # reported work actually loads, derived by scanning the code for library(),
 # requireNamespace() and pkg:: calls, and joined to the pinned versions of the
 # canonical container build (docker/versions.tsv). Roles:
-#   pipeline    -- scripts/, lib/, figures/, tables/, config.R, setup.R
-#   diagnostics -- diagnostics/ (reported ancillary analyses)
-#   tests       -- tests/testthat (reference implementations and framework)
+#   pipeline -- scripts/, lib/, figures/, tables/, config.R, setup.R
+#   tests    -- tests/testthat (reference implementations and framework)
 # Packages pinned in the container but not loaded by any of these files (e.g.
 # TCC, whose protocol the in-house DEGES follows but which is not called;
 # BiocManager; recommended packages pulled in as dependencies) are omitted:
 # the container recipe records the complete environment. Stops if a loaded
 # package has no pinned version (researcher decision 2026-08-29).
 # Input : docker/versions.tsv + the code tree
-# Output: output/tables/supp_tab_package_versions.csv (+ printed table)
+# Output: output/tables/table_s2.csv (+ printed table)
 source("setup.R")
 
 tsv <- file.path(paths$root, "docker", "versions.tsv")
@@ -27,7 +26,6 @@ roles <- list(
                list.files(file.path(paths$root, "figures"), "\\.R$", full.names = TRUE),
                list.files(file.path(paths$root, "tables"), "\\.R$", full.names = TRUE),
                file.path(paths$root, c("config.R", "setup.R"))),
-  diagnostics = list.files(file.path(paths$root, "diagnostics"), "\\.R$", full.names = TRUE),
   tests = list.files(file.path(paths$root, "tests", "testthat"), "\\.R$", full.names = TRUE)
 )
 used_in <- function(files) {
@@ -49,7 +47,7 @@ rows <- do.call(rbind, lapply(names(found), function(r) {
   if (length(p) == 0) return(NULL)
   data.frame(package = p, role = r, stringsAsFactors = FALSE)
 }))
-# first role wins in the fixed order pipeline > diagnostics > tests
+# first role wins in the fixed order pipeline > tests
 rows$role <- factor(rows$role, levels = names(roles))
 rows <- rows[order(rows$role), ]
 rows <- rows[!duplicated(rows$package), ]
@@ -60,7 +58,7 @@ if (length(missing) > 0) {
   stop("Loaded packages without a pinned version: ", paste(missing, collapse = ", "))
 }
 tab <- merge(rows, pinned[, c("package", "version")], by = "package")
-tab <- tab[order(tab$role != "pipeline", tab$role != "diagnostics", tolower(tab$package)), ]
+tab <- tab[order(tab$role != "pipeline", tolower(tab$package)), ]
 tab <- tab[, c("package", "version", "role")]
 print(tab, row.names = FALSE)
 cat("packages:", nrow(tab), "| pinned but not loaded:",
@@ -68,6 +66,6 @@ cat("packages:", nrow(tab), "| pinned but not loaded:",
 
 out_dir <- file.path(paths$output, "tables")
 dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
-utils::write.csv(tab, file.path(out_dir, "supp_tab_package_versions.csv"),
+utils::write.csv(tab, file.path(out_dir, "table_s2.csv"),
                  row.names = FALSE)
-cat("Saved:", file.path(out_dir, "supp_tab_package_versions.csv"), "\n")
+cat("Saved:", file.path(out_dir, "table_s2.csv"), "\n")

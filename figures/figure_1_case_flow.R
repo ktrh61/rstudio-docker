@@ -1,4 +1,4 @@
-# fig_cohort_flow.R  (フロー図(仮))
+# figure_1_case_flow.R  (Figure 1)
 # Cohort flow figure, both driver strata side by side (researcher decision
 # 2026-08-14: per-driver attrition is carried by this figure, not by text).
 # Formatting only -- draws the frozen step counts from 230; values must
@@ -11,7 +11,7 @@
 # (iii) side branch at the band step for the REO evaluation set (counts from
 # include_reo_evaluation in thyr_analysis_cohorts.rds; must match N-10).
 # Input : processed/thyr_cohort_flow.rds, processed/thyr_analysis_cohorts.rds
-# Output: output/figures/fig_cohort_flow.png (+ .tif 600 dpi, .pdf vector)
+# Output: output/figures/figure_1.png (300 dpi), output/figures/figure_1.tif (600 dpi)
 # Drawn at final width 175 mm with 7 pt base text (box titles 7 pt, counts
 # 6.5 pt, annotations 5.5 pt; Liberation Sans) -- artwork-guide alignment
 # 2026-08-28.
@@ -116,23 +116,17 @@ par(op)
 W_IN <- 175 / 25.4 # final width: BJC double column
 H_IN <- W_IN * (230 * n) / 2200 # aspect of the original layout
 PT <- 7 # base point size at final width (artwork guide: text 5-7 pt)
-png(file.path(out_dir, "fig_cohort_flow.png"), type = "cairo",
+png(file.path(out_dir, "figure_1.png"), type = "cairo",
     width = W_IN, height = H_IN, units = "in", res = 300,
     pointsize = PT, family = FONT_FAMILY)
 draw_flow()
 dev.off()
-cat("Saved:", file.path(out_dir, "fig_cohort_flow.png"), "\n")
+cat("Saved:", file.path(out_dir, "figure_1.png"), "\n")
 
-# Submission copies: 600 dpi LZW TIFF and vector PDF (fonts embedded).
-tiff(file.path(out_dir, "fig_cohort_flow.tif"), type = "cairo",
+# Submission copy: 600 dpi LZW TIFF.
+tiff(file.path(out_dir, "figure_1.tif"), type = "cairo",
     width = W_IN, height = H_IN, units = "in", res = 600,
     pointsize = PT, family = FONT_FAMILY, compression = "lzw")
 draw_flow()
 dev.off()
-cat("Saved:", file.path(out_dir, "fig_cohort_flow.tif"), "\n")
-
-grDevices::cairo_pdf(file.path(out_dir, "fig_cohort_flow.pdf"),
-    width = W_IN, height = H_IN, pointsize = PT, family = FONT_FAMILY)
-draw_flow()
-dev.off()
-cat("Saved:", file.path(out_dir, "fig_cohort_flow.pdf"), "\n")
+cat("Saved:", file.path(out_dir, "figure_1.tif"), "\n")

@@ -1,4 +1,4 @@
-# fig_d6_calibration.R
+# figure_s2_null_calibration.R  (Figure S2)
 # Held-out null calibration of the set-level inference, as a forest plot:
 # one row per contrast x collection cell (16), x = share of null replicates
 # with at least one discovery at q_bh < 0.10, with exact binomial 95% CI,
@@ -8,7 +8,7 @@
 # The single cell whose CI sits above the nominal level (B_Normal/Hallmark)
 # is emphasised; it is the disclosed calibration excess.
 # Input : processed/thyr_gsea_null_calibration.rds (from 415)
-# Output: output/figures/fig_d6_calibration.png (+ .tif 600 dpi, .pdf vector)
+# Output: output/figures/figure_s2.png (300 dpi), output/figures/figure_s2.tif (600 dpi)
 # Drawn at final width 175 mm, text 5.6-7 pt, no in-figure title/subtitle;
 # key and axis wording follow the manuscript (Clopper-Pearson interval,
 # Benjamini-Hochberg q) -- artwork-guide alignment 2026-08-28.
@@ -55,7 +55,7 @@ p <- ggplot(s, aes(x = p_any, y = row)) +
   ) +
   theme_thyr()
 
-save_figure(p, "fig_d6_calibration.png", width = 175, height = 120)
+save_figure(p, "figure_s2.png", width = 175, height = 120)
 
 # First-run verification against the frozen ledger values.
 message(sprintf("  p_any range %.2f-%.2f (N-24 expects 0.01-0.18)",

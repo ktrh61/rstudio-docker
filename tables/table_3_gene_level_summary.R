@@ -1,9 +1,9 @@
-# tab_gene_level_summary.R  (Tab.3(仮))
+# table_3_gene_level_summary.R  (Table 3)
 # Gene-level (410) summary per unit: tested genes, pi0, DEG counts and
 # directions, primary omnibus HC p. Formatting only -- values must match
 # N-15, N-16, N-17, N-18, N-19, N-20 on first run (consistency check).
 # Input : processed/thyr_expression_test.rds
-# Output: output/tables/tab_gene_level_summary.csv (+ printed table)
+# Output: output/tables/table_3.csv (+ printed table)
 
 source("setup.R")
 
@@ -29,6 +29,6 @@ print(tab)
 
 out_dir <- file.path(paths$output, "tables")
 dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
-utils::write.csv(tab, file.path(out_dir, "tab_gene_level_summary.csv"),
+utils::write.csv(tab, file.path(out_dir, "table_3.csv"),
                  row.names = FALSE)
-cat("Saved:", file.path(out_dir, "tab_gene_level_summary.csv"), "\n")
+cat("Saved:", file.path(out_dir, "table_3.csv"), "\n")

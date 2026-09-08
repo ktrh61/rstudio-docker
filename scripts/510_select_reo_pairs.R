@@ -5,7 +5,7 @@
 #         processed/thyr_normalized_counts.rds   (from 310; R_Tumor sample set)
 #         processed/thyr_se_raw.rds              (from 120; single count assay)
 #         processed/gene_lengths.rds             (from 020; unversioned lengths)
-# Output: processed/thyr_reo_candidate_pairs.rds, output/reo_candidate_pairs.csv
+# Output: processed/thyr_reo_candidate_pairs.rds
 #
 # A REO pair (up-gene, down-gene) has a stable within-sample order in Sporadic
 # (R0) and flips in High (R1). The candidate gene pool is the top N genes by BM
@@ -185,9 +185,3 @@ thyr_reo_candidate_pairs <- list(
 out_rds <- file.path(paths$processed, "thyr_reo_candidate_pairs.rds")
 saveRDS(thyr_reo_candidate_pairs, out_rds)
 message("Saved: ", out_rds, " (", nrow(pairs), " pairs)")
-
-if (dir.exists(paths$output)) {
-  out_csv <- file.path(paths$output, "reo_candidate_pairs.csv")
-  utils::write.csv(pairs, out_csv, row.names = FALSE)
-  message("Saved: ", out_csv)
-}

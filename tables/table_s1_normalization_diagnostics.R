@@ -1,9 +1,9 @@
-# supp_tab_normalization_diagnostics.R
+# table_s1_normalization_diagnostics.R  (Table S1)
 # Per-contrast expression filtering and DEGES-MUREN normalization diagnostics.
 # Formatting only: reads the frozen normalization object and does not refit,
 # reshuffle, renormalize, or retest any data.
 # Input : processed/thyr_normalized_counts.rds
-# Output: output/tables/supp_tab_normalization_diagnostics.csv
+# Output: output/tables/table_s1.csv
 
 source("setup.R")
 
@@ -37,6 +37,6 @@ print(tab)
 
 out_dir <- file.path(paths$output, "tables")
 dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
-out_path <- file.path(out_dir, "supp_tab_normalization_diagnostics.csv")
+out_path <- file.path(out_dir, "table_s1.csv")
 utils::write.csv(tab, out_path, row.names = FALSE)
 message("Saved: ", out_path)

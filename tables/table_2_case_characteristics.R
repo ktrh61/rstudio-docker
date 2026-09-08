@@ -1,4 +1,4 @@
-# tab_case_characteristics.R  (Table 2)
+# table_2_case_characteristics.R  (Table 2)
 # Case characteristics by analysis group: main BM (R_Sporadic/R_High/
 # B_Sporadic/B_High) and REO evaluation (R_Low/R_Mid). Formatting only --
 # no computation beyond counts/medians of frozen inputs (plus the stratum-by-
@@ -8,8 +8,7 @@
 # from processed/thyr_age_arm_difference.rds (stage 240) and are appended as notes.
 # Input : processed/thyr_analysis_cohorts.rds, processed/thyr_clinical.rds,
 #         processed/thyr_age_arm_difference.rds (from 240)
-# Output: output/tables/tab_case_characteristics.csv,
-#         output/tables/tab_case_characteristics_notes.txt (+ printed table)
+# Output: output/tables/table_2.csv (+ printed table and footnote values)
 
 source("setup.R")
 
@@ -93,16 +92,12 @@ age_note <- paste0(
   "Intervals were obtained from 9,999 resamples drawn separately within each group ",
   "(seed 19450809); no p-values were calculated."
 )
-cat("\nTable 1 footnote:\n", age_note, "\n", sep = "")
+cat("\nTable 2 footnote:\n", age_note, "\n", sep = "")
 
 if (any(is.na(sel$SEX))) cat("NOTE: SEX has NA values; recheck coding\n")
 cat("sex coding seen:", paste(unique(sel$SEX), collapse = ", "), "\n")
 
 out_dir <- file.path(paths$output, "tables")
 dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
-utils::write.csv(tab, file.path(out_dir, "tab_case_characteristics.csv"),
-                 row.names = FALSE)
-writeLines(age_note, file.path(out_dir, "tab_case_characteristics_notes.txt"),
-           useBytes = TRUE)
-cat("Saved:", file.path(out_dir, "tab_case_characteristics.csv"), "\n")
-cat("Saved:", file.path(out_dir, "tab_case_characteristics_notes.txt"), "\n")
+utils::write.csv(tab, file.path(out_dir, "table_2.csv"), row.names = FALSE)
+cat("Saved:", file.path(out_dir, "table_2.csv"), "\n")

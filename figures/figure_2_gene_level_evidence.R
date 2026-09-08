@@ -1,13 +1,13 @@
-# fig_gene_bm_evidence.R
+# figure_2_gene_level_evidence.R  (Figure 2)
 # Gene-level Brunner-Munzel evidence plot, one facet per analysis unit (not a
 # volcano: a rank test has no fold change). The x axis is the signed BM effect
 # 2*theta - 1 = Pr(X<Y) - Pr(X>Y) (Cliff's delta; > 0 = higher in the High
 # arm) and the y axis is -log10(exact permutation p). Points are coloured by
 # the Storey q inference (q_storey < FDR_CUT) and the strongest genes per unit
-# are labelled. Status is tracked in figures/manifest.csv.
+# are labelled.
 # Input : processed/thyr_expression_test.rds  (from 410)
 #         processed/thyr_se_raw.rds            (gene_id -> gene_name)
-# Output: output/figures/fig_gene_bm_evidence.png (+ .tif 600 dpi, .pdf vector)
+# Output: output/figures/figure_2.png (300 dpi), output/figures/figure_2.tif (600 dpi)
 # Drawn at final width 175 mm (BJC double column), text 5.5-7 pt, no in-figure
 # title (the legend carries it) -- artwork-guide alignment 2026-08-28.
 
@@ -71,7 +71,7 @@ p <- ggplot(df, aes(x = x, y = y)) +
   ) +
   theme_thyr()
 
-save_figure(p, "fig_gene_bm_evidence.png", width = 175, height = 150)
+save_figure(p, "figure_2.png", width = 175, height = 150)
 for (u in unit_order) {
   g <- test$units[[u]]$genes
   message(sprintf("  %-9s genes %5d | min p_exact %.2e | q<%.2f %d",

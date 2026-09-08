@@ -9,7 +9,7 @@
 #         processed/thyr_se_raw.rds                (from 120; single count assay)
 #         processed/gene_lengths.rds               (from 020)
 #         lib/reo.R
-# Output: processed/thyr_reo_evaluation.rds, output/reo_evaluation_samples.csv
+# Output: processed/thyr_reo_evaluation.rds
 #
 # The R_Low/R_Mid tumours are not filtered by ContamDE purity or PC-OD. These
 # quantities are examined separately as non-exclusion diagnostics and do not
@@ -124,9 +124,3 @@ thyr_reo_evaluation <- list(
 out_rds <- file.path(paths$processed, "thyr_reo_evaluation.rds")
 saveRDS(thyr_reo_evaluation, out_rds)
 message("Saved: ", out_rds)
-
-if (dir.exists(paths$output)) {
-  out_csv <- file.path(paths$output, "reo_evaluation_samples.csv")
-  utils::write.csv(thyr_reo_evaluation$samples, out_csv, row.names = FALSE)
-  message("Saved: ", out_csv)
-}

@@ -6,7 +6,7 @@
 #         processed/thyr_se_raw.rds                (from 120; single count assay)
 #         processed/gene_lengths.rds               (from 020)
 #         lib/reo.R
-# Output: processed/thyr_reo_panel.rds, output/reo_panel.csv
+# Output: processed/thyr_reo_panel.rds
 #
 # Greedy selection walks candidate pairs in descending median_diff and keeps a
 # pair only if it reuses no gene already in the panel and the absolute Spearman
@@ -123,13 +123,3 @@ thyr_reo_panel <- list(
 out_rds <- file.path(paths$processed, "thyr_reo_panel.rds")
 saveRDS(thyr_reo_panel, out_rds)
 message("Saved: ", out_rds, " (", nrow(panel), " pairs)")
-
-if (dir.exists(paths$output)) {
-  out_csv <- file.path(paths$output, "reo_panel.csv")
-  utils::write.csv(
-    panel[, c("pair_id", "up", "up_name", "down", "down_name",
-      "median_diff", "reversal_rate", "r0_q10")],
-    out_csv, row.names = FALSE
-  )
-  message("Saved: ", out_csv)
-}

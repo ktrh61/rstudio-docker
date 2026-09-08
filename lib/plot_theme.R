@@ -40,10 +40,9 @@ theme_thyr <- function(base_size = 7, legend_position = "top") {
 
 # Figures land in output/figures/ (reorg plan v2 s2.6: figure scripts read
 # processed/ only and write output/figures/ only). width/height are in mm at
-# final display size; three copies are written from the same object:
+# final display size; two copies are written from the same object:
 #   .png 300 dpi  -- embedded in the review/submission docx (Word -> PDF keeps 300 dpi)
 #   .tif 600 dpi  -- bitmap submission copy (BJC GTA: >= 300 dpi)
-#   .pdf vector   -- line-art submission copy (artwork guide), fonts embedded
 save_figure <- function(plot, filename, width, height) {
   out_dir <- file.path(paths$output, "figures")
   if (!dir.exists(out_dir)) {
@@ -60,10 +59,5 @@ save_figure <- function(plot, filename, width, height) {
     type = "cairo", compression = "lzw"
   )
   message("Saved: ", out_tif)
-  out_pdf <- file.path(out_dir, sub("\\.png$", ".pdf", filename))
-  ggplot2::ggsave(out_pdf, plot,
-    width = width, height = height, units = "mm", device = grDevices::cairo_pdf
-  )
-  message("Saved: ", out_pdf)
   invisible(out_png)
 }
