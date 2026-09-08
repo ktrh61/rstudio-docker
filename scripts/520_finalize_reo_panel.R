@@ -9,9 +9,11 @@
 # Output: processed/thyr_reo_panel.rds, output/reo_panel.csv
 #
 # Greedy selection walks candidate pairs in descending median_diff and keeps a
-# pair only if it reuses no gene already in the panel and its per-sample r
-# vector correlates (Spearman) below CORRELATION_THRESHOLD with every kept pair,
-# stopping at TARGET_PANEL_SIZE. A sample's panel score is the number of pairs
+# pair only if it reuses no gene already in the panel and the absolute Spearman
+# correlation of its per-sample r vector with every kept pair is below
+# CORRELATION_THRESHOLD (|rho| >= threshold against any kept pair drops the
+# candidate; an undefined correlation counts as 0), stopping at
+# TARGET_PANEL_SIZE. A sample's panel score is the number of pairs
 # that reverse (|r| >= dead zone and opposite sign to the R0 reference). The
 # classification cutoff is the maximum R0 score, and scores above that cutoff
 # are positive. R1 scores describe construction fit but do not determine the
@@ -28,7 +30,7 @@ source(file.path(paths$root, "lib", "reo.R"))
 
 # --- Configuration ---------------------------------------------------------
 TARGET_PANEL_SIZE <- 10L
-CORRELATION_THRESHOLD <- 0.75 # Spearman; drop a pair correlated above this
+CORRELATION_THRESHOLD <- 0.75 # drop a candidate with |Spearman rho| >= this against any kept pair
 # DEAD_ZONE comes from config.R via setup.R (shared with 510).
 
 # --- Load inputs -----------------------------------------------------------

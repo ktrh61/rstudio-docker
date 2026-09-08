@@ -806,6 +806,24 @@ testthat::test_that("auto switches on the allocation-count budget", {
   options(old_options)
 })
 
+testthat::test_that("a declared exact run stops above the allocation budget", {
+  x <- c(1, 2, 3, 4)
+  y <- c(5, 6, 7, 8)
+  old_options <- options(
+    brunnermunzel.exact.max.allocations = choose(8, 4) - 1
+  )
+  on.exit(options(old_options), add = TRUE)
+  testthat::expect_error(
+    brunnermunzel_mc_test(x, y, method = "exact", B = 99L),
+    "exceeds option 'brunnermunzel.exact.max.allocations'"
+  )
+  # brunnermunzel_pvalues() shares the resolver.
+  testthat::expect_error(
+    brunnermunzel_pvalues(rbind(c(x, y), c(y, x)), 4L, method = "exact"),
+    "exceeds option 'brunnermunzel.exact.max.allocations'"
+  )
+})
+
 testthat::test_that("the exact path leaves the RNG and the null cache alone", {
   .reset_null_cache()
   on.exit(.reset_null_cache(), add = TRUE)

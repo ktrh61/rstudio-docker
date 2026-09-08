@@ -20,7 +20,8 @@
 #   STEP 1 : initial MUREN scaling coefficients on the full matrix.
 #   STEP 2 : repeat `iteration` times -- screen DEGs on the FULL matrix with the
 #            current coefficients (permutation Brunner-Munzel -> Storey q with
-#            pi0 fixed at lambda = 0.5; normal cutoff set vs a floorPDEG raw-p
+#            the plug-in pi0 estimate at fixed lambda = 0.5; normal cutoff set
+#            vs a floorPDEG raw-p
 #            rank set, the larger adopted), then re-estimate
 #            MUREN coefficients from the non-DEG genes. Runs exactly `iteration`
 #            times; stops early only when no non-DEG genes remain (TCC guard).
@@ -68,8 +69,9 @@ muren_to_norm_factors <- function(scaling_coeff, lib_size) {
 # exact enumeration (or a single Monte Carlo null). With bm_method = "auto"
 # the p-values are exact whenever C(n, nx) is small enough to enumerate, so
 # the screen carries no sampling error, no 1/(n_perm + 1) floor, and no seed
-# dependence. Under the protocol-wide Storey correction (q = pi0_hat * BH with
-# pi0_hat fixed at lambda = 0.5; reorg plan v2 D1) the screen can fire on real
+# dependence. Under the protocol-wide Storey correction (q = pi0_hat times the
+# BH-adjusted p, with pi0_hat estimated by the plug-in at fixed lambda = 0.5;
+# reorg plan v2 D1) the screen can fire on real
 # data, unlike the historical BH form whose cutoff was out of reach under the
 # heavy-tailed permutation null at these group sizes.
 .deges_bm_pvalues <- function(cpm_matrix, group, group_levels,

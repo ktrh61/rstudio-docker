@@ -48,12 +48,15 @@ PURITY_THRESHOLD <- 0.6
 # REO dead zone: |log2 TPM difference| below this does not count as an order.
 DEAD_ZONE <- log2(1.2)
 
-# Protocol-wide inference threshold: Storey q < FDR_CUT at the gene level
-# (410) and the set level (420). Also the display cutoff for figures/messages.
+# Protocol-wide inference threshold at the gene level (410: Storey q with the
+# plug-in pi0 estimate at fixed lambda = 0.5) and the set level (420: BH within
+# each collection, i.e. without a pi0 estimate). Also the display cutoff for
+# figures/messages.
 FDR_CUT <- 0.10
 
-# BH cutoff for the DEGES potential-DEG screen inside 310. Conceptually
-# distinct from FDR_CUT despite the shared value.
+# Cutoff for the DEGES potential-DEG screen inside 310 (Storey q with the same
+# plug-in pi0 estimate at fixed lambda = 0.5). Conceptually distinct from
+# FDR_CUT despite the shared value.
 DEGES_FDR <- 0.10
 
 # Label shuffles for the empirical null (410; 420 consumes 410's saved

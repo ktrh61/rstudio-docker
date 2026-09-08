@@ -65,8 +65,7 @@ as_tbl$score <- reversal_score(log2_tpm, as_tbl$tumor_id, panel, dead_zone)
 as_tbl$class <- classify_reversal(as_tbl$score, boundary)
 
 # --- Read B: graded Mid vs Low application (permutation BM) -----------------
-# Two ordered bands, so the ordered-alternative (Jonckheere-Terpstra) test is a
-# one-sided Brunner-Munzel: is the R_Mid reversal score stochastically greater
+# One-sided Brunner-Munzel: is the R_Mid reversal score stochastically greater
 # than R_Low? BM is used (not Wilcoxon) for the same reason as the main
 # analysis: the mixture makes the arms unequally dispersed. Training arms
 # (Sporadic/High) are NOT in this test -- they are shown only for the figure.

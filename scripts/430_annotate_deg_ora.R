@@ -55,7 +55,8 @@ source(file.path(paths$root, "lib", "gsea_permutation.R"))
 source(file.path(paths$root, "lib", "annotation.R"))
 
 SPECIES <- "Homo sapiens"
-FDR_CUT <- 0.10
+# FDR_CUT (0.10) comes from config.R via setup.R: Storey q for the gene list
+# and the display cutoff for the BH-flagged ORA rows.
 
 expression_test <- readRDS(
   file.path(paths$processed, "thyr_expression_test.rds")

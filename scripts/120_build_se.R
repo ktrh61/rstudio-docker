@@ -1,9 +1,9 @@
 # 120_build_se.R
 # Load STAR-Counts TSV files into a SummarizedExperiment holding the single
 # count assay selected by library strandedness.
-# Input : processed/file_sample_mapping.rds       (from 020)
+# Input : processed/file_sample_mapping.rds       (from 110)
 #         raw/expression/<file_id>/<file>.tsv      (from 010)
-# Output: processed/thyr_se_raw.rds                (consumed by 040, 042)
+# Output: processed/thyr_se_raw.rds                (consumed by 140, 210, 220, 310, 510-530)
 #         meta/strand_selection_<timestamp>.tsv    (per-sample strand metrics)
 #         meta/loading_metadata_<timestamp>.rds    (run provenance)
 #
@@ -31,7 +31,7 @@ strand_ratio_threshold <- 0.5
 # --- Load mapping ----------------------------------------------------------
 mapping_file <- file.path(paths$processed, "file_sample_mapping.rds")
 if (!file.exists(mapping_file)) {
-  stop("file_sample_mapping.rds not found in processed/ (run 020 first)")
+  stop("file_sample_mapping.rds not found in processed/ (run 110 first)")
 }
 file_sample_mapping <- readRDS(mapping_file)
 
@@ -143,8 +143,11 @@ read_star_counts <- function(i, paths_vec) {
   )
 }
 
-n_cores <- max(1L, min(detectCores() - 1L, 8L))
-message("Reading count files with ", n_cores, " cores ...")
+# WORKERS (config.R) caps concurrency at every stage. The read is
+# order-preserving and uses no RNG, so the worker count does not affect the
+# output.
+n_cores <- WORKERS
+message("Reading count files with ", n_cores, " workers ...")
 
 results <- mclapply(
   seq_len(n_samples),
@@ -197,18 +200,9 @@ message(
   )
 )
 
-# A single count assay requires one consistent column across all samples. If
-# samples disagree, stop rather than mix columns of different strandedness.
-if (length(selected_levels) > 1) {
-  stop(
-    "Samples disagree on strand selection: ",
-    paste(selected_levels, collapse = ", "),
-    " (see strand_selection metrics)"
-  )
-}
-selected_column <- selected_levels
-
 # --- Strand selection record (meta) ----------------------------------------
+# Written before the consistency check below so that the per-sample metrics
+# are on disk even when the run stops on a disagreement.
 strand_selection <- data.frame(
   sample_submitter_id = sample_ids,
   selected = selected_per_sample,
@@ -231,6 +225,17 @@ strand_file <- file.path(
 )
 data.table::fwrite(strand_selection, strand_file, sep = "\t")
 message("Saved strand selection: ", strand_file)
+
+# A single count assay requires one consistent column across all samples. If
+# samples disagree, stop rather than mix columns of different strandedness.
+if (length(selected_levels) > 1) {
+  stop(
+    "Samples disagree on strand selection: ",
+    paste(selected_levels, collapse = ", "),
+    " (see ", basename(strand_file), ")"
+  )
+}
+selected_column <- selected_levels
 
 # --- Assemble the selected count matrix ------------------------------------
 message("Assembling count matrix for '", selected_column, "' ...")

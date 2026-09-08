@@ -21,9 +21,9 @@
 #
 # Outlier cases (either tissue flagged by 210) are dropped before estimation and
 # do not appear in the output. The relative-purity score (max-one within a
-# cohort) is emitted for every retained case at every purity; the >= threshold
-# selection is applied downstream in 310, so a threshold sensitivity check needs
-# only 310 re-run, not this ContamDE step.
+# cohort) is emitted for every retained case at every purity. This step does
+# not apply the threshold: the >= PURITY_THRESHOLD selection is made in 230
+# (thyr_analysis_cohorts.rds), which 310 and the later stages read.
 
 source("setup.R")
 
@@ -38,9 +38,10 @@ source(file.path(paths$root, "lib", "norm_muren.R"))
 source(file.path(paths$root, "lib", "purity_contamde.R"))
 source(file.path(paths$root, "lib", "gene_filter.R"))
 
-# MUREN worker count (WORKERS) comes from config.R via setup.R. Worker count
-# changes speed, not the MUREN result.
-message("MUREN workers: ", WORKERS, " (development; canonical is 4L)")
+# MUREN worker count (WORKERS) comes from config.R via setup.R and is part of
+# the reproduction conditions: each worker has its own RNG stream and the
+# least-trimmed-squares subsamples depend on the worker count (see config.R).
+message("MUREN workers: ", WORKERS, " (fixed by config.R)")
 
 # BLAS/OMP single-threaded (MUREN parallelizes the outer loop).
 pin_blas_threads()

@@ -123,8 +123,11 @@ parse_batch <- function(batch_result) {
   rows
 }
 
-n_cores <- max(1L, min(detectCores() - 1L, 4L))
-message("Parsing results with ", n_cores, " cores ...")
+# WORKERS (config.R) caps concurrency at every stage. Parsing is
+# order-preserving and uses no RNG, so the worker count does not affect the
+# output.
+n_cores <- WORKERS
+message("Parsing results with ", n_cores, " workers ...")
 
 parsed <- mclapply(
   batch_results,

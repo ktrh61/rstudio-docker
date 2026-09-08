@@ -65,7 +65,7 @@ source(file.path(paths$root, "lib", "gsea_permutation.R")) # bind helper
 # Shared constants (N_PERM, SEED, EXACT_THREADS, BM_EXACT_MAX, FDR_CUT) come
 # from config.R via setup.R.
 OMNIBUS_ALPHA <- c(1e-2, 1e-3, 1e-4) # per-gene null quantiles for the omnibus
-HC_ALPHA0 <- 0.1 # fraction of the p-value range Higher Criticism scans
+HC_ALPHA0 <- 0.1 # fraction of the ordered p-values (smallest ranks) that Higher Criticism scans
 PRIMARY_OMNIBUS <- "hc" # the pre-specified inferential row
 
 options(

@@ -6,7 +6,8 @@
 # visited once and the p-value is exact -- no sampling error and no 1/(B+1)
 # floor. `method = "auto"` (the default) takes that route when
 # C(n, nx) <= getOption("brunnermunzel.exact.max.allocations", 1e8) and falls
-# back to Monte Carlo above it.
+# back to Monte Carlo above it. `method = "exact"` honours the same cap but
+# stops instead of sampling.
 #
 # `brunnermunzel_pvalues()` applies the same machinery to a whole matrix of
 # features at once, which is the efficient way to use it: features sharing a
@@ -354,12 +355,28 @@ if (
     } else {
       "mc"
     }
-  } else if (method == "exact" && !is.finite(total)) {
-    stop(
-      "Exact enumeration requires C(n, nx) to be exactly representable, ",
-      "which it is not for n = ", n, " and nx = ", nx, ".",
-      call. = FALSE
-    )
+  } else if (method == "exact") {
+    if (!is.finite(total)) {
+      stop(
+        "Exact enumeration requires C(n, nx) to be exactly representable, ",
+        "which it is not for n = ", n, " and nx = ", nx, ".",
+        call. = FALSE
+      )
+    }
+    # A declared "exact" run honours the same allocation cap as "auto": it
+    # stops rather than enumerating beyond the budget or silently sampling.
+    cap <- .bm_exact_max_allocations()
+    if (total > cap) {
+      stop(
+        "Exact enumeration was requested but C(n, nx) = ",
+        format(total, big.mark = ",", scientific = FALSE),
+        " exceeds option 'brunnermunzel.exact.max.allocations' = ",
+        format(cap, big.mark = ",", scientific = FALSE),
+        " (n = ", n, ", nx = ", nx, "). Raise the cap deliberately or use ",
+        "method = \"auto\".",
+        call. = FALSE
+      )
+    }
   }
   list(method = method, total = total)
 }

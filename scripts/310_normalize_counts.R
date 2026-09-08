@@ -39,11 +39,11 @@ FLOOR_PDEG <- 0.05 # floorPDEG fraction forced as potential DEGs (TCC)
 MUREN_METHOD <- "lts" # MUREN pairwise regression
 
 # Brunner-Munzel screening (lib/stat_brunnermunzel.R). Declared exact: both
-# units are well inside the enumeration budget (C(28,12) = 3.0e7 and
-# C(36,9) = 9.4e7), so the screen's p-values carry no 1/(B + 1) floor, no
-# sampling error, and no seed dependence. The declaration matches the path
-# actually taken (reorg plan v2 s3.2): if a future cohort ever made
-# enumeration impossible the run stops rather than silently sampling.
+# strata are well inside the enumeration budget BM_EXACT_MAX (RET 12 vs 15:
+# C(27,12) = 1.7e7; BRAF 27 vs 9: C(36,9) = 9.4e7), so the screen's p-values
+# carry no 1/(B + 1) floor, no sampling error, and no seed dependence. The
+# declaration matches the path actually taken (reorg plan v2 s3.2): above the
+# budget the library stops rather than silently sampling (.bm_resolve_method).
 BM_METHOD <- "exact"
 BM_ALTERNATIVE <- "two.sided"
 
