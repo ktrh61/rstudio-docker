@@ -18,6 +18,10 @@ source(file.path(paths$root, "lib", "qc_pc_od.R"))
 source(file.path(paths$root, "lib", "units.R"))
 source(file.path(paths$root, "lib", "gene_filter.R"))
 source(file.path(paths$root, "lib", "stat_brunnermunzel.R"))
+options(
+  brunnermunzel.exact.max.allocations = BM_EXACT_MAX,
+  brunnermunzel.exact.threads = EXACT_THREADS
+)
 
 # --- Load and resolve R_Low / R_Mid tumours (from the design table) --------
 design <- readRDS(file.path(paths$processed, "thyr_case_design.rds"))

@@ -102,7 +102,7 @@ storey_pi0_null <- function(null_statistic) {
   null_p <- (n_perm - r + 1) / n_perm # genes x n_perm
   vapply(
     seq_len(n_perm),
-    function(j) storey_pi0(null_p[, j]),
+    function(j) storey_pi0(null_p[, j], lambda = STOREY_LAMBDA),
     numeric(1)
   )
 }

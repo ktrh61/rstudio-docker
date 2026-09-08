@@ -24,6 +24,10 @@ suppressPackageStartupMessages({
 source(file.path(paths$root, "lib", "units.R"))
 source(file.path(paths$root, "lib", "reo.R"))
 source(file.path(paths$root, "lib", "stat_brunnermunzel.R"))
+options(
+  brunnermunzel.exact.max.allocations = BM_EXACT_MAX,
+  brunnermunzel.exact.threads = EXACT_THREADS
+)
 
 # AS band boundaries come from config.R (AS_LOW_MAX / AS_HIGH_MIN); the band
 # assignment itself is fixed upstream in 140/230.
@@ -119,6 +123,7 @@ thyr_reo_evaluation <- list(
     test = "one-sided Brunner-Munzel, Mid > Low reversal score",
     method = attr(bm_low_mid, "mc")$method,
     p_value = bm_low_mid$p.value,
+    # theta = Pr(Low<Mid) + 0.5 Pr(Low=Mid); key name kept for the recorded artifact
     effect_P_low_lt_mid = unname(bm_low_mid$estimate)
   )
 )

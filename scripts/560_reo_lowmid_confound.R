@@ -13,6 +13,10 @@
 
 source("setup.R")
 source(file.path(paths$root, "lib", "stat_brunnermunzel.R"))
+options(
+  brunnermunzel.exact.max.allocations = BM_EXACT_MAX,
+  brunnermunzel.exact.threads = EXACT_THREADS
+)
 
 d <- readRDS(file.path(paths$processed, "thyr_reo_lowmid_purity.rds"))
 d <- d[d$band %in% c("R_Low", "R_Mid") & !is.na(d$score) & !is.na(d$tumor_purity), , drop = FALSE]
