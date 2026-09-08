@@ -45,7 +45,8 @@ N_CANDIDATES <- 500L # top genes by |effect - 0.5| (~half up, half down)
 PARAMS <- list(
   dead_zone = DEAD_ZONE,        # from config.R
   r0_exception_max = 1L,        # max sign exceptions for R0 consistency
-  r0_q10_threshold = log2(1.5), # R0 strength: 10th percentile of |r|
+  r0_quantile = 0.10,           # R0 strength: quantile of |r| that must clear the threshold
+  r0_q10_threshold = log2(1.5), # R0 strength threshold for that quantile
   chunk_size = 10000L
 )
 
@@ -97,7 +98,7 @@ expr_down <- log2_tpm[down_ids, r0_samples, drop = FALSE]
 expr_down_r1 <- log2_tpm[down_ids, r1_samples, drop = FALSE]
 n_r0 <- length(r0_samples)
 n_r1 <- length(r1_samples)
-q10_pos <- max(1L, ceiling(n_r0 * 0.10))
+q10_pos <- max(1L, ceiling(n_r0 * PARAMS$r0_quantile))
 
 pair_grid <- expand.grid(i = seq_along(up_ids), j = seq_along(down_ids))
 n_pairs <- nrow(pair_grid)

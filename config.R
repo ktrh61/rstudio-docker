@@ -72,3 +72,12 @@ DEGES_FDR <- 0.10
 # not decide claims, and the per-set p floor must clear the BH boundary of the
 # smallest family.
 N_PERM <- 9999L
+
+# Monte Carlo label allocations for a Brunner-Munzel comparison that is not
+# declared exact and whose C(n, nx) exceeds BM_EXACT_MAX (530, 540, 560:
+# Low-AS versus Mid-AS, C(36,17) = 8.6e9).
+BM_MC_DRAWS <- 999999L
+
+# Storey plug-in pi0 estimate: lambda fixed at 0.5 protocol-wide (310 screen,
+# 410 inference).
+STOREY_LAMBDA <- 0.5

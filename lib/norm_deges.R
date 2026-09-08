@@ -92,7 +92,7 @@ muren_to_norm_factors <- function(scaling_coeff, lib_size) {
 deges_muren_bm <- function(counts, group, iteration = 1L,
                            fdr, floor_pdeg,
                            n_perm, seed, alternative = "two.sided",
-                           bm_method = "auto",
+                           bm_method = "auto", pi0_lambda = 0.5,
                            muren_method = "lts", workers = 3L) {
   if (!exists("muren_norm", mode = "function", inherits = TRUE)) {
     stop("muren_norm() must be loaded (source lib/norm_muren.R).")
@@ -137,7 +137,7 @@ deges_muren_bm <- function(counts, group, iteration = 1L,
       cpm_matrix, group, group_levels, n_perm, seed, alternative, bm_method
     )
     # Protocol-wide Storey q (lib/stat_storey.R; reorg plan v2 D1).
-    screen <- storey_q(pvalues)
+    screen <- storey_q(pvalues, lambda = pi0_lambda)
     pi0_hat <- screen$pi0
     p_adj <- screen$q
 

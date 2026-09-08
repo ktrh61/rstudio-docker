@@ -39,14 +39,14 @@ labels <- c(
   band_sporadic_or_high = "Dose-zero or High-AS band",
   paired = "Tumor/normal pair available",
   pcod_clean = "Outlier screen passed (both tissues)",
-  purity_pass = "Relative purity ≥ 0.6"
+  purity_pass = sprintf("Relative purity ≥ %.1f", PURITY_THRESHOLD)
 )
 reasons <- c(
   driver_classified = "no single classified driver",
   band_sporadic_or_high = "Low-AS / Mid-AS band or no reference",
   paired = "no tumor/normal pair",
   pcod_clean = "outlier-flagged tissue",
-  purity_pass = "relative purity < 0.6"
+  purity_pass = sprintf("relative purity < %.1f", PURITY_THRESHOLD)
 )
 
 n <- nrow(flow)

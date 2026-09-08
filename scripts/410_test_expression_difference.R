@@ -228,7 +228,7 @@ test_unit <- function(dgelist, unit) {
   null_statistic <- gsea_bind_null_columns(null_columns, nrow(cpm_matrix))
   rm(null_columns)
 
-  storey <- storey_q(p_exact)
+  storey <- storey_q(p_exact, lambda = STOREY_LAMBDA)
   pi0_null <- storey_pi0_null(null_statistic)
 
   genes <- data.frame(
@@ -265,7 +265,7 @@ test_unit <- function(dgelist, unit) {
     genes = genes,
     pi0 = list(
       estimate = storey$pi0,
-      lambda = 0.5,
+      lambda = STOREY_LAMBDA,
       null = pi0_null,
       null_quantiles = stats::quantile(
         pi0_null, c(0, 0.025, 0.25, 0.5, 0.75, 0.975, 1)
@@ -304,8 +304,8 @@ thyr_expression_test <- list(
     hc_alpha0 = HC_ALPHA0,
     primary_omnibus = PRIMARY_OMNIBUS,
     exact_max = BM_EXACT_MAX,
-    inference = "Storey q < 0.10 on exact p (plug-in pi0, lambda = 0.5)",
-    pi0_lambda = 0.5,
+    inference = sprintf("Storey q < %.2f on exact p (plug-in pi0, lambda = %s)", FDR_CUT, STOREY_LAMBDA),
+    pi0_lambda = STOREY_LAMBDA,
     q_threshold = FDR_CUT,
     perm_sharing = "per-unit perm_index consumed by 420; hash per unit",
     perm_index_hash = vapply(

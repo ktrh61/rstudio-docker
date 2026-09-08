@@ -60,7 +60,8 @@ cases$score <- unname(score_of[cases$case_submitter_id])
 report <- function(keep, label) {
   d <- cases[keep, , drop = FALSE]
   lo <- d$score[d$band == "R_Low"]; mi <- d$score[d$band == "R_Mid"]
-  bm <- brunnermunzel_mc_test(lo, mi, alternative = "less", method = "auto", seed = SEED)
+  bm <- brunnermunzel_mc_test(lo, mi, alternative = "less", method = "auto",
+                              B = BM_MC_DRAWS, seed = SEED)
   message(sprintf(
     "  %-16s Low median %.1f (n=%d) | Mid median %.1f (n=%d) | Mid>Low BM p=%.4f, theta = Pr(Low<Mid) + 0.5 Pr(Low=Mid) = %.3f",
     label, stats::median(lo), length(lo), stats::median(mi), length(mi),

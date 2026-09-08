@@ -70,7 +70,7 @@ y_min <- min(d$y) - 4
 # No jitter anywhere: scores are integers (exact) and AS separates the exposed
 # points vertically on its own; the Sporadic strip stacks instead of jittering.
 p <- ggplot(d, aes(x = score, y = y)) +
-  geom_hline(yintercept = c(33.3, 66.6), linetype = "dashed", colour = "grey70") +
+  geom_hline(yintercept = c(AS_LOW_MAX, AS_HIGH_MIN), linetype = "dashed", colour = "grey70") +
   geom_hline(yintercept = -5, linetype = "dotted", colour = "grey60") +
   geom_vline(xintercept = thr + 0.5, linetype = "dashed", colour = "grey40") +
   annotate("text", x = thr + 0.5, y = 103, label = paste0("positive: score > ", thr),
@@ -83,7 +83,7 @@ p <- ggplot(d, aes(x = score, y = y)) +
   scale_colour_manual(values = pal, name = "AS band") +
   scale_shape_manual(values = c(construction = 1L, application = 16L), name = "Set") +
   scale_x_continuous(breaks = 0:n_pairs, limits = c(-0.5, n_pairs + 0.5)) +
-  scale_y_continuous(breaks = c(0, 33.3, 66.6, 100), limits = c(y_min, 105)) +
+  scale_y_continuous(breaks = c(0, AS_LOW_MAX, AS_HIGH_MIN, 100), limits = c(y_min, 105)) +
   labs(x = paste0("REO reversal score (panel of ", n_pairs, " pairs)"),
     y = "Assigned share  (radiation attributability, %)") +
   theme_thyr(legend_position = "right")

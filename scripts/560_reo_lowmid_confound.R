@@ -38,7 +38,7 @@ par_bs <- partial_spearman(d$band_num, d$score, d$tumor_purity)
 # score-purity pair. This breaks the associations of band with both variables;
 # it is not conditional randomization at fixed purity.
 set.seed(SEED)
-perm <- replicate(9999, {
+perm <- replicate(N_PERM, {
   b <- sample(d$band_num)
   partial_spearman(b, d$score, d$tumor_purity)
 })
@@ -62,7 +62,8 @@ strata <- lapply(c("lo_purity", "hi_purity"), function(s) {
     message(sprintf("  %-9s n(Low=%d,Mid=%d): too few for a test", s, length(lo), length(mi)))
     return(NULL)
   }
-  bm <- brunnermunzel_mc_test(lo, mi, alternative = "less", method = "auto", seed = SEED)
+  bm <- brunnermunzel_mc_test(lo, mi, alternative = "less", method = "auto",
+                              B = BM_MC_DRAWS, seed = SEED)
   message(sprintf(
     "  %-9s Low median %.1f (n=%d) | Mid median %.1f (n=%d) | Mid>Low p=%.4f, theta = Pr(Low<Mid) + 0.5 Pr(Low=Mid) = %.3f",
     s, stats::median(lo), length(lo), stats::median(mi), length(mi),

@@ -27,7 +27,6 @@ stopifnot(
   is.data.frame(age$summary),
   all(required_age_columns %in% names(age$summary)),
   setequal(age$summary$stratum, c("R", "B")),
-  identical(age$config$b_boot, 9999L),
   identical(age$config$seed, DIAGNOSTIC_SEED)
 )
 m <- merge(
@@ -89,8 +88,9 @@ age_note <- paste0(
   format_age_estimates("RET", age_row("R")), "; ",
   format_age_estimates("BRAF", age_row("B")), ". ",
   "Here, θ=Pr(X<Y)+0.5Pr(X=Y), with X denoting dose-zero and Y High-AS. ",
-  "Intervals were obtained from 9,999 resamples drawn separately within each group ",
-  "(seed 19450809); no p-values were calculated."
+  sprintf("Intervals were obtained from %s resamples drawn separately within each group ",
+          format(age$config$b_boot, big.mark = ",")),
+  sprintf("(seed %d); no p-values were calculated.", age$config$seed)
 )
 cat("\nTable 2 footnote:\n", age_note, "\n", sep = "")
 

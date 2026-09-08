@@ -11,7 +11,7 @@ x <- readRDS(file.path(paths$processed, "thyr_expression_test.rds"))
 rows <- lapply(names(x$units), function(u) {
   un <- x$units[[u]]
   g <- un$genes
-  deg <- g$q_storey < 0.10
+  deg <- g$q_storey < FDR_CUT
   hc <- un$omnibus[un$omnibus$test == "hc", ]
   data.frame(
     unit = u,

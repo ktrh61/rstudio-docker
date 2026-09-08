@@ -50,7 +50,7 @@ p <- ggplot(s, aes(x = p_any, y = row)) +
                                         c(lab_ex, lab_ok)), name = NULL) +
   scale_x_continuous(limits = c(0, 0.30), breaks = seq(0, 0.3, 0.05)) +
   labs(
-    x = "proportion of held-out pseudo-observations with ≥1 discovery (Benjamini–Hochberg q<0.10)",
+    x = sprintf("proportion of held-out pseudo-observations with ≥1 discovery (Benjamini–Hochberg q<%.2f)", cal$config$q_threshold),
     y = NULL
   ) +
   theme_thyr()

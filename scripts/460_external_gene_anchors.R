@@ -140,7 +140,7 @@ for (set_name in unique(hits$anchor_set)) {
     genes <- expression_test$units[[u]]$genes
     in_tested <- set_hits[set_hits$gene_id %in% genes$gene_id, ]
     g <- genes[match(in_tested$gene_id, genes$gene_id), ]
-    k <- sum(g$q_storey < 0.10)
+    k <- sum(g$q_storey < FDR_CUT)
     summary_rows[[length(summary_rows) + 1]] <- data.frame(
       anchor_set = set_name, evidence_class = set_class, tissue = set_tissue,
       matched = u %in% tissue_match[[set_tissue]],
@@ -167,7 +167,7 @@ detail_tab <- do.call(rbind, detail_rows)
 # Ory list selected jointly from normal and tumour tissues; [tissue-matched] /
 # [cross-tissue] otherwise describe whether the unit's tissue side agrees
 # with the list's source tissue.
-cat("\nMembership summary (k = list genes with q<0.10 in unit; n = tested):\n")
+cat(sprintf("\nMembership summary (k = list genes with q<%.2f in unit; n = tested):\n", FDR_CUT))
 for (i in seq_len(nrow(summary_tab))) {
   s <- summary_tab[i, ]
   lab <- if (s$tissue == "pair_difference") {

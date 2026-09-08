@@ -131,7 +131,7 @@ process_unit <- function(samples1, samples2, group_labels) {
     iteration = ITERATION, fdr = DEGES_FDR, floor_pdeg = FLOOR_PDEG,
     n_perm = 0L, seed = SEED, # both unused on the exact path
     alternative = BM_ALTERNATIVE,
-    bm_method = BM_METHOD,
+    bm_method = BM_METHOD, pi0_lambda = STOREY_LAMBDA,
     muren_method = MUREN_METHOD, workers = WORKERS
   )
 
@@ -216,7 +216,7 @@ thyr_normalized_counts <- list(
   config = list(
     iteration = ITERATION,
     fdr = DEGES_FDR,
-    fdr_method = "storey_plugin_lambda0.5",
+    fdr_method = sprintf("storey_plugin_lambda%s", STOREY_LAMBDA),
     floor_pdeg = FLOOR_PDEG,
     muren_method = MUREN_METHOD,
     workers = WORKERS,

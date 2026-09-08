@@ -72,7 +72,8 @@ as_tbl$class <- classify_reversal(as_tbl$score, boundary)
 low_score <- as_tbl$score[as_tbl$band == "R_Low"]
 mid_score <- as_tbl$score[as_tbl$band == "R_Mid"]
 bm_low_mid <- brunnermunzel_mc_test(
-  low_score, mid_score, alternative = "less", method = "auto", seed = SEED
+  low_score, mid_score, alternative = "less", method = "auto",
+  B = BM_MC_DRAWS, seed = SEED
 )
 message(sprintf(
   "\nRead B (intermediate-band application): Mid > Low reversal score, one-sided BM p = %.4f (%s), effect theta = Pr(Low<Mid) + 0.5 Pr(Low=Mid) = %.3f",

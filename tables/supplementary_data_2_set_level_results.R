@@ -23,7 +23,7 @@ rows <- lapply(names(en$units), function(u) {
 })
 tab <- do.call(rbind, rows)
 cat("rows:", nrow(tab), " columns:", paste(names(tab), collapse = ", "), "\n")
-cat("q_bh < 0.10 rows (expect 0):", sum(tab$q_bh < 0.10), "\n")
+cat(sprintf("q_bh < %.2f rows (expect 0): %d\n", FDR_CUT, sum(tab$q_bh < FDR_CUT)))
 
 out_dir <- file.path(paths$output, "tables")
 dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
