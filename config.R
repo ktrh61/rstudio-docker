@@ -12,19 +12,21 @@ SEED <- 19860426L
 # not presuppose more. No stage nests these knobs -- the peak concurrency is
 # 4 at every step, and the reference BLAS adds no threads of its own.
 #
-# WORKERS is part of the reproduction contract, not a free performance knob:
+# WORKERS is part of the reproduction conditions, not a free performance knob:
 # MUREN gives each worker its own RNG stream (norm_muren.R,
-# clusterSetRNGStream) and MASS::ltsreg draws random subsamples, so the worker
+# clusterSetRNGStream; the stream seed is a constant of the reimplementation,
+# not a study seed) and MASS::ltsreg draws random subsamples, so the worker
 # count decides which subsamples are drawn. A fixed count is fully
 # deterministic; changing it moves the last bits (measured 16 vs 4 workers:
 # purity 2e-14, scaling coefficients 2e-13, every cohort decision identical).
 WORKERS <- 4L
 
-# Seed base for the secondary stages (240 age disclosure, 415 null calibration,
-# 416 spike-in control, 440 signature agreement, 540-560 REO band checks),
-# independent of SEED so that none of them shares a random stream with the
-# inference (unified 2026-08-09). Each stage documents how it derives its
-# stream from this base.
+# Seed base for the secondary stages that draw their own resampling (240 age
+# disclosure, 415 null calibration, 416 spike-in control, 440 signature
+# agreement), independent of SEED so that none of them shares a random stream
+# with the inference (unified 2026-08-09). Each stage documents how it derives
+# its stream from this base. The ancillary REO checks (540-560) reuse SEED for
+# their Monte Carlo Brunner-Munzel comparisons and label permutation.
 DIAGNOSTIC_SEED <- 19450809L
 
 # Brunner-Munzel exact-enumeration threads and allocation cap (310/410).

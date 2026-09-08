@@ -23,6 +23,13 @@ if (!requireNamespace("parallel", quietly = TRUE)) {
 
 `%dopar%` <- foreach::`%dopar%`
 
+# stream_seed: the distributed MUREN leaves its worker processes unseeded, so
+# the least-trimmed-squares subsampling is not reproducible there. This
+# reimplementation initializes the worker random-number streams with a fixed
+# constant of its own. The value is arbitrary and is a property of the
+# implementation (like a solver default), not one of the study seeds in
+# config.R; callers keep the default so that every MUREN call in the pipeline
+# uses the same subsampling sequence.
 muren_norm <- function(reads,
                        refs = "saturated",
                        pairwise_method = "lts",
@@ -32,6 +39,7 @@ muren_norm <- function(reads,
                        trim = 10,
                        maxiter = 70,
                        workers,
+                       stream_seed = 12345L,
                        ...) {
   if (missing(workers)) {
     stop("'workers' must be explicitly specified.")
@@ -183,7 +191,7 @@ muren_norm <- function(reads,
 
   cl <- parallel::makeCluster(workers, type = "PSOCK")
   doSNOW::registerDoSNOW(cl)
-  parallel::clusterSetRNGStream(cl, 12345L)
+  parallel::clusterSetRNGStream(cl, stream_seed)
   on.exit(try(parallel::stopCluster(cl), silent = TRUE), add = TRUE)
   parallel::clusterExport(cl, varlist = required_helpers, envir = .GlobalEnv)
 
