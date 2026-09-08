@@ -35,7 +35,7 @@
 # estimated. This is the procedure the held-out null calibration passed
 # (global-null P(>=1) 0.045 pooled against nominal 0.10); the pooled
 # tail-ratio FDR and a restandardized variant were measured miscalibrated
-# (0.14 / 0.22) and are not used -- measurements in diagnostics/output/,
+# (0.14 / 0.22) and are not used -- measurements kept outside the published code,
 # decision record in reorg plan v2 appendix B. No cross-family claim is
 # made; q < 0.25 is not used, not even as an exploratory bar.
 #
@@ -48,7 +48,7 @@
 # The change from the previous spec (gseaParam = 0, Westfall-Young FWER as
 # primary inference) is a protocol amendment, not a bug fix; appendix B keeps
 # the before/after specs and what had been seen when. The spike-in positive
-# control is re-run under this inference (diagnostics/gsea_spikein_control.R).
+# control is re-run under this inference (scripts/416_gsea_spikein_control.R).
 #
 # The size window drops both noise-prone tiny sets and the vague giant ones;
 # redundant_with flags a set whose leading edge is largely contained in a

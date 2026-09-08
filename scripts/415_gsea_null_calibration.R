@@ -21,7 +21,7 @@
 # pooled tail-ratio FDR of the original D2 -- measured miscalibrated here
 # (P(>=1) 0.14 pooled, 0.24 worst cell; a restandardized variant 0.22/0.44)
 # before any real-data run; per-set p + BH measured 0.045 and was adopted.
-# The superseded measurement logs stay in diagnostics/output/.
+# The superseded measurement logs are kept outside the published code.
 #
 # Under the complete null FDR = P(at least one discovery), so the measurement
 # per unit x collection is: the share of replicates with >= 1 discovery

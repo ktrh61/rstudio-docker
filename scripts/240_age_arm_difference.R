@@ -92,7 +92,7 @@ for (drv in c("RET", "BRAF")) {
     obs_hl, ci_hl[1], ci_hl[2]
   ))
   cat(sprintf(
-    "  Pr(Sporadic<High) (BM) %.3f  [%.3f, %.3f]\n",
+    "  theta = Pr(Sporadic<High) + 0.5 Pr(=) (BM) %.3f  [%.3f, %.3f]\n",
     obs_eff, ci_eff[1], ci_eff[2]
   ))
 

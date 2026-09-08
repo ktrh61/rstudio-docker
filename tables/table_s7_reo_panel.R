@@ -1,7 +1,8 @@
 # table_s7_reo_panel.R  (Table S7)
 # Ten-pair relative-expression-ordering panel: pair identifiers, higher- and
 # lower-expressed genes, construction-set median difference, reversal rate and
-# the dose-zero q<0.10 flag, in panel order. Formatting only.
+# r0_q10 (the 10th percentile of |log2 TPM difference| among dose-zero samples),
+# in panel order. Formatting only.
 # Input : processed/thyr_reo_panel.rds (from 520)
 # Output: output/tables/table_s7.csv
 

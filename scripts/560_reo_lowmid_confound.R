@@ -6,8 +6,7 @@
 #   (A) one-sided Mid-vs-Low Brunner-Munzel comparisons within two strata formed
 #       at median purity.
 # Neither analysis establishes an AS-band association independent of purity.
-# This diagnostic runs outside the numbered stream and reads the output from
-# reo_lowmid_purity.R.
+# Reads the output of 550.
 # Input : processed/thyr_reo_lowmid_purity.rds (from 550)
 #         lib/stat_brunnermunzel.R
 # Output: processed/thyr_reo_lowmid_confound.rds
@@ -65,7 +64,7 @@ strata <- lapply(c("lo_purity", "hi_purity"), function(s) {
   }
   bm <- brunnermunzel_mc_test(lo, mi, alternative = "less", method = "auto", seed = SEED)
   message(sprintf(
-    "  %-9s Low median %.1f (n=%d) | Mid median %.1f (n=%d) | Mid>Low p=%.4f, Pr(Low<Mid)=%.3f",
+    "  %-9s Low median %.1f (n=%d) | Mid median %.1f (n=%d) | Mid>Low p=%.4f, theta = Pr(Low<Mid) + 0.5 Pr(Low=Mid) = %.3f",
     s, stats::median(lo), length(lo), stats::median(mi), length(mi),
     bm$p.value, unname(bm$estimate)))
   data.frame(stratum = s, low_median = stats::median(lo), mid_median = stats::median(mi),

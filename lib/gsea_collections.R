@@ -1,5 +1,5 @@
 # MSigDB collections for the gene-set level (420) and its null calibration
-# (diagnostics/gsea_null_calibration.R). One definition so the calibration
+# (scripts/415_gsea_null_calibration.R). One definition so the calibration
 # exercises exactly the families the analysis uses.
 #
 # Families: H, C2:CP (canonical pathways), C5:GO:BP, and C2:CGP:radiation --

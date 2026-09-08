@@ -4,8 +4,8 @@
 # groups (Sporadic + Low + Mid + High) in one ContamDE run, then describe its
 # association with the REO reversal score. This diagnostic does not authorize
 # exclusions or establish that the band-score association is purity-independent.
-# A diagnostic outside the numbered stream (reorg plan v2 s2.6); mirrors 220
-# pooled ContamDE. Run after the main chain.
+# Mirrors the pooled ContamDE of 220 for the intermediate-band application set;
+# runs after 530.
 # Input : processed/thyr_case_design.rds (from 140),
 #         thyr_se_raw.rds, thyr_reo_evaluation.rds
 #         lib/norm_muren_helpers.R, lib/norm_muren.R,
@@ -24,7 +24,7 @@ source(file.path(paths$root, "lib", "norm_muren.R"))
 source(file.path(paths$root, "lib", "purity_contamde.R"))
 source(file.path(paths$root, "lib", "gene_filter.R"))
 
-# WORKERS comes from config.R via setup.R (development 16L; canonical is 4L).
+# WORKERS comes from config.R via setup.R (fixed; part of the reproduction conditions).
 pin_blas_threads()
 
 # --- Resolve the whole RET cohort (all four bands) from the design table ----

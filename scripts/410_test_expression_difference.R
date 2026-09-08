@@ -209,7 +209,7 @@ test_unit <- function(dgelist, unit) {
   # perm_index matrices (visible in the recorded hashes). That is harmless
   # for per-unit inference and for 420's reuse, but cross-unit diagnostics
   # must not pair these matrices as independent shuffles -- see
-  # diagnostics/signature_agreement.R, which draws its own.
+  # scripts/440_signature_agreement.R, which draws its own.
   set.seed(SEED)
   perm_index <- vapply(seq_len(N_PERM), function(i) sample(n), integer(n))
   # The shuffles are drawn above, so each column below is an independent

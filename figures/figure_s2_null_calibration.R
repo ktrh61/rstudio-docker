@@ -36,7 +36,7 @@ s$row <- factor(paste(s$contrast, s$coll, sep = " · "),
                                    sep = " · ")))
 # The disclosed excess: the cell whose CI lower bound exceeds the nominal level.
 s$excess <- s$ci_lo > cal$config$nominal
-lab_ok <- "interval overlaps nominal"
+lab_ok <- "interval not entirely above nominal"
 lab_ex <- "interval entirely above nominal"
 s$flag <- factor(ifelse(s$excess, lab_ex, lab_ok), levels = c(lab_ex, lab_ok))
 

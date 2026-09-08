@@ -1,9 +1,9 @@
 # verify_environment.R — build fails unless the image reproduces the
 # qualified environment (reorg plan v2 B.12 and phase-6 unit):
 #   1. R is 4.5.3 and links the REFERENCE BLAS/LAPACK (never OpenBLAS)
-#   2. every explicitly installed package matches the proven version
-#      (versions.tsv = parity targets measured in the 4-1b dev container)
-#   3. every explicit package actually loads
+#   2. every package listed in versions.tsv matches the proven version
+#      (parity targets measured in the 4-1b dev container)
+#   3. every listed package actually loads
 #   4. the Rcpp toolchain compiles (310/410 build stat_brunnermunzel.cpp
 #      at run time)
 

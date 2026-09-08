@@ -35,7 +35,7 @@
 # variant were both measured miscalibrated under this dependence structure
 # (global-null P(>=1 discovery) 0.14 and 0.22 against nominal 0.10; per-set
 # p + BH measured 0.045). Measurements and the mechanism are recorded in
-# diagnostics/output/ and reorg plan v2 appendix B.
+# the archived measurement logs (outside the published code) and reorg plan v2 appendix B.
 # Callers evaluate one collection at a time so that each collection's NES
 # normalization is built from that collection alone.
 
