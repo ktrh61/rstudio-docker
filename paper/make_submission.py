@@ -142,13 +142,22 @@ def convert(text, index, order, warnings, do_convert=True):
         return auth + " [" + ",".join(str(n) for n in sorted(set(nums))) + "]"
 
     if do_convert:
-        # 地の文: "Morton et al. (2021)" / "Abend et al. (2012, 2013)"
-        text = re.sub(
+        # 地の文 "Morton et al. (2021)" / "Abend et al. (2012, 2013)" と括弧内 "(Morton et al. 2021)" を
+        # 文書順の 1 パスで変換する。番号は初出順(BJC: 本文で引いた順に連番)。
+        # 旧実装(2026-09-08 まで)は地の文を先に全文走査していたため、地の文で引かれる文献が
+        # 出現位置に関係なく若い番号を先取りしていた。
+        narr = re.compile(
             r"\b((?:" + ORG_ALT + r")|(?:[A-ZÀ-Þ][\w'’-]+(?: et al\.| and [A-ZÀ-Þ][\w'’-]+)?)) "
-            r"\((" + YEAR + r"(?:,\s*" + YEAR + r")*)\)",
-            narrative_repl, text)
-        # 括弧内
-        text = re.sub(r"\(([^()]*)\)", paren_repl, text)
+            r"\((" + YEAR + r"(?:,\s*" + YEAR + r")*)\)")
+        paren = re.compile(r"\(([^()]*)\)")
+        combined = re.compile("(?P<nar>" + narr.pattern + ")|(?P<par>" + paren.pattern + ")")
+
+        def dispatch(m):
+            if m.group("nar") is not None:
+                return narrative_repl(narr.match(m.group("nar")))
+            return paren_repl(paren.match(m.group("par")))
+
+        text = combined.sub(dispatch, text)
     return text
 
 
