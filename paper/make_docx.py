@@ -278,8 +278,7 @@ def _citation_converter():
 
 def additional_information():
     """declarations の Additional Information を BJC 規定順で描画する。
-    日本語管理注記(CJK 行)は除去、未記入節(【記入】)は明示プレースホルダ、
-    URL/DOI の未確定括弧も明示プレースホルダへ置換。"""
+    日本語管理注記(CJK 行)は除去、未記入節(【記入】)は明示プレースホルダ。"""
     d = _declarations()
     zone = d.split("## Additional Information", 1)[1].split("\n## ", 1)[0]
     zone = zone.split("\n", 1)[1]
@@ -290,8 +289,6 @@ def additional_information():
         body = re.sub(r"<!--.*?-->", "", body, flags=re.S)
         # 管理接頭辞「案: 」は CJK 行除去より前に外す(先頭行の英文が行ごと脱落する不具合の修正 2026-09-02)
         body = re.sub(r"^案: ", "", body, flags=re.M)
-        body = re.sub(r"【リポジトリ URL/DOI[^】]*】", "[URL/DOI to be added at publication]", body)
-        body = re.sub(r"【公開リポジトリの URL/DOI[^】]*】", "", body)
         lines = [l for l in body.split("\n") if not CJK.search(l)]
         body = re.sub(r"\n{3,}", "\n\n", "\n".join(lines)).strip()
         body = re.sub(r"(?<!\n)\n(?!\n)", " ", body)  # 段落内の改行は空白へ(引用が行をまたいでも変換できるように)

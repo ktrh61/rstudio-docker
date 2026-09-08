@@ -1,11 +1,10 @@
-# 投稿事務ドラフト(タイトルページ+Additional Information 骨子)
+# 投稿宣言(タイトルページ・Additional Information・補足ファイル要約)
 
-状態: draft(2026-08-21 起草 — 【記入】は研究者記入待ち。BJC「Article formatting」の要求節順に対応。
-確定後に投稿版へ転記する。gpt_review/review.md §10 の残作業リストの実体化)。
+投稿版の正本。make_docx.py がタイトルページと Additional Information を本文 docx に描画し、補足ファイル要約は投稿画面に入力する。記録・経緯は paper/numbers_ledger.md。
 
 ## Title page
 
-- **Title**: Driver-conditioned transcriptomic differences across radiation-attributability bands in papillary thyroid carcinoma(≤150字 ✓・結論文でない ✓)
+- **Title**: Driver-conditioned transcriptomic differences across radiation-attributability bands in papillary thyroid carcinoma
 - **Authors / Affiliations**:
   1. Kotaro Harakawa (1) *corresponding
   2. Vladimir A. Saenko (1)
@@ -14,15 +13,10 @@
   Affiliations:
   1. Department of Molecular Oncology and Diagnostic Medicine, Atomic Bomb Disease Institute, Nagasaki University, 1-12-4 Sakamoto, Nagasaki 852-8523, Japan
 
-  (綴りは PubMed 出版名義で照合済み 2026-08-26。所属名は研究者提供の現名称 — 2022 年論文の
-  旧表記と異なる。2025-04 改称の新名称 Molecular Oncology and Diagnostic Medicine を採用 —
-  研究室ページ注記に基づき研究者確定 2026-08-26。英語ヘッダ未更新のため共著者検収で再確認)
 - **Corresponding author + email + ORCID**:
   Kotaro Harakawa; ktrh61@gmail.com; ORCID 0009-0004-1086-8046
-  (大学は卒業生・離籍者向けドメインを提供しないため個人メール)
-- **Word count**: 投稿時に `paper/make_submission.py` の出力で再計測(2026-08-26 時点: 本文 4,933・Abstract 197)
 
-## Additional Information(BJC 規定順)
+## Additional Information
 
 ### Acknowledgements
 
@@ -31,7 +25,6 @@ The results reported here are based in part on data from the REBC-THYR study (Mo
 the data available. We also thank the National Cancer Institute Genomic Data Commons for
 processing and providing access to the RNA-seq data. KH thanks Sayumi Matsuo, MD, PhD, for
 advice on manuscript preparation.
-(2026-09-07 研究者起草・校正反映(KH 略記・MD, PhD 表記)。Sayumi Matsuo 氏の掲載同意は取得済み。データ提供元の謝辞は NIH GDS ポリシーに対応)
 
 ### Authors' contributions
 
@@ -42,8 +35,6 @@ of the NIH IREP input parameters; VAS additionally proposed the initial concept 
 per-case predictive classification, which motivated the relative-expression-ordering panel
 designed and implemented by KH. All authors reviewed and approved the final manuscript.
 
-(貢献実態の研究者指定 2026-08-26: oncogene 設定・AS 分割・IREP パラメータ = VAS/NM、
-他全て = KH。文言は共著者ラウンドで本人ら確認)
 
 ### Ethics approval and consent to participate
 
@@ -54,7 +45,6 @@ involving human participants were collected by the authors, and no additional et
 approval was required. The study was performed in accordance with the Declaration of
 Helsinki. Ethical approvals and participant consent for the original data collection are
 described in the source study (Morton et al. 2021).
-(研究者承認 2026-08-26 — Thyroid 誌投稿時のオールオープンデータ回答の経緯と同型)
 
 ### Consent for publication
 
@@ -68,9 +58,7 @@ https://portal.gdc.cancer.gov/projects/REBC-THYR; STAR - Counts, open access). T
 manifest (MD5 7defb0c5574453474c67dfac8367a589) is provided with the analysis code
 <!-- N-89 -->. Processed analysis objects sufficient to regenerate the reported figures and
 tables accompany the paper. Analysis code, versioned inputs, and the date-pinned container
-build recipe sufficient to regenerate the reported analyses are available at 【リポジトリ URL/DOI — 公開範囲は
-「論文再現に必要なスクリプトのみ」の方針(2026-08-14 研究者決定)に従い確定】.
-(2026-09-02: BJC GTA の必須 7 節・順序に合わせ、旧 Code availability 節を本節末尾へ統合。URL/DOI は公開時に記入)
+build recipe sufficient to regenerate the reported analyses are available at [URL/DOI to be added at publication].
 
 ### Competing interests
 
@@ -80,7 +68,7 @@ The authors declare no conflict of interest.
 
 The authors received no specific funding for this work.
 
-## Supplementary file descriptions(投稿システム入力用 — BJC GTA「各ファイルに ≤50 語の要約」。2026-08-29 起草・共著者レビュー対象)
+## Supplementary file descriptions(投稿画面に入力、各 50 語以内)
 
 ### Supplementary Material (PDF)
 
@@ -101,7 +89,6 @@ Complete label-permutation gene-set results for all tested sets in each contrast
 ### STROBE checklist (strobe_checklist.pdf)
 
 Completed STROBE checklist for cross-sectional studies (22 items). Each reporting item is mapped to the manuscript section, page, and line numbers where it is addressed; items that do not apply to this secondary analysis of publicly available data are marked as such with the reason.
-(2026-09-08 研究者 Go: 共著者送付版に下書きを同梱、頁・行は本文確定後の最終版で更新。投稿時は Word から PDF 化)
 
 ## 公開リポジトリ・プレプリント運用(2026-08-29 記録。2026-09-02 研究者決定: 共著者不同意を前提にルート B を既定として仕上げる — 同意が得られた場合のみルート A へ切替(投稿後も規定上可)。切替可能性のため両ルートの記述を保持)
 
