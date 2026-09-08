@@ -148,7 +148,7 @@
 | --- | --- | --- | --- | --- | --- |
 | N-49 | \|M\| 中央値: R_Tumor 0.183 / R_Normal 0.108 / B_Tumor 0.105 / B_Normal 0.121 | MA プロットの効果量サマリ(q<0.10 数は N-16 と一致) | run/i9canon/fig_ma_gene_bm.log:2-5(正準図 = repo/output/figures/fig_ma_gene_bm.png 2026-08-10 01:40 版; 図は B.14 で二機 md5 一致) | Fig(MA)caption | verified |
 | N-50 | AS 中央値: R_Sporadic **未定義**(非被曝 — 2026-08-15 図改修で専用ストリップ表示に変更、旧表記 0.0 は y=0 配置の名残)/ R_Low 15.6 / R_Mid 55.5 / R_High 86.7(スコア中央値 0/1/4/6 は N-41 と一致) | fig_reo_grading の帯別 assigned share | run/xeon_results/logs/fig_reo_grading.log:2-5 | Fig(REO)caption | verified |
-| N-51 | [FAIL 0 \| WARN 0 \| SKIP 0 \| PASS 415](両機) | テストスイート結果 | run/xeon_results/logs/tests.log:48; run/i9canon/tests.log:28 | Methods(再現性) | verified |
+| N-51 | テストスイート全通過(両機、記録実行時の要約行 FAIL 0 \| WARN 0 \| SKIP 0 \| PASS 415。件数は本文に書かない — 2026-09-08 研究者判断、現行スイートは 515) | テストスイート結果 | run/xeon_results/logs/tests.log:48; run/i9canon/tests.log:28 | Methods(再現性) | verified |
 | N-52 | raw 1819 ファイル md5 全一致(唯一の差分は Xeon 側のみの logs/*.parcel 1件で発現データ本体ではない) | 二機の入力同一性 | run/xeon_provenance/i9_raw_md5.txt(1819行) vs xeon_raw_md5.txt(1820行)、差分は raw_diff.txt:1-2 | Methods(再現性) | verified |
 
 ### L. 外部遺伝子リスト照合(claim_map C-13)
@@ -961,6 +961,7 @@
 - 2026-09-08: **段 5 完了(make_docx 切替)**: 図・補足表・Data の読み元を output/figures/・output/tables/ の ID 名に統一し、レビュー期の paper/gpt_review/supplementary_files を削除。投稿別ファイル名を table_s5.csv・supplementary_data_1.csv・supplementary_data_2.csv に(SI 本文の "Provided as a separate file" と宣言節の要約見出しを同期)。**表 S2**: 退避対象 gsea_self_contained.R だけが読んでいた Matrix の行が消え、役割は pipeline/tests の 2 値に(キャプション英日を同期)。パッケージ 20260908_1949 を再生成(全 docx token 差 0、SI の図 S1・S2 と訳の図 1〜3 の埋め込みを確認)。
 - 2026-09-08: **段 6 完了(検査)**: 手書きマニフェスト figures/manifest.csv と test-figure-manifest.R を削除し、ファイル名とヘッダ(先頭行の表示 ID・Input・Output)から対応を導く test-display-items.R に置換(ID の一意性、宣言入力の実在、出力の ID 命名、計算段階が output/ に書かないこと、描画が rds を書かないこと)。コンテナでテスト一式 1 回: FAIL 0 / PASS 515(=旧 415+列挙上限 2+表示品目 98)。**N-51 の 415 は記録済み実行の値のまま**(本文の "415 tests" は次の記録実行で更新)。
 - 2026-09-08: **段 7 完了(退避)**: diagnostics/(blas_sentinel・gsea_self_contained と旧 output ログ)、analysis_v7/(旧パイプライン)、tests/reference を _archive/ へ、output/ 直下と旧名の生成物(現行コードのどこからも生成されないもの)を削除。README を現行構成(scripts/ lib/ figures/ tables/ tests/ docker/、実行順は番号順→figures→tables)に書き換え。**公開範囲 = リポジトリ直下の config.R・setup.R・scripts/・lib/・figures/・tables/・tests/・Dockerfile・docker/・README(+raw/ の小さな入力)、paper/・docs/・_archive/ は含めない。** 保留: N-52 の生入力一覧に MSigDB リリース zip を含めるか。
+- 2026-09-08: **本文の "415 tests" を件数なしへ**(研究者判断: expectation 件数はテスト改変で変わり、帳簿検査も混入していた)。新文 = 同一成果物+コード同梱の自動テストスイート通過(自作 Brunner–Munzel 手続きと running-sum 濃縮統計量を参照実装と照合)。SI 77 行目の同値記述(tie-free 入力)はそのまま。訳同期、N-51 は全通過の記録に書き換え。
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
   600 dpi TIFF)/別ファイル CSV 3 件+50 語要約/カバーレター案。残 = Acknowledgements・共著者レビューと
