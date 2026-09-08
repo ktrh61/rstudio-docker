@@ -41,8 +41,10 @@ Table 1 and Table S8 are manuscript text and have no script.
 - R 4.5.3 built from source against the reference BLAS/LAPACK 3.12.0
 - Bioconductor 3.22; packages from the P3M snapshot of 2026-04-09
   (`docker/versions.tsv`, verified at image build by `docker/verify_environment.R`)
-- Gene sets: msigdbr 26.1.0 fetches the pinned MSigDB release (msigdb.2026.1,
-  checksum verified by the package) into the R user cache on first use
+- Gene sets: msigdbr 26.1.0 fetches the pinned MSigDB release 2026.1
+  (msigdb.2026.1.zip, MD5 512ba99c6827141a9d471972b812d4ac, Zenodo record
+  18968178; checksum verified by the package) into the R user cache on first
+  use. The MSigDB data itself is not redistributed here.
 
 Reproducibility is scoped to this container; run everything inside it from the
 repository root.
