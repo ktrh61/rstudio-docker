@@ -583,18 +583,35 @@
 - 2026-08-25: 機械走査3層(誤字辞書・語彙照合・LanguageTool 6.6 ローカル)を実施 — 実質指摘は
   Supp の独立節等位コンマ1件のみ(適用、研究者 Go)。他18件は誤検出として根拠つき棄却
 
-## 現況(通常セッションはこの節と直近の改訂メモのみ読めば足りる — 2026-08-29 更新)
+## 現況(通常セッションはこの節と直近の改訂メモのみ読めば足りる — 2026-10-05 更新)
+
+- **v2 改稿(共著者と合意済みの方針、2026-10-05 記録)**: v1 は 2026-09-08 送付済み(タグ coauthor-review-v1、
+  共有 = 大学 OneDrive coauthor_share_ptc-driver-conditioned-transcriptomics/v1_bjc_20260908/、v1 は変更しない)。
+  v1 実測(docx 換算)= 本文 4,988(Background 591/Methods 2,252/Results 1,075/Discussion 1,070)・抄録 200・宣言節 325。
+  - Methods を 45% から約 30%(1,500〜1,700 語)へ削減。実装の記述、背景・出力の解釈に触れる部分を SI か
+    Discussion へ移す(Methods の大半を SI へ移す形は取らない)。削減分は Background・Discussion へ配分し、
+    旧 Introduction の論調をある程度戻す(旧文そのままの再利用はしない)。
+  - 表記: 融合遺伝子を HGNC 2021 推奨の二重コロンへ(本文 CCDC6-RET 2・NCOA4-RET 3 箇所)/band・group を
+    一律再考/遺伝子記号の斜体・上付きの漏れ見直し/所属訂正 2 件(2026-09-14 メモ)。
+  - 圧縮候補の洗い出し(編集は未実施): 実装検証の記述 約 150 語/理論的帰結の説明 約 150 語/Background・
+    Discussion と重複する事前規定・推定対象・REO の読みの制限 約 300 語。
+  - 先行例(PMC の JATS XML、図表・文献除外): 同分野 BJC 4 報の Methods = Detours 2005 1,500/4,252、
+    Detours 2007 728/4,307、Dom 2012 623/3,933、Abend 2013 1,488/4,036(16〜37%)。解析主体 BJC 10 報 = 15〜38%
+    (593〜3,028 語)。
+  - **未決(研究者裁定待ち — 裁定前に着手しない)**: (a) 別格である「事前固定に関する記述」の移動・削減の扱い、
+    (b) frozen の claim_map(予告・受け列)を更新するか検査対象から外すか、(c) band・group 変更の波及範囲
+    (図・表・SI・CSV 列名)、(d) STROBE の頁・行の取得方法(Windows 側アプリの操作は都度承認)。
 
 - 語数: **投稿版基準([n] 変換後 — ジャーナルが見る形)が判断の正**(研究者決定 2026-08-31)。正本基準
-  (author-year のまま・見出し除く)は参考。最新値は語数記載のある直近の改訂メモ参照(本文 = 見出し込み Word **4,964**、研究者計数 2026-09-05。Heath [17]・Gandhi [6] 追加後の docx 換算 4,965、Word 再計数待ち。宣言節は約 320)。Abstract 200
+  (author-year のまま・見出し除く)は参考。最新値は冒頭の v2 改稿節(v1 実測)。Abstract 200
   (計数規則 = 小見出し 4 語込み・"Abstract" 表題除く、Word 計数 2026-09-02、余裕 0)。留意: 引用の新規追加は投稿版でも [n] 分増える。機械検査(凍結4・N/C タグ・引用 33/
   警告0・英綴り・訳の段落/数値同期・SI 初出順・**略語 4 回未満は綴り出し(BJC house style)**・引用 [n] 角括弧)全通過 2026-09-03。引用は本文 36・Supp 65(2026-09-08)(通読後の再実行。訳の数値同期の差分は引用番号・年・漢数字表記のみ)。
 - **フェーズ2 未着手の発見(2026-08-29)**: BJC の参考文献書式は Nature 形式(例: McAndrew, N.P.,
   Dickson, M.A., … *et al.* Title. *Br. J. Cancer* **123**, 912–918 (2020))で、**論文題名を含む**。
   現行の References(Vancouver 風・題名なし)は要整形 — **2026-08-29 実施済み**(下記メモ)。
 - 開いている残件(文言の未決論点はゼロ — 残りは批准・記入・フェーズ2 のみ):
-  1. **段 2 完了(2026-09-05)**: C-01〜17 frozen、共著者送付版 = git タグ coauthor-review-v1(本文 Word 4,959 見込み・抄録 200)。
-     次 = 共著者レビュー(英語 docx 対を送付)。以後の変更は共著者コメント起点で軽量運用+訳同期
+  1. **段 2 完了(2026-09-05)**: C-01〜17 frozen。v1 送付済み、次 = v2 改稿(冒頭の節)。
+     変更は共著者コメント起点で軽量運用+訳同期
   2. 条件付き保留: Abstract に余裕が生じた場合に "differed transcriptionally" → "differed in expression"(+1語)を検討(2026-09-02)
   3. submission_declarations の【記入】残 = Acknowledgements(親族相談中)+公開リポジトリ URL/DOI 2箇所
      (公開時確定)。所属現名称・貢献文は共著者検収で確定
@@ -978,6 +995,7 @@
 - 2026-09-08: **公開リポジトリ名を `ptc-driver-conditioned-transcriptomics` に決定**(研究者)。README の題名行と冒頭を「Analysis code for “<論文題名>” (著者)」の形に。Zenodo 記録の題名は論文題名+ "analysis code"。
 - 2026-09-09(記録追記): **Schüürhuis, Konietschke & Brunner 2025(Biom J 67:e70096)の代替検定は不採用**。2026 年 7 月末に研究者がシミュレーションで検討し、本研究の条件で第一種過誤の制御に理論上の問題を確認したため採用せず、全数列挙の studentized 置換 BM を採った。検討はシミュレーションのみ(実データでの検討は二重検定になるため行わない。掘り下げは別研究の範囲)。本文では引用しない(改善策を採っていないため)。共著者送付文で経緯として言及。
 - 2026-09-14: **v2 で反映する所属訂正 2 件**(共著者への追伸で通知済み、v1 の共有ファイルは変更しない): (1) Saenko の所属を Department of Radiation Molecular Epidemiology, Atomic Bomb Disease Institute, Nagasaki University に訂正(v1 は誤って Molecular Oncology and Diagnostic Medicine)。正式表記は本人の返答で確定。(2) KH に第 2 所属 Graduate School of Biomedical Sciences, Nagasaki University を追加。反映時は declarations の所属番号を 3 つに(1 = Molecular Oncology and Diagnostic Medicine、2 = Radiation Molecular Epidemiology、3 = Graduate School)、著者ブロック描画と訳の表紙を同期。
+- 2026-10-05: **v2 改稿方針を現況節の冒頭に記録**(共著者合意済み。返信 2 通 = 書き直し事由 2026-09-17・経緯の残りと方針は送信済み、文面は記録しない)。現況節の日付と残件 1 を v1 送付後の状態へ更新。原稿は未変更。
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
   600 dpi TIFF)/別ファイル CSV 3 件+50 語要約/カバーレター案。残 = Acknowledgements・共著者レビューと
