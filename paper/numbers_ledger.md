@@ -598,7 +598,7 @@
   - **進行(2026-10-12)**: 作業ブランチ rewrite/manuscript-20261012(rebuild/r453 から、未プッシュ)。Methods 再構成・
     Background 加筆・Discussion 再構成・表記・所属を英文のみでコミット(訳は取り込み前に同期して squash)。
     語数(投稿版基準の近似)= Background 702/Methods 1,395/Results 1,057/Discussion 1,269、本文 4,423、引用 38。
-    残 = band/group 裁定(c)・prespecified の Results 5/Discussion 3・claim_map 予告/受け列(b)・訳同期・docx 確定・STROBE 頁行(d)。
+    残 = 訳同期と squash・docx の Word 計数確定・STROBE 頁行(d)・v2 共有(訳の通読後、別途 Go)。(c)(b)・prespecified は 2026-10-13 に裁定済み。
   - 先行例(PMC の JATS XML、図表・文献除外): 同分野 BJC 4 報の Methods = Detours 2005 1,500/4,252、
     Detours 2007 728/4,307、Dom 2012 623/3,933、Abend 2013 1,488/4,036(16〜37%)。解析主体 BJC 10 報 = 15〜38%
     (593〜3,028 語)。
@@ -1008,6 +1008,15 @@
   3 つの構造的限界に再構成し推定対象の理由を自蔵、混合の読みと REO 設計の接続・外部検証の非対称性を追記(暫定版 Word 2026-03 の Discussion は
   分類器・BRAF 対照読みが前提で流用対象外)。融合遺伝子を二重コロン表記へ(本文 5 箇所、Table 2 は make_docx 表示層)、所属訂正 2 件を
   declarations に反映(Graduate School の住所は Sakamoto と同一と仮定)。引用 36 → 38(本文)。
+- 2026-10-13: **v2 第 1 巡の続き(研究者 accept 済み)**: 散文の Chernobyl を Chornobyl へ(本文 4・SI 1・カバーレター 2、文献題名は原綴り)。
+  docx 表示層 = 書簡経路(カバーレター・STROBE)にも遺伝子書式を適用、NTRK1・CYR61・ATM と RET/PTC を追加、上付き V600E は正体
+  (BJC 2024–26 の JATS 5 報で <sup> 内 <italic> は 0)、貼り付け用 txt は書式なしで別生成。図 1・2・S1 の遺伝子記号を斜体で再生成(正準コンテナ、
+  数値不変)。band と group を Methods で定義(band = AS の 4 区分、group = 1 区分 × 1 層の症例集合)し本文 13・SI 7 箇所を統一、
+  「chromosome band 7q11」は「copy-number gain at 7q11」へ(band の二義を解消)。prespecified を Results 5・Discussion 3 から落とし
+  Background・Methods 凍結文・表 1 に集約。**批准済み文言の変更** = C-04 の Results/Discussion 文(bands → dose-zero and High-AS groups)、
+  Abstract 1 語(groups → strata、200 語不変)。PubMed 実測: dose band 32 件(放射線 9)、age band 1,023、dose category 256 — band は定義つきで維持。
+  **claim_map 運用(未決 b 裁定)**: 主張文・水準・根拠は検査対象のまま、所在・Intro 予告・Disc 受けはトリガー 2 で 1 回更新。C-08 の Disc 受け欄
+  (年齢反転の記述)は本文に存在しないため、受け欄を本文の現状に合わせる(文を足す場合は研究者の文言)。
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
   600 dpi TIFF)/別ファイル CSV 3 件+50 語要約/カバーレター案。残 = Acknowledgements・共著者レビューと
