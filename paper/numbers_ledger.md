@@ -583,7 +583,7 @@
 - 2026-08-25: 機械走査3層(誤字辞書・語彙照合・LanguageTool 6.6 ローカル)を実施 — 実質指摘は
   Supp の独立節等位コンマ1件のみ(適用、研究者 Go)。他18件は誤検出として根拠つき棄却
 
-## 現況(通常セッションはこの節と直近の改訂メモのみ読めば足りる — 2026-10-05 更新)
+## 現況(通常セッションはこの節と直近の改訂メモのみ読めば足りる — 2026-10-12 更新)
 
 - **v2 改稿(共著者と合意済みの方針、2026-10-05 記録)**: v1 は 2026-09-08 送付済み(タグ coauthor-review-v1、
   共有 = 大学 OneDrive coauthor_share_ptc-driver-conditioned-transcriptomics/v1_bjc_20260908/、v1 は変更しない)。
@@ -593,8 +593,12 @@
     旧 Introduction の論調をある程度戻す(旧文そのままの再利用はしない)。
   - 表記: 融合遺伝子を HGNC 2021 推奨の二重コロンへ(本文 CCDC6-RET 2・NCOA4-RET 3 箇所)/band・group を
     一律再考/遺伝子記号の斜体・上付きの漏れ見直し/所属訂正 2 件(2026-09-14 メモ)。
-  - 圧縮候補の洗い出し(編集は未実施): 実装検証の記述 約 150 語/理論的帰結の説明 約 150 語/Background・
-    Discussion と重複する事前規定・推定対象・REO の読みの制限 約 300 語。
+  - 圧縮候補の洗い出し → **2026-10-12 実施**(下記メモ。旧推定 = 実装検証 約 150 語/理論的帰結 約 150 語/
+    Background・Discussion と重複する事前規定・推定対象・REO の読みの制限 約 300 語)。
+  - **進行(2026-10-12)**: 作業ブランチ rewrite/manuscript-20261012(rebuild/r453 から、未プッシュ)。Methods 再構成・
+    Background 加筆・Discussion 再構成・表記・所属を英文のみでコミット(訳は取り込み前に同期して squash)。
+    語数(投稿版基準の近似)= Background 702/Methods 1,395/Results 1,057/Discussion 1,269、本文 4,423、引用 38。
+    残 = band/group 裁定(c)・prespecified の Results 5/Discussion 3・claim_map 予告/受け列(b)・訳同期・docx 確定・STROBE 頁行(d)。
   - 先行例(PMC の JATS XML、図表・文献除外): 同分野 BJC 4 報の Methods = Detours 2005 1,500/4,252、
     Detours 2007 728/4,307、Dom 2012 623/3,933、Abend 2013 1,488/4,036(16〜37%)。解析主体 BJC 10 報 = 15〜38%
     (593〜3,028 語)。
@@ -996,6 +1000,14 @@
 - 2026-09-09(記録追記): **Schüürhuis, Konietschke & Brunner 2025(Biom J 67:e70096)の代替検定は不採用**。2026 年 7 月末に研究者がシミュレーションで検討し、本研究の条件で第一種過誤の制御に理論上の問題を確認したため採用せず、全数列挙の studentized 置換 BM を採った。検討はシミュレーションのみ(実データでの検討は二重検定になるため行わない。掘り下げは別研究の範囲)。本文では引用しない(改善策を採っていないため)。共著者送付文で経緯として言及。
 - 2026-09-14: **v2 で反映する所属訂正 2 件**(共著者への追伸で通知済み、v1 の共有ファイルは変更しない): (1) Saenko の所属を Department of Radiation Molecular Epidemiology, Atomic Bomb Disease Institute, Nagasaki University に訂正(v1 は誤って Molecular Oncology and Diagnostic Medicine)。正式表記は本人の返答で確定。(2) KH に第 2 所属 Graduate School of Biomedical Sciences, Nagasaki University を追加。反映時は declarations の所属番号を 3 つに(1 = Molecular Oncology and Diagnostic Medicine、2 = Radiation Molecular Epidemiology、3 = Graduate School)、著者ブロック描画と訳の表紙を同期。
 - 2026-10-05: **v2 改稿方針を現況節の冒頭に記録**(共著者合意済み。返信 2 通 = 書き直し事由 2026-09-17・経緯の残りと方針は送信済み、文面は記録しない)。現況節の日付と残件 1 を v1 送付後の状態へ更新。原稿は未変更。
+- 2026-10-12: **v2 本文改稿(第 1 巡)を作業ブランチで実施**(研究者 accept 済み、英文のみ): Methods を先行例(BJC 9・ERC 4 報の
+  Methods 実測 — 実装検証・シード・限定句・事前指定宣言の出現 0、設定値と版は記載)に照らし操作記述へ再構成、限定句は Discussion/SI の
+  既出に委ね、設定値は SI 指示へ(2,252 → 約 1,400 語)。Background は旧 Introduction(個人 OneDrive 論文関連/harakawa_20250109thyroidNM.docx)の
+  文献叙述の論調を部分復元: 疫学的導入(一次出典 Brenner 2011、共著者総説は孫引きのため不採用)・RET 融合の非特異性(Nikiforov 1997)・
+  driver 依存の出典に TCGA 2014 併記・Abend は遺伝子名でなく件数(同分野 BJC 4 報とも Intro に遺伝子名列挙なし)。Discussion は Limitations を
+  3 つの構造的限界に再構成し推定対象の理由を自蔵、混合の読みと REO 設計の接続・外部検証の非対称性を追記(暫定版 Word 2026-03 の Discussion は
+  分類器・BRAF 対照読みが前提で流用対象外)。融合遺伝子を二重コロン表記へ(本文 5 箇所、Table 2 は make_docx 表示層)、所属訂正 2 件を
+  declarations に反映(Graduate School の住所は Sakamoto と同一と仮定)。引用 36 → 38(本文)。
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
   600 dpi TIFF)/別ファイル CSV 3 件+50 語要約/カバーレター案。残 = Acknowledgements・共著者レビューと
