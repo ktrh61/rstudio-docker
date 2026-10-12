@@ -42,7 +42,7 @@ W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 
 # ヒト遺伝子記号のイタリック対象(研究者裁定 2026-08-25。PTC 単体は疾患略語で対象外)
 GENES = ("RET|BRAF|CCDC6|NCOA4|CLIP2|BHLHB9|S100A10|TESC|EHD4|"
-         "ATP5MF|MRPL52|NTHL1|URM1|USE1|PXDN|P2RY1|PLK2|PTC1|PTC3")
+         "ATP5MF|MRPL52|NTHL1|URM1|USE1|PXDN|P2RY1|PLK2|PTC1|PTC3|NTRK1|CYR61|ATM")
 
 # 図の対応表(英語版は個別 TIFF を出力、日本語参考訳のみ凡例直下に PNG を埋め込む)
 FIGS = [
@@ -302,10 +302,18 @@ def additional_information():
     return "\n".join(out).rstrip()
 
 
+def gene_markup(text):
+    """遺伝子記号の表示層書式(本文・SI・表・凡例・書簡・訳で共通): BRAF V600E → *BRAF*^V600E^
+    (上付きは立体 — BJC 2024–26 掲載例の <italic>BRAF</italic><sup>V600E</sup> に一致)、
+    RET/PTC(歴史名、番号なし)→ *RET*/*PTC*(番号つきは GENES の PTC1/PTC3 で処理)、GENES をイタリック。"""
+    text = text.replace("BRAF V600E", "*BRAF*^V600E^")
+    text = re.sub(r"(?<![\w*])RET/PTC(?![\w*])", "*RET*/*PTC*", text)
+    return re.sub(rf"(?<![\w*])({GENES})(?![\w*])", r"*\1*", text)
+
+
 def _finish(text):
     """英語版共通の仕上げ: 変異表記の上付き・遺伝子イタリック・添字。"""
-    text = text.replace("BRAF V600E", "*BRAF*^V600E^")
-    text = re.sub(rf"(?<![\w*])({GENES})(?![\w*])", r"*\1*", text)
+    text = gene_markup(text)
     return typeset_symbols(text)
 
 
@@ -454,14 +462,16 @@ def preprocess(text):
     return _finish(text)
 
 
-def letter_preprocess(text, ja=False, pair=None):
+def letter_preprocess(text, ja=False, pair=None, fmt=True):
     """カバーレター(書簡体裁): md 冒頭の管理メモ(見出し・状態・確認事項の箇条書き)を
-    除き、区切り線以降の本文だけを渡す。和文版は対応版の一行を先頭に付す。"""
+    除き、区切り線以降の本文だけを渡す。和文版は対応版の一行を先頭に付す。
+    fmt=True(docx 用)では本文と同じ遺伝子書式を適用し、貼り付け用プレーンテキストは fmt=False で生成する
+    (pandoc の plain 出力は上付きを ^(…) に落とすため)。"""
     body = text.split("\n---\n", 1)[1] if "\n---\n" in text else text
     body = body.strip("\n") + "\n"
     if ja and pair:
         body = pair + "\n\n" + body
-    return body
+    return gene_markup(body) if fmt else body
 
 
 def ja_preprocess(text, en_stem, tag, commit, src_label):
@@ -473,8 +483,7 @@ def ja_preprocess(text, en_stem, tag, commit, src_label):
             f"ソース: {src_label} @{commit}")
     text = re.sub(r"^(# [^\n]+\n)", lambda m: m.group(1) + "\n" + pair + "\n",
                   text, count=1)
-    text = text.replace("BRAF V600E", "*BRAF*^V600E^")
-    text = re.sub(rf"(?<![\w*])({GENES})(?![\w*])", r"*\1*", text)
+    text = gene_markup(text)
     return typeset_symbols(embed_figures(text))
 
 
@@ -812,7 +821,10 @@ def main():
     fig_outs = export_figures()
     # 投稿システムの Cover Letter 欄への貼り付け用プレーンテキスト(書式記号なし)
     letter_txt = SUB / "cover_letter.txt"
-    subprocess.run([PANDOC, str(SUB / "cover_letter_input.md"), "-f", "markdown+superscript",
+    plain_md = SUB / "cover_letter_plain_input.md"
+    plain_md.write_text(letter_preprocess((ROOT / "paper" / "cover_letter.md").read_text(encoding="utf-8"),
+                                          fmt=False), encoding="utf-8")
+    subprocess.run([PANDOC, str(plain_md), "-f", "markdown+superscript",
                     "-t", "plain", "--wrap=none", "-o", str(letter_txt)], check=True)
     dest = Path("/mnt/c/Users/kotaro/OneDrive/論文関連（説明用資料含）/word_check")
     if dest.parent.exists():
