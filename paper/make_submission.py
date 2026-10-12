@@ -22,7 +22,7 @@ ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "output" / "submission"
 OUT.mkdir(parents=True, exist_ok=True)
 
-ORG_AUTHORS = ["R Core Team", "National Cancer Institute", "The Gene Ontology Consortium"]  # 多語の団体著者
+ORG_AUTHORS = ["R Core Team", "National Cancer Institute", "The Gene Ontology Consortium", "Cancer Genome Atlas Research Network"]  # 多語の団体著者
 ORG_ALT = "|".join(re.escape(o) for o in ORG_AUTHORS)
 YEAR = r"(?:(?:19|20)\d\d[a-z]?|n\.d\.)"  # 年または n.d.(日付のない Web ページ)
 
