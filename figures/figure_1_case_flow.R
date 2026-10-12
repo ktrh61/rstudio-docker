@@ -62,19 +62,26 @@ for (i in seq_len(n)) {
   lab <- labels[flow$step[i]]
   if (is.na(lab)) lab <- flow$step[i]
   rect(0.5, y - 0.55, 7.5, y + 0.55)
-  text(xc, y + ifelse(i == n, 0.32, 0.22), lab, cex = 1.0, font = 2)
+  if (flow$step[i] == "driver_classified") {
+    # gene symbols in italics (plotmath); bold via bold()/bolditalic() instead of font = 2
+    lab <- expression(bold("Driver classified (") * bolditalic(RET) * bold(" / ") *
+                      bolditalic(BRAF) * bold(")"))
+    text(xc, y + ifelse(i == n, 0.32, 0.22), lab, cex = 1.0)
+  } else {
+    text(xc, y + ifelse(i == n, 0.32, 0.22), lab, cex = 1.0, font = 2)
+  }
   if (i == 1) {
     text(xc, y - 0.25, sprintf("total %d", flow$n_total[i]), cex = 0.93)
   } else if (i == n) {
-    text(xc, y - 0.02, sprintf("total %d   (RET %d | BRAF %d)",
-         flow$n_total[i], flow$n_RET[i], flow$n_BRAF[i]), cex = 0.93)
-    text(xc, y - 0.36, sprintf(
-      "RET: dose-zero %d | High-AS %d    BRAF: dose-zero %d | High-AS %d",
-      grp["R_Sporadic"], grp["R_High"], grp["B_Sporadic"], grp["B_High"]),
+    text(xc, y - 0.02, bquote("total " * .(flow$n_total[i]) * "   (" * italic(RET) * " " *
+         .(flow$n_RET[i]) * " | " * italic(BRAF) * " " * .(flow$n_BRAF[i]) * ")"), cex = 0.93)
+    text(xc, y - 0.36, bquote(italic(RET) * ": dose-zero " * .(unname(grp["R_Sporadic"])) *
+         " | High-AS " * .(unname(grp["R_High"])) * "    " * italic(BRAF) * ": dose-zero " *
+         .(unname(grp["B_Sporadic"])) * " | High-AS " * .(unname(grp["B_High"]))),
       cex = 0.79)
   } else {
-    text(xc, y - 0.25, sprintf("total %d   (RET %d | BRAF %d)",
-         flow$n_total[i], flow$n_RET[i], flow$n_BRAF[i]), cex = 0.93)
+    text(xc, y - 0.25, bquote("total " * .(flow$n_total[i]) * "   (" * italic(RET) * " " *
+         .(flow$n_RET[i]) * " | " * italic(BRAF) * " " * .(flow$n_BRAF[i]) * ")"), cex = 0.93)
   }
   if (i < n) {
     arrows(xc, y - 0.58, xc, y - 1.42, length = 0.08)
@@ -88,12 +95,13 @@ for (i in seq_len(n)) {
            reasons[step_to]), cex = 0.79, adj = 0)
     } else if (step_to == "band_sporadic_or_high") {
       # two short lines so the branch arrow below stays clear
-      text(xc + 0.3, y - 0.72, sprintf("excluded %d (RET %d | BRAF %d):",
-           d_tot, d_ret, d_braf), cex = 0.79, adj = 0)
+      text(xc + 0.3, y - 0.72, bquote("excluded " * .(d_tot) * " (" * italic(RET) * " " * .(d_ret) *
+           " | " * italic(BRAF) * " " * .(d_braf) * "):"), cex = 0.79, adj = 0)
       text(xc + 0.3, y - 0.97, reasons[step_to], cex = 0.79, adj = 0)
     } else {
-      text(xc + 0.3, y - 1.0, sprintf("excluded %d (RET %d | BRAF %d): %s",
-           d_tot, d_ret, d_braf, reasons[step_to]), cex = 0.79, adj = 0)
+      text(xc + 0.3, y - 1.0, bquote("excluded " * .(d_tot) * " (" * italic(RET) * " " * .(d_ret) *
+           " | " * italic(BRAF) * " " * .(d_braf) * "): " * .(unname(reasons[step_to]))),
+           cex = 0.79, adj = 0)
     }
   }
 }
@@ -102,7 +110,7 @@ y2 <- (n - 2) * 2 + 1 # y of the driver_classified box centre
 n_lowmid_ret <- flow$n_RET[2] - flow$n_RET[3] # RET cases leaving at the band step
 rect(9.0, y2 - 2.45, 13.3, y2 - 0.45)
 text(11.15, y2 - 0.75, "REO application set", cex = 1.0, font = 2)
-text(11.15, y2 - 1.12, sprintf("of %d RET Low-/Mid-AS cases,", n_lowmid_ret),
+text(11.15, y2 - 1.12, bquote("of " * .(n_lowmid_ret) * " " * italic(RET) * " Low-/Mid-AS cases,"),
      cex = 0.86)
 text(11.15, y2 - 1.44, sprintf("%d with a tumor RNA-seq sample", nrow(ev)),
      cex = 0.86)
