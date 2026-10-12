@@ -6,12 +6,14 @@
 
 - **Title**: Driver-conditioned transcriptomic differences across radiation-attributability bands in papillary thyroid carcinoma
 - **Authors / Affiliations**:
-  1. Kotaro Harakawa (1) *corresponding
-  2. Vladimir A. Saenko (1)
+  1. Kotaro Harakawa (1, 3) *corresponding
+  2. Vladimir A. Saenko (2)
   3. Norisato Mitsutake (1)
 
   Affiliations:
   1. Department of Molecular Oncology and Diagnostic Medicine, Atomic Bomb Disease Institute, Nagasaki University, 1-12-4 Sakamoto, Nagasaki 852-8523, Japan
+  2. Department of Radiation Molecular Epidemiology, Atomic Bomb Disease Institute, Nagasaki University, 1-12-4 Sakamoto, Nagasaki 852-8523, Japan
+  3. Graduate School of Biomedical Sciences, Nagasaki University, 1-12-4 Sakamoto, Nagasaki 852-8523, Japan
 
 - **Corresponding author + email + ORCID**:
   Kotaro Harakawa; ktrh61@gmail.com; ORCID 0009-0004-1086-8046
