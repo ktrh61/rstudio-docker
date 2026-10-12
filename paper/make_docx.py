@@ -120,6 +120,7 @@ TABLE_SPECS = {
                  "age_surgery": "Age at surgery, years, median [range]",
                  "age_exposure": "Age at exposure, years, median [range]",
                  "driver_detail": "Designated driver, n"},
+        fmt={"driver_detail": lambda v: v.replace("-RET", "::RET")},  # HGNC 二重コロン(表示層のみ、凍結 CSV は不変)
         rows={"R_Sporadic": "R_Sporadic (dose-zero)", "R_Low": "R_Low (Low-AS)",
               "R_Mid": "R_Mid (Mid-AS)", "R_High": "R_High (High-AS)",
               "B_Sporadic": "B_Sporadic (dose-zero)", "B_High": "B_High (High-AS)"}),
