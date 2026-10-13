@@ -1021,6 +1021,10 @@
   (先行例 10 報 0.2〜2.3)→ 文体由来の rather than 等 16 文を肯定形へ(限定句差分検査済み)、規律上の非主張は残して 4.8/千語。
   **批准済み文言の変更(accept 済み)** = C-13(context only … unestablished)・C-16(unresolved, with no bearing in either direction)・
   C-17(motivates …; … remains undemonstrated)。訳同期済み。
+- 2026-10-13(続 2): **文体指標の整理**: 節をつなぐセミコロン 38 → 9(投稿版 11.3 → 約 5/千語。先行例 1.1〜9.3。凍結文・C-07・C-17 の分割は
+  しない)、評価的形容 4 文を削除(C-01「complementary roles」→「Together」、C-14「coherent direction」→「direction」、結論の「coherent」
+  「complementary」「documented, reproducible framework」→「additional」「reproducible design」。accept 済み、訳同期)。AI 語彙・文頭接続副詞は 0、
+  三つ組列挙 23 件は内容由来のため維持。
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
   600 dpi TIFF)/別ファイル CSV 3 件+50 語要約/カバーレター案。残 = Acknowledgements・共著者レビューと
