@@ -1017,6 +1017,10 @@
   Abstract 1 語(groups → strata、200 語不変)。PubMed 実測: dose band 32 件(放射線 9)、age band 1,023、dose category 256 — band は定義つきで維持。
   **claim_map 運用(未決 b 裁定)**: 主張文・水準・根拠は検査対象のまま、所在・Intro 予告・Disc 受けはトリガー 2 で 1 回更新。C-08 の Disc 受け欄
   (年齢反転の記述)は本文に存在しないため、受け欄を本文の現状に合わせる(文を足す場合は研究者の文言)。
+- 2026-10-13(続): **否定対比構文の整理**(研究者指摘: 生成 AI 的な「A は B でも C でもなく D」構文の多用)。機械走査で本文 8.2/千語
+  (先行例 10 報 0.2〜2.3)→ 文体由来の rather than 等 16 文を肯定形へ(限定句差分検査済み)、規律上の非主張は残して 4.8/千語。
+  **批准済み文言の変更(accept 済み)** = C-13(context only … unestablished)・C-16(unresolved, with no bearing in either direction)・
+  C-17(motivates …; … remains undemonstrated)。訳同期済み。
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
   600 dpi TIFF)/別ファイル CSV 3 件+50 語要約/カバーレター案。残 = Acknowledgements・共著者レビューと
