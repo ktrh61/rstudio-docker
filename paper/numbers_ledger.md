@@ -1025,6 +1025,10 @@
   しない)、評価的形容 4 文を削除(C-01「complementary roles」→「Together」、C-14「coherent direction」→「direction」、結論の「coherent」
   「complementary」「documented, reproducible framework」→「additional」「reproducible design」。accept 済み、訳同期)。AI 語彙・文頭接続副詞は 0、
   三つ組列挙 23 件は内容由来のため維持。
+- 2026-10-14: **文調の整理(研究者指摘: 接続詞のない短文の連続・格調)**: Background 全体と Methods/Results の短文連続 6 箇所を従属節・等位で
+  結合(平均文長 21.0 → 24.1 語、12 語以下 24% → 18%、接続語あり文 32% → 38%、先行例 10 報の範囲内)。裸の This/It 始まり 6 文に名詞を添付
+  (Abstract の 1 文は 200 語固定のため据え置き)。**凍結文「Throughout this section, …」を Discussion P1 の末尾から冒頭へ移動(文言不変、
+  位置のみ。研究者 Go)**。受動態 21%(先行例 35〜59%)・名詞化は術語由来で据え置き、Methods の We 始まりは Nature Portfolio 慣行として維持。訳同期。
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
   600 dpi TIFF)/別ファイル CSV 3 件+50 語要約/カバーレター案。残 = Acknowledgements・共著者レビューと
