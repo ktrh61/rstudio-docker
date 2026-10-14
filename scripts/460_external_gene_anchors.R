@@ -12,11 +12,13 @@
 # discriminated radiation-induced from sporadic thyroid tumours after external
 # radiotherapy in childhood, reported in Ory 2011 Supplementary Table 3
 # (ory2011_gene_signature.csv; probes hybridising two paralogues give one row
-# per gene, probes without a gene symbol are kept under their accession). The
-# classes remain explicit because the Ory lists were selected by multivariate
-# procedures (sPLS-DA/DIABLO; EMts_2PCA) rather than gene-wise testing
-# followed by qRT-PCR confirmation. The exposure setting of each list is
-# carried in its name and reported with the counts.
+# per gene, probes without a gene symbol are kept under their accession), and
+# the 106-gene signature that discriminated post-Chornobyl from sporadic PTCs
+# in a reanalysis of the Detours 2007 series, reported in Ugolin 2011 Table S3
+# (ugolin2011_gene_signature.csv). The classes remain explicit because these
+# lists were selected by multivariate procedures (sPLS-DA/DIABLO; EMts_2PCA)
+# rather than gene-wise testing followed by qRT-PCR confirmation. The exposure
+# setting of each list is carried in its name and reported with the counts.
 #
 # This is a membership count, not a test. For every anchor set x unit we
 # report k (list genes among the unit's Storey q<0.10 DEGs) over n (list genes
@@ -36,6 +38,7 @@
 # Input : raw/external/external_gene_anchors.csv  (validated anchor lists)
 #         raw/external/ory2026_gene_signatures.csv (multivariate signatures, post-Chornobyl)
 #         raw/external/ory2011_gene_signature.csv  (multivariate signature, post-radiotherapy)
+#         raw/external/ugolin2011_gene_signature.csv (multivariate signature, post-Chornobyl, Detours 2007 series)
 #         processed/thyr_expression_test.rds     (from 410; genes table)
 #         processed/thyr_se_raw.rds              (rowData: gene_id, gene_name)
 # Output: processed/thyr_external_gene_anchors.rds
@@ -68,11 +71,19 @@ ory2011 <- read.csv(
 names(ory2011)[names(ory2011) == "signature"] <- "anchor_set"
 ory2011$evidence_class <- "multivariate_signature"
 
+ugolin2011 <- read.csv(
+  file.path(paths$raw, "external", "ugolin2011_gene_signature.csv"),
+  stringsAsFactors = FALSE
+)
+names(ugolin2011)[names(ugolin2011) == "signature"] <- "anchor_set"
+ugolin2011$evidence_class <- "multivariate_signature"
+
 anchor_columns <- c(
   "anchor_set", "evidence_class", "tissue", "mapping", "doi",
   "source_table", "symbol_published", "symbol_current", "ensembl_id", "note"
 )
-anchors <- rbind(validated[, anchor_columns], ory[, anchor_columns], ory2011[, anchor_columns])
+anchors <- rbind(validated[, anchor_columns], ory[, anchor_columns], ory2011[, anchor_columns],
+                 ugolin2011[, anchor_columns])
 stopifnot(!anyDuplicated(anchors[, c("anchor_set", "symbol_published")]))
 
 expression_test <- readRDS(

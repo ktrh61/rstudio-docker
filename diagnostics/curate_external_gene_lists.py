@@ -15,10 +15,18 @@
 #             signature; expression = log mean sporadic - log mean
 #             radiation-induced, so a negative value is higher expression in
 #             radiation-induced tumors)
+#           pone.0023581.s006.doc                Ugolin 2011, PLoS One 6:e23581,
+#             Table S3 on the journal page (the file is titled "Supplementary
+#             table 2" inside): 106-gene / 109-probe signature discriminating
+#             sporadic from post-Chernobyl PTCs (GEO GSE3950, Detours 2007);
+#             expression = log mean post-Chernobyl - log mean sporadic, so a
+#             positive value is higher expression in post-Chornobyl tumors.
+#             Word 97 binary; text pieces are read as 8-bit and UTF-16 runs.
 #         raw/reference/gencode.v36.annotation.gtf  (gene_name universe used
 #             to choose symbol_current; final resolution happens in 460)
 # Output: raw/external/ory2026_gene_signatures.csv
 #         raw/external/ory2011_gene_signature.csv
+#         raw/external/ugolin2011_gene_signature.csv
 #         Without --write the transcription is compared with the committed CSV
 #         and must be identical (row order included); differences are printed
 #         and the exit status is 1.
@@ -93,6 +101,99 @@ ACCVAL11 = re.compile(r"^(\S+)\s+(-?\d+,\d+)\s+(\d+,\d+)(?:\s+\((.*)\))?$")
 ACCSYM11 = re.compile(r"^(\S+)\s+(\S+)$")
 FOOT11 = re.compile(r"^(Downloaded|from|journals\..*|by|guest|on|\d{1,2}|October|2026|Accession|Symbol or name|number value|Expression)$")
 SYMBOL11 = re.compile(r"^[A-Za-z][A-Za-z0-9\-\._]*$")
+
+
+# --------------------------------------------------------------- Ugolin 2011 --
+UGOLIN2011 = dict(file="pone.0023581.s006.doc", doi="10.1371/journal.pone.0023581",
+                  signature="ugolin2011_tumor", tissue="tumor", mapping="direct",
+                  source_table="Table S3 (file pone.0023581.s006.doc)", n_probes=109, n_genes=106)
+RENAMES_UGOLIN = {
+    "ATP5E": ("ATP5F1E", "HGNC:838"), "ATP5H": ("ATP5PD", "HGNC:845"), "CD97": ("ADGRE5", "HGNC:1711"),
+    "PKM2": ("PKM", "HGNC:9021"), "RAD51L1": ("RAD51B", "HGNC:9822"), "SHFM1": ("SEM1", "HGNC:10845"),
+    "TCEB1": ("ELOC", "HGNC:11617"), "TMEM178": ("TMEM178A", "HGNC:28517"), "RNU1A": ("RNU1-1", "HGNC:10120"),
+    "LOC203274": ("LINC00537", "NCBI Gene 203274"),
+}
+# One row carries the NCBI locus identifier in the accession cell with the
+# name "Hypothetical protein LOC203274" and no symbol; the identifier is used
+# as the published symbol so that the NCBI rename above can apply.
+SPECIAL_SYMBOLS_UGOLIN = {"LOC203274": "LOC203274"}
+NUMU = re.compile(r"^-?\d+,\d+$")
+ACCU = re.compile(r"^(N[MR]_\d+|X[MR]_\d+|[A-Z]{1,3}\d{5,6}|[A-Z]{2}\d{6})$")
+
+
+def doc_text_runs(path):
+    """Printable text runs of a Word 97 binary file (8-bit and UTF-16LE pieces), in file order."""
+    b = open(path, "rb").read()
+    runs = [(m.start(), m.group().decode("ascii")) for m in re.finditer(rb"[\x20-\x7e]{2,}", b)]
+    runs += [(m.start(), m.group().decode("utf-16le")) for m in re.finditer(rb"(?:[\x20-\x7e\xa0-\xff]\x00){2,}", b)]
+    return [t.strip() for _, t in sorted(runs) if t.strip()]
+
+
+def parse_ugolin2011(names):
+    toks = doc_text_runs(SRC / UGOLIN2011["file"])
+    toks = toks[toks.index("Acc") + 1:]
+    if "PAGE" in toks:                      # header/footer field after the last row
+        toks = toks[:toks.index("PAGE")]
+    probes, cur = [], None
+    for t in toks:
+        if ACCU.match(t):
+            if cur:
+                probes.append(cur)
+            cur = dict(acc=t, text=[], nums=[])
+        elif cur is not None:
+            (cur["nums"] if NUMU.match(t) else cur["text"]).append(t)
+    if cur:
+        probes.append(cur)
+    probes = [p for p in probes if len(p["nums"]) >= 2]
+    if len(probes) != UGOLIN2011["n_probes"]:
+        sys.exit(f"Ugolin 2011: {len(probes)} probes parsed, expected {UGOLIN2011['n_probes']}")
+    # merged gene cells: a probe without text is a second probe of the preceding gene
+    genes = []
+    for p in probes:
+        if not p["text"]:
+            genes[-1]["probes"].append(p)
+            continue
+        genes.append(dict(text=p["text"], probes=[p]))
+    if len(genes) != UGOLIN2011["n_genes"]:
+        sys.exit(f"Ugolin 2011: {len(genes)} genes parsed, expected {UGOLIN2011['n_genes']}")
+    out = []
+    for g in genes:
+        exprs = [float(p["nums"][0].replace(",", ".")) for p in g["probes"]]
+        if len({e > 0 for e in exprs}) != 1:
+            sys.exit(f"Ugolin 2011: probes of one gene disagree in sign: {g}")
+        direction = "higher_in_post_chornobyl" if exprs[0] > 0 else "lower_in_post_chornobyl"
+        accs = "/".join(p["acc"] for p in g["probes"])
+        notes = [f"published_direction={direction}", f"accession {accs}"]
+        if len(g["probes"]) > 1:
+            notes.append(f"{len(g['probes'])} probes for this gene (merged cells in source)")
+        sym = g["text"][0] if len(g["text"]) >= 2 and SYMBOL11.match(g["text"][0]) else ""
+        sym = SPECIAL_SYMBOLS_UGOLIN.get(g["probes"][0]["acc"], sym)
+        if not sym:
+            key = g["probes"][0]["acc"]
+            out.append(dict(signature=UGOLIN2011["signature"], tissue=UGOLIN2011["tissue"], mapping=UGOLIN2011["mapping"],
+                            doi=UGOLIN2011["doi"], source_table=UGOLIN2011["source_table"], symbol_published=key,
+                            symbol_current=key, ensembl_id="",
+                            note="; ".join(notes[:1]) + f"; no gene symbol in source ({' '.join(g['text'])})"))
+            continue
+        cur = sym
+        if sym not in names:
+            if sym in RENAMES_UGOLIN and RENAMES_UGOLIN[sym][0] in names:
+                cur = RENAMES_UGOLIN[sym][0]; notes.append(f"renamed ({RENAMES_UGOLIN[sym][1]})")
+            elif sym in RENAMES_UGOLIN:
+                notes.append(f"current symbol {RENAMES_UGOLIN[sym][0]} ({RENAMES_UGOLIN[sym][1]}); not present in GENCODE v36 annotation")
+            else:
+                notes.append("not present in GENCODE v36 annotation")
+        out.append(dict(signature=UGOLIN2011["signature"], tissue=UGOLIN2011["tissue"], mapping=UGOLIN2011["mapping"],
+                        doi=UGOLIN2011["doi"], source_table=UGOLIN2011["source_table"], symbol_published=sym,
+                        symbol_current=cur, ensembl_id="", note="; ".join(notes)))
+    keys = [o["symbol_published"] for o in out]
+    dup = sorted({k for k in keys if keys.count(k) > 1})
+    if dup:
+        sys.exit(f"duplicate symbol_published in ugolin2011_tumor: {dup}")
+    higher = sum(1 for o in out if "higher_in" in o["note"])
+    resolved = sum(1 for o in out if o["symbol_current"] in names)
+    print(f"ugolin2011_tumor: {len(probes)} probes, {len(out)} genes ({higher} higher / {len(out) - higher} lower in post-Chornobyl PTCs; {resolved} with a GENCODE v36 symbol)")
+    return out
 
 
 def pdf_pages(path):
@@ -268,7 +369,7 @@ def emit(rows, target, write):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--write", nargs="*", default=None, metavar="LIST",
-                    help="write these CSVs (ory2026_gene_signatures, ory2011_gene_signature) instead of comparing")
+                    help="write these CSVs (ory2026_gene_signatures, ory2011_gene_signature, ugolin2011_gene_signature) instead of comparing")
     args = ap.parse_args()
     write = set(args.write) if args.write is not None else set()
     names = gencode_names()
@@ -277,6 +378,8 @@ def main():
                "ory2026_gene_signatures" in write)
     ok &= emit(parse_ory2011(pdf_pages(SRC / ORY2011["file"]), names), OUT / "ory2011_gene_signature.csv",
                "ory2011_gene_signature" in write)
+    ok &= emit(parse_ugolin2011(names), OUT / "ugolin2011_gene_signature.csv",
+               "ugolin2011_gene_signature" in write)
     sys.exit(0 if ok else 1)
 
 
