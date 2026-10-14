@@ -2812,6 +2812,114 @@
    "volume": "159",
    "pages": "676-90",
    "formatted": "Cancer Genome Atlas Research Network. Integrated genomic characterization of papillary thyroid carcinoma. *Cell* **159**, 676–690 (2014)."
+  },
+  {
+   "biblio": "Ory C, Ugolin N, Levalois C, Lacroix L, Caillou B, Bidart JM, et al. Endocr Relat Cancer 2011;18:193–206. doi:10.1677/ERC-10-0205 (PMID 21148326)",
+   "kind": "article",
+   "pmid": "21148326",
+   "doi": "10.1677/ERC-10-0205",
+   "title": "Gene expression signature discriminates sporadic from post-radiotherapy-induced thyroid tumors",
+   "authors": [
+    [
+     "Ory",
+     "C."
+    ],
+    [
+     "Ugolin",
+     "N."
+    ],
+    [
+     "Levalois",
+     "C."
+    ],
+    [
+     "Lacroix",
+     "L."
+    ],
+    [
+     "Caillou",
+     "B."
+    ],
+    [
+     "Bidart",
+     "J.M."
+    ],
+    [
+     "Schlumberger",
+     "M."
+    ],
+    [
+     "Diallo",
+     "I."
+    ],
+    [
+     "de Vathaire",
+     "F."
+    ],
+    [
+     "Hofman",
+     "P."
+    ],
+    [
+     "Santini",
+     "J."
+    ],
+    [
+     "Malfoy",
+     "B."
+    ],
+    [
+     "Chevillard",
+     "S."
+    ]
+   ],
+   "journal": "Endocr Relat Cancer",
+   "year": "2011",
+   "volume": "18",
+   "pages": "193–206",
+   "formatted": "Ory, C., Ugolin, N., Levalois, C., Lacroix, L., Caillou, B., Bidart, J.M. et al. Gene expression signature discriminates sporadic from post-radiotherapy-induced thyroid tumors. *Endocr. Relat. Cancer* **18**, 193–206 (2011)."
+  },
+  {
+   "biblio": "Hadj-Hamou NS, Ugolin N, Ory C, Britzen-Laurent N, Sastre-Garau X, Chevillard S, et al. Carcinogenesis 2011;32:929–934. doi:10.1093/carcin/bgr064 (PMID 21470956)",
+   "kind": "article",
+   "pmid": "21470956",
+   "doi": "10.1093/carcin/bgr064",
+   "title": "A transcriptome signature distinguished sporadic from postradiotherapy radiation-induced sarcomas",
+   "authors": [
+    [
+     "Hadj-Hamou",
+     "N.S."
+    ],
+    [
+     "Ugolin",
+     "N."
+    ],
+    [
+     "Ory",
+     "C."
+    ],
+    [
+     "Britzen-Laurent",
+     "N."
+    ],
+    [
+     "Sastre-Garau",
+     "X."
+    ],
+    [
+     "Chevillard",
+     "S."
+    ],
+    [
+     "Malfoy",
+     "B."
+    ]
+   ],
+   "journal": "Carcinogenesis",
+   "year": "2011",
+   "volume": "32",
+   "pages": "929–934",
+   "formatted": "Hadj-Hamou, N.S., Ugolin, N., Ory, C., Britzen-Laurent, N., Sastre-Garau, X., Chevillard, S. et al. A transcriptome signature distinguished sporadic from postradiotherapy radiation-induced sarcomas. *Carcinogenesis* **32**, 929–934 (2011)."
   }
  ]
 }
