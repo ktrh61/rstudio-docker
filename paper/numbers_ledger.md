@@ -1048,6 +1048,9 @@
   第 3 文の証拠列挙の 4 項目目へ、Morton 文は発現水準の結論(クラスタリング・分化/シグナル伝達スコア・遺伝子別/セットの線量回帰のいずれもドライバーと関連し線量と
   関連せず)に。橋渡し文に Ory 2011(ERC、外部放射線治療後甲状腺腫瘍の 322 遺伝子署名)と Hadj-Hamou 2011(Carcinogenesis、肉腫 135 遺伝子署名)を追加(PubMed 抄録で照合、
   台帳・bibliography.json 登録)。引用 38 → 40、旧 [10] 以降は +2、訳の [n] は機械再同期(EN/JA 出現数一致)。第一の特徴の REBC-THYR 句は短縮。
+- 2026-10-15(続 2): 研究者指摘「期待 → しかし REBC-THYR は(ゲノムでは得たのに)発現では、のニュアンスがなく箇条書きをつないだ感触」→ 第 6 文を
+  "At cohort scale, however, … found no such difference. Although it identified several dose-related genomic alterations, …, its transcriptomic analyses showed
+  expression shaped by the driver rather than by radiation dose, whether assessed by …" に。P2 冒頭は "Yet those analyses were pooled across drivers". 訳同期済み。
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
   600 dpi TIFF)/別ファイル CSV 3 件+50 語要約/カバーレター案。残 = Acknowledgements・共著者レビューと
