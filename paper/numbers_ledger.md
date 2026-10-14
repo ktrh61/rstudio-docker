@@ -1051,6 +1051,8 @@
 - 2026-10-15(続 2): 研究者指摘「期待 → しかし REBC-THYR は(ゲノムでは得たのに)発現では、のニュアンスがなく箇条書きをつないだ感触」→ 第 6 文を
   "At cohort scale, however, … found no such difference. Although it identified several dose-related genomic alterations, …, its transcriptomic analyses showed
   expression shaped by the driver rather than by radiation dose, whether assessed by …" に。P2 冒頭は "Yet those analyses were pooled across drivers". 訳同期済み。
+- 2026-10-15(続 3): **外部遺伝子リストの転記スクリプトを追加**(diagnostics/curate_external_gene_lists.py、出版社ファイルは raw/external/source/ に置き git 管理外)。Ory 2026 の 3 シグネチャ(S2/S4/S6)を Sci Rep 補足 PDF から機械抽出し、既存 CSV と順序を含め同一を確認(手作業整備の注記 5 件は ANNOTATIONS 表に明示)。
+  Ory 2011 の 322 遺伝子シグネチャ(照合追加は研究者決定)は出版社サイトが自動取得を拒否(Bioscientifica 403・Wayback 停止中)。OA 総説 Genes 2012;3:19 の補足表に員数のみの再掲(XX 328 行 = 322 プローブ、記号あり 295、方向なし)があり、停止条件(方向なし・件数不一致)で中断、入手経路の裁定待ち。候補 CSV と改名表(HGNC 21 件・NCBI 6 件、未解決 LOC 5 件)はスクラッチに保持。
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
   600 dpi TIFF)/別ファイル CSV 3 件+50 語要約/カバーレター案。残 = Acknowledgements・共著者レビューと
