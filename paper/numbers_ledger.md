@@ -1084,6 +1084,7 @@
 - 2026-10-16(続 27): **両端の群の文を「differ most in their radiogenic proportion」に**(研究者指摘: 群が症例を対比する主語動詞の不整合、割合は群の属性)。訳同期。詳細はコミット
 - 2026-10-16(続 28): **Background の帯の定義を Methods の 4 区分(dose-zero 込み)と整合させ、仮説文と両端の群の文を実際の比較(最高帯 対 dose-zero)で名指し**(研究者指摘: 「extreme bands」が Low-AS 対 High-AS を連想させる。原因 = Background の旧定義「intervals of the AS scale」が dose-zero を含まなかった)。暫定、下流通読で再修正あり得る。訳同期。詳細はコミット
 - 2026-10-16(続 29): **事前規定と解釈限定の按分を BJC 前例に合わせる**(研究者了承、**暫定** — 全体通読で再考あり得る): Background P5 末尾は定義のみ、P6 は「4 比較を事前規定」1 文+主要の理由+副次の問い+凍結文+REO に圧縮(否定形 4 つ=対照でない・多重性・病因でない・個別同定でないを除去)。AS の役割は Methods の AS 節に操作文 1 文(no case-level causal assignment)、解釈限定は Discussion の limitation 第二項に 1 句。根拠 = BJC データ解析型 8 報の実測(CCP 2015 doi:10.1038/bjc.2015.223・EndoPredict 2013 doi:10.1038/bjc.2013.671 ほか): 規定は Methods の操作文、Intro 1 句、Discussion は証拠水準として 1 文、限定は Methods 小節末尾か Discussion。訳同期。詳細はコミット
+- 2026-10-16(続 30): **P5・P6 を圧縮**(研究者判断: 本研究の部分が Background の 43% で先行 4 報の 16〜29% より重い): P5 = データ出所句・入力規約句を Methods に委ね導出を畳む、P6 = BRAF の理由と正常組織の問いは表 1 が根拠つきで担うため「secondary」1 語に、締めの定型文を削除。凍結文不変、仮説文不変。fusion drivers は過去形(コホート所見)。本研究部分 375→約 270 語。訳同期。詳細はコミット
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
   600 dpi TIFF)/別ファイル CSV 3 件+50 語要約/カバーレター案。残 = Acknowledgements・共著者レビューと
