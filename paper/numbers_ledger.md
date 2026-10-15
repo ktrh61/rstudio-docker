@@ -1082,6 +1082,7 @@
 - 2026-10-15(続 25): **仮説文と mixture model 文を「根拠 → 仮説」の順に組み替え、抜けていた中間段(連続線量モデルは起因腫瘍と散発腫瘍を平均して希釈・極端帯は最も異なる混合を対比)を補う。仮説文は能動の関係節にし「unstratified」を外す(層別は直前の問いの文が担う)**(研究者採択、**暫定** — 通読後に整合性を再判断。Discussion の「mixture reading set out in the Background」参照 2 箇所は mixture の語の維持で成立)。訳同期。詳細はコミット
 - 2026-10-15(続 26): **混合モデルの導出段を明示**(研究者指摘: 「割合が変わる」から始まると唐突): 線量はリスクを上げる/被曝者の腫瘍が放射線起因とは限らない(Kocher 2008 を付記 — 放射線専門誌以外の読者向け)/混合の定義/Morton の既出事実を前提に希釈の帰結→仮説。「most different mixtures」→「cases whose radiogenic proportions differ most」。暫定、通読後に再判断。訳同期。詳細はコミット
 - 2026-10-16(続 27): **両端の群の文を「differ most in their radiogenic proportion」に**(研究者指摘: 群が症例を対比する主語動詞の不整合、割合は群の属性)。訳同期。詳細はコミット
+- 2026-10-16(続 28): **Background の帯の定義を Methods の 4 区分(dose-zero 込み)と整合させ、仮説文と両端の群の文を実際の比較(最高帯 対 dose-zero)で名指し**(研究者指摘: 「extreme bands」が Low-AS 対 High-AS を連想させる。原因 = Background の旧定義「intervals of the AS scale」が dose-zero を含まなかった)。暫定、下流通読で再修正あり得る。訳同期。詳細はコミット
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
   600 dpi TIFF)/別ファイル CSV 3 件+50 語要約/カバーレター案。残 = Acknowledgements・共著者レビューと
