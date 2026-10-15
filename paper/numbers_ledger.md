@@ -1072,6 +1072,7 @@
 - 2026-10-15(続 15): **Background を宣言段落(疫学+2 水準の宣言)/ドライバー段落/トランスクリプトーム段落に分け、「the same study」を「the REBC-THYR study」へ**(研究者提案: 宣言と本体の対応を段落で可視化。指示語は列挙をまたぐため Ory 2026 等と誤読される)。Background 6 段落、引用番号不変、訳同期。詳細はコミット
 - 2026-10-15(続 16): **P3 末尾に腫瘍比較の遺伝子の研究間不一致(Dom 2012・Abend 2013 の原文、本日全文確認)を追加、P4 冒頭を「2 水準の対比(ドライバー一貫・トランスクリプトーム不一致)→探し方を定める 2 知見」に、P5 冒頭「related question on an axis other than dose」を「同じ問いを起因性の軸で扱った」に**(研究者指摘: 先行研究の課題=水準間の対比が未記述、「関連した問い」は別の問いに聞こえる)。通読で整合性判断待ち。引用番号不変、訳同期。詳細はコミット
 - 2026-10-15(続 17): **「have the longest record / a shorter record」を「are the best characterized / have been characterized more recently」へ(PubMed 題名・抄録で前者 0 件)、P4 冒頭の 2 水準対比文を削除し P3 末尾の総括 1 文(ドライバー水準との違い)に集約**(研究者指摘: 口語的表現・P3 と P4 の二重)。訳同期、引用番号不変。詳細はコミット
+- 2026-10-15(続 18): **ETV6::NTRK3 文の導入句「have been characterized more recently:」を削除し事実の列挙のみに**(研究者指摘: 時期の比較は文の役割とずれる。RET 側の best characterized で含意済み)。訳同期。詳細はコミット
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
   600 dpi TIFF)/別ファイル CSV 3 件+50 語要約/カバーレター案。残 = Acknowledgements・共著者レビューと
