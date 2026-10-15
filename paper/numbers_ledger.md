@@ -1078,6 +1078,7 @@
 - 2026-10-15(続 21): **P4・P5 の重複と規範性を整理**(研究者指摘): P4 冒頭 determine/should→bear on/can、「only within ... a driver stratum」→「a comparison within a driver stratum avoids this confounding」(記述形)、P4 末尾の空白宣言文を削除し P5 冒頭「We therefore asked ... whether exposure is associated with tumor expression within a driver stratum」に統合、「on the axis of radiation attributability rather than dose」削除(仮説文が導入)。仮説文・mixture model 文は不変。訳同期。通読で対処待ち。詳細はコミット
 - 2026-10-15(続 22): **P4 主題文を「Two findings from these studies bear on ...:」とし、2 知見をコロンで直結**(研究者指摘: 裸の Two findings は漠然。予告型主題文は英語論文の定型だが出所の付加と即時の具体化が条件。案 B=導入文削除は転換の合図を失うため不採用)。訳同期。詳細はコミット
 - 2026-10-15(続 23): **P4 主題文の bear on → have implications for**(研究者裁定: 生物医学論文で慣用的な結合を優先、bear on は文語的で非母語読者が立ち止まる)。訳同期。詳細はコミット
+- 2026-10-15(続 24): **P4 の「a comparison within a driver stratum avoids this confounding」を削除**(研究者指摘: 交絡文の裏返しで重複。対処法は次文の conditioned on driver と P5 の問いが担う)。訳同期。詳細はコミット
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
   600 dpi TIFF)/別ファイル CSV 3 件+50 語要約/カバーレター案。残 = Acknowledgements・共著者レビューと
