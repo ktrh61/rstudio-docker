@@ -1074,6 +1074,7 @@
 - 2026-10-15(続 17): **「have the longest record / a shorter record」を「are the best characterized / have been characterized more recently」へ(PubMed 題名・抄録で前者 0 件)、P4 冒頭の 2 水準対比文を削除し P3 末尾の総括 1 文(ドライバー水準との違い)に集約**(研究者指摘: 口語的表現・P3 と P4 の二重)。訳同期、引用番号不変。詳細はコミット
 - 2026-10-15(続 18): **ETV6::NTRK3 文の導入句「have been characterized more recently:」を削除し事実の列挙のみに**(研究者指摘: 時期の比較は文の役割とずれる。RET 側の best characterized で含意済み)。訳同期。詳細はコミット
 - 2026-10-15(続 19): **ETV6::NTRK3 を「Evidence of the same kind exists for ...」で RET の証拠型に接続、Morton 文を「fusion drivers as a class」に**(研究者指摘: 唐突な遺伝子の切り替え、Morton の fusion が RET 限定に読め段落が往復して見える。個別 2 例→クラスのコホート知見の一方向に)。訳同期。詳細はコミット
+- 2026-10-15(続 20): **Background の口語・比喩表現を一括整理**(研究者指示: 通読前に揃える): covers both partners→extends to both fusion partners/gave way to→shifted toward/文頭 There→In that stratum/分裂文 what differed was→but ... differed:/apart from→except+CLIP2 研究に Hess 2011 を付記/comparisons asked→addressed/that program→that plan。shaped by(常用)は対象外。訳同期、引用番号不変。詳細はコミット
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
   600 dpi TIFF)/別ファイル CSV 3 件+50 語要約/カバーレター案。残 = Acknowledgements・共著者レビューと
