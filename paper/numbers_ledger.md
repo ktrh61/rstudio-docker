@@ -1079,6 +1079,7 @@
 - 2026-10-15(続 22): **P4 主題文を「Two findings from these studies bear on ...:」とし、2 知見をコロンで直結**(研究者指摘: 裸の Two findings は漠然。予告型主題文は英語論文の定型だが出所の付加と即時の具体化が条件。案 B=導入文削除は転換の合図を失うため不採用)。訳同期。詳細はコミット
 - 2026-10-15(続 23): **P4 主題文の bear on → have implications for**(研究者裁定: 生物医学論文で慣用的な結合を優先、bear on は文語的で非母語読者が立ち止まる)。訳同期。詳細はコミット
 - 2026-10-15(続 24): **P4 の「a comparison within a driver stratum avoids this confounding」を削除**(研究者指摘: 交絡文の裏返しで重複。対処法は次文の conditioned on driver と P5 の問いが担う)。訳同期。詳細はコミット
+- 2026-10-15(続 25): **仮説文と mixture model 文を「根拠 → 仮説」の順に組み替え、抜けていた中間段(連続線量モデルは起因腫瘍と散発腫瘍を平均して希釈・極端帯は最も異なる混合を対比)を補う。仮説文は能動の関係節にし「unstratified」を外す(層別は直前の問いの文が担う)**(研究者採択、**暫定** — 通読後に整合性を再判断。Discussion の「mixture reading set out in the Background」参照 2 箇所は mixture の語の維持で成立)。訳同期。詳細はコミット
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
   600 dpi TIFF)/別ファイル CSV 3 件+50 語要約/カバーレター案。残 = Acknowledgements・共著者レビューと
