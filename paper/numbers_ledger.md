@@ -602,8 +602,9 @@
     Background・Discussion と重複する事前規定・推定対象・REO の読みの制限 約 300 語)。
   - **進行(2026-10-14)**: 作業ブランチ rewrite/manuscript-20261012(rebuild/r453 から。origin へ随時 push)。Methods 再構成・
     Background 加筆と漏斗型再構成・Discussion 再構成・表記・所属・文調整理を内容単位でコミット(訳は各コミットで同期済み、約 37 本)。
-    語数(投稿版基準の近似)= Background 809/Methods 1,414/Results 1,043/Discussion 1,248、本文 4,514、引用 38。
-    残 = 研究者の通読(訳 docx から)→ squash で rebuild/r453 へ(Go)→ v2 共有(別途 Go)→ STROBE 頁行(d)・カバーレター日付/DOI。(c)(b)・prespecified は 2026-10-13 に裁定済み。
+    語数(投稿版 docx 実測 2026-10-16、小見出し除く)= Background 714/Methods 1,481/Results 1,120/Discussion 1,509、本文 4,824(余裕 176)、Abstract 199、引用 42。
+    2026-10-15〜16: Background を研究者通読に沿って全面整理(約 25 単位、台帳メモ 続 10〜31)、事前規定の按分を BJC 前例に合わせた(暫定)。
+    残 = 研究者の通読(Results・Discussion 中心)→ squash で rebuild/r453 へ(Go)→ v2 共有(別途 Go)→ STROBE 頁行(d)・カバーレター日付/DOI。(c)(b)・prespecified は 2026-10-13 に裁定済み。
   - 先行例(PMC の JATS XML、図表・文献除外): 同分野 BJC 4 報の Methods = Detours 2005 1,500/4,252、
     Detours 2007 728/4,307、Dom 2012 623/3,933、Abend 2013 1,488/4,036(16〜37%)。解析主体 BJC 10 報 = 15〜38%
     (593〜3,028 語)。
