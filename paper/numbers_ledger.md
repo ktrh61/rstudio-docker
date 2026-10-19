@@ -1116,7 +1116,7 @@
 - 2026-10-20(続 26): **P4 末尾「suggests a direction for」→「points to this theme as a direction for」**(研究者 Go。段落既出の細胞周期テーマを指示して具体化。機構の中身は C-14 の水準を超えるため書かない)。訳同期。
 - 2026-10-20(続 27): **「Between-stratum concordance」を「Concordance between the RET and BRAF contrasts」に改名**(研究者裁定: Discussion から読む読者に層の正体が見えない。Results 一致だけでは不十分)。Methods・Results 小見出し、Discussion P4 冒頭、表 1 B_Normal 根拠欄(cross-stratum normal comparison→R_Normal)、補足の小見出しと表 S6 題名。Methods の「cross-stratum question」も表 1 の問いの中身で言い換え。補足のシード文「between-stratum agreement」は平叙の記述として残置。結論の cross-driver は仮説の性質の語として残置。訳同期。
 - 2026-10-20(続 28): **P4 冒頭の「without adding independent evidence for it」を 1 文に展開**(研究者指摘: 何に対する独立証拠かが読めない)。「注釈は発見済みリストの特徴づけで、差の存在に証拠を加えない」と明示。C-14 の事前固定と同内容、訳同期。
-- 2026-10-20(続 29): **一致解析の小見出しに「within each tissue」を付加**(Methods・Results・補足の 3 箇所。研究者指摘: 見出しからは RET 対 BRAF の 1 回の比較に見え、正常組織の組と腫瘍の組の 2 組構造が読めない)。Methods 第 1 文「For each tissue」と整合、訳同期。
+- 2026-10-20(続 29): **一致解析の小見出しに「within each tissue」を付加**(Methods・Results・補足の 3 箇所と Discussion P4 冒頭文。研究者指摘: 見出しからは RET 対 BRAF の 1 回の比較に見え、正常組織の組と腫瘍の組の 2 組構造が読めない)。Methods 第 1 文「For each tissue」と整合、訳同期。
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
   600 dpi TIFF)/別ファイル CSV 3 件+50 語要約/カバーレター案。残 = Acknowledgements・共著者レビューと
