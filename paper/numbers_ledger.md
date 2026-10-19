@@ -1089,6 +1089,7 @@
 - 2026-10-16(続 31): **P5 冒頭の asked → examined**(研究者裁定: asked は実験系の定型、本稿は解析系なので疫学・臨床解析の文体に揃える)。訳同期。詳細はコミット
 - 2026-10-19: **Discussion の構成変更**(研究者 Go。先行例 12 報の JATS 実測に基づく): 文献照合段落(旧 P2、386 語)を冒頭 2 文と重複員数を落として約 265 語に圧縮し REO 段落の後(limitation の前)へ移動、limitation 第二項の調整モデル不採用の理由を 1 文に(全文は SI、Abend 2013 型)、REO 段落に仮説生成の 2 文(RET 層内の帯の起因割合は AS 範囲の含意より大きい可能性/10 ペアの順序は標的アッセイで測定可)を追加。順序 = 主結果→射程→注釈→一致→REO→文献→limitation→結論。引用番号不変、訳同期。詳細はコミット
 - 2026-10-19(続): **Discussion P1 冒頭「The principal finding was …」→「In this study, … differed broadly in expression.」**(研究者裁定: PMC 実測で principal finding は BJC 21 件対 main finding 98 件、先行例 12 報の第 1 段落は In this study 型 6 報。結論段落の第 1 文と呼応)。訳同期。詳細はコミット
+- 2026-10-19(続 2): **P3 冒頭「bound the scope of that finding」→「delimit the scope of this difference」**(研究者指摘: bound は bind の過去形と読まれる、PMC 0 件対 delimit 193 件。P1 に finding の語がなくなったため指示先を difference に)。訳同期。詳細はコミット
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
   600 dpi TIFF)/別ファイル CSV 3 件+50 語要約/カバーレター案。残 = Acknowledgements・共著者レビューと
