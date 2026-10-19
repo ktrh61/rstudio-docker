@@ -1099,6 +1099,7 @@
 - 2026-10-19(続 9): **P5(REO)の構築上の選択 2 文を We 主語に**(研究者 Go。Background「we constructed … applied it unchanged」・Methods「We set」「We then applied」と呼応。P2 の BRAF-tumor 文と P7 の性能推定文は現状維持を裁定)。限定句(過半・全例ではなく・フィルタなし)不変、訳同期。
 - 2026-10-19(続 10): **P4(機能注釈、C-14)のつなぎを整理**(研究者指摘: ぶつ切り感)。第 2・3 文を結合、ラベル並べ替え文を「Under the …」で gene-sampling 文と対に、最終文に Methods 既出の開示(gene-sampling p は被験者レベルの無作為化を表さない)を理由句として添付。5 文→4 文、事実・限定句・C-14 の 4 要素は不変、訳同期。
 - 2026-10-19(続 11): **P4 冒頭「The functional annotation」→「Annotation of the reported gene list」**(研究者指摘: functional annotation は本文初出で既出扱いの定冠詞が浮く。Results 小見出し「list annotation」と P1「identified … for reporting」に接続)。意味不変、訳同期。
+- 2026-10-19(続 12): **P2 の BRAF-normal 文「was therefore treated as unresolved」→「therefore remained unresolved」**(研究者 Go。PMC 実測: treated as unresolved 37 件、remained unresolved 6,528 件。受動の「扱った」は行為者と規則の補読を要する)。C-16 の読み(表 1 規則 5)は therefore が担い不変、訳同期。
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
   600 dpi TIFF)/別ファイル CSV 3 件+50 語要約/カバーレター案。残 = Acknowledgements・共著者レビューと
