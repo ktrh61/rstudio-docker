@@ -1106,6 +1106,7 @@
 - 2026-10-19(続 16): **表 1 の「reading rules」「is/are read as」を interpretation 系に統一**(研究者 Go。PMC: reading rules 48 件/interpretation rules 434 件、is read as 1,784 件/is interpreted as 38,478 件)。説明文 1、脚注冒頭 1、脚注動詞 4 の計 6 箇所。規則の内容・凍結句不変、訳同期。
 - 2026-10-19(続 17): **P1 の特異性の限定文「these results leave open whether」→「it remains unclear whether」**(研究者 Go。PMC: leave(s) open whether 415 件、it remains unclear whether 119,132 件)。限定句不変、直前文との主語重複も解消、訳同期。
 - 2026-10-19(続 18): **P2 の副次 3 対比を「In X, 結果, 解釈」の並列に統一**(研究者指摘: RET-normal は結果→解釈、BRAF-tumor は目的→解釈、BRAF-normal は 3 文で不揃い)。BRAF-tumor の設計説明「asked the parallel question … within BRAF V600E-positive PTCs」は Background・表 1 既出のため落とし、方向未指定は「for which Table 1 specified no direction」で保持。6 文→4 文、C-03/C-04/N-25/C-16 タグと限定句不変、訳同期。
+- 2026-10-19(続 19): **自結果の遺伝子に付けた形容詞「reported」2 箇所を「at q<0.10」「q<0.10 gene list」に**(研究者指摘: 文献照合段落の「reported direction」と同形で出所が紛れる)。「reported here」(凍結句)と動詞用法は自結果、here なしの形容詞 reported は先行研究に分離。意味不変、訳同期。
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
   600 dpi TIFF)/別ファイル CSV 3 件+50 語要約/カバーレター案。残 = Acknowledgements・共著者レビューと
