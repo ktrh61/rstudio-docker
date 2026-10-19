@@ -22,11 +22,26 @@
 #             expression = log mean post-Chernobyl - log mean sporadic, so a
 #             positive value is higher expression in post-Chornobyl tumors.
 #             Word 97 binary; text pieces are read as 8-bit and UTF-16 runs.
+#           PMC3798970.xml  Abend 2013, Br J Cancer 109:2286, Table 1 (qRT-PCR-
+#             validated dose-expression genes; "Normal tissue" and "Tumour
+#             tissue" sections)
+#           PMC3405097.xml  Abend 2012, PLoS One 7:e39103, Table 2 (11 qRT-PCR-
+#             validated genes, tumour-minus-normal differential dose-expression)
+#           PMC3464765.xml  Dom 2012, Br J Cancer 107:994, Figure 2 legend (the
+#             seven qRT-PCR-confirmed normal-tissue genes with their symbols;
+#             the Results sentence gives full names only)
+#             The three XML files are the PMC JATS full text fetched with
+#             https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pmc&id=<PMCID>&rettype=xml
+#             (2026-10-20) and saved under the PMCID.
+#           CLIP2 (Hess 2011, PNAS 108:9595; validation Selmansberger 2015,
+#             Oncogene 34:3917) is a single-gene list entered as a constant.
 #         raw/reference/gencode.v36.annotation.gtf  (gene_name universe used
 #             to choose symbol_current; final resolution happens in 460)
 # Output: raw/external/ory2026_gene_signatures.csv
 #         raw/external/ory2011_gene_signature.csv
 #         raw/external/ugolin2011_gene_signature.csv
+#         raw/external/external_gene_anchors.csv  (qRT-PCR-validated lists;
+#             7-column schema without source_table/ensembl_id, which 460 fills)
 #         Without --write the transcription is compared with the committed CSV
 #         and must be identical (row order included); differences are printed
 #         and the exit status is 1.
@@ -41,8 +56,10 @@
 # without a gene symbol (ESTs, immunoglobulin loci, clones) are kept with the
 # accession as symbol_published so that the listed size stays 322 probes.
 #
-# Environment: Python 3 with pdfplumber (transcribed with pdfplumber 0.11.10).
+# Environment: Python 3; pdfplumber (transcribed with 0.11.10) is needed for the
+#   two Ory lists only. --lists restricts a run to the named CSVs.
 import argparse, csv, re, sys, io
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -340,16 +357,124 @@ def parse_ory2011(pages, names):
     return out
 
 
-def to_csv_text(rows):
+# ------------------------------------------------ qRT-PCR-validated lists --
+COLS_VALIDATED = ["anchor_set", "tissue", "mapping", "doi",
+                  "symbol_published", "symbol_current", "note"]
+ABEND2013 = dict(file="PMC3798970.xml", doi="10.1038/bjc.2013.574", table="Table 1",
+                 sections={"Normal tissue": ("abend2013_normal", "normal", 8),
+                           "Tumour tissue": ("abend2013_tumor", "tumor", 6)})
+ABEND2012 = dict(file="PMC3405097.xml", doi="10.1371/journal.pone.0039103", table="Table 2",
+                 anchor_set="abend2012_pairdiff", tissue="pair_difference", mapping="indirect",
+                 n_genes=11)
+DOM2012 = dict(file="PMC3464765.xml", doi="10.1038/bjc.2012.302", figure="Figure 2",
+               anchor_set="dom2012_normal", tissue="normal", mapping="direct", n_genes=7)
+CLIP2 = dict(anchor_set="clip2", tissue="tumor", mapping="direct", doi="10.1073/pnas.1017137108",
+             symbol_published="CLIP2", symbol_current="CLIP2", note="validation: 10.1038/onc.2014.311")
+RENAMES_VALIDATED = {  # published symbol -> (current symbol, note)
+    "C1orf9": ("SUCO", "renamed (HGNC:1240)"),
+    "FAM38A": ("PIEZO1", "renamed"),
+}
+CYTOBAND = re.compile(r"^\d+[pq]")
+
+
+def jats_root(path):
+    return ET.parse(path).getroot()
+
+
+def jats_table_rows(root, label):
+    for tw in root.iter("table-wrap"):
+        lab = tw.find("label")
+        if lab is not None and "".join(lab.itertext()).strip() == label:
+            return [["".join(c.itertext()).strip() for c in tr] for tr in tw.iter("tr")]
+    sys.exit(f"{label} not found in JATS")
+
+
+def jats_figure_caption(root, label):
+    for fig in root.iter("fig"):
+        lab = fig.find("label")
+        if lab is not None and "".join(lab.itertext()).strip() == label:
+            return "".join(fig.find("caption").itertext())
+    sys.exit(f"{label} not found in JATS")
+
+
+def validated_row(anchor_set, tissue, mapping, doi, sym, names, note=""):
+    cur = sym
+    if sym in RENAMES_VALIDATED and RENAMES_VALIDATED[sym][0] in names:
+        cur, note = RENAMES_VALIDATED[sym]
+    elif sym not in names:
+        sys.exit(f"{anchor_set}: {sym} is not a GENCODE v36 gene_name and no rename is listed")
+    return dict(anchor_set=anchor_set, tissue=tissue, mapping=mapping, doi=doi,
+                symbol_published=sym, symbol_current=cur, note=note)
+
+
+def parse_abend2013(names):
+    rows = jats_table_rows(jats_root(SRC / ABEND2013["file"]), ABEND2013["table"])
+    out, section = [], None
+    for cells in rows:
+        text = [c for c in cells if c]
+        if len(text) == 1 and text[0] in ABEND2013["sections"]:
+            section = ABEND2013["sections"][text[0]]
+            continue
+        if section is None or len(cells) < 2 or not CYTOBAND.match(cells[1]):
+            continue  # header rows; gene rows carry a cytoband in column 2
+        out.append(validated_row(section[0], section[1], "direct", ABEND2013["doi"], cells[0], names))
+    for anchor_set, tissue, n in ABEND2013["sections"].values():
+        got = sum(1 for r in out if r["anchor_set"] == anchor_set)
+        if got != n:
+            sys.exit(f"{anchor_set}: {got} genes parsed, expected {n}")
+    normal = {r["symbol_published"] for r in out if r["anchor_set"] == "abend2013_normal"}
+    tumor = {r["symbol_published"] for r in out if r["anchor_set"] == "abend2013_tumor"}
+    for r in out:
+        if r["symbol_published"] in normal & tumor and not r["note"]:
+            r["note"] = "also in " + ("abend2013_tumor" if r["anchor_set"] == "abend2013_normal" else "abend2013_normal")
+    print(f"abend2013: {len(normal)} normal + {len(tumor)} tumour genes transcribed from {ABEND2013['table']} ({len(normal & tumor)} in both)")
+    return out
+
+
+def parse_abend2012(names):
+    rows = jats_table_rows(jats_root(SRC / ABEND2012["file"]), ABEND2012["table"])
+    out = [validated_row(ABEND2012["anchor_set"], ABEND2012["tissue"], ABEND2012["mapping"], ABEND2012["doi"], cells[0], names)
+           for cells in rows if len(cells) >= 2 and CYTOBAND.match(cells[1])]
+    if len(out) != ABEND2012["n_genes"]:
+        sys.exit(f"{ABEND2012['anchor_set']}: {len(out)} genes parsed, expected {ABEND2012['n_genes']}")
+    print(f"{ABEND2012['anchor_set']}: {len(out)} genes transcribed from {ABEND2012['table']}")
+    return out
+
+
+def parse_dom2012(names):
+    cap = jats_figure_caption(jats_root(SRC / DOM2012["file"]), DOM2012["figure"])
+    a = cap.index("Regulation of ")
+    b = cap.index(" was confirmed", a)
+    # symbols appear either in parentheses after the full name or bare (DUSP1);
+    # "G(olf)" and "A10" do not match (lower case / too short)
+    syms = [x or y for x, y in re.findall(r"\(([A-Z][A-Z0-9]+)\)|(?<![\w(])([A-Z][A-Z0-9]{3,})(?![\w)])", cap[a:b])]
+    if len(syms) != DOM2012["n_genes"] or len(set(syms)) != len(syms):
+        sys.exit(f"{DOM2012['anchor_set']}: symbols parsed from {DOM2012['figure']} legend: {syms}")
+    print(f"{DOM2012['anchor_set']}: {len(syms)} genes transcribed from {DOM2012['figure']} legend")
+    return [validated_row(DOM2012["anchor_set"], DOM2012["tissue"], DOM2012["mapping"], DOM2012["doi"], s, names) for s in syms]
+
+
+def parse_validated(names):
+    out = parse_abend2013(names) + parse_abend2012(names) + parse_dom2012(names)
+    if CLIP2["symbol_current"] not in names:
+        sys.exit("clip2: CLIP2 is not a GENCODE v36 gene_name")
+    out.append(dict(CLIP2))
+    dup = {(r["anchor_set"], r["symbol_published"]) for r in out if sum(1 for q in out if (q["anchor_set"], q["symbol_published"]) == (r["anchor_set"], r["symbol_published"])) > 1}
+    if dup:
+        sys.exit(f"duplicate anchor_set/symbol_published: {dup}")
+    return out
+
+
+def to_csv_text(rows, cols=COLS):
     s = io.StringIO()
-    w = csv.DictWriter(s, fieldnames=COLS, lineterminator="\n")
+    w = csv.DictWriter(s, fieldnames=cols, lineterminator="\n")
     w.writeheader()
     w.writerows(rows)
     return s.getvalue()
 
 
-def emit(rows, target, write):
-    new = to_csv_text(rows)
+def emit(rows, target, write, cols=COLS):
+    new = to_csv_text(rows, cols)
     if write:
         target.write_text(new)
         print("wrote", target)
@@ -369,17 +494,26 @@ def emit(rows, target, write):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--write", nargs="*", default=None, metavar="LIST",
-                    help="write these CSVs (ory2026_gene_signatures, ory2011_gene_signature, ugolin2011_gene_signature) instead of comparing")
+                    help="write these CSVs (ory2026_gene_signatures, ory2011_gene_signature, ugolin2011_gene_signature, external_gene_anchors) instead of comparing")
+    ap.add_argument("--lists", nargs="*", default=None, metavar="LIST",
+                    help="transcribe only these CSVs (default: all four)")
     args = ap.parse_args()
     write = set(args.write) if args.write is not None else set()
     names = gencode_names()
+    lists = {
+        "ory2026_gene_signatures": (lambda: parse_ory2026(pdf_pages(SRC / ORY2026["file"])), COLS),
+        "ory2011_gene_signature": (lambda: parse_ory2011(pdf_pages(SRC / ORY2011["file"]), names), COLS),
+        "ugolin2011_gene_signature": (lambda: parse_ugolin2011(names), COLS),
+        "external_gene_anchors": (lambda: parse_validated(names), COLS_VALIDATED),
+    }
+    unknown = (set(args.lists or []) | write) - set(lists)
+    if unknown:
+        sys.exit(f"unknown list name(s): {sorted(unknown)}")
     ok = True
-    ok &= emit(parse_ory2026(pdf_pages(SRC / ORY2026["file"])), OUT / "ory2026_gene_signatures.csv",
-               "ory2026_gene_signatures" in write)
-    ok &= emit(parse_ory2011(pdf_pages(SRC / ORY2011["file"]), names), OUT / "ory2011_gene_signature.csv",
-               "ory2011_gene_signature" in write)
-    ok &= emit(parse_ugolin2011(names), OUT / "ugolin2011_gene_signature.csv",
-               "ugolin2011_gene_signature" in write)
+    for name, (parse, cols) in lists.items():
+        if args.lists is not None and name not in args.lists:
+            continue
+        ok &= emit(parse(), OUT / f"{name}.csv", name in write, cols)
     sys.exit(0 if ok else 1)
 
 
