@@ -602,7 +602,7 @@
     Background・Discussion と重複する事前規定・推定対象・REO の読みの制限 約 300 語)。
   - **進行(2026-10-14)**: 作業ブランチ rewrite/manuscript-20261012(rebuild/r453 から。origin へ随時 push)。Methods 再構成・
     Background 加筆と漏斗型再構成・Discussion 再構成・表記・所属・文調整理を内容単位でコミット(訳は各コミットで同期済み、約 37 本)。
-    語数(投稿版 docx 実測 2026-10-16、小見出し除く)= Background 714/Methods 1,481/Results 1,120/Discussion 1,509、本文 4,824(余裕 176)、Abstract 199、引用 42。
+    語数(投稿版 docx 実測 2026-10-19、小見出し除く)= Background 714/Methods 1,481/Results 1,120/Discussion 1,503、本文 4,818(余裕 182)、Abstract 199、引用 42。
     2026-10-15〜16: Background を研究者通読に沿って全面整理(約 25 単位、台帳メモ 続 10〜31)、事前規定の按分を BJC 前例に合わせた(暫定)。
     残 = 研究者の通読(Results・Discussion 中心)→ squash で rebuild/r453 へ(Go)→ v2 共有(別途 Go)→ STROBE 頁行(d)・カバーレター日付/DOI。(c)(b)・prespecified は 2026-10-13 に裁定済み。
   - 先行例(PMC の JATS XML、図表・文献除外): 同分野 BJC 4 報の Methods = Detours 2005 1,500/4,252、
@@ -1087,6 +1087,7 @@
 - 2026-10-16(続 29): **事前規定と解釈限定の按分を BJC 前例に合わせる**(研究者了承、**暫定** — 全体通読で再考あり得る): Background P5 末尾は定義のみ、P6 は「4 比較を事前規定」1 文+主要の理由+副次の問い+凍結文+REO に圧縮(否定形 4 つ=対照でない・多重性・病因でない・個別同定でないを除去)。AS の役割は Methods の AS 節に操作文 1 文(no case-level causal assignment)、解釈限定は Discussion の limitation 第二項に 1 句。根拠 = BJC データ解析型 8 報の実測(CCP 2015 doi:10.1038/bjc.2015.223・EndoPredict 2013 doi:10.1038/bjc.2013.671 ほか): 規定は Methods の操作文、Intro 1 句、Discussion は証拠水準として 1 文、限定は Methods 小節末尾か Discussion。訳同期。詳細はコミット
 - 2026-10-16(続 30): **P5・P6 を圧縮**(研究者判断: 本研究の部分が Background の 43% で先行 4 報の 16〜29% より重い): P5 = データ出所句・入力規約句を Methods に委ね導出を畳む、P6 = BRAF の理由と正常組織の問いは表 1 が根拠つきで担うため「secondary」1 語に、締めの定型文を削除。凍結文不変、仮説文不変。fusion drivers は過去形(コホート所見)。本研究部分 375→約 270 語。訳同期。詳細はコミット
 - 2026-10-16(続 31): **P5 冒頭の asked → examined**(研究者裁定: asked は実験系の定型、本稿は解析系なので疫学・臨床解析の文体に揃える)。訳同期。詳細はコミット
+- 2026-10-19: **Discussion の構成変更**(研究者 Go。先行例 12 報の JATS 実測に基づく): 文献照合段落(旧 P2、386 語)を冒頭 2 文と重複員数を落として約 265 語に圧縮し REO 段落の後(limitation の前)へ移動、limitation 第二項の調整モデル不採用の理由を 1 文に(全文は SI、Abend 2013 型)、REO 段落に仮説生成の 2 文(RET 層内の帯の起因割合は AS 範囲の含意より大きい可能性/10 ペアの順序は標的アッセイで測定可)を追加。順序 = 主結果→射程→注釈→一致→REO→文献→limitation→結論。引用番号不変、訳同期。詳細はコミット
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
   600 dpi TIFF)/別ファイル CSV 3 件+50 語要約/カバーレター案。残 = Acknowledgements・共著者レビューと
