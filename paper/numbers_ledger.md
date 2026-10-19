@@ -1104,6 +1104,7 @@
 - 2026-10-19(続 14): **P1 の C-01 主張文の動詞「constitute positive evidence」→「provide positive evidence」**(研究者 Go。PMC 実測: constitute 26 件、provide 477 件、Abstract は providing)。凍結文だが事実・水準不変の動詞のみの更改、「Together, these results」は標準形(PMC 39 万件)で維持、訳同期。
 - 2026-10-19(続 15): **Discussion の「reading(s)」(解釈の意)6 箇所を interpretation 系に統一**(研究者 Go。BJC 46 報で reading は計器値の意のみ、PMC: readings drawn from 7 件/interpretations drawn from 307 件。Methods・Background は interpretation)。凍結文は「interpretations drawn from the map in Table 1 (Methods)」、凍結句 before … reported here 不変。mixture reading→mixture interpretation ×3、This reading→This interpretation、isolated reading→treating … in isolation。意味不変、訳同期。
 - 2026-10-19(続 16): **表 1 の「reading rules」「is/are read as」を interpretation 系に統一**(研究者 Go。PMC: reading rules 48 件/interpretation rules 434 件、is read as 1,784 件/is interpreted as 38,478 件)。説明文 1、脚注冒頭 1、脚注動詞 4 の計 6 箇所。規則の内容・凍結句不変、訳同期。
+- 2026-10-19(続 17): **P1 の特異性の限定文「these results leave open whether」→「it remains unclear whether」**(研究者 Go。PMC: leave(s) open whether 415 件、it remains unclear whether 119,132 件)。限定句不変、直前文との主語重複も解消、訳同期。
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
   600 dpi TIFF)/別ファイル CSV 3 件+50 語要約/カバーレター案。残 = Acknowledgements・共著者レビューと
