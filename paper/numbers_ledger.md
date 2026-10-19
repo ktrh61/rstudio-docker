@@ -1112,6 +1112,7 @@
 - 2026-10-20(続 22): **Discussion の不自然表現 11 箇所を事前学習ベースの判断で更改**(研究者 Go。機械走査は PMC 句検索の人工物が多く中止): differed broadly→extensively(P1・結論)、label-aligned structure→structure aligned with the band labels、gives … biological structure / separate proof→places … in a biological context / independent evidence、independent material→samples、Correspondence→Overlap、validated anchors→qRT-PCR-validated lists(Methods の語)、breadth→size、runs the other way→is reversed、leave … unestablished→do not establish …、P8 の 2 文を 1 文に(convert into→reduce to a null result)、partly carried by→partly attributable to。事実・限定句・水準不変、訳同期。Results の「validated-anchor-by-contrast cells」は未変更(要裁定)。
 - 2026-10-20(続 23): **Results の「validated-anchor-by-contrast cells」→「cells formed by the qRT-PCR-validated lists and the four contrasts」**(研究者 Go。Methods・Discussion の語に統一、N-53 不変)。訳同期。本文の anchor は REO の construction anchors(Abstract・Results)のみ残存。
 - 2026-10-20(続 24): **補足資料の「validated-anchor class」「validated anchors」3 箇所を qRT-PCR-validated に統一**(研究者 Go。本文 Methods・Results・Discussion と同語)。N-53 不変、訳同期。
+- 2026-10-20(続 25): **P4 冒頭文を具体化(biological context→proliferation and DNA repair)し、47 語の第 2 文を 2 文に分割**(研究者指摘: 一般名詞のみで具体性を欠く、長文)。テーマは Results の要約で新主張なし、C-14 の 4 要素と水準ラベル不変、訳同期。
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
   600 dpi TIFF)/別ファイル CSV 3 件+50 語要約/カバーレター案。残 = Acknowledgements・共著者レビューと
