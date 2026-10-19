@@ -14,7 +14,7 @@
 
 | Item | No. | Recommendation | Reported on page No. / section |
 |--------|----|------------------------------------------------|------------------------------------------------|
-| Title and abstract | 1 | (a) Indicate the study's design with a commonly used term in the title or the abstract. | Not stated in the title or the abstract (structured 200-word abstract). The design is described in Methods, Analysis contrasts and interpretation (p. 6, lines 136–156) and characterised as cross-sectional across driver-conditioned strata in Discussion (p. 15, lines 432–453). The secondary-analysis nature of the study is stated under Ethics approval and consent to participate (p. 17, lines 478–483). |
+| Title and abstract | 1 | (a) Indicate the study's design with a commonly used term in the title or the abstract. | Not stated in the title or the abstract (structured 200-word abstract). The design is stated as a cross-sectional analysis in Methods, Analysis contrasts (p. 6, lines 136–156; page and line numbers to be refreshed on the final version). The secondary-analysis nature of the study is stated under Ethics approval and consent to participate (p. 17, lines 478–483). |
 | | | (b) Provide in the abstract an informative and balanced summary of what was done and what was found. | Abstract, p. 2, lines 9–31. |
 | **Introduction** | | | |
 | Background/rationale | 2 | Explain the scientific background and rationale for the investigation being reported. | Background, p. 2–3, lines 33–57. |
