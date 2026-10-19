@@ -1091,6 +1091,7 @@
 - 2026-10-19(続): **Discussion P1 冒頭「The principal finding was …」→「In this study, … differed broadly in expression.」**(研究者裁定: PMC 実測で principal finding は BJC 21 件対 main finding 98 件、先行例 12 報の第 1 段落は In this study 型 6 報。結論段落の第 1 文と呼応)。訳同期。詳細はコミット
 - 2026-10-19(続 2): **P3 冒頭「bound the scope of that finding」→「delimit the scope of this difference」**(研究者指摘: bound は bind の過去形と読まれる、PMC 0 件対 delimit 193 件。P1 に finding の語がなくなったため指示先を difference に)。訳同期。詳細はコミット
 - 2026-10-19(続 3): **凍結文(Discussion P1 末尾)の後半を更改: 「labeled as hypothesis-generating」→「presented as hypothesis-generating」**(研究者批准: 凍結の趣旨は事実の固定で意味は不変、label は機械的な印象を与える。PMC 実測 labeled 16 件対 presented 357 件。事前固定の射程節「before the finalized analysis …」4 箇所は不変)。訳同期。詳細はコミット
+- 2026-10-19(続 4): **P1 の特異性の限定文を「leave open whether … specific to radiation or reflects age, birth cohort, or other factors aligned with the AS bands」に**(研究者指摘: by themselves の挿入と対立項の不在でわかりにくい。結論段落と同語で呼応、非主張の強さは不変、+9 語)。訳同期。詳細はコミット
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
   600 dpi TIFF)/別ファイル CSV 3 件+50 語要約/カバーレター案。残 = Acknowledgements・共著者レビューと
