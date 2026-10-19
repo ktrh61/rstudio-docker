@@ -1108,6 +1108,7 @@
 - 2026-10-19(続 18): **P2 の副次 3 対比を「In X, 結果, 解釈」の並列に統一**(研究者指摘: RET-normal は結果→解釈、BRAF-tumor は目的→解釈、BRAF-normal は 3 文で不揃い)。BRAF-tumor の設計説明「asked the parallel question … within BRAF V600E-positive PTCs」は Background・表 1 既出のため落とし、方向未指定は「for which Table 1 specified no direction」で保持。6 文→4 文、C-03/C-04/N-25/C-16 タグと限定句不変、訳同期。
 - 2026-10-19(続 19): **自結果の遺伝子に付けた形容詞「reported」2 箇所を「at q<0.10」「q<0.10 gene list」に**(研究者指摘: 文献照合段落の「reported direction」と同形で出所が紛れる)。「reported here」(凍結句)と動詞用法は自結果、here なしの形容詞 reported は先行研究に分離。意味不変、訳同期。
 - 2026-10-19(続 20): **P4 末尾「identifies a direction for mechanistic investigation」→「suggests a direction for further mechanistic studies」**(研究者 Go。PMC: identifies a direction for 2 件、suggests a direction for 175 件、for further mechanistic 5,872 件)。C-14 の仮説生成水準と整合、主張は弱まる側、訳同期。
+- 2026-10-19(続 21): **Background の帯定義文「which with the dose-zero cases form」→「which, together with the dose-zero cases, form」**(研究者 Go。Background の不自然表現の走査で唯一の推奨。関係詞直後の前置詞句の割り込みを解消)。意味不変、訳同期。
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
   600 dpi TIFF)/別ファイル CSV 3 件+50 語要約/カバーレター案。残 = Acknowledgements・共著者レビューと
