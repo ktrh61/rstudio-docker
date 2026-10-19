@@ -1096,6 +1096,7 @@
 - 2026-10-19(続 6): **凍結文の宣言「beyond the map … hypothesis-generating」の拾い元を照合**(研究者 Go): P4 機能注釈の第 1 文に「at the hypothesis-generating level」を付記(C-14 の水準ラベルが Discussion に無かった)、P6 帯順「consistent with the hypothesized ordering」→「in the order that the mixture reading anticipates」(明文の事前仮説が無いため Background の混合の読みに帰着、C-08 は記述的観察のまま)。意味不変、訳同期。詳細はコミット
 - 2026-10-19(続 7): **P2 冒頭「The secondary contrasts」→「The three secondary contrasts」**(研究者 Go。Results の語形に揃え、Discussion 先読みでも集合の大きさが見えるように)。意味不変、訳同期。
 - 2026-10-19(続 8): **P1 設計文を We 主語に**(研究者裁定: Background「We prespecified」と呼応。BJC 41 報の Discussion 実測: we 含有文 中央値 27%、本稿 2%、we の後続動詞は行為動詞が大半)。用語も Background に統一: 「driver-defined tumor class」→「a driver stratum」、「radiation-attributability bands」→「the AS bands」(結論段落の前者は不変)。動詞・限定句は不変、訳同期。
+- 2026-10-19(続 9): **P5(REO)の構築上の選択 2 文を We 主語に**(研究者 Go。Background「we constructed … applied it unchanged」・Methods「We set」「We then applied」と呼応。P2 の BRAF-tumor 文と P7 の性能推定文は現状維持を裁定)。限定句(過半・全例ではなく・フィルタなし)不変、訳同期。
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
   600 dpi TIFF)/別ファイル CSV 3 件+50 語要約/カバーレター案。残 = Acknowledgements・共著者レビューと
