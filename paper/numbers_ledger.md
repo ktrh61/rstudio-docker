@@ -1119,6 +1119,7 @@
 - 2026-10-20(続 29): **一致解析の小見出しに「within each tissue」を付加**(Methods・Results・補足の 3 箇所と Discussion P4 冒頭文。研究者指摘: 見出しからは RET 対 BRAF の 1 回の比較に見え、正常組織の組と腫瘍の組の 2 組構造が読めない)。Methods 第 1 文「For each tissue」と整合、訳同期。
 - 2026-10-20(続 30): **P5(一致)末尾の「motivates a cross-driver hypothesis; … remains undemonstrated」を 2 文に再構成**(研究者指摘: 仮説の中身が語に無く、両立→動機づけの接続が逆に読める)。「motivates, but cannot demonstrate, the hypothesis that …」で中身と未実証を 1 対に(does not→cannot は研究者裁定: 共変量との両立という設計上の理由の帰結は能力の否定)。C-17 の水準不変、セミコロン解消、訳同期。
 - 2026-10-20(続 31): **P6(REO)から Results・Methods の再掲を除去**(研究者裁定: 構築群分離の文と無変更適用の手続き文を削除、中央値 0/1/4/6 と θ/p の数値を落とす。構築上の 2 選択は We 主語 2 文のまま維持)。13 文 323 語→9 文。N-41・N-40 は Discussion から外れ Results に残存、C-08 は維持、訳同期。
+- 2026-10-20(続 32): **P6 冒頭「translated … into panel-based per-case readouts」→「gave each case a score derived from the group-level RET-tumor contrast」**(研究者指摘: 比喩的。PMC: per-case/per-sample readouts 0 件、per-sample score 系 41〜66 件)。意味不変、訳同期。
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
   600 dpi TIFF)/別ファイル CSV 3 件+50 語要約/カバーレター案。残 = Acknowledgements・共著者レビューと
