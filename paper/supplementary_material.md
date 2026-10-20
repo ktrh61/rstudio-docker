@@ -156,7 +156,7 @@ Among the sets meeting the rule for the lower-expression list, E2F targets had 4
 
 ### Sex-chromosome annotation of the RET-tumor list
 
-Among the 1,765 RET-tumor genes meeting the Storey q<0.10 rule (Supplementary Data 1), 57 were X-linked: 36 were expressed at higher and 21 at lower levels in High-AS cases; no Y-linked gene met the rule <!-- N-82 -->. The 15,621 genes tested in the contrast included 572 X-linked and two Y-linked genes <!-- N-82 -->.
+Among the 1,765 RET-tumor genes meeting the Storey q<0.10 rule (Supplementary Data 1), 57 were X-linked: 36 were expressed at higher and 21 at lower levels in High-AS cases; no Y-linked gene met the rule <!-- N-82 -->. The 15,621 genes tested in the RET-tumor contrast included 572 X-linked and two Y-linked genes <!-- N-82 -->.
 
 ### REO pair construction
 
