@@ -150,7 +150,7 @@ In the single positive-control scenario, the expression values for 195 genes fro
 
 ### Over-representation annotation of the RET-tumor list
 
-Across Hallmark, C2 canonical pathways, C5 GO Biological Process, and the radiation-curated family, respectively, the numbers of sets meeting the family-by-list q<0.10 rule were 0/0/0/0 for genes expressed more highly in High-AS cases, 12/105/205/7 for genes expressed less highly in High-AS cases, and 6/37/71/2 for the combined list (Table S5) <!-- N-59 -->.
+The numbers of sets meeting the family-by-list q<0.10 rule were as follows. For genes expressed more highly in High-AS cases, no set met the rule in any family. For genes expressed less highly, 12 Hallmark, 105 C2 canonical-pathway, 205 C5 GO Biological Process, and 7 radiation-curated sets met it. For the combined list, the counts were 6, 37, 71, and 2 in the same order (Table S5) <!-- N-59 -->.
 
 For the lower-expression list, illustrative counts were 46 of 199 genes for E2F targets, 41 of 198 for G2M checkpoint <!-- N-61 -->, and 68 of 322 for Reactome DNA repair <!-- N-62 -->. The radiation-curated set with the smallest raw hypergeometric p-value contained 46 of its 126 genes in the lower-expression list, compared with 6.4 expected under the gene-sampling reference <!-- N-60 -->.
 
