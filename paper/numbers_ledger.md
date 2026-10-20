@@ -1173,7 +1173,7 @@
 - 2026-10-20(続 82): **Supp Results「gene-reuse and redundancy restrictions」→「gene-reuse and correlation restrictions」**(研究者の問い: greedy selection は適切か → 標準用語で Supp Methods に定義あり維持。redundancy は未定義かつ Supp Data 2 の列名と衝突するため相関に)。±0 語。補足訳同期。
 - 2026-10-20(続 83): **Supp Results の純度推定文を 2 文に分割**(研究者指摘: 目が滑る → セミコロン連結+"matched" 2 回の長い限定+Supp Methods の再掲(REO に残る)。「The other two Low-AS and three Mid-AS tumors had no matched normal sample and therefore no purity score.」に。assay→sample で本文と統一)。−13 語、N タグ不変。補足訳同期。
 - 2026-10-20(続 84): **セミコロン長文の分割 3 件**(研究者依頼の構造検索: 両節 12 語以上): (A) 本文 Results 外部リスト「…; 18 of the 20 cells … were empty」→「. Of the 20 cells …, 18 were empty」(訳は既に 2 文) (B) Supp Results の同対応文 (C) Supp Methods の PC-OD 文(続 51 で分割した本文の写し)。各 ±0 語、N タグ不変。訳 2 件同期。
-- 2026-10-20(続 85): **Supp Methods のセミコロン長文 13 件(両節 12 語以上)をピリオドで 2 文に分割**(研究者 Go。言い換えは "0.5 was also the fixed value" → "The same fixed value, 0.5, was used" の 1 件のみ、他は区切りのみ)。密度 8.8 → 6.2/千語(先行例本文 3.5、本稿本文 5.0)。N タグ不変。補足訳 7 件を同位置で分割(他 6 件は既に 2 文)。
+- 2026-10-20(続 85): **Supp Methods のセミコロン長文 13 件(両節 12 語以上)をピリオドで 2 文に分割**(研究者 Go。言い換えは "0.5 was also the fixed value" → "The same fixed value, 0.5, was used" の 1 件のみ、他は区切りのみ)。密度 8.8 → 6.0/千語(先行例本文 3.5、本稿本文 5.0)。N タグ不変。補足訳 7 件を同位置で分割(他 6 件は既に 2 文)。
 - 2026-10-20(続 46): **word_check へ書き出し(タグ 20261020_1112、HEAD 8fd5949)と語数実測**: 小見出し除く 4,949(10-19 行比 +131: Background +37・Methods +13・Results −1・Discussion +82)、見出し込み 5,017。Background の差は 10-16 の Background 整理が旧行に未反映だったもの(正本の Background は dabb6b5 から無変更)。本日の増分は Discussion(交絡 5 文化と限界・結論の削減の差し引き)。現況行を更新
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
