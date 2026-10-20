@@ -603,7 +603,7 @@
     Background・Discussion と重複する事前規定・推定対象・REO の読みの制限 約 300 語)。
   - **進行(2026-10-14)**: 作業ブランチ rewrite/manuscript-20261012(rebuild/r453 から。origin へ随時 push)。Methods 再構成・
     Background 加筆と漏斗型再構成・Discussion 再構成・表記・所属・文調整理を内容単位でコミット(訳は各コミットで同期済み、約 37 本)。
-    語数(投稿版 docx 実測 2026-10-20 深夜、pandoc plain 経由、小見出し除く)= Background 749/Methods 1,508/Results 992/Discussion 1,596、本文 4,845(余裕 155)。見出し込み(2026-09-02 確定の Word 計数範囲)= 5,017(超過 17、編集部返答 09-04 の裁量幅内)。Abstract 198(続 134、余裕 2)、引用 42。
+    語数(投稿版 docx 実測 2026-10-20 深夜、pandoc plain 経由、小見出し除く)= Background 749/Methods 1,539/Results 992/Discussion 1,593、本文 4,873(余裕 127)(続 138 時点)。見出し込み(2026-09-02 確定の Word 計数範囲)= 5,017(超過 17、編集部返答 09-04 の裁量幅内)。Abstract 198(続 134、余裕 2)、引用 42。
     2026-10-15〜16: Background を研究者通読に沿って全面整理(約 25 単位、台帳メモ 続 10〜31)、事前規定の按分を BJC 前例に合わせた(暫定)。
     残 = 研究者の通読(Results・Discussion 中心)→ squash で rebuild/r453 へ(Go)→ v2 共有(別途 Go)→ STROBE 頁行(d)・カバーレター日付/DOI。(c)(b)・prespecified は 2026-10-13 に裁定済み。
   - 先行例(PMC の JATS XML、図表・文献除外): 同分野 BJC 4 報の Methods = Detours 2005 1,500/4,252、
@@ -1230,5 +1230,6 @@
 - 2026-10-20(続 135): **Methods Gene-set inference「checked in a single positive-control scenario」→「examined in …」**(研究者依頼の動詞走査: 9 文中 checked のみ口語寄り。BJC 73 報の Methods で checked 1 回、assessed 108・evaluated 57・examined 18)。±0 語、訳同期。
 - 2026-10-20(続 136): **Methods Concordance 節の「The tumor comparison was included for completeness.」を前文に whereas で接続**(研究者指摘: 接続なしで唐突 → 事前指定の問い 対 網羅のための追加、という役割差を対比で明示)。−1 語、訳は元から 1 文で不変。
 - 2026-10-20(続 137): **Methods REO「Eligible pairs were ranked …」→「Pairs that met these rules were ranked …」**(研究者の問い: eligible は一般的か → 語は普通だが "eligible pairs" は稀(199 件)で未定義、Supp Methods の qualified と揺れ。前文の選択規則を受ける形に)。+2 語、訳同期。
+- 2026-10-20(続 138): **Methods 外部リスト比較の 1 文(90 語超)を 3 文に分割**(研究者指摘: Two classes が何か読み取りにくい → 「The first class comprised …」「The second comprised …:」で境目を明示。Supp Methods の 2 文構造と同形)。+8 語、訳同期。語数再実測(docx→pandoc plain): Background 749/Methods 1,539/Results 992/Discussion 1,593、本文 4,873(余裕 127)。
   最終承認・表 1〜3 の個別ファイル化(投稿時)・公開リポジトリと DOI(Data/Code availability 記入)・
   フェーズ6 再構築確認・投稿システム側の入力(キーワード・推薦査読者があれば)
