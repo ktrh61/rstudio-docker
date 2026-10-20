@@ -61,7 +61,7 @@ REBC-THYR の遺伝子レベル STAR カウントファイルを国立がん研�
 
 ### 解析対比
 
-この横断解析では、各ドライバー層の内部で、腫瘍組織・対応正常組織それぞれについて High-AS と dose-zero を比較する 4 つの対比、RET-tumor、RET-normal、BRAF-tumor、BRAF-normal を定義した(表と解析ファイル上のラベルは R_Tumor、R_Normal、B_Tumor、B_Normal)。各対比の内部で X は dose-zero 群、Y は High-AS 群を表し、Brunner–Munzel 相対効果(確率的指標)[29] は θ=Pr(X<Y)+0.5Pr(X=Y) とした。θ>0.5 は High-AS 症例で発現が高い傾向を示す。Higher Criticism(HC)[30] を RET-tumor の唯一の主要対比レベル検定とし、3 つの副次対比は同じ方法で解析して別々に報告し、対比横断の調整は適用しなかった。各結果パターンに割り当てた解釈(表 1)は、確定解析が本稿で報告する結果を生む前に固定した。
+この横断解析では、各ドライバー層の内部で、腫瘍組織・対応正常組織それぞれについて High-AS と dose-zero を比較する 4 つの対比、RET-tumor、RET-normal、BRAF-tumor、BRAF-normal を定義した(表と解析ファイル上のラベルは R_Tumor、R_Normal、B_Tumor、B_Normal)。各対比の内部で X は dose-zero 群、Y は High-AS 群を表し、Brunner–Munzel 相対効果(確率的指標)[29] は θ=Pr(X<Y)+0.5Pr(X=Y) である。θ>0.5 は High-AS 症例で発現が高い傾向を示す。Higher Criticism(HC)[30] を RET-tumor の唯一の主要対比レベル検定とし、3 つの副次対比は同じ方法で解析して別々に報告し、対比横断の調整は適用しなかった。各結果パターンに割り当てた解釈(表 1)は、確定解析が本稿で報告する結果を生む前に固定した。
 
 ### 共変量
 
