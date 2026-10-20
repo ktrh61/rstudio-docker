@@ -1213,5 +1213,6 @@
 - 2026-10-20(続 118): **Background「can be sought」→「can be detected」**(研究者の問い: 受動態の違和感 → sought は稀(2,948 件)で文語的、detected(327,771 件)は続く 2 文の「検出を妨げる条件」と直結)。±0 語。訳同期(探し得る→検出し得る)。
 - 2026-10-20(続 119): **ETV6::NTRK3 層の記述を補完**(研究者の問い: Methods への委託で情報が拾えているか → 被曝側の事情が本文のどこにもなかった): Methods「The ETV6::NTRK3 stratum (seven dose-zero and 25 exposed cases, without AS values) was not analyzed.」(N-103、+6 語)/Background「contained enough dose-zero and exposed cases」→「supported the comparison」(被曝 25 例は存在するため「不足」は不正確、AS 未算出が理由)。訳同期。
 - 2026-10-20(続 120): **語数の再実測**(研究者依頼、Methods 通読前の確認): 投稿版 docx を pandoc plain に変換し Heading2 単位で計数 = Background 749/Methods 1,508/Results 992/Discussion 1,596、本文 4,845(余裕 155)、Abstract 198(小見出し 4 語込み。md 基準の 197 と 1 語差はトークン化の違い)。11:14 実測比: Results −127(続 46〜113 の削除)、Methods +14、Discussion +11、Background −2。現況行を更新。
+- 2026-10-20(続 121): **Methods の We 文を決定の記述に限定し、手順の 12 文を受動態・材料主語に**(研究者裁定。先行例実測: BJC 2025〜26 原著 73 報の Methods で We 冒頭 2.4%、41/73 は 0、受動態 61%。本稿は 20%→約 10%)。残す We = 4 対比の定義・年齢分布の報告・共変量モデル不採用・DEGES スクリーンの置換・p 値の連続量報告・候補ペアの出所選択・外部リスト 2 クラスの区別(7 文)。±0 語、N・C タグ不変。訳は元から無人称のため不変。
   最終承認・表 1〜3 の個別ファイル化(投稿時)・公開リポジトリと DOI(Data/Code availability 記入)・
   フェーズ6 再構築確認・投稿システム側の入力(キーワード・推薦査読者があれば)
