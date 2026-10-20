@@ -181,7 +181,7 @@ Five of the 39 shared-tissue signature genes of Ory et al. (2026) tested in each
 
 **Figure S1 | Gene-level MA plots by analysis contrast.** The A axis is mean log2 counts per million across samples in each contrast, and the M axis is the display-only log2 fold change for High-AS minus dose-zero cases (labeled “Sporadic” in the analysis code). Points are colored by the Storey q<0.10 result from the rank-based Brunner–Munzel analysis; the fold change was not used for gene selection.
 
-**Figure S2 | Held-out complete-null calibration of the gene-set procedure.** Each row shows, for one contrast-by-collection cell, the proportion of 100 held-out label-shuffle pseudo-observations that produced at least one discovery at q<0.10. Error bars are descriptive 95% Clopper–Pearson intervals, and the dashed line marks the nominal 0.10 level. Because pseudo-observations within a cell shared the same null pool, the intervals do not account for their dependence.
+**Figure S2 | Held-out complete-null calibration of the gene-set procedure.** Each row shows, for one contrast-by-collection cell, the proportion of 100 held-out label-shuffle pseudo-observations that produced at least one discovery at q<0.10. Error bars are descriptive 95% Clopper–Pearson intervals, and the dashed line marks the nominal 0.10 level.
 
 **Table S1 | Expression filtering and DEGES-MUREN normalization diagnostics by contrast.** The table reports group sizes, the number of protein-coding genes before and after `filterByExpr`, the number of DEGES iterations, the third-iteration screening π0 estimate and Jaccard index, and the range of final normalization factors.
 
@@ -191,13 +191,13 @@ Five of the 39 shared-tissue signature genes of Ory et al. (2026) tested in each
 
 **Table S4 | Held-out complete-null calibration by contrast and collection.** For each cell, the table reports the number of tested sets, number of pseudo-observations, number and proportion with at least one discovery at q<0.10, descriptive 95% Clopper–Pearson limits, mean number of discoveries, and maximum number in any pseudo-observation.
 
-**Table S5 | Descriptive over-representation annotation of the RET-tumor gene list.** Results are reported separately for genes expressed at higher levels in High-AS cases, genes expressed at lower levels in High-AS cases, and their union across Hallmark, C2 canonical pathways, C5 Gene Ontology Biological Process, and the radiation-curated family. Set size, observed and expected overlap, one-sided hypergeometric p-value, and family-by-list Benjamini–Hochberg q-value are included. This table is hypothesis-generating and does not report the subject-label permutation gene-set test.
+**Table S5 | Descriptive over-representation annotation of the RET-tumor gene list.** Results are reported separately for genes expressed at higher levels in High-AS cases, genes expressed at lower levels in High-AS cases, and their union across Hallmark, C2 canonical pathways, C5 Gene Ontology Biological Process, and the radiation-curated family. Set size, observed and expected overlap, one-sided hypergeometric p-value, and family-by-list Benjamini–Hochberg q-value are included.
 
 **Table S6 | Concordance of signed gene-level statistics between the RET and BRAF contrasts.** Normal-tissue and tumor-tissue comparisons are shown separately with the paired contrasts, number of shared genes, Spearman correlation, central 95% label-shuffle interval, two-sided shuffle p-value, and number of shuffles.
 
 **Table S7 | Ten-pair relative-expression-ordering panel.** For each selected pair, the table gives Ensembl identifiers and gene symbols for the higher- and lower-expression genes, the absolute construction-group shift in median within-sample log2-TPM difference, the High-AS reversal rate, and the 10th percentile of the absolute within-sample difference among dose-zero construction cases.
 
-**Table S8 | Source publications for the radiation-curated gene sets represented in Supplementary Data 2.** Each row identifies a gene-set definition and its source publication as recorded by MSigDB. Only sets represented in the reported results after size filtering are listed. The sets were obtained through MSigDB, not re-derived from the source studies.
+**Table S8 | Source publications for the radiation-curated gene sets represented in Supplementary Data 2.** Each row identifies a gene-set definition and its source publication as recorded by MSigDB. Only sets represented in the reported results after size filtering are listed. Set definitions are those distributed by MSigDB.
 
 | MSigDB gene-set name | Source publication | PMID |
 | --- | --- | --- |
