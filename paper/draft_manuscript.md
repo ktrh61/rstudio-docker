@@ -19,7 +19,7 @@ In the REBC-THYR cohort, cases were stratified by driver and exposed cases bande
 
 ### Results
 
-In RET fusion-positive PTCs, 1,765 of 15,621 genes met Storey q<0.10 <!-- N-16, N-15 --> (omnibus p=0.0112 <!-- N-20 -->); other contrasts lacked concordant gene- and contrast-level evidence. No gene set met q<0.10 under label permutation, whereas genes expressed at lower levels in High-AS cases were over-represented in cell-cycle and DNA-repair annotations. REO score medians showed an ordered descriptive profile (dose-zero/Low-AS/Mid-AS/High-AS, 0/1/4/6 <!-- N-41 -->), with the extremes as construction anchors.
+In RET fusion-positive PTCs, 1,765 of 15,621 genes met Storey q<0.10 <!-- N-16, N-15 --> (omnibus p=0.0112 <!-- N-20 -->); other contrasts lacked concordant gene- and contrast-level evidence. No gene set met q<0.10 under label permutation, whereas genes expressed at lower levels in High-AS cases were over-represented in cell-cycle and DNA-repair annotations. REO score medians formed an ordered descriptive profile across the dose-zero, Low-AS, Mid-AS, and High-AS bands (0, 1, 4, and 6) <!-- N-41 -->.
 
 ### Conclusions
 
