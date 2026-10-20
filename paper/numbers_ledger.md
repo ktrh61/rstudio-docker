@@ -1144,6 +1144,7 @@
 - 2026-10-20(続 53): **Results 年齢段落末の「These descriptive estimates neither establish nor exclude confounding.」を削除**(研究者の問い: 事前宣言の再確認か → 同内容は Supp Methods Covariates の「not testing confounding or demonstrating balance」と Discussion limitation(行 160)に既存。リント 7 は禁止規則で但し書きを要求しない。C-04/C-07 と同じ「Results の解釈文を Disc へ一本化」)。−8 語、N タグなし、C-15 所在欄は不変。訳同期。
 - 2026-10-20(続 54): **Results の HC 文から「so the contrast-level evidence of label-aligned expression structure did not rely only on the size of the gene list」を削除**(研究者の問い: 事実か解釈か → 解釈。同じ読みは Discussion 行 148 に既存、"label-aligned expression structure" は Results 限りの著者用語、否定対比構文の残り)。−18 語、N タグ(p 値)不変、C-01 は Results 事実+Disc 読みで維持。訳同期。
 - 2026-10-20(続 55): **Results 副次対比段落の主題文「gave different forms of limited evidence」を「In the three secondary contrasts,」の方向づけ句に置換**(研究者の問い: 解釈では → "limited"・"different forms" は評価。同役割の文は Discussion 冒頭(行 150)に既存)。−5 語、N・C タグ不変。訳同期。
+- 2026-10-20(続 56): **Results の X/Y 連鎖員数文から「counts that are descriptive and do not exclude sex-related expression structure」を削除**(研究者の問い: 解釈では → 但し書き・現在形。同文は Supp Results 行 159 に既存で本文の参照先)。−12 語、N-82 不変、補足結果の参照は保持。訳同期。
 - 2026-10-20(続 46): **word_check へ書き出し(タグ 20261020_1112、HEAD 8fd5949)と語数実測**: 小見出し除く 4,949(10-19 行比 +131: Background +37・Methods +13・Results −1・Discussion +82)、見出し込み 5,017。Background の差は 10-16 の Background 整理が旧行に未反映だったもの(正本の Background は dabb6b5 から無変更)。本日の増分は Discussion(交絡 5 文化と限界・結論の削減の差し引き)。現況行を更新
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
