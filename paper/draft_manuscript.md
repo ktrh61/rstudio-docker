@@ -169,7 +169,7 @@ In conclusion, High-AS and dose-zero RET fusion-positive PTCs differed extensive
 
 **Figure 2 | Gene-level evidence by contrast.** Signed Brunner–Munzel effect, defined as 2θ−1, where θ=Pr(X<Y)+0.5Pr(X=Y), against −log10 permutation p. Genes meeting Storey q<0.10 are colored by direction.
 
-**Figure 3 | REO reversal scores by AS band.** Scores from 0 to 10 for the 10-pair panel <!-- N-37 -->. Dose-zero and High-AS defined the panel; it was applied without refitting to Low-AS and Mid-AS. The four-band pattern is descriptive and is not a test of a linear dose response.
+**Figure 3 | REO reversal scores by AS band.** Scores from 0 to 10 for the 10-pair panel <!-- N-37 -->. The panel was constructed from the dose-zero and High-AS groups and applied without refitting to the Low-AS and Mid-AS bands. The four-band pattern is descriptive and is not a test of a linear dose response.
 
 **Table 1 | Prespecified interpretation of the four exposure contrasts, fixed before the finalized analysis produced the results reported here.** Each contrast has a prespecified role and its basis; the interpretation rules fixed together with the table are given as footnotes. No outcome pattern requires labeling after the fact.
 
