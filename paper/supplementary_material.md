@@ -34,7 +34,7 @@ We estimated relative tumor purity jointly for dose-zero and High-AS cases withi
 
 Case pairing used the GDC merged-aliquot expression assays. Each included case was required to have one unique merged tumor and one unique merged normal sample. The main cohort additionally required RET fusion-positive classification or BRAF V600E-positive classification without another candidate driver mutation in the source cohort's whole-genome sequencing (WGS) or RNA calls (175 of 190 BRAF V600E cases <!-- N-94 -->), membership in the dose-zero or High-AS group, both tissues passing the outlier screen, and relative purity of at least 0.6.
 
-The REO construction set comprised the RET fusion-positive subset of the main cohort. The intermediate-band application set comprised RET fusion-positive PTCs from the Low-AS and Mid-AS bands, whether or not a matched normal was available. The outlier and purity exclusions used for the construction cohort were not applied to this set, so that no case was removed from the set to which the panel was applied; the corresponding metrics were reported as descriptive diagnostics and were not used to exclude cases.
+The REO construction set comprised the RET fusion-positive subset of the main cohort. The REO application set comprised RET fusion-positive PTCs from the Low-AS and Mid-AS bands, whether or not a matched normal was available. The outlier and purity exclusions used for the construction cohort were not applied to this set, so that no case was removed from the set to which the panel was applied; the corresponding metrics were reported as descriptive diagnostics and were not used to exclude cases.
 
 ### Analysis contrasts
 
