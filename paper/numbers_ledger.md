@@ -1137,6 +1137,7 @@
 - 2026-10-20(続 46): **Results 冒頭「Of 440 REBC-THYR cases」→「Of the 440 REBC-THYR cases」**(研究者の問いに先行例 12 報の Results 第 1 文を実測して回答: 母数提示型 4/12、"Of N, k" は Abend 2013 と同型で一般的。440 は Methods で導入済みのため定冠詞を付加、+1 語)。数値・訳は不変。
 - 2026-10-20(続 47): **Results 冒頭の「and each case contributed one tumor and one matched normal sample」を削除**(研究者指摘: Methods の主コホート定義(ペア要件)の再掲で冗長。評価文ではない)。−11 語、N-09 は前置の括弧に残置。訳同期。
 - 2026-10-20(続 48): **Results の Methods 再掲 4 件を削除+用語 1 件**(研究者 Go — 走査結果): (A) 行 119 の非二値化宣言文(Methods の同文あり。C-16 タグは直前の BRAF-normal 事実文冒頭へ移動、所在欄は不変) (B) 行 131 の「a descriptive addition for completeness」 (C) 行 135 の「expected by construction … classification performance」(Methods+Disc limitation に既出) (D) 行 143 の「membership counts were descriptive …」(補足結果の参照は前文末へ) (E) 行 111 "primary cohort"→"main cohort"(表記ゆれ)。計 −49 語、N タグ不変、警告 0、docx token 差 0。訳同期。
+- 2026-10-20(続 49): **Results 性別文の「compared with」を「and」に並列化**(研究者の問い「女性側で数えてよいか」に回答: PTC は女性優位で Abend 2013 も女性側、Table 2 に両列あり → 女性側は維持。層間比較の構文は Discussion が使う BRAF 層内の不均衡(23/27 対 4/9)と合わないため並列へ)。±0 語、N-12/N-13 不変。訳同期(「では」→「で」)。
 - 2026-10-20(続 46): **word_check へ書き出し(タグ 20261020_1112、HEAD 8fd5949)と語数実測**: 小見出し除く 4,949(10-19 行比 +131: Background +37・Methods +13・Results −1・Discussion +82)、見出し込み 5,017。Background の差は 10-16 の Background 整理が旧行に未反映だったもの(正本の Background は dabb6b5 から無変更)。本日の増分は Discussion(交絡 5 文化と限界・結論の削減の差し引き)。現況行を更新
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
