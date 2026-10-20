@@ -41,7 +41,7 @@ PANDOC = os.environ.get("PANDOC", "pandoc")
 W = "http://schemas.openxmlformats.org/wordprocessingml/2006/main"
 
 # ヒト遺伝子記号のイタリック対象(研究者裁定 2026-08-25。PTC 単体は疾患略語で対象外)
-GENES = ("RET|BRAF|CCDC6|NCOA4|CLIP2|BHLHB9|S100A10|TESC|EHD4|"
+GENES = ("RET|BRAF|CCDC6|NCOA4|CLIP2|BHLHB9|S100A10|UBA3|TESC|EHD4|"
          "ATP5MF|MRPL52|NTHL1|URM1|USE1|PXDN|P2RY1|PLK2|PTC1|PTC3|NTRK1|NTRK3|ETV6|CYR61|ATM|"
          "C16orf96|CLECL1|CRTC1|DHRS9|DUOX2|ECI1|EPB41L3|FCMR|FLT4|HJURP|IFI16|IGSF1|IRAG2|MYB|"
          "OTUD4|OTULIN|RPP30|SRPK1|TPGS1|VSIG2|ZBTB46|ZCCHC12|"
@@ -123,7 +123,10 @@ TABLE_SPECS = {
                  "age_surgery": "Age at surgery, years, median [range]",
                  "age_exposure": "Age at exposure, years, median [range]",
                  "driver_detail": "Designated driver, n"},
-        fmt={"driver_detail": lambda v: v.replace("-RET", "::RET")},  # HGNC 二重コロン(表示層のみ、凍結 CSV は不変)
+        # 表示層のみ(凍結 CSV は不変): HGNC 二重コロン、内部ラベルを本文表記へ(RET-OTHER → other partner、
+        # BRAF.MutV600E → BRAF V600E。後者は gene_markup が *BRAF*^V600E^ にする。研究者 Go 2026-10-20)
+        fmt={"driver_detail": lambda v: v.replace("-RET", "::RET").replace("RET-OTHER", "other partner")
+             .replace("BRAF.MutV600E", "BRAF V600E")},
         rows={"R_Sporadic": "R_Sporadic (dose-zero)", "R_Low": "R_Low (Low-AS)",
               "R_Mid": "R_Mid (Mid-AS)", "R_High": "R_High (High-AS)",
               "B_Sporadic": "B_Sporadic (dose-zero)", "B_High": "B_High (High-AS)"}),
