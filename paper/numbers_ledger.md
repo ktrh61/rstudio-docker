@@ -603,7 +603,7 @@
     Background・Discussion と重複する事前規定・推定対象・REO の読みの制限 約 300 語)。
   - **進行(2026-10-14)**: 作業ブランチ rewrite/manuscript-20261012(rebuild/r453 から。origin へ随時 push)。Methods 再構成・
     Background 加筆と漏斗型再構成・Discussion 再構成・表記・所属・文調整理を内容単位でコミット(訳は各コミットで同期済み、約 37 本)。
-    語数(投稿版 docx 実測 2026-10-20、docx 20261020_1112、小見出し除く)= Background 751/Methods 1,494/Results 1,119/Discussion 1,585、本文 4,949(余裕 51)。見出し込み(2026-09-02 確定の Word 計数範囲)= 5,017(超過 17、編集部返答 09-04 の裁量幅内)。Abstract 225(続 105、上限超過 25 — 通読後に調整)、引用 42。
+    語数(投稿版 docx 実測 2026-10-20、docx 20261020_1112、小見出し除く)= Background 751/Methods 1,494/Results 1,119/Discussion 1,585、本文 4,949(余裕 51)。見出し込み(2026-09-02 確定の Word 計数範囲)= 5,017(超過 17、編集部返答 09-04 の裁量幅内)。Abstract 229(続 106、上限超過 29 — 通読後に調整)、引用 42。
     2026-10-15〜16: Background を研究者通読に沿って全面整理(約 25 単位、台帳メモ 続 10〜31)、事前規定の按分を BJC 前例に合わせた(暫定)。
     残 = 研究者の通読(Results・Discussion 中心)→ squash で rebuild/r453 へ(Go)→ v2 共有(別途 Go)→ STROBE 頁行(d)・カバーレター日付/DOI。(c)(b)・prespecified は 2026-10-13 に裁定済み。
   - 先行例(PMC の JATS XML、図表・文献除外): 同分野 BJC 4 報の Methods = Detours 2005 1,500/4,252、
@@ -1198,5 +1198,6 @@
 - 2026-10-20(続 103): **Abstract Conclusions を Discussion 末尾に整合(暫定、研究者検討中)**: 「differed transcriptionally … hypothesized within-driver AS-band association. This does not establish a radiation-specific signature, and the REO profile requires independent validation.」→「After driver stratification, … differed extensively in expression, providing positive evidence for the working hypothesis that AS-associated expression structure remains detectable within a driver-defined tumor class. Whether this structure is specific to radiation remains undetermined, but the design provides a reproducible framework for testing it in future cohorts.」(先行例 10 報の Conclusions = 主結果+含意・展望の型、中央値 約 28 語。"positive evidence" の強度は保持、仮説文言と "signature" 非使用を Discussion に合わせ、保留だった transcriptionally→in expression を解消)。機械計数: Conclusions 53、**Abstract 232(上限超過 32、通読後に調整)**。訳同期。
 - 2026-10-20(続 104): **Abstract Results の REO 文を「REO scores in the intermediate bands lay between those of the extreme bands.」に**(研究者指摘: Low/Mid が Abstract 内で未定義、中央値 0/1/4/6 は記述的観察で主結果の p 値と同格に見える → Methods の語(extreme/intermediate bands)だけで、数値・帯名なしの弱い記述に)。N タグ(中央値)は文末に保持。機械計数: Results 60、**Abstract 224(上限超過 24、通読後に調整)**。訳同期。
 - 2026-10-20(続 105): **Abstract Results「; other contrasts lacked concordant gene- and contrast-level evidence.」→「, whereas the secondary comparisons yielded at most one gene.」**(研究者指摘: 冗長で不正確な印象 → 副次対比の遺伝子数 0/0/1 の事実だけを述べ、Methods の primary を受ける語に)。機械計数: Results 61、**Abstract 225(上限超過 25、通読後に調整)**。訳同期。
+- 2026-10-20(続 106): **Abstract Results 第 2 文「under label permutation」→「in the gene-set analysis, whereas, in descriptive annotation, …」(annotations→categories)**(研究者指摘: label permutation は文脈で理解不能 → 検定と記述的注釈の役割対比だけを示す)。機械計数: Results 65、**Abstract 229(上限超過 29、通読後に調整)**。訳同期。
   最終承認・表 1〜3 の個別ファイル化(投稿時)・公開リポジトリと DOI(Data/Code availability 記入)・
   フェーズ6 再構築確認・投稿システム側の入力(キーワード・推薦査読者があれば)
