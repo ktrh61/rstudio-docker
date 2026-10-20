@@ -84,7 +84,7 @@ Higher Criticism を主要オムニバス統計量とし、RET-tumor 対比を�
 
 遺伝子セット定義は MSigDB(Subramanian et al. 2005)から msigdbr 26.1.0(Dolgalev 2026)で取得した。同パッケージは MSigDB リリース 2026.1(ヒト)を提供する。15–500 遺伝子のサイズフィルタの前で、4 コレクションは Hallmark(50 セット; Liberzon et al. 2015)、Reactome(Milacic et al. 2024)・WikiPathways(Agrawal et al. 2024)・KEGG MEDICUS(Kanehisa et al. 2025)・BioCarta(Nishimura 2001)・PID(Schaefer et al. 2009)に限定した C2 canonical pathways(3,910 セット。レガシー KEGG サブコレクションは除外)、C5 GO Biological Process(7,538 セット; Ashburner et al. 2000; The Gene Ontology Consortium 2026)、C2:CGP の放射線キュレーション部分集合(28 セット)である。放射線キュレーション規則は、報告するセットレベル実行の前に固定した。報告結果に現れる放射線キュレーションセットの原典は表 S8 に示す。
 
-スパイクインでは、BRAF-tumor 対比の確定済み正規化 counts-per-million 行列から出発し、行列中に存在する HALLMARK_ADIPOGENESIS の 195 遺伝子の値を、その High-AS 9 検体で 1.15 倍した。その後、上記の完全な順位付け・遺伝子セット手続きを 9,999 ラベルシャッフルと診断シード 19450809 で繰り返した。埋め込んだセットの Hallmark 内順位は BH q 値の昇順で定義した。これは単一の整合シグナルのチェックであり、一般的な検出力解析ではない。
+単一の陽性対照シナリオとして、1 セットのスパイクインを構成した: BRAF-tumor 対比の確定済み正規化 counts-per-million 行列から出発し、行列中に存在する HALLMARK_ADIPOGENESIS の 195 遺伝子の値を、その High-AS 9 検体で 1.15 倍した。その後、上記の完全な順位付け・遺伝子セット手続きを 9,999 ラベルシャッフルと診断シード 19450809 で繰り返した。埋め込んだセットの Hallmark 内順位は BH q 値の昇順で定義した。
 
 過剰代表解析では、Storey q<0.10 を満たす RET-tumor 遺伝子を高発現・低発現・結合の各リストへ分割した。片側超幾何検定は、RET-tumor 対比で検定した全遺伝子をユニバースとし、各ファミリー×リスト組合せ内で BH 調整を行った。n 遺伝子のリスト、K 遺伝子のセット、N 遺伝子のユニバースについて、この参照の下での期待重なりは nK/N である。ファミリー×リストのセル内で、単一の主導的な記述例を特定する際は raw 超幾何 p 値が最小のセットを用いたが、q<0.10 規則を担ったのは調整 q 値であってその記述的順序ではない。Goeman and Bühlmann (2007) の用語では、この統計量は競合的(competitive)であるが、その gene-sampling p 値は被験者レベルのラベルランダム化を参照しない。
 
