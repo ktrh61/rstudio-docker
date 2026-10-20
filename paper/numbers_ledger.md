@@ -1209,5 +1209,6 @@
 - 2026-10-20(続 114): **ORA の名前と地位を Abstract Methods へ(「…, and descriptive over-representation analysis」)、Results 第 2 文の「in descriptive annotation」を削除**(研究者指摘: in descriptive annotation が分からない → 方法は Methods で 1 回、Results は結果のみ)。機械計数: Methods 77/Results 58、**Abstract 207(上限超過 7、通読後に調整)**。訳同期。
 - 2026-10-20(続 115): **Abstract からセット水準の 2 所見(セット検定の帰無+過剰代表)を組で削除、Methods の手法文を目的つきに**(研究者裁定: 5 所見は Abstract の容量を超える。理解の障害がこの対にあった、仮説生成水準で主張に寄与しない、組でなければ誤読を招く)。Methods 第 3 文 = 「Gene-level differences were tested with permutation Brunner–Munzel tests and summarized per comparison by Higher Criticism, and a REO panel …」、Results は主要比較+副次比較+REO の 2 文。機械計数: Background 31/Methods 77/Results 37/Conclusions 40、**Abstract 186(余裕 14)**。削除文に N タグなし。訳同期。
 - 2026-10-20(続 116): **Abstract の正確さの拡充 5 件**(研究者採択、余裕の範囲): REO パネルが RET 層内であること(of the RET fusion-positive stratum)/中央値(Median REO scores)/層内比較(within each stratum)/tumor initiation の tumor 復元/tested genes。機械計数: Background 31/Methods 86/Results 39/Conclusions 40、**Abstract 197(余裕 3)**。訳同期。
+- 2026-10-20(続 117): **Background「a gene-expression signature」→「a gene expression signature」**(研究者の問い: Abstract の gene expression との差は意図的か → 揺れ。先行例 12 報はハイフンなし 10/0、原稿内でもこの 1 箇所のみ)。全ファイルでハイフン形の残存 0 を確認。±0 語、訳不変。
   最終承認・表 1〜3 の個別ファイル化(投稿時)・公開リポジトリと DOI(Data/Code availability 記入)・
   フェーズ6 再構築確認・投稿システム側の入力(キーワード・推薦査読者があれば)
