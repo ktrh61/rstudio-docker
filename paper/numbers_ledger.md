@@ -1231,5 +1231,6 @@
 - 2026-10-20(続 136): **Methods Concordance 節の「The tumor comparison was included for completeness.」を前文に whereas で接続**(研究者指摘: 接続なしで唐突 → 事前指定の問い 対 網羅のための追加、という役割差を対比で明示)。−1 語、訳は元から 1 文で不変。
 - 2026-10-20(続 137): **Methods REO「Eligible pairs were ranked …」→「Pairs that met these rules were ranked …」**(研究者の問い: eligible は一般的か → 語は普通だが "eligible pairs" は稀(199 件)で未定義、Supp Methods の qualified と揺れ。前文の選択規則を受ける形に)。+2 語、訳同期。
 - 2026-10-20(続 138): **Methods 外部リスト比較の 1 文(90 語超)を 3 文に分割**(研究者指摘: Two classes が何か読み取りにくい → 「The first class comprised …」「The second comprised …:」で境目を明示。Supp Methods の 2 文構造と同形)。+8 語、訳同期。語数再実測(docx→pandoc plain): Background 749/Methods 1,539/Results 992/Discussion 1,593、本文 4,873(余裕 127)。
+- 2026-10-20(続 139): **Supp Methods の We 文を決定・方針に限定し、手順の 42 文を受動態・材料主語に**(研究者裁定、機械判定を採用): 241 文中 We 71(29%)→ 29(12%)。残す We = 臨床表の無編集読込・数値列の扱い・acute 維持・ライブラリサイズ保持・純度の推定法と相対扱い・オムニバス p の分離報告・性別報告の理由・X/Y 計数・共変量モデル不採用・λ 固定・用語方針・連続量報告・完全順位・BH 収集内・π0 非推定・較正の評価・平均発見数・記述的プール・上位 500・有限 TPM 要件・参照符号規則・構築後不変更・無変更適用・両極アンカー・署名クラス分離理由・員数の記述的報告。主な語の変更: checked→verified(AS 入力の照合)、Following→Under(懸垂回避)、described whether the directions agreed→compared with it。N タグ不変、語数 ±0 前後。補足訳は無人称のため不変。
   最終承認・表 1〜3 の個別ファイル化(投稿時)・公開リポジトリと DOI(Data/Code availability 記入)・
   フェーズ6 再構築確認・投稿システム側の入力(キーワード・推薦査読者があれば)
