@@ -132,7 +132,7 @@ The corresponding tumor-profile comparison gave rho=0.459 across 15,560 genes, o
 
 ### REO construction and intermediate-band application
 
-<!-- C-08 --> Of 57,694 candidate pairs, 153 met the selection criteria <!-- N-35 --> and 10 formed the final panel <!-- N-37 --> (Table S7; Supplementary Results). The maximum reversal score among dose-zero construction cases was 2 <!-- N-38 -->. All 12 dose-zero RET fusion-positive cases therefore scored at or below this cutoff, and 13 of 15 High-AS RET fusion-positive cases scored above it <!-- N-38 -->.
+<!-- C-08 --> Of 57,694 candidate pairs, 153 met the selection criteria <!-- N-35 --> and 10 formed the final panel <!-- N-37 --> (Table S7; Supplementary Results). The maximum reversal score among dose-zero construction cases was 2, and 13 of 15 High-AS RET fusion-positive cases scored above this cutoff <!-- N-38 -->.
 
 Applied unchanged, the construction-derived cutoff classified the Low-AS cases as nine negative and eight positive and the Mid-AS cases as eight negative and 11 positive <!-- N-42 -->. Graded-score medians were 0, 1, 4, and 6 across the dose-zero, Low-AS, Mid-AS, and High-AS bands (Fig. 3) <!-- N-41 -->. The Mid–Low comparison gave a relative effect θ=0.616 (X, Low-AS; Y, Mid-AS) and one-sided p=0.1127 <!-- N-40 -->.
 
