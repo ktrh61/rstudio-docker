@@ -120,7 +120,7 @@ In the three secondary contrasts, RET-normal had no gene at q<0.10 and an HC p-v
 
 ### Gene sets and list annotation
 
-No set met q<0.10 in any of the 16 contrast-by-collection cells <!-- N-27, C-05 -->. The smallest adjusted value was 0.114 in the BRAF-tumor radiation-curated cell <!-- N-28 --> (Table S3; Supplementary Data 2). In the complete-null assessment, at least one set was selected in 102 of 1,600 held-out contrast-by-collection replicates (descriptive pooled rate, 0.064) <!-- N-24, C-06 -->, while BRAF-normal/Hallmark had a cell-specific rate of 0.18 (descriptive 95% interval, 0.110–0.269 <!-- N-25 -->; Fig. S2; Table S4). In the single positive-control scenario, the planted set ranked first among 50 Hallmark sets (q=0.0101) <!-- N-31 -->, and no other set met q<0.10 <!-- N-32 --> (Supplementary Results).
+No set met q<0.10 in any of the 16 contrast-by-collection cells <!-- N-27, C-05 -->. The smallest adjusted value was 0.114 in the BRAF-tumor radiation-curated cell <!-- N-28 --> (Table S3; Supplementary Data 2). In the complete-null assessment, at least one set was selected in 102 of 1,600 held-out contrast-by-collection pseudo-observations (descriptive pooled rate, 0.064) <!-- N-24, C-06 -->, while BRAF-normal/Hallmark had a cell-specific rate of 0.18 (descriptive 95% interval, 0.110–0.269 <!-- N-25 -->; Fig. S2; Table S4). In the single positive-control scenario, the planted set ranked first among 50 Hallmark sets (q=0.0101) <!-- N-31 -->, and no other set met q<0.10 <!-- N-32 --> (Supplementary Results).
 
 Under the separate gene-sampling reference, genes expressed at lower levels in High-AS RET fusion-positive PTCs were over-represented in proliferation, cell-cycle, and DNA-repair annotations, including E2F targets (46/199), G2M checkpoint (41/198) <!-- N-61 -->, and Reactome DNA repair (68/322) <!-- N-62 -->. In the radiation-curated family, seven sets met the rule, led by two Zhou cell-cycle sets of the ionizing-radiation response (46/126 and 30/84) <!-- N-60 -->. Among genes expressed at higher levels in High-AS RET fusion-positive PTCs, no set in any family met the over-representation threshold (Table S5) <!-- N-59, C-14 -->.
 
@@ -132,7 +132,7 @@ The corresponding tumor-profile comparison gave rho=0.459 across 15,560 genes, o
 
 ### REO construction and intermediate-band application
 
-<!-- C-08 --> Of 57,694 candidate pairs, 153 met the selection criteria <!-- N-35 --> and 10 formed the final panel <!-- N-37 --> (Table S7; Supplementary Results). The maximum reversal score among dose-zero construction cases was 2, and 13 of 15 High-AS RET fusion-positive cases scored above this cutoff <!-- N-38 -->.
+<!-- C-08 --> Of 57,694 candidate pairs, 153 met the selection rules <!-- N-35 --> and 10 formed the final panel <!-- N-37 --> (Table S7; Supplementary Results). The maximum reversal score among dose-zero construction samples was 2, and 13 of 15 High-AS RET fusion-positive cases scored above this cutoff <!-- N-38 -->.
 
 Applied unchanged, the construction-derived cutoff classified the Low-AS cases as nine negative and eight positive and the Mid-AS cases as eight negative and 11 positive <!-- N-42 -->. Graded-score medians were 0, 1, 4, and 6 across the dose-zero, Low-AS, Mid-AS, and High-AS bands (Fig. 3) <!-- N-41 -->. The Mid–Low comparison gave a relative effect θ=0.616 (X, Low-AS; Y, Mid-AS) and one-sided p=0.1127 <!-- N-40 -->.
 
