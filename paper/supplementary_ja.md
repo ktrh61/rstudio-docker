@@ -43,7 +43,7 @@ REO 構築セットは主コホートの RET 融合陽性部分集合からな�
 
 ### 解析対比
 
-4 つの High-AS 対 dose-zero 対比は、RET-tumor(解析ファイル上 `R_Tumor`)、RET-normal(`R_Normal`)、BRAF-tumor(`B_Tumor`)、BRAF-normal(`B_Normal`)である。これらのラベルは対比を指し、検体群を指さない。各対比で、群 X は dose-zero、群 Y は High-AS とした。Brunner–Munzel 相対効果(確率的指標; Brunner and Munzel 2000)を θ と表記した:
+4 つの High-AS 対 dose-zero 対比は、RET-tumor(解析ファイル上 `R_Tumor`)、RET-normal(`R_Normal`)、BRAF-tumor(`B_Tumor`)、BRAF-normal(`B_Normal`)である。これらのラベルは対比を指し、検体群を指さない。各対比で、群 X は dose-zero、群 Y は High-AS とした。Brunner–Munzel 相対効果(確率的指標; Brunner and Munzel 2000)を θ と表記する:
 
 θ = Pr(X<Y) + 0.5 Pr(X=Y)。
 
