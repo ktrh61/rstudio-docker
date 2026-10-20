@@ -1223,5 +1223,6 @@
 - 2026-10-20(続 128): **Methods の ETV6::NTRK3 文を We 形・理由つきに「Because the ETV6::NTRK3 stratum had only seven dose-zero cases (with 25 exposed cases), we did not calculate AS for it and did not analyze it.」**(研究者訂正: AS の不在は算出しなかっただけで構造的不可能ではない → 標本サイズによる著者の決定。N-103 の注記に理由を追記)。+8 語、訳同期。
 - 2026-10-20(続 129): **Methods の主コホート定義文「belonged to the dose-zero or High-AS group」→「were in the dose-zero or High-AS group」**(研究者の問い: comprised と belonged は最適か → comprised は網羅的定義に適合し維持、belonged to は擬人化で稀(905 件)のため平易な were in に)。−1 語、訳不変。
 - 2026-10-20(続 130): **Results の REO 文「θ=0.616 (X, Low-AS; Y, Mid-AS)」→「θ=0.616 (Mid-AS relative to Low-AS)」**(研究者の問い: 性染色体の X/Y と紛れないか → 定義式の X・Y は Brunner & Munzel 2000 の原記法のため Methods・Table 2 脚注・Fig. 2・Supp は維持、散文中で裸の文字が出る 1 箇所のみ語に)。−1 語、訳同期。
+- 2026-10-20(続 131): **凍結宣言文 2 箇所の表現改善(意味不変)**(研究者裁定: 凍結は意味の凍結で一言一句ではない): Methods「Table 1 records the interpretation map assigned before …」→「The interpretation assigned to each outcome pattern (Table 1) was fixed before the finalized analysis produced the results reported here.」(records は稀(903 件)、map は著者用語、Background の参照文との重複を解消)/Discussion「drawn from the map in Table 1」→「drawn from Table 1」、「go beyond the map」→「beyond those in Table 1」。正準句は不変。±0 語前後、訳同期。
   最終承認・表 1〜3 の個別ファイル化(投稿時)・公開リポジトリと DOI(Data/Code availability 記入)・
   フェーズ6 再構築確認・投稿システム側の入力(キーワード・推薦査読者があれば)
