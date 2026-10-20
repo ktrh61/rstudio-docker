@@ -15,11 +15,11 @@ Although fusion drivers become more frequent with dose in post-Chornobyl papilla
 
 ### Methods
 
-In the REBC-THYR cohort, cases were stratified by driver, and the highest band of the NIH IREP Assigned Share (AS; High-AS) was compared with dose-zero cases in tumor and matched normal tissue. The primary comparison was in RET fusion-positive tumors, where radiation-related initiation was expected. Gene-level differences were tested with permutation Brunner–Munzel tests and summarized per comparison by Higher Criticism, and a relative-expression-ordering (REO) panel constructed from the extreme bands was applied unchanged to the intermediate bands.
+In the REBC-THYR cohort, cases were stratified by driver, and the highest band of the NIH IREP Assigned Share (AS; High-AS) was compared with dose-zero cases within each stratum in tumor and matched normal tissue. The primary comparison was in RET fusion-positive tumors, where radiation-related tumor initiation was expected. Gene-level differences were tested with permutation Brunner–Munzel tests and summarized per comparison by Higher Criticism, and a relative-expression-ordering (REO) panel constructed from the extreme bands of the RET fusion-positive stratum was applied unchanged to the intermediate bands.
 
 ### Results
 
-In the primary comparison, 1,765 of 15,621 genes met Storey q<0.10 <!-- N-16, N-15 --> (omnibus p=0.0112 <!-- N-20 -->), whereas the secondary comparisons yielded at most one gene. REO scores in the intermediate bands lay between the dose-zero and High-AS values <!-- N-41 -->.
+In the primary comparison, 1,765 of 15,621 tested genes met Storey q<0.10 <!-- N-16, N-15 --> (omnibus p=0.0112 <!-- N-20 -->), whereas the secondary comparisons yielded at most one gene. Median REO scores in the intermediate bands lay between the dose-zero and High-AS values <!-- N-41 -->.
 
 ### Conclusions
 
