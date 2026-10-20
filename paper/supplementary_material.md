@@ -109,15 +109,15 @@ Graded scores were summarized by their median within each of the four bands. Wit
 
 ### Ancillary REO quality and purity diagnostics
 
-As a descriptive quality check, the same PC-OD input construction was applied separately within the Low-AS and Mid-AS RET fusion-positive PTCs. Flags from this screen were reported but were not used to exclude cases; every intermediate-band case remained in the REO application.
+As a descriptive quality check, the same PC-OD input construction was applied separately within the Low-AS and Mid-AS RET fusion-positive PTCs. Flags from this screen were not used to exclude cases, and every intermediate-band case remained in the REO application.
 
-For cases with matched normal tissue, relative purity was estimated on a common scale by pooling paired cases across all four RET groups in one contamDE-lm proportion run separate from the main-cohort estimation, and the resulting scores were summarized in each band by their median. Cases without matched normal tissue remained in the REO application but did not enter the purity analyses.
+For cases with matched normal tissue, relative purity was estimated on a common scale by pooling paired cases across all four RET groups in one contamDE-lm proportion run separate from the main-cohort estimation, and the resulting scores were summarized in each band by their median. Cases without matched normal tissue did not enter the purity analyses.
 
 Associations between relative purity and REO score were summarized using Spearman correlations separately within Low-AS and Mid-AS cases and after pooling the two bands. In the pooled intermediate-band cases, the band–score and band–purity Spearman correlations were also calculated. To describe the band–score association after rank-scale adjustment for purity, the partial Spearman coefficient was calculated by correlating residuals from separate linear projections of band rank and score rank on purity rank.
 
 In a separate diagnostic permutation procedure, the Low-AS and Mid-AS labels were permuted 9,999 times using seed 19860426 while retaining each sample's observed score–purity pair. With Mid-AS coded above Low-AS, an upper-tail p-value for a positive partial coefficient was calculated using plus-one counting. Because this scheme also breaks the band–purity association, the resulting p-value describes the band–score association without holding purity fixed.
 
-As a further descriptive comparison, the pooled Low-AS and Mid-AS cases were split into two strata at the median of the common-scale purity and, within each stratum, a one-sided Brunner–Munzel test assessed whether REO scores tended to be higher in Mid-AS than in Low-AS cases. At these group sizes, the permutation distribution was enumerated exactly. None of these purity analyses was designated as a confirmatory test of an AS-band association independent of purity.
+As a further descriptive comparison, the pooled Low-AS and Mid-AS cases were split into two strata at the median of the common-scale purity and, within each stratum, a one-sided Brunner–Munzel test assessed whether REO scores tended to be higher in Mid-AS than in Low-AS cases. At these group sizes, the permutation distribution was enumerated exactly.
 
 ### External gene-list comparison
 
