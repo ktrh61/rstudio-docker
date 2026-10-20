@@ -19,7 +19,7 @@
 
 ### 方法
 
-REBC-THYR コホートの事故後 PTC 63 例をドライバー(RET 融合または BRAF V600E)で層別し、腫瘍組織および対応正常組織で解析した。NIH IREP の Assigned Share(AS)は被曝例の帯分けのみに用い、High-AS は最高帯を指す。RET 融合陽性腫瘍の比較を主要比較とした。推論には並べ替え Brunner–Munzel 検定、Higher Criticism、ラベル並べ替え遺伝子セット解析を用いた。両極の帯から構築した相対発現順序(REO)パネルを中間帯へ無変更で適用した。
+REBC-THYR コホートの事故後 PTC をドライバーで層別し、腫瘍組織および対応正常組織で解析した。NIH IREP の Assigned Share(AS)は被曝例の帯分けのみに用いた。RET 融合陽性腫瘍の比較を主要比較とした。推論には並べ替え Brunner–Munzel 検定、Higher Criticism、ラベル並べ替え遺伝子セット解析を用い、両極の帯から構築した相対発現順序(REO)パネルを中間帯へ無変更で適用した。
 
 ### 結果
 
