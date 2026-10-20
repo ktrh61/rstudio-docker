@@ -1211,5 +1211,6 @@
 - 2026-10-20(続 116): **Abstract の正確さの拡充 5 件**(研究者採択、余裕の範囲): REO パネルが RET 層内であること(of the RET fusion-positive stratum)/中央値(Median REO scores)/層内比較(within each stratum)/tumor initiation の tumor 復元/tested genes。機械計数: Background 31/Methods 86/Results 39/Conclusions 40、**Abstract 197(余裕 3)**。訳同期。
 - 2026-10-20(続 117): **Background「a gene-expression signature」→「a gene expression signature」**(研究者の問い: Abstract の gene expression との差は意図的か → 揺れ。先行例 12 報はハイフンなし 10/0、原稿内でもこの 1 箇所のみ)。全ファイルでハイフン形の残存 0 を確認。±0 語、訳不変。
 - 2026-10-20(続 118): **Background「can be sought」→「can be detected」**(研究者の問い: 受動態の違和感 → sought は稀(2,948 件)で文語的、detected(327,771 件)は続く 2 文の「検出を妨げる条件」と直結)。±0 語。訳同期(探し得る→検出し得る)。
+- 2026-10-20(続 119): **ETV6::NTRK3 層の記述を補完**(研究者の問い: Methods への委託で情報が拾えているか → 被曝側の事情が本文のどこにもなかった): Methods「The ETV6::NTRK3 stratum (seven dose-zero and 25 exposed cases, without AS values) was not analyzed.」(N-103、+6 語)/Background「contained enough dose-zero and exposed cases」→「supported the comparison」(被曝 25 例は存在するため「不足」は不正確、AS 未算出が理由)。訳同期。
   最終承認・表 1〜3 の個別ファイル化(投稿時)・公開リポジトリと DOI(Data/Code availability 記入)・
   フェーズ6 再構築確認・投稿システム側の入力(キーワード・推薦査読者があれば)
