@@ -1172,6 +1172,7 @@
 - 2026-10-20(続 81): **Methods の定義語と Results の受け語の食い違い 3 件を Methods 側に統一**(研究者依頼の走査): replicates→pseudo-observations(本文 1・Supp 2)、selection criteria→selection rules(本文 1)、construction cases→construction samples(カットオフ定義の再掲、本文 1・Supp 1。Discussion の症例数の文は据え置き)。代名詞・指示語 25 件は先行詞あり。各 ±0 語、N タグ不変。訳同期(疑似観測・選択規則・構築検体)。
 - 2026-10-20(続 82): **Supp Results「gene-reuse and redundancy restrictions」→「gene-reuse and correlation restrictions」**(研究者の問い: greedy selection は適切か → 標準用語で Supp Methods に定義あり維持。redundancy は未定義かつ Supp Data 2 の列名と衝突するため相関に)。±0 語。補足訳同期。
 - 2026-10-20(続 83): **Supp Results の純度推定文を 2 文に分割**(研究者指摘: 目が滑る → セミコロン連結+"matched" 2 回の長い限定+Supp Methods の再掲(REO に残る)。「The other two Low-AS and three Mid-AS tumors had no matched normal sample and therefore no purity score.」に。assay→sample で本文と統一)。−13 語、N タグ不変。補足訳同期。
+- 2026-10-20(続 84): **セミコロン長文の分割 3 件**(研究者依頼の構造検索: 両節 12 語以上): (A) 本文 Results 外部リスト「…; 18 of the 20 cells … were empty」→「. Of the 20 cells …, 18 were empty」(訳は既に 2 文) (B) Supp Results の同対応文 (C) Supp Methods の PC-OD 文(続 51 で分割した本文の写し)。各 ±0 語、N タグ不変。訳 2 件同期。
 - 2026-10-20(続 46): **word_check へ書き出し(タグ 20261020_1112、HEAD 8fd5949)と語数実測**: 小見出し除く 4,949(10-19 行比 +131: Background +37・Methods +13・Results −1・Discussion +82)、見出し込み 5,017。Background の差は 10-16 の Background 整理が旧行に未反映だったもの(正本の Background は dabb6b5 から無変更)。本日の増分は Discussion(交絡 5 文化と限界・結論の削減の差し引き)。現況行を更新
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
