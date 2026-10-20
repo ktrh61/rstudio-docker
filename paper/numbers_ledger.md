@@ -603,7 +603,7 @@
     Background・Discussion と重複する事前規定・推定対象・REO の読みの制限 約 300 語)。
   - **進行(2026-10-14)**: 作業ブランチ rewrite/manuscript-20261012(rebuild/r453 から。origin へ随時 push)。Methods 再構成・
     Background 加筆と漏斗型再構成・Discussion 再構成・表記・所属・文調整理を内容単位でコミット(訳は各コミットで同期済み、約 37 本)。
-    語数(投稿版 docx 実測 2026-10-20、docx 20261020_1112、小見出し除く)= Background 751/Methods 1,494/Results 1,119/Discussion 1,585、本文 4,949(余裕 51)。見出し込み(2026-09-02 確定の Word 計数範囲)= 5,017(超過 17、編集部返答 09-04 の裁量幅内)。Abstract 186(続 115、余裕 14)、引用 42。
+    語数(投稿版 docx 実測 2026-10-20、docx 20261020_1112、小見出し除く)= Background 751/Methods 1,494/Results 1,119/Discussion 1,585、本文 4,949(余裕 51)。見出し込み(2026-09-02 確定の Word 計数範囲)= 5,017(超過 17、編集部返答 09-04 の裁量幅内)。Abstract 197(続 116、余裕 3)、引用 42。
     2026-10-15〜16: Background を研究者通読に沿って全面整理(約 25 単位、台帳メモ 続 10〜31)、事前規定の按分を BJC 前例に合わせた(暫定)。
     残 = 研究者の通読(Results・Discussion 中心)→ squash で rebuild/r453 へ(Go)→ v2 共有(別途 Go)→ STROBE 頁行(d)・カバーレター日付/DOI。(c)(b)・prespecified は 2026-10-13 に裁定済み。
   - 先行例(PMC の JATS XML、図表・文献除外): 同分野 BJC 4 報の Methods = Detours 2005 1,500/4,252、
@@ -1208,5 +1208,6 @@
 - 2026-10-20(続 113): **Abstract Results 第 1 文「In RET fusion-positive PTCs」→「In the primary comparison」(Methods の定義語で受け、Conclusions と揃える)、第 2 文の「in the gene-set analysis」を削除(q<0.10 のセットで検定と分かる)**(研究者: 第 1 文採択、第 2 文は圧縮案で一旦)。機械計数: Results 61、**Abstract 207(上限超過 7、通読後に調整)**。訳同期。
 - 2026-10-20(続 114): **ORA の名前と地位を Abstract Methods へ(「…, and descriptive over-representation analysis」)、Results 第 2 文の「in descriptive annotation」を削除**(研究者指摘: in descriptive annotation が分からない → 方法は Methods で 1 回、Results は結果のみ)。機械計数: Methods 77/Results 58、**Abstract 207(上限超過 7、通読後に調整)**。訳同期。
 - 2026-10-20(続 115): **Abstract からセット水準の 2 所見(セット検定の帰無+過剰代表)を組で削除、Methods の手法文を目的つきに**(研究者裁定: 5 所見は Abstract の容量を超える。理解の障害がこの対にあった、仮説生成水準で主張に寄与しない、組でなければ誤読を招く)。Methods 第 3 文 = 「Gene-level differences were tested with permutation Brunner–Munzel tests and summarized per comparison by Higher Criticism, and a REO panel …」、Results は主要比較+副次比較+REO の 2 文。機械計数: Background 31/Methods 77/Results 37/Conclusions 40、**Abstract 186(余裕 14)**。削除文に N タグなし。訳同期。
+- 2026-10-20(続 116): **Abstract の正確さの拡充 5 件**(研究者採択、余裕の範囲): REO パネルが RET 層内であること(of the RET fusion-positive stratum)/中央値(Median REO scores)/層内比較(within each stratum)/tumor initiation の tumor 復元/tested genes。機械計数: Background 31/Methods 86/Results 39/Conclusions 40、**Abstract 197(余裕 3)**。訳同期。
   最終承認・表 1〜3 の個別ファイル化(投稿時)・公開リポジトリと DOI(Data/Code availability 記入)・
   フェーズ6 再構築確認・投稿システム側の入力(キーワード・推薦査読者があれば)
