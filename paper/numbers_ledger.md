@@ -1177,6 +1177,7 @@
 - 2026-10-20(続 46): **word_check へ書き出し(タグ 20261020_1112、HEAD 8fd5949)と語数実測**: 小見出し除く 4,949(10-19 行比 +131: Background +37・Methods +13・Results −1・Discussion +82)、見出し込み 5,017。Background の差は 10-16 の Background 整理が旧行に未反映だったもの(正本の Background は dabb6b5 から無変更)。本日の増分は Discussion(交絡 5 文化と限界・結論の削減の差し引き)。現況行を更新
 - 2026-10-20(続 86): **Supp Methods の「label-aligned structure」→「structure aligned with the band labels」**(最後の残存 1 箇所。Discussion の平易形に統一、造語回避)。+3 語。補足訳同期。
 - 2026-10-20(続 87): **Supp Results「18 of 20 source-list-by-contrast cells」→「18 of the 20 cells formed by the five lists and the four contrasts」**(研究者の問い: ハイフン急増か → 段落密度 10.5/100 語は Supp Results 平均 10.6 と同じで固定名由来。唯一の 3 連ハイフン句を本文と同形に)。+6 語。補足訳同期。
+- 2026-10-20(続 88): **外部リスト段落の動詞を Methods の定義語に統一**(研究者依頼の動詞走査): occurred in → were/was present in(Supp Results 9・本文 Results 5。Supp Methods「present in its q<0.10 list」と同形、Europe PMC でも present が多数)/resolved to → mapped to(Supp 2、Methods「We mapped published symbols」)/裸の "RET-tumor" 2 箇所を "the RET-tumor list" に/遺伝子名のエムダッシュ挿入 2 箇所を括弧に(他文のコロン列挙と整合)。N-86 タグは括弧直後へ。±0〜+2 語。訳: 出現→含まれ、解決→対応。
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
   600 dpi TIFF)/別ファイル CSV 3 件+50 語要約/カバーレター案。残 = Acknowledgements・共著者レビューと
