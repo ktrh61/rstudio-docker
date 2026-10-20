@@ -1199,5 +1199,6 @@
 - 2026-10-20(続 104): **Abstract Results の REO 文を「REO scores in the intermediate bands lay between those of the extreme bands.」に**(研究者指摘: Low/Mid が Abstract 内で未定義、中央値 0/1/4/6 は記述的観察で主結果の p 値と同格に見える → Methods の語(extreme/intermediate bands)だけで、数値・帯名なしの弱い記述に)。N タグ(中央値)は文末に保持。機械計数: Results 60、**Abstract 224(上限超過 24、通読後に調整)**。訳同期。
 - 2026-10-20(続 105): **Abstract Results「; other contrasts lacked concordant gene- and contrast-level evidence.」→「, whereas the secondary comparisons yielded at most one gene.」**(研究者指摘: 冗長で不正確な印象 → 副次対比の遺伝子数 0/0/1 の事実だけを述べ、Methods の primary を受ける語に)。機械計数: Results 61、**Abstract 225(上限超過 25、通読後に調整)**。訳同期。
 - 2026-10-20(続 106): **Abstract Results 第 2 文「under label permutation」→「in the gene-set analysis, whereas, in descriptive annotation, …」(annotations→categories)**(研究者指摘: label permutation は文脈で理解不能 → 検定と記述的注釈の役割対比だけを示す)。機械計数: Results 65、**Abstract 229(上限超過 29、通読後に調整)**。訳同期。
+- 2026-10-20(続 107): **Abstract Results の REO 文「between those of the extreme bands」→「between the dose-zero and High-AS values」**(研究者の問い: 両極の情報が落ちていないか → 構築群の分離は構築由来なので省くが、向きは定義済みラベルで明示)。±0 語、Abstract 229 のまま(機械計数)。訳同期。
   最終承認・表 1〜3 の個別ファイル化(投稿時)・公開リポジトリと DOI(Data/Code availability 記入)・
   フェーズ6 再構築確認・投稿システム側の入力(キーワード・推薦査読者があれば)
