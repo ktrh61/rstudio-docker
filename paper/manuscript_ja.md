@@ -105,7 +105,7 @@ dose-zero と High-AS の構築群において、二値読み出しはパネル�
 
 ### コホート
 
-REBC-THYR 440 症例のうち 63 症例が主コホート定義を満たした(図 1、表 2): RET 融合陽性層は dose-zero 12 症例と High-AS 15 症例(R_Sporadic と R_High)、BRAF V600E 陽性層は dose-zero 27 症例と High-AS 9 症例(B_Sporadic と B_High)を含んだ。女性は RET 融合陽性で dose-zero 12 例中 10 例・High-AS 15 例中 11 例、BRAF V600E 陽性で 27 例中 23 例・9 例中 4 例であった。RET 融合陽性の dose-zero 例と High-AS 例では、融合はそれぞれ CCDC6::RET が 6 例と 7 例、NCOA4::RET が 2 例と 4 例、その他のパートナーとの融合が 4 例と 4 例であった。症例減少の大半はドライバー分類と極端帯への限定で生じた(図 1)。PC-OD は RET 融合陽性層で腫瘍・正常のいずれの検体にもフラグを立てなかった。4 標的群での唯一のフラグは High-AS の BRAF V600E 陽性腫瘍 1 検体で、この症例は主コホートから除かれた。別建ての REO 適用セットは Low-AS 17 例と Mid-AS 19 例の RET 融合陽性 PTC からなる。
+REBC-THYR 440 症例のうち 63 症例が主コホート定義を満たした(図 1、表 2): RET 融合陽性層は dose-zero 12 症例と High-AS 15 症例(R_Sporadic と R_High)、BRAF V600E 陽性層は dose-zero 27 症例と High-AS 9 症例(B_Sporadic と B_High)を含んだ。RET 融合陽性では dose-zero 12 例中 10 例・High-AS 15 例中 11 例が女性であり、BRAF V600E 陽性では 27 例中 23 例・9 例中 4 例が女性であった。RET 融合陽性の dose-zero 例と High-AS 例では、融合はそれぞれ CCDC6::RET が 6 例と 7 例、NCOA4::RET が 2 例と 4 例、その他のパートナーとの融合が 4 例と 4 例であった。症例減少の大半はドライバー分類と極端帯への限定で生じた(図 1)。PC-OD は RET 融合陽性層で腫瘍・正常のいずれの検体にもフラグを立てなかった。4 標的群での唯一のフラグは High-AS の BRAF V600E 陽性腫瘍 1 検体で、この症例は主コホートから除かれた。別建ての REO 適用セットは Low-AS 17 例と Mid-AS 19 例の RET 融合陽性 PTC からなる。
 
 High-AS 症例は dose-zero 症例より手術時年齢が高く、Hodges–Lehmann 推定で RET 層 2.5 年(95% 信頼区間 −1.0〜6.0)、BRAF 層 8.0 年(3.0〜12.0)であった。性別・融合パートナー・相対純度の分布は表 2 とその脚注に要約する。
 
