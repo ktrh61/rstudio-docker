@@ -1240,5 +1240,6 @@
 - 2026-10-20(続 145): **Table 1 ブロックの宣言形を記述形に(意味不変)**: キャプション末尾と脚注末尾に重複していた「No outcome pattern requires labeling after the fact.」をキャプションから削除し、脚注では「These rules cover every possible outcome pattern.」(網羅性の記述)に/キャプションと列見出しの "prespecified" を削除(表題の「Prespecified …, fixed before …」が担う)。−11 語。訳同期。
 - 2026-10-20(続 146): **Supplementary 凡例の宣言形但し書き 3 件**(研究者 Go): Table S5 末尾「This table is hypothesis-generating and does not report …」削除/Fig. S2 末尾「… the intervals do not account for their dependence」削除(Supp Methods に同内容)/Table S8 末尾「obtained through MSigDB, not re-derived …」→「Set definitions are those distributed by MSigDB.」。−40 語、N タグなし。補足訳同期。
 - 2026-10-20(続 147): **Supp Methods Data sources「We converted missing markers to NA and treated a column as numeric only when …」→受動態**(研究者の問い: We の連続 → 前文の無編集読込は完全性の言明で We 維持、型判定は読み込み規約のため受動態)。±0 語、訳不変。
+- 2026-10-20(続 148): **Supp Methods の strandedness 文「… in which case the larger column was used; otherwise the unstranded column was used」→「… The larger column (for stranded libraries) or the unstranded column (otherwise) was taken as the sample's counts.」**(研究者の問い: used は最適か → 用途が文中にない。カウントとして採用、と明示し反復とセミコロンも解消)。±0 語、N タグ不変。補足訳同期。
   最終承認・表 1〜3 の個別ファイル化(投稿時)・公開リポジトリと DOI(Data/Code availability 記入)・
   フェーズ6 再構築確認・投稿システム側の入力(キーワード・推薦査読者があれば)
