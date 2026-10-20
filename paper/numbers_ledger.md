@@ -1215,5 +1215,6 @@
 - 2026-10-20(続 120): **語数の再実測**(研究者依頼、Methods 通読前の確認): 投稿版 docx を pandoc plain に変換し Heading2 単位で計数 = Background 749/Methods 1,508/Results 992/Discussion 1,596、本文 4,845(余裕 155)、Abstract 198(小見出し 4 語込み。md 基準の 197 と 1 語差はトークン化の違い)。11:14 実測比: Results −127(続 46〜113 の削除)、Methods +14、Discussion +11、Background −2。現況行を更新。
 - 2026-10-20(続 121): **Methods の We 文を決定の記述に限定し、手順の 12 文を受動態・材料主語に**(研究者裁定。先行例実測: BJC 2025〜26 原著 73 報の Methods で We 冒頭 2.4%、41/73 は 0、受動態 61%。本稿は 20%→約 10%)。残す We = 4 対比の定義・年齢分布の報告・共変量モデル不採用・DEGES スクリーンの置換・p 値の連続量報告・候補ペアの出所選択・外部リスト 2 クラスの区別(7 文)。±0 語、N・C タグ不変。訳は元から無人称のため不変。
 - 2026-10-20(続 122): **Methods の AS 算出文を「the NIH IREP thyroid model, version 5.7.3, was used to calculate the AS associated with the expected excess relative risk from the recorded thyroid dose and ages」に**(研究者指摘: 分詞修飾 associated と受動態 was calculated の重なり → モデルを主語に、IREP の定義句は目的語のまま保持)。±0 語、訳は現行で対応。
+- 2026-10-20(続 123): **Methods のセット水準手続きの文を 2 文に分割**(続 122 と同型の検索で検出した唯一の残り: 主語の挿入分詞句 selected on … と受動態 was assessed … and checked の重なり)。「The set-level procedure was selected … . Its operating characteristics were assessed … and checked …」。+2 語、N-06/N-30 不変。訳同期。
   最終承認・表 1〜3 の個別ファイル化(投稿時)・公開リポジトリと DOI(Data/Code availability 記入)・
   フェーズ6 再構築確認・投稿システム側の入力(キーワード・推薦査読者があれば)
