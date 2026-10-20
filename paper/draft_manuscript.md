@@ -15,7 +15,7 @@ Although fusion drivers become more frequent with dose in post-Chornobyl papilla
 
 ### Methods
 
-In the REBC-THYR cohort, cases were stratified by driver and exposed cases banded by the NIH IREP Assigned Share (AS). The highest band (High-AS) was compared with dose-zero cases in tumor and matched normal tissue. The RET fusion-positive tumor comparison was primary. Inference used permutation Brunner–Munzel tests, Higher Criticism, and label-permutation gene-set analysis, and a relative-expression-ordering (REO) panel constructed from the extreme bands was applied unchanged to the intermediate bands.
+In the REBC-THYR cohort, cases were stratified by driver and exposed cases banded by the NIH IREP Assigned Share (AS). The highest band (High-AS) was compared with dose-zero cases in tumor and matched normal tissue. Among these comparisons, the RET fusion-positive tumor comparison was primary and the others secondary. Inference used permutation Brunner–Munzel tests, Higher Criticism, and label-permutation gene-set analysis, and a relative-expression-ordering (REO) panel constructed from the extreme bands was applied unchanged to the intermediate bands.
 
 ### Results
 
