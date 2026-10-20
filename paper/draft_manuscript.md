@@ -171,17 +171,17 @@ In conclusion, High-AS and dose-zero RET fusion-positive PTCs differed extensive
 
 **Figure 3 | REO reversal scores by AS band.** Scores from 0 to 10 for the 10-pair panel <!-- N-37 -->. The panel was constructed from the dose-zero and High-AS groups and applied without refitting to the Low-AS and Mid-AS bands.
 
-**Table 1 | Prespecified interpretation of the four exposure contrasts, fixed before the finalized analysis produced the results reported here.** Each contrast has a prespecified role and its basis; the interpretation rules fixed together with the table are given as footnotes. No outcome pattern requires labeling after the fact.
+**Table 1 | Prespecified interpretation of the four exposure contrasts, fixed before the finalized analysis produced the results reported here.** Each contrast has a role and its basis; the interpretation rules fixed together with the table are given as footnotes.
 
 <!-- 表1(旧表2)本体+脚注規則(正本。Methods: Analysis contrasts から 2026-08-18 移設 — 投稿整形時に一方向切り出し、編集可能な第2コピーは作らない。規則の (a)-(f) 脚注化は研究者の書き直し待ち) -->
-| Contrast | Prespecified role | Basis |
+| Contrast | Role | Basis |
 | --- | --- | --- |
 | R_Tumor | Tests the working hypothesis; signal expected | primary expectation of the working hypothesis (Background); the driver-conditioned gap left by Morton et al. (2021) |
 | R_Normal | Tests the working hypothesis; signal possible | long-term molecular memory of exposure — dose-dependent expression within exposed normal tissue (Abend et al. 2013); signatures distinguishing exposed from unexposed normal tissue (Ory et al. 2026) |
 | B_Normal | Tests whether an exposure-related normal-tissue change is shared across driver strata | counterpart of R_Normal; the shared signatures of Ory et al. (2026) were reported without driver stratification |
 | B_Tumor | No direction specified; a signal cannot be ruled out | point-mutation drivers become less likely as dose rises in the source cohort (Morton et al. 2021) |
 
-Interpretation rules, fixed with the table: a signal in R_Tumor is interpreted as agreement with the prior expectation; a tumor signal confined to the BRAF stratum would contradict the hypothesis and is interpreted with non-etiological explanations first; concordant signals in both normal contrasts are interpreted as consistent with an exposure-related change shared across the gland, and discordant signals as suggesting that the type of change depends on the driver; a normal-tissue signal confined to the BRAF stratum is interpreted first as confounding, and one confined to the RET stratum as unable to distinguish attenuated sharing from a driver-dependent type; and an all-null outcome is reported as a null result bounded by the study's detection limits. No outcome pattern requires labeling after the fact.
+Interpretation rules, fixed with the table: a signal in R_Tumor is interpreted as agreement with the prior expectation; a tumor signal confined to the BRAF stratum would contradict the hypothesis and is interpreted with non-etiological explanations first; concordant signals in both normal contrasts are interpreted as consistent with an exposure-related change shared across the gland, and discordant signals as suggesting that the type of change depends on the driver; a normal-tissue signal confined to the BRAF stratum is interpreted first as confounding, and one confined to the RET stratum as unable to distinguish attenuated sharing from a driver-dependent type; and an all-null outcome is reported as a null result bounded by the study's detection limits. These rules cover every possible outcome pattern.
 
 **Table 2 | Case characteristics.** Group size with the size of the stratum-by-band pool from which each group was drawn (cases with a tumor–normal pair in parentheses) <!-- N-95 -->, sex, age at surgery and age at exposure, and RET fusion-partner composition; footnotes give the age-difference estimates with confidence intervals and the group medians of relative tumor purity.
 
