@@ -64,7 +64,7 @@ In this cross-sectional analysis, we defined four contrasts comparing High-AS wi
 
 ### Covariates
 
-For exposed cases, age at exposure entered the AS calculation as a radiation-risk modifier. We report group distributions of age at surgery, with Hodges–Lehmann differences and 95% bootstrap intervals <!-- N-63 -->, together with sex composition and RET fusion-partner composition. We fitted no common covariate-adjusted model, for the estimand reasons given in Supplementary Methods. No sequencing- or processing-batch field was available in the analysis objects.
+For exposed cases, age at exposure entered the IREP model as a radiation-risk modifier. We report group distributions of age at surgery, with Hodges–Lehmann differences and 95% bootstrap intervals <!-- N-63 -->, together with sex composition and RET fusion-partner composition. We fitted no common covariate-adjusted model, for the estimand reasons given in Supplementary Methods. No sequencing- or processing-batch field was available in the analysis objects.
 
 ### Normalization and gene-level inference
 
