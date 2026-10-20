@@ -167,7 +167,7 @@ The top-500 construction ranking contained 318 genes expressed at higher and 182
 
 The ancillary PC-OD screen identified no outliers among the intermediate-band tumors (Low-AS, 0/17; Mid-AS, 0/19) <!-- N-43 -->.
 
-Relative purity could be estimated for 15 Low-AS and 16 Mid-AS tumors <!-- N-44 -->; two Low-AS and three Mid-AS tumors lacked the matched normal assay required by the matched-pair estimator and remained in the REO analysis without a purity score. In the pooled paired RET purity run, median relative purity scores were 0.690, 0.704, 0.739, and 0.814 in the dose-zero, Low-AS, Mid-AS, and High-AS bands, respectively <!-- N-44 -->.
+Relative purity could be estimated for 15 Low-AS and 16 Mid-AS tumors <!-- N-44 -->. The other two Low-AS and three Mid-AS tumors had no matched normal sample and therefore no purity score. In the pooled paired RET purity run, median relative purity scores were 0.690, 0.704, 0.739, and 0.814 in the dose-zero, Low-AS, Mid-AS, and High-AS bands, respectively <!-- N-44 -->.
 
 Within the intermediate bands, Spearman correlations between purity and REO score were 0.684 in Low-AS cases, 0.345 in Mid-AS cases, and 0.538 when pooled <!-- N-45 -->. The unadjusted band–score correlation was 0.142, the band–purity correlation was 0.036 <!-- N-48 -->, and the partial Spearman coefficient after adjustment for purity rank was 0.146 (descriptive one-sided permutation p=0.2162) <!-- N-46 -->. Purity-stratified one-sided comparisons of Mid-AS with Low-AS (two strata split at the median purity) gave p=0.3069 (θ=0.580) in the lower-purity stratum and p=0.4197 (θ=0.532) in the higher-purity stratum <!-- N-47 -->.
 
