@@ -1162,6 +1162,7 @@
 - 2026-10-20(続 71): **Supp Results の ORA 集計の前置き文「were as follows.」を削り、最初の事実文に畳み込む**(研究者の問い: as follows は列挙直結の前置きで、独立 3 文の前では宙に浮く。予告型主題文を置かない規則と整合)。−9 語、N-59 不変。補足訳同期。
 - 2026-10-20(続 72): **Supp Results「No set met … in any family」→「No set in any family met …」**(研究者の問い: 否定数量詞主語は適切か → Europe PMC で動詞否定の 10 倍以上、本文と同型。語順のみ主語直後へ)。±0 語、訳は不変で対応。
 - 2026-10-20(続 73): **「expressed more/less highly」を「expressed at higher/lower levels」に全置換**(研究者の問い: less highly は分かりにくい → Europe PMC: expressed less highly 6 件、expressed at lower levels 15,630 件。調節動詞を避ける方針は維持)。本文 5 箇所(Abstract 1・Results 3・Disc 1)+SI 4 箇所(Results 3・Table S5 凡例 1)、対の文は "971 were expressed at higher and 794 at lower levels"。Abstract +1 語 → 200(余裕 0)。lower-/higher-expression list のラベルと "expression lower in" は据え置き。訳は既に中立表現で不変。
+- 2026-10-20(続 74): **ORA のセットに使った "flagged" を "met the rule" に**(研究者の問い: 機械的 → flag は PC-OD・DEGES の事前スクリーンの用法に限る。本文行 125・Supp 行 155 の 2 箇所、続 61/67 の文案で台帳の内部用語が漏れていた)。±0 語、N タグ不変。訳同期。
 - 2026-10-20(続 46): **word_check へ書き出し(タグ 20261020_1112、HEAD 8fd5949)と語数実測**: 小見出し除く 4,949(10-19 行比 +131: Background +37・Methods +13・Results −1・Discussion +82)、見出し込み 5,017。Background の差は 10-16 の Background 整理が旧行に未反映だったもの(正本の Background は dabb6b5 から無変更)。本日の増分は Discussion(交絡 5 文化と限界・結論の削減の差し引き)。現況行を更新
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
