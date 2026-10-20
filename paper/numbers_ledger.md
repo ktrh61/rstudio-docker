@@ -603,7 +603,7 @@
     Background・Discussion と重複する事前規定・推定対象・REO の読みの制限 約 300 語)。
   - **進行(2026-10-14)**: 作業ブランチ rewrite/manuscript-20261012(rebuild/r453 から。origin へ随時 push)。Methods 再構成・
     Background 加筆と漏斗型再構成・Discussion 再構成・表記・所属・文調整理を内容単位でコミット(訳は各コミットで同期済み、約 37 本)。
-    語数(投稿版 docx 実測 2026-10-19、小見出し除く)= Background 714/Methods 1,481/Results 1,120/Discussion 1,503、本文 4,818(余裕 182)、Abstract 199、引用 42。
+    語数(投稿版 docx 実測 2026-10-20、docx 20261020_1112、小見出し除く)= Background 751/Methods 1,494/Results 1,119/Discussion 1,585、本文 4,949(余裕 51)。見出し込み(2026-09-02 確定の Word 計数範囲)= 5,017(超過 17、編集部返答 09-04 の裁量幅内)。Abstract 199、引用 42。
     2026-10-15〜16: Background を研究者通読に沿って全面整理(約 25 単位、台帳メモ 続 10〜31)、事前規定の按分を BJC 前例に合わせた(暫定)。
     残 = 研究者の通読(Results・Discussion 中心)→ squash で rebuild/r453 へ(Go)→ v2 共有(別途 Go)→ STROBE 頁行(d)・カバーレター日付/DOI。(c)(b)・prespecified は 2026-10-13 に裁定済み。
   - 先行例(PMC の JATS XML、図表・文献除外): 同分野 BJC 4 報の Methods = Detours 2005 1,500/4,252、
@@ -1134,6 +1134,7 @@
 - 2026-10-20(続 43): **limitation 第三項の帰結文を分解**(研究者指摘: 「妥当だった/検出力限定/不在の証拠でない/標本特異的」の 4 段連結が AI 的な迂遠文。検出力の帰結(帰無結果)と構築集合の小ささの帰結(REO パネル)は原因が別)。「not evidence of absence」→「remain compatible with differences that the study could not detect」(肯定形・同強度)、REO は独立 2 文、「without tuning」は譲歩節(この事実の唯一の記載箇所なので保持)。N-09/N-10 不変、訳同期。
 - 2026-10-20(続 44): **limitation 第四項(Storey 推定量への依拠・交換可能性・正規化の非ランダム化)を本文から削除**(研究者指摘: 統計の一般論の言い直し。3 点とも Supplementary Methods に同内容の開示があり、DEGES の条件付き正規化は帰無下でスケーリング因子がほぼ不変で limitation の格ではない。Q-19 の「紙面に予防的弁護は置かない」とも整合)。冒頭文の区分を 3 つに、結びを「restrict what the primary association can be attributed to, not whether it was observed」に(旧「do not reduce … to a null result」は不自然かつ予防的弁護)。訳同期。
 - 2026-10-20(続 45): **結論段落を通しで整合**(研究者指摘: 「although not independent」は何から独立でないか不明、文単位の修正で段落が破綻しないか)。挿入句を独立文「All three were derived from the same RET-tumor contrast and therefore add no evidence independent of it」に(限定句は保持・対象を明示)、第 4 文の「that structure」→「this expression structure」(指示対象を仮説の語に固定)、第 5 文の「reproducible design」→「reproducible framework」(design の重複回避)。作業仮説の文言は不変。訳同期。
+- 2026-10-20(続 46): **word_check へ書き出し(タグ 20261020_1112、HEAD 8fd5949)と語数実測**: 小見出し除く 4,949(10-19 行比 +131: Background +37・Methods +13・Results −1・Discussion +82)、見出し込み 5,017。Background の差は 10-16 の Background 整理が旧行に未反映だったもの(正本の Background は dabb6b5 から無変更)。本日の増分は Discussion(交絡 5 文化と限界・結論の削減の差し引き)。現況行を更新
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
   600 dpi TIFF)/別ファイル CSV 3 件+50 語要約/カバーレター案。残 = Acknowledgements・共著者レビューと
