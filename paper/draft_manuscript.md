@@ -11,11 +11,11 @@
 
 ### Background
 
-Although fusion drivers become more frequent with dose in post-Chornobyl papillary thyroid carcinoma (PTC), expression has not been shown to differ consistently with exposure. To avoid confounding by driver, we examined whether expression differed between cases with high estimated radiation attribution and dose-zero cases within driver strata.
+Although fusion drivers become more frequent with dose in post-Chornobyl papillary thyroid carcinoma (PTC), expression has not been shown to differ consistently with exposure. We therefore examined, within driver strata, whether expression differed between cases with high estimated radiation attribution and dose-zero cases, expecting radiation-related tumor initiation in the RET fusion-positive stratum.
 
 ### Methods
 
-We calculated NIH IREP Assigned Share (AS) for ordinal banding only. We stratified by driver (RET fusion or BRAF V600E) and compared expression between High-AS and dose-zero cases in tumor and matched normal tissue; the RET fusion-positive tumor comparison was primary. We used permutation Brunner–Munzel tests, Higher Criticism, label-permutation gene-set inference, and a relative-expression-ordering (REO) panel constructed from extreme bands, applied unchanged to intermediate bands.
+In the REBC-THYR cohort, 63 <!-- N-08 --> post-Chornobyl PTCs were stratified by driver (RET fusion or BRAF V600E) and analyzed in tumor and matched normal tissue. The NIH IREP Assigned Share (AS) was used only to band exposed cases; High-AS denotes the highest band. The RET fusion-positive tumor comparison was primary. Inference used permutation Brunner–Munzel tests, Higher Criticism, and label-permutation gene-set analysis. A relative-expression-ordering (REO) panel constructed from the extreme bands was applied unchanged to the intermediate bands.
 
 ### Results
 
