@@ -1160,6 +1160,7 @@
 - 2026-10-20(続 69): **Supp Results の完全帰無冒頭文を「the per-cell proportion of replicates that produced at least one discovery ranged …, and 13 of the 16 cells …」に**(研究者の問い: 分詞句で "discovery ranged" が隣接する袋小路構造 → 関係節で修飾の切れ目を明示、per-cell を主語側へ)。+2 語、N タグ不変。補足訳同期。
 - 2026-10-20(続 70): **Supp Results の「The only descriptive interval … was for BRAF-normal/Hallmark, which had …」→「Only the BRAF-normal/Hallmark cell had a descriptive interval lying entirely above 0.10 (rate 0.18; 0.110–0.269)」**(研究者の問い: 口語的か → lie above は標準。主語をセルに揃え "was for"・関係節を除去)。−3 語、N タグ不変。補足訳同期。
 - 2026-10-20(続 71): **Supp Results の ORA 集計の前置き文「were as follows.」を削り、最初の事実文に畳み込む**(研究者の問い: as follows は列挙直結の前置きで、独立 3 文の前では宙に浮く。予告型主題文を置かない規則と整合)。−9 語、N-59 不変。補足訳同期。
+- 2026-10-20(続 72): **Supp Results「No set met … in any family」→「No set in any family met …」**(研究者の問い: 否定数量詞主語は適切か → Europe PMC で動詞否定の 10 倍以上、本文と同型。語順のみ主語直後へ)。±0 語、訳は不変で対応。
 - 2026-10-20(続 46): **word_check へ書き出し(タグ 20261020_1112、HEAD 8fd5949)と語数実測**: 小見出し除く 4,949(10-19 行比 +131: Background +37・Methods +13・Results −1・Discussion +82)、見出し込み 5,017。Background の差は 10-16 の Background 整理が旧行に未反映だったもの(正本の Background は dabb6b5 から無変更)。本日の増分は Discussion(交絡 5 文化と限界・結論の削減の差し引き)。現況行を更新
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
