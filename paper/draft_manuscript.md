@@ -11,7 +11,7 @@
 
 ### Background
 
-Although fusion drivers become more frequent with dose in post-Chornobyl papillary thyroid carcinoma (PTC), expression has not been shown to differ consistently with exposure. We therefore examined, within driver strata, whether expression differed between cases with high estimated radiation attribution and dose-zero cases, expecting radiation-related tumor initiation in the RET fusion-positive stratum.
+Although fusion drivers become more frequent with dose in post-Chornobyl papillary thyroid carcinoma (PTC), gene expression has not been consistently associated with exposure. We therefore examined, within driver strata, whether expression differed between cases with high estimated radiation attribution and dose-zero cases, expecting radiation-related tumor initiation in the RET fusion-positive stratum.
 
 ### Methods
 
