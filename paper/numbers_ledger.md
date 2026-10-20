@@ -1236,5 +1236,6 @@
 - 2026-10-20(続 141): **Discussion limitation「Although no tuning was involved」→「Although we did not tune the panel」**(研究者の問い: Results/Discussion で We にすべき受動態は → Results 0、Discussion はこの 1 文のみ。構築後の不調整は著者の決定で、Supp Methods の We 文に対応。譲歩節は唯一の記載箇所のため保持)。±0 語、訳同期。
 - 2026-10-20(続 142): **Fig. 1 凡例「stratified by RET and BRAF driver」→「stratified by driver (RET fusion or BRAF V600E)」**(研究者の問い: stratified は最適か → 本稿の層の動詞として維持、単数 driver に 2 名を冠した目的語を Methods の層名の形に)。+2 語、N タグ不変、図内ラベル不変。訳同期。
 - 2026-10-20(続 143): **Fig. 3 凡例「Dose-zero and High-AS defined the panel; it was applied without refitting to Low-AS and Mid-AS.」→「The panel was constructed from the dose-zero and High-AS groups and applied without refitting to the Low-AS and Mid-AS bands.」**(凡例・脚注の走査で唯一の裸ラベル+擬人化+セミコロン。Methods の語に揃える)。+4 語、N タグ・図内不変。訳同期。
+- 2026-10-20(続 144): **Fig. 3 凡例の但し書き「The four-band pattern is descriptive and is not a test of a linear dose response.」を削除**(研究者指摘: 唐突で AI 的な「A である、B ではない」宣言。地位は Methods、読みは Discussion が担う)。−15 語、N タグなし。訳同期。
   最終承認・表 1〜3 の個別ファイル化(投稿時)・公開リポジトリと DOI(Data/Code availability 記入)・
   フェーズ6 再構築確認・投稿システム側の入力(キーワード・推薦査読者があれば)
