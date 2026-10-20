@@ -1238,5 +1238,6 @@
 - 2026-10-20(続 143): **Fig. 3 凡例「Dose-zero and High-AS defined the panel; it was applied without refitting to Low-AS and Mid-AS.」→「The panel was constructed from the dose-zero and High-AS groups and applied without refitting to the Low-AS and Mid-AS bands.」**(凡例・脚注の走査で唯一の裸ラベル+擬人化+セミコロン。Methods の語に揃える)。+4 語、N タグ・図内不変。訳同期。
 - 2026-10-20(続 144): **Fig. 3 凡例の但し書き「The four-band pattern is descriptive and is not a test of a linear dose response.」を削除**(研究者指摘: 唐突で AI 的な「A である、B ではない」宣言。地位は Methods、読みは Discussion が担う)。−15 語、N タグなし。訳同期。
 - 2026-10-20(続 145): **Table 1 ブロックの宣言形を記述形に(意味不変)**: キャプション末尾と脚注末尾に重複していた「No outcome pattern requires labeling after the fact.」をキャプションから削除し、脚注では「These rules cover every possible outcome pattern.」(網羅性の記述)に/キャプションと列見出しの "prespecified" を削除(表題の「Prespecified …, fixed before …」が担う)。−11 語。訳同期。
+- 2026-10-20(続 146): **Supplementary 凡例の宣言形但し書き 3 件**(研究者 Go): Table S5 末尾「This table is hypothesis-generating and does not report …」削除/Fig. S2 末尾「… the intervals do not account for their dependence」削除(Supp Methods に同内容)/Table S8 末尾「obtained through MSigDB, not re-derived …」→「Set definitions are those distributed by MSigDB.」。−40 語、N タグなし。補足訳同期。
   最終承認・表 1〜3 の個別ファイル化(投稿時)・公開リポジトリと DOI(Data/Code availability 記入)・
   フェーズ6 再構築確認・投稿システム側の入力(キーワード・推薦査読者があれば)
