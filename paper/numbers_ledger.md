@@ -1227,5 +1227,6 @@
 - 2026-10-20(続 132): **Table 1 凡例・脚注の「the map」2 箇所→「the table」**(続 131 の残り。投稿物中の map は 0。行 329 の起草メモは投稿外)。−1 語、訳同期。
 - 2026-10-20(続 133): **Methods Covariates「age at exposure entered the AS calculation as a radiation-risk modifier」→「entered the IREP model as …」**(研究者の問い: entered は適切か → 動詞は定型(entered the model as 5,125 件)、目的語 calculation が稀(79 件)。前文の IREP thyroid model に揃える)。±0 語、訳同期。
 - 2026-10-20(続 134): **Abstract Results「(omnibus p=0.0112)」→「(Higher Criticism p=0.0112)」**(研究者の問い: HC はセット推論と繋がるか → 繋がらない。対比水準のオムニバス検定で、Abstract Methods の「summarized per comparison by Higher Criticism」の受けを同じ語にする)。+1 語、**Abstract 198(余裕 2)**。訳同期。
+- 2026-10-20(続 135): **Methods Gene-set inference「checked in a single positive-control scenario」→「examined in …」**(研究者依頼の動詞走査: 9 文中 checked のみ口語寄り。BJC 73 報の Methods で checked 1 回、assessed 108・evaluated 57・examined 18)。±0 語、訳同期。
   最終承認・表 1〜3 の個別ファイル化(投稿時)・公開リポジトリと DOI(Data/Code availability 記入)・
   フェーズ6 再構築確認・投稿システム側の入力(キーワード・推薦査読者があれば)
