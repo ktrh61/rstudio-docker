@@ -1157,6 +1157,7 @@
 - 2026-10-20(続 66): **Supp Results の ORA 集計文をスラッシュ列から散文へ**(研究者指摘: 不親切 → 同文書で "/" は k/n 分数にも使われ 12/105 が「105 中 12」と読める、4 ファミリーの順序が文頭にしかない、Table S5 に集計行なし)。ファミリー名を各数値に直接付けた 4 文に。N-59 不変。Abstract の 0/1/4/6 は 200 語制限下で対象外。補足訳同期。
 - 2026-10-20(続 67): **Supp Results の ORA 例示文「illustrative counts were …」を「Among the sets flagged for the lower-expression list, E2F targets contained 46 of its 199 genes in the list, …」に**(研究者指摘: 唐突 → 続 63 のテーマ文削除で何の員数か不明になっていた。次文と同じ「contained k of its K genes in the list」構文で観測重なりを明示)。N-61/N-62 不変、訳は現在形→過去形で同期。
 - 2026-10-20(続 68): **Supp Results の「Descriptively pooled across cells」→「Pooled across the 16 cells, …(descriptive pooled rate, 0.064; …)」**(研究者指摘: 不自然 → Europe PMC 18 件のみ。記述的なのは操作でなく率の地位なので本文と同じラベル形に)。+3 語、N タグ不変。補足訳同期。
+- 2026-10-20(続 69): **Supp Results の完全帰無冒頭文を「the per-cell proportion of replicates that produced at least one discovery ranged …, and 13 of the 16 cells …」に**(研究者の問い: 分詞句で "discovery ranged" が隣接する袋小路構造 → 関係節で修飾の切れ目を明示、per-cell を主語側へ)。+2 語、N タグ不変。補足訳同期。
 - 2026-10-20(続 46): **word_check へ書き出し(タグ 20261020_1112、HEAD 8fd5949)と語数実測**: 小見出し除く 4,949(10-19 行比 +131: Background +37・Methods +13・Results −1・Discussion +82)、見出し込み 5,017。Background の差は 10-16 の Background 整理が旧行に未反映だったもの(正本の Background は dabb6b5 から無変更)。本日の増分は Discussion(交絡 5 文化と限界・結論の削減の差し引き)。現況行を更新
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
