@@ -1259,5 +1259,6 @@
 - 2026-10-20(続 164): **Supp Methods の spike-in 段落: 冒頭「For the spike-in, …」→「As a single positive-control scenario, a one-set spike-in was constructed: …」(Supp 内で初出の語を目的つきで導入)、末尾「This was a single coherent-signal check, not a general power analysis.」を削除**(研究者指摘: 前提知識なしに通らない)。−3 語。補足訳同期。
 - 2026-10-20(続 165): **Supp Methods の略語 BH(3 回、未定義)を Benjamini–Hochberg に綴り出し、spike-in の順位文を「The planted set's rank among the Hallmark sets was determined by ascending within-collection Benjamini–Hochberg q-value.」に**(研究者指摘: 用語の取り回し → 4 回未満の略語は綴り出す house style、順位の母集団と q の種類を明示)。+5 語前後。補足訳同期。
 - 2026-10-20(続 166): **Supp Methods ORA 分類文「… is competitive, but its gene-sampling p-value does not refer to subject-level label randomization」→「… is competitive and its p-value is obtained under gene sampling」**(研究者の問い: A-but-not-B か → Goeman & Bühlmann の 2 軸分類を肯定形に。帰結は本文 Methods が担う)。−5 語。補足訳同期。
+- 2026-10-20(続 167): **Supp Methods Complete-null 節: 「We also reported the mean number of discoveries.」→「The mean number of discoveries per cell was also calculated.」(計算は受動態、reported→calculated)/Clopper–Pearson 文を 2 文に分け「do not have exact coverage」→「are therefore approximate for the shared-pool design」(開示を肯定形で保持)**(研究者 Go)。±0 語前後。補足訳同期。
   最終承認・表 1〜3 の個別ファイル化(投稿時)・公開リポジトリと DOI(Data/Code availability 記入)・
   フェーズ6 再構築確認・投稿システム側の入力(キーワード・推薦査読者があれば)
