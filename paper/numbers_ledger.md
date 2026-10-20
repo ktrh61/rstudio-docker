@@ -1166,6 +1166,7 @@
 - 2026-10-20(続 75): **Supp Results の ORA 2 文で「contained k of its K genes in the list」→「had … in the list」**(研究者の問い: contain/curate/compare の使い分け → radiation-curated は定義済み集合名、compared with は観測対期待で適切、contained + in the list は「リスト内に含む」と二重に読めるため所有の had に)。±0 語、N タグ不変、訳不変。併せて本文・SI の containment 動詞(contain/comprise/include/consist/hold)を全走査: 同型の曖昧は他に無し。
 - 2026-10-20(続 76): **Results 性別文「Females comprised 10 of 12 …」→「Ten of 12 … were female, as were 23 of 27 and four of nine …」**(続 75 の動詞走査で検出: 部分が全体を comprise する逆向き用法。Europe PMC: were female 346,099 件が最多)。±0 語、N-12/N-13 不変。訳同期。
 - 2026-10-20(続 77): **Supp Results「the sets that met the rule」→「the sets meeting the rule」**(研究者の問い: meeting は適切か → 分詞縮約は標準、本稿の名詞修飾は分詞形で統一。関係節形はこの 1 箇所のみだったため揃えた)。−1 語、訳不変。
+- 2026-10-20(続 78): **Supp Results 性染色体節「tested in the contrast」→「tested in the RET-tumor contrast」**(研究者の問い: contrast は適切か → 用語は正しいが前文に contrast の語がなく指示が弱い。対比名を明記)。+1 語、N タグ不変。補足訳同期。
 - 2026-10-20(続 46): **word_check へ書き出し(タグ 20261020_1112、HEAD 8fd5949)と語数実測**: 小見出し除く 4,949(10-19 行比 +131: Background +37・Methods +13・Results −1・Discussion +82)、見出し込み 5,017。Background の差は 10-16 の Background 整理が旧行に未反映だったもの(正本の Background は dabb6b5 から無変更)。本日の増分は Discussion(交絡 5 文化と限界・結論の削減の差し引き)。現況行を更新
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
