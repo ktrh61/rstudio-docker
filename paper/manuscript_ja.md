@@ -19,7 +19,7 @@
 
 ### 方法
 
-REBC-THYR コホートにおいて症例をドライバーで層別し、NIH IREP の Assigned Share(AS)の最高帯(High-AS)を、腫瘍組織および対応正常組織で dose-zero 症例と比較した。RET 融合陽性腫瘍の比較は、その層で放射線関連の腫瘍発生が期待されるため、主要比較とした。これらの比較には並べ替え Brunner–Munzel 検定、Higher Criticism、ラベル並べ替え遺伝子セット解析を用い、両極の帯から構築した相対発現順序(REO)パネルを中間帯へ無変更で適用した。
+REBC-THYR コホートにおいて症例をドライバーで層別し、NIH IREP の Assigned Share(AS)の最高帯(High-AS)を、腫瘍組織および対応正常組織で dose-zero 症例と比較した。主要比較は RET 融合陽性腫瘍で行い、この層では放射線関連の腫瘍発生が期待された。これらの比較には並べ替え Brunner–Munzel 検定、Higher Criticism、ラベル並べ替え遺伝子セット解析を用い、両極の帯から構築した相対発現順序(REO)パネルを中間帯へ無変更で適用した。
 
 ### 結果
 
