@@ -1244,5 +1244,6 @@
 - 2026-10-20(続 149): **用途の補語を欠く "used" の走査 → 3 件修正**(研究者 Go): 本文 AS 節「The IREP input route … was used」→「AS was calculated with the IREP input route …」/Supp HC「assumptions … were not used」→「were not required」/Supp REO「… were used」→「were used instead」。否定の不使用宣言 3 件は維持。+2 語。訳同期。AS の出力選択(期待 ERR に対応する AS)は Supp Methods 第 1 文と本文 Methods に既記載で、不採用側の分位点 AS は書かない(研究者確認)。
 - 2026-10-20(続 150): **Supp Methods AS 節の予防線「These studies document the provenance of the convention rather than independently validating acute coding …」を削除**(研究者の問い: 過度に防御的か → 読者が立てていない疑義への先回りで、段落の DDREF 論証(順序不変)が実質を担う。第 1 文の computational continuity が来歴の限定を含意)。−21 語、N タグなし。補足訳同期。
 - 2026-10-20(続 151): **Supp Methods AS 節「AS values were available for every exposed case in the two analysis strata」→「We calculated AS for every exposed case in the two analysis strata」**(研究者指摘: 成り行きの含み → 算出範囲は著者の決定で、本文の「we did not calculate AS for it」と対にする)。±0 語、N タグ不変。補足訳同期。
+- 2026-10-20(続 152): **Supp Methods QC 節「PC-OD was a QC and cohort-definition step, not a gene-level hypothesis test, and …」の「not a gene-level hypothesis test」を削除**(研究者の問い → 肯定形の段階の位置づけで足りる "A, not B" 句)。−5 語。補足訳同期。
   最終承認・表 1〜3 の個別ファイル化(投稿時)・公開リポジトリと DOI(Data/Code availability 記入)・
   フェーズ6 再構築確認・投稿システム側の入力(キーワード・推薦査読者があれば)
