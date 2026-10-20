@@ -150,17 +150,17 @@ In the single positive-control scenario, the expression values for 195 genes fro
 
 ### Over-representation annotation of the RET-tumor list
 
-No set in any family met the family-by-list q<0.10 rule for genes expressed more highly in High-AS cases. For genes expressed less highly, 12 Hallmark, 105 C2 canonical-pathway, 205 C5 GO Biological Process, and 7 radiation-curated sets met the rule. For the combined list, the counts were 6, 37, 71, and 2 in the same order (Table S5) <!-- N-59 -->.
+No set in any family met the family-by-list q<0.10 rule for genes expressed at higher levels in High-AS cases. For genes expressed at lower levels, 12 Hallmark, 105 C2 canonical-pathway, 205 C5 GO Biological Process, and 7 radiation-curated sets met the rule. For the combined list, the counts were 6, 37, 71, and 2 in the same order (Table S5) <!-- N-59 -->.
 
 Among the sets flagged for the lower-expression list, E2F targets contained 46 of its 199 genes in the list, G2M checkpoint 41 of 198 <!-- N-61 -->, and Reactome DNA repair 68 of 322 <!-- N-62 -->. The radiation-curated set with the smallest raw hypergeometric p-value contained 46 of its 126 genes in the lower-expression list, compared with 6.4 expected under the gene-sampling reference <!-- N-60 -->.
 
 ### Sex-chromosome annotation of the RET-tumor list
 
-Among the 1,765 RET-tumor genes meeting the Storey q<0.10 rule (Supplementary Data 1), 57 were X-linked: 36 were expressed more highly and 21 less highly in High-AS cases; no Y-linked gene met the rule <!-- N-82 -->. The 15,621 genes tested in the contrast included 572 X-linked and two Y-linked genes <!-- N-82 -->.
+Among the 1,765 RET-tumor genes meeting the Storey q<0.10 rule (Supplementary Data 1), 57 were X-linked: 36 were expressed at higher and 21 at lower levels in High-AS cases; no Y-linked gene met the rule <!-- N-82 -->. The 15,621 genes tested in the contrast included 572 X-linked and two Y-linked genes <!-- N-82 -->.
 
 ### REO pair construction
 
-The top-500 construction ranking contained 318 genes expressed more highly and 182 expressed less highly in High-AS RET fusion-positive PTCs <!-- N-35 -->. One higher-expression gene had zero TPM in at least one construction sample and therefore failed the finite-log2-TPM requirement, leaving 317 higher- and 182 lower-expression genes eligible for pairing. Of their 57,694 cross-direction pairs, 153 met all stability, separation, and reversal criteria <!-- N-35 -->. Across these qualifying pairs, the absolute shift in median within-sample log2-TPM difference ranged from 1.159 to 4.700, and the High-AS reversal rate ranged from 0.53 to 0.87 <!-- N-36 -->. Greedy selection with the gene-reuse and redundancy restrictions produced the final 10-pair panel. The maximum reversal score among dose-zero construction cases was 2; consequently, scores greater than 2 were classified as positive (Table S7) <!-- N-38 -->.
+The top-500 construction ranking contained 318 genes expressed at higher and 182 at lower levels in High-AS RET fusion-positive PTCs <!-- N-35 -->. One higher-expression gene had zero TPM in at least one construction sample and therefore failed the finite-log2-TPM requirement, leaving 317 higher- and 182 lower-expression genes eligible for pairing. Of their 57,694 cross-direction pairs, 153 met all stability, separation, and reversal criteria <!-- N-35 -->. Across these qualifying pairs, the absolute shift in median within-sample log2-TPM difference ranged from 1.159 to 4.700, and the High-AS reversal rate ranged from 0.53 to 0.87 <!-- N-36 -->. Greedy selection with the gene-reuse and redundancy restrictions produced the final 10-pair panel. The maximum reversal score among dose-zero construction cases was 2; consequently, scores greater than 2 were classified as positive (Table S7) <!-- N-38 -->.
 
 
 ### Ancillary REO quality and purity diagnostics
@@ -191,7 +191,7 @@ Five of the 39 shared-tissue signature genes of Ory et al. (2026) tested in each
 
 **Table S4 | Held-out complete-null calibration by contrast and collection.** For each cell, the table reports the number of tested sets, number of pseudo-observations, number and proportion with at least one discovery at q<0.10, descriptive 95% Clopper–Pearson limits, mean number of discoveries, and maximum number in any pseudo-observation.
 
-**Table S5 | Descriptive over-representation annotation of the RET-tumor gene list.** Results are reported separately for genes expressed more highly in High-AS cases, genes expressed less highly in High-AS cases, and their union across Hallmark, C2 canonical pathways, C5 Gene Ontology Biological Process, and the radiation-curated family. Set size, observed and expected overlap, one-sided hypergeometric p-value, and family-by-list Benjamini–Hochberg q-value are included. This table is hypothesis-generating and does not report the subject-label permutation gene-set test.
+**Table S5 | Descriptive over-representation annotation of the RET-tumor gene list.** Results are reported separately for genes expressed at higher levels in High-AS cases, genes expressed at lower levels in High-AS cases, and their union across Hallmark, C2 canonical pathways, C5 Gene Ontology Biological Process, and the radiation-curated family. Set size, observed and expected overlap, one-sided hypergeometric p-value, and family-by-list Benjamini–Hochberg q-value are included. This table is hypothesis-generating and does not report the subject-label permutation gene-set test.
 
 **Table S6 | Concordance of signed gene-level statistics between the RET and BRAF contrasts.** Normal-tissue and tumor-tissue comparisons are shown separately with the paired contrasts, number of shared genes, Spearman correlation, central 95% label-shuffle interval, two-sided shuffle p-value, and number of shuffles.
 
