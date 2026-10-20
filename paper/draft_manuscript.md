@@ -165,7 +165,7 @@ In conclusion, High-AS and dose-zero RET fusion-positive PTCs differed extensive
 
 <!-- 2026-08-21 C2 ポート: 試案キャプションへ更新。表1ブロック(旧・表2ブロック、2026-08-26 に引用順へ番号交換)(キャプション・行・規則)は正本の批准版を維持 — 位置づけ列・パターン規則は不可侵。対訳は廃止(f 保留方針) -->
 
-**Figure 1 | Case flow.** From 440 <!-- N-11 --> REBC-THYR cases to the 63-case <!-- N-08 --> main cohort and 36-case <!-- N-10 --> REO application set, stratified by RET and BRAF driver.
+**Figure 1 | Case flow.** From 440 <!-- N-11 --> REBC-THYR cases to the 63-case <!-- N-08 --> main cohort and 36-case <!-- N-10 --> REO application set, stratified by driver (RET fusion or BRAF V600E).
 
 **Figure 2 | Gene-level evidence by contrast.** Signed Brunner–Munzel effect, defined as 2θ−1, where θ=Pr(X<Y)+0.5Pr(X=Y), against −log10 permutation p. Genes meeting Storey q<0.10 are colored by direction.
 
