@@ -1201,5 +1201,6 @@
 - 2026-10-20(続 106): **Abstract Results 第 2 文「under label permutation」→「in the gene-set analysis, whereas, in descriptive annotation, …」(annotations→categories)**(研究者指摘: label permutation は文脈で理解不能 → 検定と記述的注釈の役割対比だけを示す)。機械計数: Results 65、**Abstract 229(上限超過 29、通読後に調整)**。訳同期。
 - 2026-10-20(続 107): **Abstract Results の REO 文「between those of the extreme bands」→「between the dose-zero and High-AS values」**(研究者の問い: 両極の情報が落ちていないか → 構築群の分離は構築由来なので省くが、向きは定義済みラベルで明示)。±0 語、Abstract 229 のまま(機械計数)。訳同期。
 - 2026-10-20(続 108): **Abstract Conclusions 第 1 文の Results 再述(After driver stratification, … differed extensively in expression)を外し「The primary comparison provides positive evidence for the working hypothesis …」に、第 2 文の provides→offers**(研究者指摘: Results の焼き直し → 先行例の Conclusions は解釈の言明から始まる)。機械計数: Conclusions 43、**Abstract 219(上限超過 19、通読後に調整)**。訳同期。
+- 2026-10-20(続 109): **Abstract Methods 第 4 文「Inference used …」→「These comparisons used …」**(研究者の問い: 道具が Background の検討のためと自明か → 抽象主語を前文の比較群で受ける)。±0 語、Abstract 219 のまま(機械計数)。訳同期。
   最終承認・表 1〜3 の個別ファイル化(投稿時)・公開リポジトリと DOI(Data/Code availability 記入)・
   フェーズ6 再構築確認・投稿システム側の入力(キーワード・推薦査読者があれば)
