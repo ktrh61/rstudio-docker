@@ -603,7 +603,7 @@
     Background・Discussion と重複する事前規定・推定対象・REO の読みの制限 約 300 語)。
   - **進行(2026-10-14)**: 作業ブランチ rewrite/manuscript-20261012(rebuild/r453 から。origin へ随時 push)。Methods 再構成・
     Background 加筆と漏斗型再構成・Discussion 再構成・表記・所属・文調整理を内容単位でコミット(訳は各コミットで同期済み、約 37 本)。
-    語数(投稿版 docx 実測 2026-10-20、docx 20261020_1112、小見出し除く)= Background 751/Methods 1,494/Results 1,119/Discussion 1,585、本文 4,949(余裕 51)。見出し込み(2026-09-02 確定の Word 計数範囲)= 5,017(超過 17、編集部返答 09-04 の裁量幅内)。Abstract 200(続 73 で +1、余裕 0)、引用 42。
+    語数(投稿版 docx 実測 2026-10-20、docx 20261020_1112、小見出し除く)= Background 751/Methods 1,494/Results 1,119/Discussion 1,585、本文 4,949(余裕 51)。見出し込み(2026-09-02 確定の Word 計数範囲)= 5,017(超過 17、編集部返答 09-04 の裁量幅内)。Abstract 199(続 73 で +1、続 90 で −1、余裕 1)、引用 42。
     2026-10-15〜16: Background を研究者通読に沿って全面整理(約 25 単位、台帳メモ 続 10〜31)、事前規定の按分を BJC 前例に合わせた(暫定)。
     残 = 研究者の通読(Results・Discussion 中心)→ squash で rebuild/r453 へ(Go)→ v2 共有(別途 Go)→ STROBE 頁行(d)・カバーレター日付/DOI。(c)(b)・prespecified は 2026-10-13 に裁定済み。
   - 先行例(PMC の JATS XML、図表・文献除外): 同分野 BJC 4 報の Methods = Detours 2005 1,500/4,252、
@@ -1179,7 +1179,7 @@
 - 2026-10-20(続 87): **Supp Results「18 of 20 source-list-by-contrast cells」→「18 of the 20 cells formed by the five lists and the four contrasts」**(研究者の問い: ハイフン急増か → 段落密度 10.5/100 語は Supp Results 平均 10.6 と同じで固定名由来。唯一の 3 連ハイフン句を本文と同形に)。+6 語。補足訳同期。
 - 2026-10-20(続 88): **外部リスト段落の動詞を Methods の定義語に統一**(研究者依頼の動詞走査): occurred in → were/was present in(Supp Results 9・本文 Results 5。Supp Methods「present in its q<0.10 list」と同形、Europe PMC でも present が多数)/resolved to → mapped to(Supp 2、Methods「We mapped published symbols」)/裸の "RET-tumor" 2 箇所を "the RET-tumor list" に/遺伝子名のエムダッシュ挿入 2 箇所を括弧に(他文のコロン列挙と整合)。N-86 タグは括弧直後へ。±0〜+2 語。訳: 出現→含まれ、解決→対応。
 - 2026-10-20(続 89): **全文の動詞走査(研究者依頼、本文 7,656 語・SI 6,573 語の動詞形を機械抽出し文脈確認)→ 3 件修正**: Abstract "We asked whether"→"We examined whether"(10-15 の規則の残存、±0 語で Abstract 200 維持)/"gave"→"yielded"(本文 Results 2・Supp 4、Europe PMC で yielded が 6〜7 倍)/Discussion "ran opposite to"→"was opposite in direction to"(続 62 の自作文、40 件 対 6,601 件、+2 語)。Supp Methods のコード操作動詞(queried・parsed・stored 等)と comprised 10 件は適切と判定。訳は Abstract のみ同期(与える=yield は不変)。
-- 2026-10-20(続 90): **Abstract「over-representation analysis highlighted … among genes expressed at lower levels」→「genes expressed at lower levels … were over-represented in cell-cycle and DNA-repair annotations」(Results と同じ動詞、±0 語で 200 維持)/Supp Methods「typed a column as numeric」→「treated a column as numeric」**(続 89 の任意 2 件、研究者 Go)。訳同期。
+- 2026-10-20(続 90): **Abstract「over-representation analysis highlighted … among genes expressed at lower levels」→「genes expressed at lower levels … were over-represented in cell-cycle and DNA-repair annotations」(Results と同じ動詞、−1 語 → Abstract 199、余裕 1)/Supp Methods「typed a column as numeric」→「treated a column as numeric」**(続 89 の任意 2 件、研究者 Go)。訳同期。
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
   600 dpi TIFF)/別ファイル CSV 3 件+50 語要約/カバーレター案。残 = Acknowledgements・共著者レビューと
