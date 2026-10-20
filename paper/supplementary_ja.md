@@ -15,7 +15,7 @@
 
 国立がん研究所(NCI)Genomic Data Commons(GDC)の API(Heath et al. 2021)に対し、GDC Data Release 45.0 の下でプロジェクト REBC-THYR のオープンアクセスファイルを、データカテゴリ Transcriptome Profiling、実験戦略 RNA-Seq、データタイプ Gene Expression Quantification、ワークフロータイプ STAR - Counts を指定して照会した。この照会により 906 のリリース済みファイルが得られた。付随するマニフェストはファイルの UUID・名称・サイズ・GDC 提供の MD5 チェックサムを含み(マニフェスト MD5、7defb0c5574453474c67dfac8367a589)、ダウンロードした全ファイルを記録されたチェックサムと照合検証した。
 
-臨床データの出典は Morton et al. (2021) の Data S1 であり、全列を保持し値を一切編集せずに読み込んだ。欠測マーカーは NA へ変換し、非欠測値のすべてが数値として解釈できた場合に限り列を数値型とした。
+臨床データの出典は Morton et al. (2021) の Data S1 であり、全列を保持し値を一切編集せずに読み込んだ。欠測マーカーは NA へ変換し、非欠測値のすべてが数値として解釈できた場合に限り列を数値として扱った。
 
 GDC API を通じ GenomicDataCommons(Morgan and Davis 2025)を用いてファイルを症例・生体試料に対応付け、SummarizedExperiment コンテナ(Morgan et al. 2025)に検体ごとのカウントアッセイを 1 つずつ組み上げた。全ゼロ遺伝子の除去により 58,448 遺伝子 × 906 検体を得た。エクソン結合遺伝子長は、GDC の GENCODE v36 参照アノテーション(Mudge et al. 2025)から rtracklayer(Lawrence et al. 2009)を用いて導出した。
 
