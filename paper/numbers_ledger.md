@@ -1246,5 +1246,6 @@
 - 2026-10-20(続 151): **Supp Methods AS 節「AS values were available for every exposed case in the two analysis strata」→「We calculated AS for every exposed case in the two analysis strata」**(研究者指摘: 成り行きの含み → 算出範囲は著者の決定で、本文の「we did not calculate AS for it」と対にする)。±0 語、N タグ不変。補足訳同期。
 - 2026-10-20(続 152): **Supp Methods QC 節「PC-OD was a QC and cohort-definition step, not a gene-level hypothesis test, and …」の「not a gene-level hypothesis test」を削除**(研究者の問い → 肯定形の段階の位置づけで足りる "A, not B" 句)。−5 語。補足訳同期。
 - 2026-10-20(続 153): **Supp Methods QC 節: 「Thus, it did not alter the primary RET fusion-positive cohort.」を削除(自明な帰結の言い直し)、「PC-OD preceded purity estimation so that …」を純度段落の冒頭へ移動し「Purity estimation followed PC-OD so that an anomalous sample could not affect the purity fit.」に**(研究者指摘: 唐突 → 順序の文は純度推定の導入として位置で担わせる)。−9 語、N タグなし。補足訳同期。
+- 2026-10-20(続 154): **Supp Methods 純度段落「Protein-coding, filterByExpr-reduced paired counts were MUREN-normalized」→「Paired counts of protein-coding genes retained by filterByExpr were MUREN-normalized」**(研究者の問い: ハイフン複合語の妥当性 → matched-pair・pseudo-likelihood・protein-coding・MUREN-normalized は標準、filterByExpr-reduced は関数名の造語かつ 3 連修飾のため名詞後置に)。±0 語。補足訳同期。
   最終承認・表 1〜3 の個別ファイル化(投稿時)・公開リポジトリと DOI(Data/Code availability 記入)・
   フェーズ6 再構築確認・投稿システム側の入力(キーワード・推薦査読者があれば)
