@@ -603,7 +603,7 @@
     Background・Discussion と重複する事前規定・推定対象・REO の読みの制限 約 300 語)。
   - **進行(2026-10-14)**: 作業ブランチ rewrite/manuscript-20261012(rebuild/r453 から。origin へ随時 push)。Methods 再構成・
     Background 加筆と漏斗型再構成・Discussion 再構成・表記・所属・文調整理を内容単位でコミット(訳は各コミットで同期済み、約 37 本)。
-    語数(投稿版 docx 実測 2026-10-20、docx 20261020_1112、小見出し除く)= Background 751/Methods 1,494/Results 1,119/Discussion 1,585、本文 4,949(余裕 51)。見出し込み(2026-09-02 確定の Word 計数範囲)= 5,017(超過 17、編集部返答 09-04 の裁量幅内)。Abstract 203(続 91、上限超過 3 — Background 継続修正中に調整)、引用 42。
+    語数(投稿版 docx 実測 2026-10-20、docx 20261020_1112、小見出し除く)= Background 751/Methods 1,494/Results 1,119/Discussion 1,585、本文 4,949(余裕 51)。見出し込み(2026-09-02 確定の Word 計数範囲)= 5,017(超過 17、編集部返答 09-04 の裁量幅内)。Abstract 205(続 92、上限超過 5 — Background 継続修正中に調整)、引用 42。
     2026-10-15〜16: Background を研究者通読に沿って全面整理(約 25 単位、台帳メモ 続 10〜31)、事前規定の按分を BJC 前例に合わせた(暫定)。
     残 = 研究者の通読(Results・Discussion 中心)→ squash で rebuild/r453 へ(Go)→ v2 共有(別途 Go)→ STROBE 頁行(d)・カバーレター日付/DOI。(c)(b)・prespecified は 2026-10-13 に裁定済み。
   - 先行例(PMC の JATS XML、図表・文献除外): 同分野 BJC 4 報の Methods = Detours 2005 1,500/4,252、
@@ -1183,6 +1183,7 @@
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
 - 2026-10-20(続 91): **Abstract Background を再構成(暫定、継続修正あり)**: 旧「Radiation dose is associated with fusion rather than point-mutation drivers …, while driver composition structures expression. We examined … within driver-defined strata.」→「Although fusion drivers become more frequent with dose in post-Chornobyl PTC, no consistent exposure-associated expression difference has emerged. Because driver confounds expression, we examined … within driver strata.」(研究者: 本文 Background との飛躍。先行例 10 報の Background は中央値 38 語・19%、既知→未解決→目的の 1〜2 文型。Chornobyl は題名になく Abstract 唯一の言及のため保持。"driver composition structures expression" の向きのずれを解消)。併せて頻度の語を "frequent" に統一(Abstract 1+Background 4、同段落の frequent 2 回と揃える)。Background 39→43 語、**Abstract 203(上限超過 3、後で調整。提示時の 41 語は計数誤り)**。訳同期(Background 訳は元から「多くなる」で不変)。
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
+- 2026-10-20(続 92): **Abstract Background 第 1 文の主節を動詞中心に**: 「no consistent exposure-associated expression difference has emerged」→「expression has not been shown to differ consistently with exposure」(研究者提案: 名詞化を避け expression を主語に。証拠の水準は "been shown" で保持し、生物学的主張化を防ぐ)。Background 45 語、**Abstract 205(上限超過 5、継続修正中)**。訳同期。
   600 dpi TIFF)/別ファイル CSV 3 件+50 語要約/カバーレター案。残 = Acknowledgements・共著者レビューと
   最終承認・表 1〜3 の個別ファイル化(投稿時)・公開リポジトリと DOI(Data/Code availability 記入)・
   フェーズ6 再構築確認・投稿システム側の入力(キーワード・推薦査読者があれば)
