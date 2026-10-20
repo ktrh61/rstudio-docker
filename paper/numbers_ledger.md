@@ -603,7 +603,7 @@
     Background・Discussion と重複する事前規定・推定対象・REO の読みの制限 約 300 語)。
   - **進行(2026-10-14)**: 作業ブランチ rewrite/manuscript-20261012(rebuild/r453 から。origin へ随時 push)。Methods 再構成・
     Background 加筆と漏斗型再構成・Discussion 再構成・表記・所属・文調整理を内容単位でコミット(訳は各コミットで同期済み、約 37 本)。
-    語数(投稿版 docx 実測 2026-10-20、docx 20261020_1112、小見出し除く)= Background 751/Methods 1,494/Results 1,119/Discussion 1,585、本文 4,949(余裕 51)。見出し込み(2026-09-02 確定の Word 計数範囲)= 5,017(超過 17、編集部返答 09-04 の裁量幅内)。Abstract 220(続 109、上限超過 20 — 通読後に調整)、引用 42。
+    語数(投稿版 docx 実測 2026-10-20、docx 20261020_1112、小見出し除く)= Background 751/Methods 1,494/Results 1,119/Discussion 1,585、本文 4,949(余裕 51)。見出し込み(2026-09-02 確定の Word 計数範囲)= 5,017(超過 17、編集部返答 09-04 の裁量幅内)。Abstract 217(続 110、上限超過 17 — 通読後に調整)、引用 42。
     2026-10-15〜16: Background を研究者通読に沿って全面整理(約 25 単位、台帳メモ 続 10〜31)、事前規定の按分を BJC 前例に合わせた(暫定)。
     残 = 研究者の通読(Results・Discussion 中心)→ squash で rebuild/r453 へ(Go)→ v2 共有(別途 Go)→ STROBE 頁行(d)・カバーレター日付/DOI。(c)(b)・prespecified は 2026-10-13 に裁定済み。
   - 先行例(PMC の JATS XML、図表・文献除外): 同分野 BJC 4 報の Methods = Detours 2005 1,500/4,252、
@@ -1202,5 +1202,6 @@
 - 2026-10-20(続 107): **Abstract Results の REO 文「between those of the extreme bands」→「between the dose-zero and High-AS values」**(研究者の問い: 両極の情報が落ちていないか → 構築群の分離は構築由来なので省くが、向きは定義済みラベルで明示)。±0 語、Abstract 229 のまま(機械計数)。訳同期。
 - 2026-10-20(続 108): **Abstract Conclusions 第 1 文の Results 再述(After driver stratification, … differed extensively in expression)を外し「The primary comparison provides positive evidence for the working hypothesis …」に、第 2 文の provides→offers**(研究者指摘: Results の焼き直し → 先行例の Conclusions は解釈の言明から始まる)。機械計数: Conclusions 43、**Abstract 219(上限超過 19、通読後に調整)**。訳同期。
 - 2026-10-20(続 109): **Abstract Methods 第 4 文「Inference used …」→「These comparisons used …」**(研究者の問い: 道具が Background の検討のためと自明か → 抽象主語を前文の比較群で受ける)。+1 語(機械計数: Methods 80)、**Abstract 220(上限超過 20、通読後に調整)**。訳同期。
+- 2026-10-20(続 110): **Abstract Conclusions 第 2 文の limitation(Whether this structure is specific to radiation remains undetermined, but …)を外し、展望のみ「The design offers a reproducible framework for testing the biological and cross-driver implications of this association in future cohorts.」に**(研究者の問い → 先行例 10 報の Conclusions に明示的 limitation 文は 0 件、不確かさは助動詞で表す型。主張文言は AS-associated で中立のため断り文なしでも強まらない。Discussion 末尾の展望と同形)。機械計数: Conclusions 40、**Abstract 217(上限超過 17、通読後に調整)**。訳同期。
   最終承認・表 1〜3 の個別ファイル化(投稿時)・公開リポジトリと DOI(Data/Code availability 記入)・
   フェーズ6 再構築確認・投稿システム側の入力(キーワード・推薦査読者があれば)
