@@ -1235,5 +1235,6 @@
 - 2026-10-20(続 140): **本文 Methods の基準 11 項目を Supp Methods に機械適用 → 6 件修正**(研究者 Go): 分詞修飾+受動態の重なり 2 件(ratios used for→for/構築コホートの除外不適用を本文と同じ We 形)、表 S1 の所在表現に given、AI 節 checked→verified、age at exposure の AS calculation→IREP model、Ancillary 節 64 語文のセミコロンを文に分割。著者用語・prespecified・Of N・respectively・文頭副詞は 0。補足訳 2 件同期。
 - 2026-10-20(続 141): **Discussion limitation「Although no tuning was involved」→「Although we did not tune the panel」**(研究者の問い: Results/Discussion で We にすべき受動態は → Results 0、Discussion はこの 1 文のみ。構築後の不調整は著者の決定で、Supp Methods の We 文に対応。譲歩節は唯一の記載箇所のため保持)。±0 語、訳同期。
 - 2026-10-20(続 142): **Fig. 1 凡例「stratified by RET and BRAF driver」→「stratified by driver (RET fusion or BRAF V600E)」**(研究者の問い: stratified は最適か → 本稿の層の動詞として維持、単数 driver に 2 名を冠した目的語を Methods の層名の形に)。+2 語、N タグ不変、図内ラベル不変。訳同期。
+- 2026-10-20(続 143): **Fig. 3 凡例「Dose-zero and High-AS defined the panel; it was applied without refitting to Low-AS and Mid-AS.」→「The panel was constructed from the dose-zero and High-AS groups and applied without refitting to the Low-AS and Mid-AS bands.」**(凡例・脚注の走査で唯一の裸ラベル+擬人化+セミコロン。Methods の語に揃える)。+4 語、N タグ・図内不変。訳同期。
   最終承認・表 1〜3 の個別ファイル化(投稿時)・公開リポジトリと DOI(Data/Code availability 記入)・
   フェーズ6 再構築確認・投稿システム側の入力(キーワード・推薦査読者があれば)
