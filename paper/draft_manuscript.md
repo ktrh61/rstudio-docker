@@ -23,7 +23,7 @@ In RET fusion-positive PTCs, 1,765 of 15,621 genes met Storey q<0.10 <!-- N-16, 
 
 ### Conclusions
 
-The primary comparison provides positive evidence for the working hypothesis that AS-associated expression structure remains detectable within a driver-defined tumor class. Whether this structure is specific to radiation remains undetermined, but the design offers a reproducible framework for testing it in future cohorts.
+The primary comparison provides positive evidence for the working hypothesis that AS-associated expression structure remains detectable within a driver-defined tumor class. The design offers a reproducible framework for testing the biological and cross-driver implications of this association in future cohorts.
 
 ## Background
 
