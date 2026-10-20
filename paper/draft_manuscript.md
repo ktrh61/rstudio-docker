@@ -23,7 +23,7 @@ In RET fusion-positive PTCs, 1,765 of 15,621 genes met Storey q<0.10 <!-- N-16, 
 
 ### Conclusions
 
-After driver stratification, High-AS and dose-zero RET fusion-positive PTCs differed extensively in expression, providing positive evidence for the working hypothesis that AS-associated expression structure remains detectable within a driver-defined tumor class. Whether this structure is specific to radiation remains undetermined, but the design provides a reproducible framework for testing it in future cohorts.
+The primary comparison provides positive evidence for the working hypothesis that AS-associated expression structure remains detectable within a driver-defined tumor class. Whether this structure is specific to radiation remains undetermined, but the design offers a reproducible framework for testing it in future cohorts.
 
 ## Background
 
