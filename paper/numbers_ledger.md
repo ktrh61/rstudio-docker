@@ -1264,5 +1264,6 @@
 - 2026-10-20(続 169): **Supp Methods Complete-null 節から確定較正の結果文「The final assessment … yielded a descriptive pooled rate of 0.064; one cell had a rate of 0.18.」を削除**(研究者の問い: Results 相当か → 開発段階の数値(0.140/0.221/0.44/0.045)は手続き選択の記録で Methods、確定較正の 0.064/0.18 は Results で本文・Supp Results に既報)。N-24/N-25 のタグは本文 Results・Supp Results に残存。−23 語。補足訳同期。
 - 2026-10-20(続 170): **Supp Methods Concordance 節「A correlation outside the reference interval does not distinguish exposure-associated structure from a covariate shared across strata.」→「… indicates structure shared across strata, whether exposure-associated or due to a covariate shared by both strata.」**(研究者の問い: 定義か穴埋めか → 棄却側の読み方の定義。否定形を肯定形に)。±0 語。補足訳同期。
 - 2026-10-20(続 171): **Supp Methods REO 節「We did not change the panel or its classification rule after construction.」を削除**(研究者裁定: 後続文の「applied … unchanged」「without refitting」が肯定形で同内容を担う否定の穴埋め)。−12 語。補足訳同期。
+- 2026-10-20(続 172): **Supp Methods REO 節: 「Demonstrating this separation was a prerequisite …, but it was not an unbiased estimate of classification performance because …」を削除(根拠は前段落の操作で既出、解釈は Discussion limitation が担う)、「… and treated the resulting classifications as descriptive application results」を削除(造語的な地位ラベル)**(研究者 Go)。−42 語。補足訳同期。
   最終承認・表 1〜3 の個別ファイル化(投稿時)・公開リポジトリと DOI(Data/Code availability 記入)・
   フェーズ6 再構築確認・投稿システム側の入力(キーワード・推薦査読者があれば)
