@@ -70,7 +70,6 @@ Higher Criticism was the primary omnibus statistic, with the RET-tumor contrast 
 
 Exhaustive recomputation of the genome-wide omnibus profiles over every label allocation was not computationally practical. For each contrast, 9,999 label shuffles were therefore generated and stored using seed 19860426 <!-- N-04, N-05 -->. Shuffling broke the association between group labels and expression while retaining each sample's joint expression profile and hence the dependence among genes. These shuffles provided the null distributions for the omnibus statistics and the plug-in π0 estimator and were reused unchanged for gene-set inference.
 
-Because we defined no binary contrast label, we report the omnibus p-values, per-gene q-values, and rejection curves as continuous evidence. We do not use “support” or “no support” wording to imply an undeclared cutoff.
 
 ### Gene-set inference
 
