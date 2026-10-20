@@ -19,7 +19,7 @@ In the REBC-THYR cohort, cases were stratified by driver, and the highest band o
 
 ### Results
 
-In RET fusion-positive PTCs, 1,765 of 15,621 genes met Storey q<0.10 <!-- N-16, N-15 --> (omnibus p=0.0112 <!-- N-20 -->), whereas the secondary comparisons yielded at most one gene. No gene set met q<0.10 in the gene-set analysis, whereas, in descriptive annotation, genes expressed at lower levels in High-AS cases were over-represented in cell-cycle and DNA-repair categories. REO scores in the intermediate bands lay between the dose-zero and High-AS values <!-- N-41 -->.
+In the primary comparison, 1,765 of 15,621 genes met Storey q<0.10 <!-- N-16, N-15 --> (omnibus p=0.0112 <!-- N-20 -->), whereas the secondary comparisons yielded at most one gene. No gene set met q<0.10, whereas, in descriptive annotation, genes expressed at lower levels in High-AS cases were over-represented in cell-cycle and DNA-repair categories. REO scores in the intermediate bands lay between the dose-zero and High-AS values <!-- N-41 -->.
 
 ### Conclusions
 
