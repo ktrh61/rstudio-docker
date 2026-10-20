@@ -603,7 +603,7 @@
     Background・Discussion と重複する事前規定・推定対象・REO の読みの制限 約 300 語)。
   - **進行(2026-10-14)**: 作業ブランチ rewrite/manuscript-20261012(rebuild/r453 から。origin へ随時 push)。Methods 再構成・
     Background 加筆と漏斗型再構成・Discussion 再構成・表記・所属・文調整理を内容単位でコミット(訳は各コミットで同期済み、約 37 本)。
-    語数(投稿版 docx 実測 2026-10-20 深夜、pandoc plain 経由、小見出し除く)= Background 749/Methods 1,508/Results 992/Discussion 1,596、本文 4,845(余裕 155)。見出し込み(2026-09-02 確定の Word 計数範囲)= 5,017(超過 17、編集部返答 09-04 の裁量幅内)。Abstract 197(続 116、余裕 3)、引用 42。
+    語数(投稿版 docx 実測 2026-10-20 深夜、pandoc plain 経由、小見出し除く)= Background 749/Methods 1,508/Results 992/Discussion 1,596、本文 4,845(余裕 155)。見出し込み(2026-09-02 確定の Word 計数範囲)= 5,017(超過 17、編集部返答 09-04 の裁量幅内)。Abstract 198(続 134、余裕 2)、引用 42。
     2026-10-15〜16: Background を研究者通読に沿って全面整理(約 25 単位、台帳メモ 続 10〜31)、事前規定の按分を BJC 前例に合わせた(暫定)。
     残 = 研究者の通読(Results・Discussion 中心)→ squash で rebuild/r453 へ(Go)→ v2 共有(別途 Go)→ STROBE 頁行(d)・カバーレター日付/DOI。(c)(b)・prespecified は 2026-10-13 に裁定済み。
   - 先行例(PMC の JATS XML、図表・文献除外): 同分野 BJC 4 報の Methods = Detours 2005 1,500/4,252、
@@ -1226,5 +1226,6 @@
 - 2026-10-20(続 131): **凍結宣言文 2 箇所の表現改善(意味不変)**(研究者裁定: 凍結は意味の凍結で一言一句ではない): Methods「Table 1 records the interpretation map assigned before …」→「The interpretation assigned to each outcome pattern (Table 1) was fixed before the finalized analysis produced the results reported here.」(records は稀(903 件)、map は著者用語、Background の参照文との重複を解消)/Discussion「drawn from the map in Table 1」→「drawn from Table 1」、「go beyond the map」→「beyond those in Table 1」。正準句は不変。±0 語前後、訳同期。
 - 2026-10-20(続 132): **Table 1 凡例・脚注の「the map」2 箇所→「the table」**(続 131 の残り。投稿物中の map は 0。行 329 の起草メモは投稿外)。−1 語、訳同期。
 - 2026-10-20(続 133): **Methods Covariates「age at exposure entered the AS calculation as a radiation-risk modifier」→「entered the IREP model as …」**(研究者の問い: entered は適切か → 動詞は定型(entered the model as 5,125 件)、目的語 calculation が稀(79 件)。前文の IREP thyroid model に揃える)。±0 語、訳同期。
+- 2026-10-20(続 134): **Abstract Results「(omnibus p=0.0112)」→「(Higher Criticism p=0.0112)」**(研究者の問い: HC はセット推論と繋がるか → 繋がらない。対比水準のオムニバス検定で、Abstract Methods の「summarized per comparison by Higher Criticism」の受けを同じ語にする)。+1 語、**Abstract 198(余裕 2)**。訳同期。
   最終承認・表 1〜3 の個別ファイル化(投稿時)・公開リポジトリと DOI(Data/Code availability 記入)・
   フェーズ6 再構築確認・投稿システム側の入力(キーワード・推薦査読者があれば)
