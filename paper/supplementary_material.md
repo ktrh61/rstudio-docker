@@ -10,7 +10,7 @@
 
 The National Cancer Institute (NCI) Genomic Data Commons (GDC) API (Heath et al. 2021) was queried for open-access files in project REBC-THYR under GDC Data Release 45.0 <!-- N-92 -->, using data category Transcriptome Profiling, experimental strategy RNA-Seq, data type Gene Expression Quantification, and workflow type STAR - Counts. The query returned 906 released files <!-- N-89 -->. The accompanying manifest contained the file UUIDs, names, sizes, and GDC-provided MD5 checksums (manifest MD5, 7defb0c5574453474c67dfac8367a589) <!-- N-89 -->; every downloaded file was verified against its recorded checksum.
 
-Clinical data came from Data S1 of Morton et al. (2021), which we read with all columns retained and without editing any values. We converted missing markers to NA and treated a column as numeric only when every non-missing value parsed as numeric.
+Clinical data came from Data S1 of Morton et al. (2021), which we read with all columns retained and without editing any values. Missing markers were converted to NA, and a column was treated as numeric only when every non-missing value parsed as numeric.
 
 Files were mapped to cases and biospecimens through the GDC API using GenomicDataCommons (Morgan and Davis 2025), and one count assay per sample was assembled in a SummarizedExperiment container (Morgan et al. 2025). Removing all-zero genes yielded 58,448 genes and 906 samples <!-- N-14 -->. Exon-union gene lengths were derived from the GDC GENCODE v36 reference annotation (Mudge et al. 2025) using rtracklayer (Lawrence et al. 2009) <!-- N-66 -->.
 
