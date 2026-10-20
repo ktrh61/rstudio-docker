@@ -1221,5 +1221,6 @@
 - 2026-10-20(続 126): **Methods の AS 用途制限文を We 形に「We used AS only to order exposed cases and to define the bands, and we derived no case-level causal assignment from it.」**(研究者の問い → only と因果帰属の不導出は著者の決定で、残した We 文と同種。セミコロン連結も解消)。±0 語、訳不変。
 - 2026-10-20(続 127): **Methods の決定文 4 件を We 形に**(研究者依頼の走査: 受動態 11 文中、決定 = 適用セットへの除外不適用(42 語文も分割)・対比横断調整なし・分類規則の無変更適用(朝の受動態化を戻す)・診断を除外に不使用。他 7 文は定義・手順で維持。凍結 4 文は非該当)。+1 語、N・C タグ不変、訳は無人称のため不変。
 - 2026-10-20(続 128): **Methods の ETV6::NTRK3 文を We 形・理由つきに「Because the ETV6::NTRK3 stratum had only seven dose-zero cases (with 25 exposed cases), we did not calculate AS for it and did not analyze it.」**(研究者訂正: AS の不在は算出しなかっただけで構造的不可能ではない → 標本サイズによる著者の決定。N-103 の注記に理由を追記)。+8 語、訳同期。
+- 2026-10-20(続 129): **Methods の主コホート定義文「belonged to the dose-zero or High-AS group」→「were in the dose-zero or High-AS group」**(研究者の問い: comprised と belonged は最適か → comprised は網羅的定義に適合し維持、belonged to は擬人化で稀(905 件)のため平易な were in に)。−1 語、訳不変。
   最終承認・表 1〜3 の個別ファイル化(投稿時)・公開リポジトリと DOI(Data/Code availability 記入)・
   フェーズ6 再構築確認・投稿システム側の入力(キーワード・推薦査読者があれば)
