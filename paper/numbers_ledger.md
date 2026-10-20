@@ -1225,5 +1225,6 @@
 - 2026-10-20(続 130): **Results の REO 文「θ=0.616 (X, Low-AS; Y, Mid-AS)」→「θ=0.616 (Mid-AS relative to Low-AS)」**(研究者の問い: 性染色体の X/Y と紛れないか → 定義式の X・Y は Brunner & Munzel 2000 の原記法のため Methods・Table 2 脚注・Fig. 2・Supp は維持、散文中で裸の文字が出る 1 箇所のみ語に)。−1 語、訳同期。
 - 2026-10-20(続 131): **凍結宣言文 2 箇所の表現改善(意味不変)**(研究者裁定: 凍結は意味の凍結で一言一句ではない): Methods「Table 1 records the interpretation map assigned before …」→「The interpretation assigned to each outcome pattern (Table 1) was fixed before the finalized analysis produced the results reported here.」(records は稀(903 件)、map は著者用語、Background の参照文との重複を解消)/Discussion「drawn from the map in Table 1」→「drawn from Table 1」、「go beyond the map」→「beyond those in Table 1」。正準句は不変。±0 語前後、訳同期。
 - 2026-10-20(続 132): **Table 1 凡例・脚注の「the map」2 箇所→「the table」**(続 131 の残り。投稿物中の map は 0。行 329 の起草メモは投稿外)。−1 語、訳同期。
+- 2026-10-20(続 133): **Methods Covariates「age at exposure entered the AS calculation as a radiation-risk modifier」→「entered the IREP model as …」**(研究者の問い: entered は適切か → 動詞は定型(entered the model as 5,125 件)、目的語 calculation が稀(79 件)。前文の IREP thyroid model に揃える)。±0 語、訳同期。
   最終承認・表 1〜3 の個別ファイル化(投稿時)・公開リポジトリと DOI(Data/Code availability 記入)・
   フェーズ6 再構築確認・投稿システム側の入力(キーワード・推薦査読者があれば)
