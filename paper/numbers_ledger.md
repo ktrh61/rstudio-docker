@@ -603,7 +603,7 @@
     Background・Discussion と重複する事前規定・推定対象・REO の読みの制限 約 300 語)。
   - **進行(2026-10-14)**: 作業ブランチ rewrite/manuscript-20261012(rebuild/r453 から。origin へ随時 push)。Methods 再構成・
     Background 加筆と漏斗型再構成・Discussion 再構成・表記・所属・文調整理を内容単位でコミット(訳は各コミットで同期済み、約 37 本)。
-    語数(投稿版 docx 実測 2026-10-20、docx 20261020_1112、小見出し除く)= Background 751/Methods 1,494/Results 1,119/Discussion 1,585、本文 4,949(余裕 51)。見出し込み(2026-09-02 確定の Word 計数範囲)= 5,017(超過 17、編集部返答 09-04 の裁量幅内)。Abstract 212(続 100、上限超過 12 — 通読後に調整)、引用 42。
+    語数(投稿版 docx 実測 2026-10-20、docx 20261020_1112、小見出し除く)= Background 751/Methods 1,494/Results 1,119/Discussion 1,585、本文 4,949(余裕 51)。見出し込み(2026-09-02 確定の Word 計数範囲)= 5,017(超過 17、編集部返答 09-04 の裁量幅内)。Abstract 205(続 101、上限超過 5 — 通読後に調整)、引用 42。
     2026-10-15〜16: Background を研究者通読に沿って全面整理(約 25 単位、台帳メモ 続 10〜31)、事前規定の按分を BJC 前例に合わせた(暫定)。
     残 = 研究者の通読(Results・Discussion 中心)→ squash で rebuild/r453 へ(Go)→ v2 共有(別途 Go)→ STROBE 頁行(d)・カバーレター日付/DOI。(c)(b)・prespecified は 2026-10-13 に裁定済み。
   - 先行例(PMC の JATS XML、図表・文献除外): 同分野 BJC 4 報の Methods = Detours 2005 1,500/4,252、
@@ -1193,5 +1193,6 @@
 - 2026-10-20(続 98): **Abstract Background 第 2 文「whether exposure was associated with expression」→「this association」**(研究者指摘: exposure の重複 → 第 1 文の関連を名詞で受ける)。機械計数: Background 40、**Abstract 209(上限超過 9、通読後に調整)**。訳同期。
 - 2026-10-20(続 99): **Abstract Methods 第 1〜2 文を「In the REBC-THYR cohort, cases were stratified by driver and exposed cases banded by the NIH IREP Assigned Share (AS). The highest band (High-AS) was compared with dose-zero cases in tumor and matched normal tissue.」に**(研究者指摘: post-Chornobyl の反復、"analyzed in … tissue" の空疎な動詞 → 組織は比較の文へ)。機械計数: Methods 70、**Abstract 205(上限超過 5、通読後に調整)**。訳同期。
 - 2026-10-20(続 100): **Abstract Methods「The RET fusion-positive tumor comparison was primary.」→「Among these comparisons, the RET fusion-positive tumor comparison was primary and the others secondary.」**(研究者指摘: 唐突・異物感 → 前文の比較群を受けて設計の内訳として読ませ、Results の "other contrasts" の指示先も定義)。機械計数: Methods 77、**Abstract 212(上限超過 12、通読後に調整)**。訳同期。
+- 2026-10-20(続 101): **RET 主要の期待と指定を Methods の 1 文に統合**(研究者 Go: 因果を一直線に): Background 第 2 文 = 「We therefore examined this association within driver strata.」/Methods 第 3 文 = 「The RET fusion-positive tumor comparison was primary because radiation-related tumor initiation was expected in that stratum.」(本文 Background と同構造)。機械計数: Background 31/Methods 79/Results 63/Conclusions 31、**Abstract 205(上限超過 5、通読後に調整)**。訳同期。
   最終承認・表 1〜3 の個別ファイル化(投稿時)・公開リポジトリと DOI(Data/Code availability 記入)・
   フェーズ6 再構築確認・投稿システム側の入力(キーワード・推薦査読者があれば)
