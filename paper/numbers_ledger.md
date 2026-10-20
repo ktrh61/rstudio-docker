@@ -1169,6 +1169,7 @@
 - 2026-10-20(続 78): **Supp Results 性染色体節「tested in the contrast」→「tested in the RET-tumor contrast」**(研究者の問い: contrast は適切か → 用語は正しいが前文に contrast の語がなく指示が弱い。対比名を明記)。+1 語、N タグ不変。補足訳同期。
 - 2026-10-20(続 79): **Supp Results REO 構築「Of their 57,694 cross-direction pairs, 153 met all stability, separation, and reversal criteria」→「Of the 57,694 pairs that combined one higher-expression gene with one lower-expression gene, 153 met all three selection rules」**(研究者の問い → 57,694=317×182 は正しいが cross-direction と 3 規則名は未定義の内部用語。Methods の selection rules に合わせた)。±0 語、N-35 不変。補足訳同期。
 - 2026-10-20(続 80): **Supp Results「Across these qualifying pairs」→「Across these 153 pairs」**(研究者の問い → Supp Methods は qualified で定義、qualifying は別形。前文の 153 で受ける)。±0 語、N タグ不変。補足訳同期。
+- 2026-10-20(続 81): **Methods の定義語と Results の受け語の食い違い 3 件を Methods 側に統一**(研究者依頼の走査): replicates→pseudo-observations(本文 1・Supp 2)、selection criteria→selection rules(本文 1)、construction cases→construction samples(カットオフ定義の再掲、本文 1・Supp 1。Discussion の症例数の文は据え置き)。代名詞・指示語 25 件は先行詞あり。各 ±0 語、N タグ不変。訳同期(疑似観測・選択規則・構築検体)。
 - 2026-10-20(続 46): **word_check へ書き出し(タグ 20261020_1112、HEAD 8fd5949)と語数実測**: 小見出し除く 4,949(10-19 行比 +131: Background +37・Methods +13・Results −1・Discussion +82)、見出し込み 5,017。Background の差は 10-16 の Background 整理が旧行に未反映だったもの(正本の Background は dabb6b5 から無変更)。本日の増分は Discussion(交絡 5 文化と限界・結論の削減の差し引き)。現況行を更新
 - **提出パッケージ現況(2026-08-29)**: 済 = Word 本文(投稿形・タイトルページ・節順・表整形・添字・図
   300 dpi・横置き判定・References 書式)/Supp docx(同、PDF 化は Word から)/図 5 枚(PDF ベクター+
