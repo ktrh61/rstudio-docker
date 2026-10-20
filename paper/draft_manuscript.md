@@ -11,7 +11,7 @@
 
 ### Background
 
-Although fusion drivers become more frequent with dose in post-Chornobyl papillary thyroid carcinoma (PTC), no consistent exposure-associated expression difference has emerged. Because driver confounds expression, we examined whether expression differed between cases with high estimated radiation attribution and dose-zero cases within driver strata.
+Although fusion drivers become more frequent with dose in post-Chornobyl papillary thyroid carcinoma (PTC), expression has not been shown to differ consistently with exposure. Because driver confounds expression, we examined whether expression differed between cases with high estimated radiation attribution and dose-zero cases within driver strata.
 
 ### Methods
 
