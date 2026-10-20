@@ -1241,5 +1241,6 @@
 - 2026-10-20(続 146): **Supplementary 凡例の宣言形但し書き 3 件**(研究者 Go): Table S5 末尾「This table is hypothesis-generating and does not report …」削除/Fig. S2 末尾「… the intervals do not account for their dependence」削除(Supp Methods に同内容)/Table S8 末尾「obtained through MSigDB, not re-derived …」→「Set definitions are those distributed by MSigDB.」。−40 語、N タグなし。補足訳同期。
 - 2026-10-20(続 147): **Supp Methods Data sources「We converted missing markers to NA and treated a column as numeric only when …」→受動態**(研究者の問い: We の連続 → 前文の無編集読込は完全性の言明で We 維持、型判定は読み込み規約のため受動態)。±0 語、訳不変。
 - 2026-10-20(続 148): **Supp Methods の strandedness 文「… in which case the larger column was used; otherwise the unstranded column was used」→「… The larger column (for stranded libraries) or the unstranded column (otherwise) was taken as the sample's counts.」**(研究者の問い: used は最適か → 用途が文中にない。カウントとして採用、と明示し反復とセミコロンも解消)。±0 語、N タグ不変。補足訳同期。
+- 2026-10-20(続 149): **用途の補語を欠く "used" の走査 → 3 件修正**(研究者 Go): 本文 AS 節「The IREP input route … was used」→「AS was calculated with the IREP input route …」/Supp HC「assumptions … were not used」→「were not required」/Supp REO「… were used」→「were used instead」。否定の不使用宣言 3 件は維持。+2 語。訳同期。AS の出力選択(期待 ERR に対応する AS)は Supp Methods 第 1 文と本文 Methods に既記載で、不採用側の分位点 AS は書かない(研究者確認)。
   最終承認・表 1〜3 の個別ファイル化(投稿時)・公開リポジトリと DOI(Data/Code availability 記入)・
   フェーズ6 再構築確認・投稿システム側の入力(キーワード・推薦査読者があれば)
