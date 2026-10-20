@@ -1218,5 +1218,6 @@
 - 2026-10-20(続 123): **Methods のセット水準手続きの文を 2 文に分割**(続 122 と同型の検索で検出した唯一の残り: 主語の挿入分詞句 selected on … と受動態 was assessed … and checked の重なり)。「The set-level procedure was selected … . Its operating characteristics were assessed … and checked …」。+2 語、N-06/N-30 不変。訳同期。
 - 2026-10-20(続 124): **Methods の Supplementary 参照文 3 件「are in Supplementary Methods」→「are described in」(手続き)/「are given in」(規約・設定値)**(研究者の問い: 独立文か括弧書きか → BJC 73 報で独立文 35・括弧 34 と同等、形は維持。動詞なしの所在表現だけが非標準)。+3 語、訳不変。
 - 2026-10-20(続 125): **Methods の band/group 定義文「Throughout, band denotes …」→「Throughout this paper, band denotes …」**(研究者の問い → denotes は標準(567,808 件)で維持、裸の Throughout は BJC 73 報で 0 のため範囲を補う)。+2 語。
+- 2026-10-20(続 126): **Methods の AS 用途制限文を We 形に「We used AS only to order exposed cases and to define the bands, and we derived no case-level causal assignment from it.」**(研究者の問い → only と因果帰属の不導出は著者の決定で、残した We 文と同種。セミコロン連結も解消)。±0 語、訳不変。
   最終承認・表 1〜3 の個別ファイル化(投稿時)・公開リポジトリと DOI(Data/Code availability 記入)・
   フェーズ6 再構築確認・投稿システム側の入力(キーワード・推薦査読者があれば)
