@@ -68,7 +68,7 @@ p <- ggplot(df, aes(x = A, y = M)) +
   geom_hline(yintercept = 0, colour = "grey85") +
   geom_point(aes(colour = sig), size = 0.6, alpha = 0.6) +
   ggrepel::geom_text_repel(data = lab, aes(label = gene), size = label_size(),
-    family = FONT_FAMILY, segment.size = 0.2,
+    family = FONT_FAMILY, fontface = "italic", segment.size = 0.2,
     max.overlaps = 20, min.segment.length = 0, colour = "grey20", seed = 1L) +
   scale_colour_manual(values = pal, name = NULL, drop = FALSE) +
   facet_wrap(~unit, ncol = 2) +
