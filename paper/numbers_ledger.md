@@ -603,7 +603,7 @@
     Background・Discussion と重複する事前規定・推定対象・REO の読みの制限 約 300 語)。
   - **進行(2026-10-14)**: 作業ブランチ rewrite/manuscript-20261012(rebuild/r453 から。origin へ随時 push)。Methods 再構成・
     Background 加筆と漏斗型再構成・Discussion 再構成・表記・所属・文調整理を内容単位でコミット(訳は各コミットで同期済み、約 37 本)。
-    語数(投稿版 docx 実測 2026-10-20 深夜、pandoc plain 経由、小見出し除く)= Background 749/Methods 1,539/Results 992/Discussion 1,593、本文 4,873(余裕 127)(続 138 時点)。見出し込み(2026-09-02 確定の Word 計数範囲)= 5,017(超過 17、編集部返答 09-04 の裁量幅内)。Abstract 198(続 134、余裕 2)、引用 42。
+    語数(投稿版 docx 実測 2026-10-21 校正クローズ時、pandoc markdown 経由で Heading2 単位、小見出し除く)= Background 752/Methods 1,531/Results 985/Discussion 1,673、本文 4,941(余裕 59)(続 192 時点)。見出し込み(2026-09-02 確定の Word 計数範囲)= 5,009(超過 9、編集部返答 09-04 の裁量幅内)。Abstract 199(小見出し 4 語込み、余裕 1)、引用 42。
     2026-10-15〜16: Background を研究者通読に沿って全面整理(約 25 単位、台帳メモ 続 10〜31)、事前規定の按分を BJC 前例に合わせた(暫定)。
     残 = 研究者の通読(Results・Discussion 中心)→ squash で rebuild/r453 へ(Go)→ v2 共有(別途 Go)→ STROBE 頁行(d)・カバーレター日付/DOI。(c)(b)・prespecified は 2026-10-13 に裁定済み。
   - 先行例(PMC の JATS XML、図表・文献除外): 同分野 BJC 4 報の Methods = Detours 2005 1,500/4,252、
@@ -1284,5 +1284,6 @@
 - 2026-10-21(続 189): **Discussion 凍結宣言文「Throughout this section, …」→「Throughout the Discussion, …」**(研究者 Go、最終通読: 訳「本節」が Discussion 節を指すことを英訳とも自明にする。射程の Throughout は保持、意味は凍結どおり、±0 語)。訳「考察の全体を通じて」。make_submission 警告 0、make_docx 10 件 token差 0。
 - 2026-10-21(続 190): **Conclusions 第 1 文に評価を付与**(研究者 Go、最終通読: 旧第 1 文は Results 再掲のみで、第 2 文の additional が受ける主要証拠の評価がなかった): 「…, providing positive evidence for the working hypothesis that AS-associated expression structure remains detectable within a driver-defined tumor class」(Abstract Conclusions・Discussion 冒頭 C-01 と同文言、新解釈ではない)。第 2 文は「consistent with this hypothesis」で受ける。BJC 先行例 11 報の最終段落第 1 文は全て主結果再掲+位置づけ。±0 語相当。訳同期。make_submission 警告 0、make_docx 10 件 token差 0。
 - 2026-10-21(続 191): **Conclusions 第 2・3 文を 1 文に畳み込み**(研究者 Go、最終通読: 留保 2 文連続→nevertheless のぶつ切り感): 「…, all derived from the same RET-tumor contrast, provide further observations consistent with this hypothesis but not independent evidence for it.」非独立性は内容そのものなので保持。−8 語。訳同期。make_submission 警告 0、make_docx 10 件 token差 0。
+- 2026-10-21(続 192): **校正クローズ時の語数実測**(研究者依頼): 投稿版 docx → pandoc markdown → Heading2 単位(小見出し除く)= Background 752/Methods 1,531/Results 985/Discussion 1,673、本文 4,941(余裕 59)。見出し込み 5,009(超過 9、裁量幅内)。Abstract 199(小見出し込み)。続 138 比: Discussion +80(ORA 食い違いの読み・層間一致の具体化・limitation 理由文)、Methods −8、Results −7、Background +3。現況行を更新。
   最終承認・表 1〜3 の個別ファイル化(投稿時)・公開リポジトリと DOI(Data/Code availability 記入)・
   フェーズ6 再構築確認・投稿システム側の入力(キーワード・推薦査読者があれば)
