@@ -124,7 +124,7 @@ TABLE_SPECS = {
                  "age_exposure": "Age at exposure, years, median [range]",
                  "driver_detail": "Designated driver, n"},
         # 表示層のみ(凍結 CSV は不変): HGNC 二重コロン、内部ラベルを本文表記へ(RET-OTHER → other partner、
-        # BRAF.MutV600E → BRAF V600E。後者は gene_markup が *BRAF*^V600E^ にする。研究者 Go 2026-10-20)
+        # BRAF.MutV600E → BRAF V600E。後者は gene_markup が *BRAF* V600E にする。研究者 Go 2026-10-20)
         fmt={"driver_detail": lambda v: v.replace("-RET", "::RET").replace("RET-OTHER", "other partner")
              .replace("BRAF.MutV600E", "BRAF V600E")},
         rows={"R_Sporadic": "R_Sporadic (dose-zero)", "R_Low": "R_Low (Low-AS)",
@@ -309,10 +309,10 @@ def additional_information():
 
 
 def gene_markup(text):
-    """遺伝子記号の表示層書式(本文・SI・表・凡例・書簡・訳で共通): BRAF V600E → *BRAF*^V600E^
-    (上付きは立体 — BJC 2024–26 掲載例の <italic>BRAF</italic><sup>V600E</sup> に一致)、
-    RET/PTC(歴史名、番号なし)→ *RET*/*PTC*(番号つきは GENES の PTC1/PTC3 で処理)、GENES をイタリック。"""
-    text = text.replace("BRAF V600E", "*BRAF*^V600E^")
+    """遺伝子記号の表示層書式(本文・SI・表・凡例・書簡・訳で共通): HGNC/HGVS に従い遺伝子記号は
+    イタリック、変異記述は正体の平文(BRAF V600E → *BRAF* V600E。上付きは用いない — 2026-10-21 研究者決定、
+    BJC 2021–26 の 24 報中 16 報がこの形)、RET/PTC(歴史名、番号なし)→ *RET*/*PTC*(番号つきは GENES の
+    PTC1/PTC3 で処理)、GENES をイタリック。"""
     text = re.sub(r"(?<![\w*])RET/PTC(?![\w*])", "*RET*/*PTC*", text)
     return re.sub(rf"(?<![\w*])({GENES})(?![\w*])", r"*\1*", text)
 
@@ -482,7 +482,7 @@ def letter_preprocess(text, ja=False, pair=None, fmt=True):
 
 def ja_preprocess(text, en_stem, tag, commit, src_label):
     """日本語参考訳の閲覧用整形: 対応する英語版 docx の名前を冒頭に記載し
-    (同一時刻タグで同時生成される対)、遺伝子イタリック・V600E 上付き・添字を
+    (同一時刻タグで同時生成される対)、遺伝子イタリック・添字を
     英語版と同じ規則で適用する。引用 [n] は素のまま(英語版 References 対応)。"""
     text = re.sub(r"^-{3,}\s*$", "", text, flags=re.M)
     pair = (f"**対応版**: 英語版 {en_stem}_{tag}.docx(同時生成の対)。"
@@ -695,7 +695,7 @@ def tokens_md(text):
     text = re.sub(r"```\{=openxml\}.*?```", " ", text, flags=re.S)  # 改ページ(非テキスト)
     text = re.sub(r"!\[[^\]]*\]\([^)]*\)(\{[^}]*\})?", " ", text)  # 画像構文は非テキスト
     text = re.sub(r"(?<!!)\[([^\]]*)\]\((?:https?://)[^)]*\)", r"\1", text)  # ハイパーリンクは表示文字だけ
-    text = re.sub(r"\^([^\^\s]+)\^", r" \1 ", text)  # 上付き(引用番号・V600E・10^−6)
+    text = re.sub(r"\^([^\^\s]+)\^", r" \1 ", text)  # 上付き(引用番号・10^−6)
     text = re.sub(r"~([^~\s]+)~", r" \1 ", text)  # 添字(π0・log2・n_X)
     text = re.sub(r"[#*|`^~]", " ", text)
     return re.findall(r"[A-Za-z0-9]+", text)
