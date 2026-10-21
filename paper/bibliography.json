@@ -2712,6 +2712,430 @@
    "volume": "6",
    "pages": "972-981",
    "formatted": "Zhou, T., Chou, J., Mullen, T.E., Elkon, R., Zhou, Y., Simpson, D.A. et al. Identification of primary transcriptional regulation of cell cycle-regulated genes upon DNA damage. *Cell Cycle* **6**, 972–981 (2007)."
+  },
+  {
+   "biblio": "Brenner AV, Tronko MD, Hatch M, Bogdanova TI, Oliynik VA, Lubin JH, et al. Environ Health Perspect 2011;119:933-939. doi:10.1289/ehp.1002674 (PMID 21406336)",
+   "kind": "article",
+   "pmid": "21406336",
+   "doi": "10.1289/ehp.1002674",
+   "title": "I-131 dose response for incident thyroid cancers in Ukraine related to the Chornobyl accident",
+   "authors": [
+    [
+     "Brenner",
+     "A.V."
+    ],
+    [
+     "Tronko",
+     "M.D."
+    ],
+    [
+     "Hatch",
+     "M."
+    ],
+    [
+     "Bogdanova",
+     "T.I."
+    ],
+    [
+     "Oliynik",
+     "V.A."
+    ],
+    [
+     "Lubin",
+     "J.H."
+    ],
+    [
+     "Zablotska",
+     "L.B."
+    ],
+    [
+     "Tereschenko",
+     "V.P."
+    ],
+    [
+     "McConnell",
+     "R.J."
+    ],
+    [
+     "Zamotaeva",
+     "G.A."
+    ],
+    [
+     "O'Kane",
+     "P."
+    ],
+    [
+     "Bouville",
+     "A.C."
+    ],
+    [
+     "Chaykovskaya",
+     "L.V."
+    ],
+    [
+     "Greenebaum",
+     "E."
+    ],
+    [
+     "Paster",
+     "I.P."
+    ],
+    [
+     "Shpak",
+     "V.M."
+    ],
+    [
+     "Ron",
+     "E."
+    ]
+   ],
+   "journal": "Environ Health Perspect",
+   "year": "2011",
+   "volume": "119",
+   "pages": "933-9",
+   "formatted": "Brenner, A.V., Tronko, M.D., Hatch, M., Bogdanova, T.I., Oliynik, V.A., Lubin, J.H. et al. I-131 dose response for incident thyroid cancers in Ukraine related to the Chornobyl accident. *Environ. Health Perspect.* **119**, 933–939 (2011)."
+  },
+  {
+   "biblio": "Cancer Genome Atlas Research Network. Cell 2014;159:676-690. doi:10.1016/j.cell.2014.09.050 (PMID 25417114)",
+   "kind": "article",
+   "pmid": "25417114",
+   "doi": "10.1016/j.cell.2014.09.050",
+   "title": "Integrated genomic characterization of papillary thyroid carcinoma",
+   "authors": [
+    [
+     "Cancer Genome Atlas Research Network",
+     ""
+    ]
+   ],
+   "journal": "Cell",
+   "year": "2014",
+   "volume": "159",
+   "pages": "676-90",
+   "formatted": "Cancer Genome Atlas Research Network. Integrated genomic characterization of papillary thyroid carcinoma. *Cell* **159**, 676–690 (2014)."
+  },
+  {
+   "biblio": "Ory C, Ugolin N, Levalois C, Lacroix L, Caillou B, Bidart JM, et al. Endocr Relat Cancer 2011;18:193–206. doi:10.1677/ERC-10-0205 (PMID 21148326)",
+   "kind": "article",
+   "pmid": "21148326",
+   "doi": "10.1677/ERC-10-0205",
+   "title": "Gene expression signature discriminates sporadic from post-radiotherapy-induced thyroid tumors",
+   "authors": [
+    [
+     "Ory",
+     "C."
+    ],
+    [
+     "Ugolin",
+     "N."
+    ],
+    [
+     "Levalois",
+     "C."
+    ],
+    [
+     "Lacroix",
+     "L."
+    ],
+    [
+     "Caillou",
+     "B."
+    ],
+    [
+     "Bidart",
+     "J.M."
+    ],
+    [
+     "Schlumberger",
+     "M."
+    ],
+    [
+     "Diallo",
+     "I."
+    ],
+    [
+     "de Vathaire",
+     "F."
+    ],
+    [
+     "Hofman",
+     "P."
+    ],
+    [
+     "Santini",
+     "J."
+    ],
+    [
+     "Malfoy",
+     "B."
+    ],
+    [
+     "Chevillard",
+     "S."
+    ]
+   ],
+   "journal": "Endocr Relat Cancer",
+   "year": "2011",
+   "volume": "18",
+   "pages": "193–206",
+   "formatted": "Ory, C., Ugolin, N., Levalois, C., Lacroix, L., Caillou, B., Bidart, J.M. et al. Gene expression signature discriminates sporadic from post-radiotherapy-induced thyroid tumors. *Endocr. Relat. Cancer* **18**, 193–206 (2011)."
+  },
+  {
+   "biblio": "Hadj-Hamou NS, Ugolin N, Ory C, Britzen-Laurent N, Sastre-Garau X, Chevillard S, et al. Carcinogenesis 2011;32:929–934. doi:10.1093/carcin/bgr064 (PMID 21470956)",
+   "kind": "article",
+   "pmid": "21470956",
+   "doi": "10.1093/carcin/bgr064",
+   "title": "A transcriptome signature distinguished sporadic from postradiotherapy radiation-induced sarcomas",
+   "authors": [
+    [
+     "Hadj-Hamou",
+     "N.S."
+    ],
+    [
+     "Ugolin",
+     "N."
+    ],
+    [
+     "Ory",
+     "C."
+    ],
+    [
+     "Britzen-Laurent",
+     "N."
+    ],
+    [
+     "Sastre-Garau",
+     "X."
+    ],
+    [
+     "Chevillard",
+     "S."
+    ],
+    [
+     "Malfoy",
+     "B."
+    ]
+   ],
+   "journal": "Carcinogenesis",
+   "year": "2011",
+   "volume": "32",
+   "pages": "929–934",
+   "formatted": "Hadj-Hamou, N.S., Ugolin, N., Ory, C., Britzen-Laurent, N., Sastre-Garau, X., Chevillard, S. et al. A transcriptome signature distinguished sporadic from postradiotherapy radiation-induced sarcomas. *Carcinogenesis* **32**, 929–934 (2011)."
+  },
+  {
+   "biblio": "Ory C, Ugolin N, Hofman P, Schlumberger M, Likhtarev IA, Chevillard S. Thyroid 2013;23:1390–1400. doi:10.1089/thy.2012.0318 (PMID 23521174)",
+   "kind": "article",
+   "pmid": "23521174",
+   "doi": "10.1089/thy.2012.0318",
+   "title": "Comparison of transcriptomic signature of post-Chernobyl and postradiotherapy thyroid tumors",
+   "authors": [
+    [
+     "Ory",
+     "C."
+    ],
+    [
+     "Ugolin",
+     "N."
+    ],
+    [
+     "Hofman",
+     "P."
+    ],
+    [
+     "Schlumberger",
+     "M."
+    ],
+    [
+     "Likhtarev",
+     "I.A."
+    ],
+    [
+     "Chevillard",
+     "S."
+    ]
+   ],
+   "journal": "Thyroid",
+   "year": "2013",
+   "volume": "23",
+   "pages": "1390–1400",
+   "formatted": "Ory, C., Ugolin, N., Hofman, P., Schlumberger, M., Likhtarev, I.A. & Chevillard, S. Comparison of transcriptomic signature of post-Chernobyl and postradiotherapy thyroid tumors. *Thyroid* **23**, 1390–1400 (2013)."
+  },
+  {
+   "biblio": "Ugolin N, Ory C, Lefevre E, Benhabiles N, Hofman P, Schlumberger M, et al. PLoS One 2011;6:e23581. doi:10.1371/journal.pone.0023581 (PMID 21853153)",
+   "kind": "article",
+   "pmid": "21853153",
+   "doi": "10.1371/journal.pone.0023581",
+   "title": "Strategy to find molecular signatures in a small series of rare cancers: validation for radiation-induced breast and thyroid tumors",
+   "authors": [
+    [
+     "Ugolin",
+     "N."
+    ],
+    [
+     "Ory",
+     "C."
+    ],
+    [
+     "Lefevre",
+     "E."
+    ],
+    [
+     "Benhabiles",
+     "N."
+    ],
+    [
+     "Hofman",
+     "P."
+    ],
+    [
+     "Schlumberger",
+     "M."
+    ],
+    [
+     "Chevillard",
+     "S."
+    ]
+   ],
+   "journal": "PLoS One",
+   "year": "2011",
+   "volume": "6",
+   "pages": "e23581",
+   "formatted": "Ugolin, N., Ory, C., Lefevre, E., Benhabiles, N., Hofman, P., Schlumberger, M. et al. Strategy to find molecular signatures in a small series of rare cancers: validation for radiation-induced breast and thyroid tumors. *PLoS One* **6**, e23581 (2011)."
+  },
+  {
+   "biblio": "Ricarte-Filho JC, Li S, Garcia-Rendueles ME, Montero-Conde C, Voza F, Knauf JA, et al. J Clin Invest 2013;123:4935-4944. doi:10.1172/JCI69766 (PMID 24135138)",
+   "kind": "article",
+   "pmid": "24135138",
+   "doi": "10.1172/JCI69766",
+   "title": "Identification of kinase fusion oncogenes in post-Chernobyl radiation-induced thyroid cancers",
+   "authors": [
+    [
+     "Ricarte-Filho",
+     "J.C."
+    ],
+    [
+     "Li",
+     "S."
+    ],
+    [
+     "Garcia-Rendueles",
+     "M.E.R."
+    ],
+    [
+     "Montero-Conde",
+     "C."
+    ],
+    [
+     "Voza",
+     "F."
+    ],
+    [
+     "Knauf",
+     "J.A."
+    ],
+    [
+     "Heguy",
+     "A."
+    ],
+    [
+     "Viale",
+     "A."
+    ],
+    [
+     "Bogdanova",
+     "T."
+    ],
+    [
+     "Thomas",
+     "G.A."
+    ],
+    [
+     "Mason",
+     "C.E."
+    ],
+    [
+     "Fagin",
+     "J.A."
+    ]
+   ],
+   "journal": "J Clin Invest",
+   "year": "2013",
+   "volume": "123",
+   "pages": "4935-4944",
+   "formatted": "Ricarte-Filho, J.C., Li, S., Garcia-Rendueles, M.E.R., Montero-Conde, C., Voza, F., Knauf, J.A. et al. Identification of kinase fusion oncogenes in post-Chernobyl radiation-induced thyroid cancers. *J. Clin. Invest.* **123**, 4935–4944 (2013)."
+  },
+  {
+   "biblio": "Leeman-Neill RJ, Kelly LM, Liu P, Brenner AV, Little MP, Bogdanova TI, et al. Cancer 2014;120:799-807. doi:10.1002/cncr.28484 (PMID 24327398)",
+   "kind": "article",
+   "pmid": "24327398",
+   "doi": "10.1002/cncr.28484",
+   "title": "ETV6-NTRK3 is a common chromosomal rearrangement in radiation-associated thyroid cancer",
+   "authors": [
+    [
+     "Leeman-Neill",
+     "R.J."
+    ],
+    [
+     "Kelly",
+     "L.M."
+    ],
+    [
+     "Liu",
+     "P."
+    ],
+    [
+     "Brenner",
+     "A.V."
+    ],
+    [
+     "Little",
+     "M.P."
+    ],
+    [
+     "Bogdanova",
+     "T.I."
+    ],
+    [
+     "Evdokimova",
+     "V.N."
+    ],
+    [
+     "Hatch",
+     "M."
+    ],
+    [
+     "Zurnadzy",
+     "L.Y."
+    ],
+    [
+     "Nikiforova",
+     "M.N."
+    ],
+    [
+     "Yue",
+     "N.J."
+    ],
+    [
+     "Zhang",
+     "M."
+    ],
+    [
+     "Mabuchi",
+     "K."
+    ],
+    [
+     "Tronko",
+     "M.D."
+    ],
+    [
+     "Nikiforov",
+     "Y.E."
+    ]
+   ],
+   "journal": "Cancer",
+   "year": "2014",
+   "volume": "120",
+   "pages": "799-807",
+   "formatted": "Leeman-Neill, R.J., Kelly, L.M., Liu, P., Brenner, A.V., Little, M.P., Bogdanova, T.I. et al. ETV6-NTRK3 is a common chromosomal rearrangement in radiation-associated thyroid cancer. *Cancer* **120**, 799–807 (2014)."
   }
  ]
 }
