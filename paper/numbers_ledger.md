@@ -605,7 +605,7 @@
     Background 加筆と漏斗型再構成・Discussion 再構成・表記・所属・文調整理を内容単位でコミット(訳は各コミットで同期済み、約 37 本)。
     語数(投稿版 docx 実測 2026-10-21 校正クローズ時、pandoc markdown 経由で Heading2 単位、小見出し除く)= Background 752/Methods 1,531/Results 985/Discussion 1,673、本文 4,941(余裕 59)(続 192 時点)。見出し込み(2026-09-02 確定の Word 計数範囲)= 5,009(超過 9、編集部返答 09-04 の裁量幅内)。Abstract 199(小見出し 4 語込み、余裕 1)、引用 42。
     2026-10-15〜16: Background を研究者通読に沿って全面整理(約 25 単位、台帳メモ 続 10〜31)、事前規定の按分を BJC 前例に合わせた(暫定)。
-    残 = 研究者の通読(Results・Discussion 中心)→ squash で rebuild/r453 へ(Go)→ v2 共有(別途 Go)→ STROBE 頁行(d)・カバーレター日付/DOI。(c)(b)・prespecified は 2026-10-13 に裁定済み。
+    2026-10-21: 最終通読完了(続 178〜191)、著者情報・カバーレター更新、V600E 上付き廃止(続 194〜199)、rebuild/r453 へ 4 本に squash(続 200)、共有 v2_bjc_20261021 作成(続 201、タグ coauthor-review-v2 = a49a368)。残 = 共著者 v2 レビュー → STROBE 頁行(d)・カバーレター日付/DOI → 投稿。(c)(b)・prespecified は 2026-10-13 に裁定済み。
   - 先行例(PMC の JATS XML、図表・文献除外): 同分野 BJC 4 報の Methods = Detours 2005 1,500/4,252、
     Detours 2007 728/4,307、Dom 2012 623/3,933、Abend 2013 1,488/4,036(16〜37%)。解析主体 BJC 10 報 = 15〜38%
     (593〜3,028 語)。
@@ -1293,5 +1293,6 @@
 - 2026-10-21(続 198): **所属 1「Department of Molecular Oncology and Diagnostic Medicine」→「Department of Molecular Oncology」**(NM の主張、研究者指示)。原本 submission_declarations.md、カバーレター英(責任著者行)・和(分子腫瘍学分野)を同期、本文・補足の表紙は自動生成で同期。make_submission 警告 0、make_docx 10 件 token差 0。
 - 2026-10-21(続 199): **BRAF V600E の表示を *BRAF*^V600E^ → *BRAF* V600E(遺伝子斜体、変異記述は正体の平文、上付きなし)へ全範囲で切替**(研究者決定。共著者は上付き斜体を所望したが、BJC 2021–26 の本文つき 24 報の実測では *BRAF* V600E が 16 報・上付き正体 3 報・上付き斜体 1 報で、HGVS は変異記述を正体平文とし上付きを用いない。融合の HGNC 二重コロンと同じ根拠で説明する)。make_docx の gene_markup を変更、docx XML で本文 8・補足 6・表 2・書簡・STROBE・和訳の V600E run に superscript なしを確認。残る上付きは補足文献リストの Zurnadzhy 2021 の原題(BRAF^V600E^)のみで、引用題名は原表記を保つため対象外。make_submission 警告 0、make_docx 10 件 token差 0。
 - 2026-10-21(続 200): **rewrite/manuscript-20261012(522 コミット、先頭 f2c19f1)を rebuild/r453 へ種類別 4 本に squash**(研究者 Go): 27df469 外部遺伝子リスト・460(raw/external、scripts/460、diagnostics/curate_external_gene_lists.py、.gitignore)/10f4718 生成スクリプト(make_docx・make_submission・図 1/2/S1 の R)/1cc73fd 原稿類(本文・補足・訳・カバーレター・STROBE・宣言・bibliography)/6c2e180 台帳類(numbers・claim_map・citation・objections)。4 本適用後の木は作業ブランチ先頭と差分 0。詳細履歴は作業ブランチとタグ archive/rewrite-manuscript-v2-2026-10-21 に保持(ブランチは削除しない)。push は別途 Go。
+- 2026-10-21(続 201): **共著者共有 v2 を作成**(研究者 Go): 大学 OneDrive 共有ルート直下 `v2_bjc_20261021/` = タグ coauthor-review-v2(a49a368)・世代 20261021_1443 の投稿形式 13 ファイル(本文・表 1〜3・図 1〜3・補足・STROBE・カバーレターの docx/tif、CSV 3 本は output/tables の 2026-09-08 産物で不変)を `_v2` 名で複製(全件 cmp 一致)+README.txt(v1 構成+「v1 を置き換える」+表記規約 HGNC/HGVS の 2 項を追加)、計 22 MB。v1 フォルダは不変。変更点の説明はメール・追伸で伝える(README には書かない)。タグ push は別途。
   最終承認・表 1〜3 の個別ファイル化(投稿時)・公開リポジトリと DOI(Data/Code availability 記入)・
   フェーズ6 再構築確認・投稿システム側の入力(キーワード・推薦査読者があれば)
