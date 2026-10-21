@@ -109,3 +109,6 @@ _archive/diagnostics/output/
 # Submission-assembly copies retained with the GPT review deliverables.
 !paper/gpt_review/supplementary_files/
 !paper/gpt_review/supplementary_files/**
+
+# publisher supplementary files used only to transcribe raw/external/*.csv (diagnostics/curate_external_gene_lists.py)
+raw/external/source/
