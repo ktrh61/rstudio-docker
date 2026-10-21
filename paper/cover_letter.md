@@ -22,7 +22,7 @@ Beyond thyroid cancer, this driver-conditioned extreme-band framework may be app
 
 The main text from Background to Discussion is approximately 5,000 words including section headings; the mandatory Additional Information section adds approximately 330 words. This manuscript is submitted to the *British Journal of Cancer* only. It reports original research that has not been published previously and has not been posted as a preprint, and it is not under consideration for publication elsewhere. All authors have approved the manuscript and agree to its submission. The authors declare no competing interests and received no specific funding for this work. The analysis used only open-access data from the NCI Genomic Data Commons and the published clinical table of the source study; no new participant data were collected. A completed STROBE checklist for cross-sectional studies is provided as supplementary information. Generative AI tools assisted with code development, consistency checks, and drafting and editing of manuscript text under author supervision, as documented in the Methods.
 
-Corresponding author: Kotaro Harakawa, Department of Molecular Oncology and Diagnostic Medicine, Atomic Bomb Disease Institute, Nagasaki University, 1-12-4 Sakamoto, Nagasaki 852-8523, Japan; e-mail ktrh61@gmail.com; ORCID 0009-0004-1086-8046.
+Corresponding author: Kotaro Harakawa, Department of Molecular Oncology, Atomic Bomb Disease Institute, Nagasaki University, 1-12-4 Sakamoto, Nagasaki 852-8523, Japan; e-mail ktrh61@gmail.com; ORCID 0009-0004-1086-8046.
 
 Yours sincerely,
 

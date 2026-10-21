@@ -23,7 +23,7 @@ British Journal of Cancer
 
 本文(Background から Discussion まで)は節見出しを含めて約 5,000 語で、必須の Additional Information 節が約 330 語加わります。本原稿は *British Journal of Cancer* のみに投稿しています。これまでに未発表かつプレプリントとしても未掲載の原著研究を報告するものであり、他誌で掲載審査中ではありません。全著者が本原稿を承認し、投稿に同意しています。著者らに競合利益はなく、本研究に特定の資金提供は受けていません。解析には NCI Genomic Data Commons のオープンアクセスデータと出典研究の公表済み臨床表のみを用い、新たな参加者データは収集していません。横断研究用の STROBE チェックリスト(記入済み)を補足資料として添付しています。生成 AI ツールは、方法に記載のとおり、著者の監督の下でコード開発・整合性検査・原稿文の起草と編集を支援しました。
 
-責任著者: Kotaro Harakawa、長崎大学原爆後障害医療研究所 分子腫瘍・診断医学分野(Department of Molecular Oncology and Diagnostic Medicine, Atomic Bomb Disease Institute, Nagasaki University)、〒852-8523 長崎市坂本 1-12-4、e-mail ktrh61@gmail.com、ORCID 0009-0004-1086-8046。
+責任著者: Kotaro Harakawa、長崎大学原爆後障害医療研究所 分子腫瘍学分野(Department of Molecular Oncology, Atomic Bomb Disease Institute, Nagasaki University)、〒852-8523 長崎市坂本 1-12-4、e-mail ktrh61@gmail.com、ORCID 0009-0004-1086-8046。
 
 敬具
 
