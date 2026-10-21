@@ -1288,5 +1288,6 @@
 - 2026-10-21(続 193): **見出し込み 5,009 語(超過 9)は削減せず現状維持**(研究者裁定: 編集部 09-04 返答の裁量幅内、本文のみ 4,941 で上限内)。予備案(自動計数で弾かれた場合のみ): 文体語 9 語 = Discussion 冒頭 In this study,(3)/Together,(1)/in effect→effectively(1)/directly(1)/itself ×2(2)/the present sequencing platform→this(1)。
 - 2026-10-21(続 194): **著者ブロック: Mitsutake の所属を (1) → (1, 2)**(研究者指示: Radiation Molecular Epidemiology にも籍があるため、出典 https://www.genken.nagasaki-u.ac.jp/drme/)。原本 submission_declarations.md、本文・補足の表紙は自動生成で同期(Mitsutake^1,2^ を確認)。所属訂正 2 件(2026-09-14)は反映済みを照合。make_submission 警告 0、make_docx 10 件 token差 0。
 - 2026-10-21(続 195): **Authors' contributions: 「KH conceived the study, developed …」→「NM conceived the study. KH designed the study, developed and executed …」**(NM の提案、研究者承諾)。VAS/NM の層別設計・AS 帯の寄与、VAS の分類器の着想、全員承認の文は不変。原本 submission_declarations.md、本文 Additional Information は自動生成で同期。make_submission 警告 0、make_docx 10 件 token差 0。
+- 2026-10-21(続 196): **カバーレター: 「; the source cohort's continuous dose–expression analyses had not identified a corresponding signal」を削除**(研究者 Go。v1 で共著者が「先行解析の無信号が動機という認識ではない」と述べた読みを許す唯一の残存箇所。本文 v2 は動機を Morton の肯定的知見から導く形に既に改稿済み。前段落の設計理由で論理は保たれる)。和訳同期。make_submission 警告 0、make_docx 10 件 token差 0。
   最終承認・表 1〜3 の個別ファイル化(投稿時)・公開リポジトリと DOI(Data/Code availability 記入)・
   フェーズ6 再構築確認・投稿システム側の入力(キーワード・推薦査読者があれば)
