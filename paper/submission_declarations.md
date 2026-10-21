@@ -30,8 +30,8 @@ advice on manuscript preparation.
 
 ### Authors' contributions
 
-KH conceived the study, developed and executed the full analysis pipeline, performed all
-statistical analyses, and drafted the manuscript. VAS and NM contributed the driver-based
+NM conceived the study. KH designed the study, developed and executed the full analysis
+pipeline, performed all statistical analyses, and drafted the manuscript. VAS and NM contributed the driver-based
 stratification design and the Assigned Share banding approach, including the specification
 of the NIH IREP input parameters; VAS additionally proposed the initial concept of a
 per-case predictive classification, which motivated the relative-expression-ordering panel
